@@ -1,0 +1,34 @@
+#!/usr/bin/python
+# this script performs the installation of all the needed
+# packages, it will ask for your sudo permision!!!!!
+
+
+import os
+
+print "This script will install all the dependencies, it will ask for sudo permission!!!"
+
+
+def install(what):
+  print "=========================="
+  print "=========================="
+  print "Installing ",what
+  print "=========================="
+  print "=========================="
+  os.system("sudo apt-get install "+what)
+
+
+packages = ["python-scipy"]
+packages += ["python-numpy"]
+packages += ["python-matplotlib"]
+packages += ["python-visual"]
+packages += ["gfortran"]
+packages += ["liblapack-dev"]
+packages += ["mayavi2"]
+
+for p in packages:
+  install(p)
+
+
+print
+print "All needed packages installed, now run build_graphene-like"
+

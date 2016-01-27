@@ -1,0 +1,70 @@
+#!/usr/bin/python
+
+# this script installs the quantum honeycomp package
+
+
+
+import os
+import sys
+
+f90src = "f90src"  # fortran 90 source
+
+pwd = os.getcwd() # get the current location
+
+print "\n\n"
+print "Checking if all the packages are present..."
+
+
+
+# check if all the python packages are present
+try:
+  import visual
+except:
+  print "ERROR, python-visual package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import matplotlib
+except:
+  print "ERROR, python-matplotlib package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+try:
+  import numpy
+except:
+  print "ERROR, python-numpy package not installed"
+  print "STOPPING"
+  sys.exit()
+
+try:
+  import scipy
+except:
+  print "ERROR, python-scipy package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import visual
+except:
+  print "ERROR, python-visual package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import mayavi
+except:
+  print "ERROR, python-mayavi package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+print "All the needed packages are installed"

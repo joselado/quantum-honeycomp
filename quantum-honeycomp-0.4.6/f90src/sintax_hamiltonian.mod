@@ -1,0 +1,490 @@
+GFORTRAN module version '10' created from sintax_hamiltonian.f90
+MD5:468313232748fa8a9f09a12e76517bad -- If you edit this, you'll get what you deserve.
+
+(() () () () () () () () () () () () () () () () () () () () () () ()
+() () () ())
+
+()
+
+(('hamiltonian_type' 'system_variables' 2) ('hopping_type'
+'system_variables' 3) ('klist_type' 'system_variables' 4))
+
+()
+
+()
+
+()
+
+(2 'Hamiltonian_type' 'system_variables' '' 1 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ())
+0 0 () () 0 ((5 'has_spinpol' (LOGICAL 4 0 0 0 LOGICAL ()) () (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 1)) (6
+'has_lattice' (LOGICAL 4 0 0 0 LOGICAL ()) () (UNKNOWN-FL UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0
+0 0 LOGICAL ()) 0 0)) (7 'has_positions' (LOGICAL 4 0 0 0 LOGICAL ()) ()
+(UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS (CONSTANT (LOGICAL 4 0 0 0 LOGICAL ()) 0 0)) (8 'positions'
+(REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
+UNKNOWN-ACCESS ()) (9 'lattice_vectors' (REAL 8 0 0 0 REAL ()) (2 0
+DEFERRED () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (10
+'reciprocal_vectors' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
+DIMENSION) UNKNOWN-ACCESS ()) (11 'dimensionality' (INTEGER 4 0 0 0
+INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0
+0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0')) (12
+'norbitals' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0
+0 0 INTEGER ()) 0 '2')) (13 'num_hoppings' (INTEGER 4 0 0 0 INTEGER ())
+() (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0')) (14 'onsite'
+(COMPLEX 8 0 0 0 COMPLEX ()) (2 0 DEFERRED () () () ()) (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION)
+UNKNOWN-ACCESS ()) (15 'directional_hoppings' (DERIVED 3 0 0 0 DERIVED ())
+(1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS (STRUCTURE (DERIVED 3
+0 0 0 DERIVED ()) 0 (((NULL (REAL 8 0 0 0 REAL ()) 0) ()) ((NULL (
+COMPLEX 8 0 0 0 COMPLEX ()) 0) ()) (() ())) ()))) PUBLIC (() () () ()) ()
+0 0 1332311)
+3 'Hopping_type' 'system_variables' '' 1 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ())
+0 0 () () 0 ((16 'direction' (REAL 8 0 0 0 REAL ()) (1 0 DEFERRED () ())
+(UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
+DIMENSION) UNKNOWN-ACCESS ()) (17 'hopping' (COMPLEX 8 0 0 0 COMPLEX ())
+(2 0 DEFERRED () () () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (18 'label'
+(CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0
+'40'))) () (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0)
+UNKNOWN-ACCESS ())) PUBLIC (() () () ()) () 0 0 54340918)
+4 'Klist_type' 'system_variables' '' 1 ((DERIVED UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOC_COMP) (UNKNOWN 0 0 0 0 UNKNOWN ())
+0 0 () () 0 ((19 'nkpoints' (INTEGER 4 0 0 0 INTEGER ()) () (UNKNOWN-FL
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) UNKNOWN-ACCESS (
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0')) (20 'nev_found' (INTEGER 4
+0 0 0 INTEGER ()) (1 0 DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())
+(21 'kpoint' (REAL 8 0 0 0 REAL ()) (2 0 DEFERRED () () () ()) (
+UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0 ALLOCATABLE
+DIMENSION) UNKNOWN-ACCESS ()) (22 'weight' (REAL 8 0 0 0 REAL ()) (1 0
+DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
+0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ()) (23 'kname' (CHARACTER 1 0
+0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) (1 0
+DEFERRED () ()) (UNKNOWN-FL UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN
+0 0 ALLOCATABLE DIMENSION) UNKNOWN-ACCESS ())) PUBLIC (() () () ()) () 0
+0 43167272)
+24 'acos' '(intrinsic)' '' 1 ((PROCEDURE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0 FUNCTION) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 24
+() () () 0 0)
+25 'autosmearing_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+26 'bands' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (27 28 29 30
+31 32 33) 0 0)
+34 'bands_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+30 'bands_operators_option' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0
+() () () 0 0)
+35 'berry_curv_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+36 'berry_phase_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+37 'clean_waves' 'system_variables' '' 1 ((PROCEDURE UNKNOWN-INTENT
+MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0
+0 () () 0 () () () 0 0)
+38 'create_half_bz_klist' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 39 0 (40) () 0 () () () 0 0)
+41 'define_num_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+42 'denmat_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+43 'density_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+44 'density_matrix' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (45
+46 47) 0 0)
+48 'development' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (49
+50 51) 0 0)
+52 'dielectric' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (53
+54 55 56 57 58 59 60 61 62 63 64) 0 0)
+61 'dielectric_type' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () () 0
+() () () 0 0)
+65 'dk_becurv' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+31 'do_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+66 'do_berry' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+45 'do_denmat' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+60 'do_dielectric' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+67 'do_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0
+() () () 0 0)
+68 'do_ldos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+69 'do_scf' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0
+() () () 0 0)
+70 'dos' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (71 72 73 74
+25 75 76 41 67 68 77) 0 0)
+78 'dos_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+77 'dos_operators_option' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0
+() () () 0 0)
+33 'economic_memory_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+79 'electrons' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (80
+81 82) 0 0)
+83 'emax' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
+0)
+29 'emax_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+56 'emax_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+74 'emax_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+84 'emin' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
+0)
+28 'emin_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+55 'emin_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+73 'emin_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+85 'energies' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0
+0 0 REAL ()) 0 0 () (1 0 DEFERRED () ()) 0 () () () 0 0)
+86 'energies_k' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0
+0 0 REAL ()) 0 0 () (1 0 DEFERRED () ()) 0 () () () 0 0)
+76 'estep_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+58 'ewindow_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+87 'expand_bz' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+82 'extra_electrons' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ())
+0 0 () () 0 () () () 0 0)
+88 'fermi' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+80 'filling' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+89 'hamiltonian' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (DERIVED 2 0 0 0 DERIVED ()) 0 0
+() () 0 () () () 0 0)
+90 'hamiltonian_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+91 'hamiltonian_type' 'system_variables' '' 1 ((PROCEDURE UNKNOWN-INTENT
+UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
+()) 0 0 () () 0 () () () 0 0)
+92 'has_tr' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0
+() () () 0 0)
+93 'hopping' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 0 COMPLEX ()) 0 0 () (2 0 DEFERRED () () () ()) 0 () () () 0 0)
+94 'hopping_type' 'system_variables' '' 1 ((PROCEDURE UNKNOWN-INTENT
+UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
+()) 0 0 () () 0 () () () 0 0)
+95 'hubbard_scf' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+96 'im' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 () () 0 () ()
+() 0 0)
+97 'initialize_eigenstates' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+98 'initialize_eigenvalues' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+99 'initialize_eigenvalues_k' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+100 'initialize_eigenvectors_k' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+101 'initialize_hamiltonian' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+102 'initialize_klist' 'system_variables' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+103 'inputs' 'inputs' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+104 'io_files' 'io_files' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0
+0)
+105 'is_collinear' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+106 'klist' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN EXPLICIT-SAVE 0 0) (DERIVED 4 0 0 0 DERIVED ()) 0 0
+() () 0 () () () 0 0)
+32 'klist_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0 () () () 0 0)
+107 'klist_berry' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '30'))) 0 0 () () 0 () () () 0 0)
+108 'klist_type' 'system_variables' '' 1 ((PROCEDURE UNKNOWN-INTENT
+UNKNOWN-PROC DECL UNKNOWN 0 0 FUNCTION GENERIC) (UNKNOWN 0 0 0 0 UNKNOWN
+()) 0 0 () () 0 () () () 0 0)
+109 'kpoints' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (
+110 111 112 113 114 87) 0 0)
+115 'list_hop_dirs' 'sintax_hamiltonian' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (REAL 8 0
+0 0 REAL ()) 0 0 () (2 0 DEFERRED () () () ()) 0 () () () 0 0)
+116 'list_hop_names' 'sintax_hamiltonian' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (
+CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '40')))
+0 0 () (1 0 DEFERRED () ()) 0 () () () 0 0)
+117 'magnetism_file' 'io_files' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((
+CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '80'))) 0 0 () () 0 () () () 0 0)
+118 'max_ite' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+119 'max_scf_err' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+120 'mean_field_amplitude' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ())
+0 0 () () 0 () () () 0 0)
+121 'mean_field_matrix' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0
+() () () 0 0)
+122 'mean_field_operators' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0
+() () () 0 0)
+123 'mix_coef' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+124 'nev_found' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+110 'nkpoints' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+125 'nkpoints_connection' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0
+INTEGER ()) 0 0 () () 0 () () () 0 0)
+126 'norbitals' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+71 'num_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+53 'num_ene_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+127 'num_old_ham' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+128 'num_wf' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+129 'num_wf_k' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+130 'onsite' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 0 COMPLEX ()) 0 0 () (2 0 DEFERRED () () () ()) 0 () () () 0 0)
+64 'phi_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+131 'pi' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
+0)
+57 'q_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () ()
+() 0 0)
+132 'read_inputs' 'inputs' '' 1 ((PROCEDURE UNKNOWN-INTENT MODULE-PROC
+DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 ()
+() () 0 0)
+111 'refine_kmesh_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0
+INTEGER ()) 0 0 () () 0 () () () 0 0)
+114 'refine_kmesh_denmat' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0
+INTEGER ()) 0 0 () () 0 () () () 0 0)
+113 'refine_kmesh_dielectric' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0
+INTEGER ()) 0 0 () () 0 () () () 0 0)
+112 'refine_kmesh_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (INTEGER 4 0 0 0
+INTEGER ()) 0 0 () () 0 () () () 0 0)
+133 'save_mean_field' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+134 'scf_convergence' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
+0 () () (127 118 135 123 119 69 136 122 95 121 120 133 137 105 138) 0 0)
+139 'setup_hop_names' 'sintax_hamiltonian' '' 1 ((PROCEDURE
+UNKNOWN-INTENT MODULE-PROC DECL UNKNOWN 0 0 SUBROUTINE) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+81 'shift_fermi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+136 'shift_to_zero' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+49 'show_debug' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+50 'show_diagonalization' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+51 'show_read_hamiltonian' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+140 'sintax_hamiltonian' 'sintax_hamiltonian' '' 1 ((MODULE
+UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0
+UNKNOWN ()) 0 0 () () 0 () () () 0 0)
+135 'smearing' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+54 'smearing_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+75 'smearing_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ()) 0 0 () ()
+0 () () () 0 0)
+137 'smearing_type_scf' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (CHARACTER 1 0 0 0
+CHARACTER ((CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '20'))) 0 0 () () 0
+() () () 0 0)
+141 'system_dimension' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
+() () 0 () () () 0 0)
+142 'system_variables' 'system_variables' '' 1 ((MODULE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () ()
+0 () () () 0 0)
+62 'temperature_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ())
+0 0 () () 0 () () () 0 0)
+47 'temperature_denmat' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (REAL 8 0 0 0 REAL ())
+0 0 () () 0 () () () 0 0)
+143 'topology' 'inputs' '' 1 ((NAMELIST UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () (66
+65 107 92 125) 0 0)
+138 'ultrafast_mf' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+144 'use_ewindow' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+27 'use_ewindow_bands' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+72 'use_ewindow_dos' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0
+LOGICAL ()) 0 0 () () 0 () () () 0 0)
+145 'use_green' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0 () ()
+() 0 0)
+59 'use_rpa' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+146 'wf' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0
+COMPLEX ()) 0 0 () (2 0 DEFERRED () () () ()) 0 () () () 0 0)
+147 'wf_k' 'system_variables' '' 1 ((VARIABLE UNKNOWN-INTENT
+UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8
+0 0 0 COMPLEX ()) 0 0 () (2 0 DEFERRED () () () ()) 0 () () () 0 0)
+46 'write_denmat' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+63 'write_full_chi' 'inputs' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 IN_NAMELIST) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0
+() () 0 () () () 0 0)
+40 'mesh' '' '' 39 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+UNKNOWN 0 0 DUMMY) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (INTEGER 4 0
+0 0 INTEGER ()) 0 '30'))) 0 0 () () 0 () () () 0 0)
+)
+
+('Hamiltonian_type' 0 2 'Hopping_type' 0 3 'Klist_type' 0 4 'acos' 0 24
+'autosmearing_dos' 0 25 'bands' 0 26 'bands_file' 0 34
+'bands_operators_option' 0 30 'berry_curv_file' 0 35 'berry_phase_file'
+0 36 'clean_waves' 0 37 'create_half_bz_klist' 0 38 'define_num_dos' 0
+41 'denmat_file' 0 42 'density_file' 0 43 'density_matrix' 0 44
+'development' 0 48 'dielectric' 0 52 'dielectric_type' 0 61 'dk_becurv'
+0 65 'do_bands' 0 31 'do_berry' 0 66 'do_denmat' 0 45 'do_dielectric' 0
+60 'do_dos' 0 67 'do_ldos' 0 68 'do_scf' 0 69 'dos' 0 70 'dos_file' 0 78
+'dos_operators_option' 0 77 'economic_memory_bands' 0 33 'electrons' 0
+79 'emax' 0 83 'emax_bands' 0 29 'emax_chi' 0 56 'emax_dos' 0 74 'emin'
+0 84 'emin_bands' 0 28 'emin_chi' 0 55 'emin_dos' 0 73 'energies' 0 85
+'energies_k' 0 86 'estep_dos' 0 76 'ewindow_chi' 0 58 'expand_bz' 0 87
+'extra_electrons' 0 82 'fermi' 0 88 'filling' 0 80 'hamiltonian' 0 89
+'hamiltonian_file' 0 90 'hamiltonian_type' 0 91 'has_tr' 0 92 'hopping'
+0 93 'hopping_type' 0 94 'hubbard_scf' 0 95 'im' 0 96
+'initialize_eigenstates' 0 97 'initialize_eigenvalues' 0 98
+'initialize_eigenvalues_k' 0 99 'initialize_eigenvectors_k' 0 100
+'initialize_hamiltonian' 0 101 'initialize_klist' 0 102 'inputs' 0 103
+'io_files' 0 104 'is_collinear' 0 105 'klist' 0 106 'klist_bands' 0 32
+'klist_berry' 0 107 'klist_type' 0 108 'kpoints' 0 109 'list_hop_dirs' 0
+115 'list_hop_names' 0 116 'magnetism_file' 0 117 'max_ite' 0 118
+'max_scf_err' 0 119 'mean_field_amplitude' 0 120 'mean_field_matrix' 0
+121 'mean_field_operators' 0 122 'mix_coef' 0 123 'nev_found' 0 124
+'nkpoints' 0 110 'nkpoints_connection' 0 125 'norbitals' 0 126 'num_dos'
+0 71 'num_ene_chi' 0 53 'num_old_ham' 0 127 'num_wf' 0 128 'num_wf_k' 0
+129 'onsite' 0 130 'phi_chi' 0 64 'pi' 0 131 'q_chi' 0 57 'read_inputs'
+0 132 'refine_kmesh_bands' 0 111 'refine_kmesh_denmat' 0 114
+'refine_kmesh_dielectric' 0 113 'refine_kmesh_dos' 0 112 'save_mean_field'
+0 133 'scf_convergence' 0 134 'setup_hop_names' 0 139 'shift_fermi' 0 81
+'shift_to_zero' 0 136 'show_debug' 0 49 'show_diagonalization' 0 50
+'show_read_hamiltonian' 0 51 'sintax_hamiltonian' 0 140 'smearing' 0 135
+'smearing_chi' 0 54 'smearing_dos' 0 75 'smearing_type_scf' 0 137
+'system_dimension' 0 141 'system_variables' 0 142 'temperature_chi' 0 62
+'temperature_denmat' 0 47 'topology' 0 143 'ultrafast_mf' 0 138
+'use_ewindow' 0 144 'use_ewindow_bands' 0 27 'use_ewindow_dos' 0 72
+'use_green' 0 145 'use_rpa' 0 59 'wf' 0 146 'wf_k' 0 147 'write_denmat'
+0 46 'write_full_chi' 0 63)

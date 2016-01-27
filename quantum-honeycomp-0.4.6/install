@@ -1,0 +1,119 @@
+#!/usr/bin/python
+
+# this script installs the quantum honeycomp package
+
+
+
+import os
+import sys
+
+f90src = "f90src"  # fortran 90 source
+
+pwd = os.getcwd() # get the current location
+
+print "\n\n"
+print "Checking if all the packages are present..."
+
+
+
+# check if all the python packages are present
+try:
+  import visual
+except:
+  print "ERROR, python-visual package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import matplotlib
+except:
+  print "ERROR, python-matplotlib package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+try:
+  import numpy
+except:
+  print "ERROR, python-numpy package not installed"
+  print "STOPPING"
+  sys.exit()
+
+try:
+  import scipy
+except:
+  print "ERROR, python-scipy package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import visual
+except:
+  print "ERROR, python-visual package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+try:
+  import mayavi
+except:
+  print "ERROR, python-mayavi package not installed"
+  print "STOPPING"
+  sys.exit()
+
+
+
+
+
+#print "Done!\n"
+
+
+
+
+import subprocess
+
+print "Compiling...."
+
+# compile f2py routines
+os.chdir(pwd+"/pysrc")
+os.system("python compile_fortran.py") # compile fortran programs
+os.chdir("..")
+
+
+# compile tb90.x
+os.chdir(pwd+"/"+f90src) # go to srcf90
+os.system('chmod +x compilation.sh')  # compile 
+os.system("rm tb90.x ")
+os.system('./compilation.sh')  # compile 
+if os.path.isfile("tb90.x"):
+  print "Successful compilation"
+else:
+  print "Compilation failed, check the file compilation.sh"
+  sys.exit()  
+
+
+
+
+
+# copy programs to the bin directory
+os.chdir(pwd+'/bin') # go to bin directory
+os.system('cp '+pwd+'/utilities/* '+pwd+'/bin') # copy utilities
+os.system('cp '+pwd+"/"+f90src+"/tb90.x "+pwd+"/bin") # copy tb90.x
+fx = open('qhroot.py','w')
+fx.write('path='+"'"+pwd+"/files'\n")
+fx.close()
+os.system('chmod +x *')   # give execution permission
+
+print "Done!\n\n"
+
+print "Add to your .bashrc\n\n"
+
+print "  export PATH=$PATH:"+pwd+"/bin\n\n\n"
+
+
+
