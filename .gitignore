@@ -1,5 +1,6 @@
 *.OUT
 *.pyc
 *.so
+*.o
 __pycache__
 *.swp
