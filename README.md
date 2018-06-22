@@ -8,13 +8,13 @@ This program allows to perform tight binding calculations with a user friendly i
 # How to install #
 
 The program has been developed to run in Linux machines. Execute the script "install" to compile all the necesary libraries,
-afterwards add to your .bashrc the folder ../bin, where the script quantum-honeycomp is present
+afterwards add to your .bashrc the folder ../bin, where the script quantum-honeycomp is present. 
 
 This program uses several python libraries. For Debian/Ubuntu machines, a script called "autoinstall" will install all the
-necessary libraries
+necessary libraries.
 
-For using this program in Mac or Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
-a version of ubuntu in that virtual machine, and following the previous instructions
+For using this program in Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
+a version of ubuntu in that virtual machine, and following the previous instructions.
 
 
 # Capabilities #
