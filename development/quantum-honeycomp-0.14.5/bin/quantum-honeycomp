@@ -1,0 +1,66 @@
+#!/usr/bin/python
+from __future__ import print_function
+import os
+import platform
+
+def get_qhroot():
+  """Gets the root path of quantum honeycomp"""
+  return os.environ["QHROOT"]+"/"
+
+qhroot = get_qhroot()  # get the root path
+
+
+def get_anaconda_command(name="python"):
+  """Return the path for Anaconda Python, which has pyqt by default"""
+  os.system("rm -f /tmp/qh_commands.txt") # remove
+  os.system("which -a "+name+"  > /tmp/qh_commands.txt") # run the command
+  lines = open("/tmp/qh_commands.txt").read() # read the lines
+  lines = lines.split("\n") # split the lines
+  del lines[-1] # remove the last one
+  print("Found ",len(lines),"python paths\n")
+  for l in lines: # loop over pythons
+    l = l.split(" ")[-1] # get last line 
+    print(l)
+    if "anaconda" in l: 
+      print("Found Anaconda ",name,"in",l)
+      return l
+  print("Anaconda",name,"not found")
+  raise # not found
+#  result = subprocess.check_output(["which -a python"])
+
+
+
+
+def get_python():
+  if platform.system()=="Linux":
+    python = "/usr/bin/python3" # Python 3
+  else:
+    python ="python" # python for mac
+  return python
+
+# get the python path
+try:
+  python = get_anaconda_command("python3")
+except:
+  python = get_python() # get the Python path
+
+python = get_python() # get the Python path
+
+
+
+if not platform.system()=="Linux": # For Mac
+  try:
+    python = get_anaconda_command("python")
+  except: python="python"
+  os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
+
+else: # For Linux
+  try:
+    from gi.repository import Gtk as gtk
+    print("Running GTK interface")
+    os.system(python+" "+qhroot+"bin/quantum-honeycomp-gtk")
+  except:
+    os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
+  #  os.system("quantum-honeycomp-pyqt")
+    print("Running PyQt interface")
+  #  exit()
