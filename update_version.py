@@ -5,7 +5,6 @@ import numpy as np
 
 l = np.genfromtxt("VERSION.TXT") # read the version
 n = l[2] # get the version number
-n += 1 # increase number
 a,b,c = str(int(l[0])),str(int(l[1])),str(int(n)) # create the three numbers
 
 
@@ -27,6 +26,7 @@ import sys
 
 if len(sys.argv)>1: # if input provided
   if "update" in sys.argv[1]:
+    c= str(int(n + 1)) # increase number
     open("VERSION.TXT","w").write(a+"  "+b+"  "+c)
 
 else:
