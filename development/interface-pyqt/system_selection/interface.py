@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -94,9 +94,13 @@ class Ui_MainWindow(object):
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(260, 170, 331, 18))
         self.label.setObjectName("label")
+        self.qh_version = QtWidgets.QLabel(self.centralwidget)
+        self.qh_version.setGeometry(QtCore.QRect(110, 600, 181, 41))
+        self.qh_version.setText("")
+        self.qh_version.setObjectName("qh_version")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 890, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 890, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)

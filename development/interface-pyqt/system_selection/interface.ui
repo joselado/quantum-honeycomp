@@ -218,6 +218,19 @@
      <string>Select the system you want to compute</string>
     </property>
    </widget>
+   <widget class="QLabel" name="qh_version">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>600</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -225,7 +238,7 @@
      <x>0</x>
      <y>0</y>
      <width>890</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
