@@ -16,11 +16,33 @@ names += [("kanemele","kanemelef90.f90","kanemelef90")]
 names += [("green","greenf90.f90","greenf90")] 
 names += [("specialhopping","specialhoppingf90.f90","specialhoppingf90")] 
 
+
+
+def get_anaconda_command(name="python"):
+  """Return the path for Anaconda Python, which has pyqt by default"""
+  os.system("rm -f /tmp/qh_commands.txt") # remove
+  os.system("which -a "+name+"  > /tmp/qh_commands.txt") # run the command
+  lines = open("/tmp/qh_commands.txt").read() # read the lines
+  lines = lines.split("\n") # split the lines
+  del lines[-1] # remove the last one
+  print("Found ",len(lines),"python paths\n")
+  for l in lines: print(l)
+  for l in lines: # loop over pythons
+    l = l.split(" ")[-1] # get last line 
+    if "anaconda" in l:
+      print("\nFound Anaconda ",name,"in",l)
+      return l
+  print("Anaconda",name,"not found")
+  raise
+
+
+
+
 import platform
 if platform.system()=="Linux":
   compiler = "/usr/bin/f2py3" # name of the compiler
 else: 
-  compiler = "f2py" # name of the compiler
+  compiler = get_anaconda_command("f2py") # name of the compiler
 
 
 for name in names:
