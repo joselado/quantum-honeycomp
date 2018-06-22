@@ -56,7 +56,7 @@ def call_mode(mode,folder=None,pyqt=False):
       os.system(python+" "+path+"interface-pyqt/"+mode+"/"+mode+".py   "+path +"  &")
     else:
       if platform.system()=="Linux": # for Linux
-        os.system("/usr/bin/python3 "+path+"systems/"+mode+"/"+mode+".py   "+path +"  &")
+        os.system(python+" "+path+"systems/"+mode+"/"+mode+".py   "+path +"  &")
       else:
         print("Not available in",platform.system())
   return launch

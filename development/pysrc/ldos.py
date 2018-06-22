@@ -238,7 +238,7 @@ def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,random=False):
     fo.flush() # flush
   fo.close() # close file
   # Now calculate the DOS
-  from dosf90 import calculate_dos
+  from dos import calculate_dos
   es2 = np.linspace(min(es),max(es),len(es)*10)
   ys = calculate_dos(evals,es2,delta) # use the Fortran routine
   from dos import write_dos
