@@ -21,6 +21,7 @@ os.system("tar -cvf "+name+".tar "+name) # create new tar file
 os.system("rm -r "+name) # remove the folder
 os.system("cp "+name+".tar quantum-honeycomp-latest.tar") # create new tar file
 
+#exit()
 
 import sys
 
