@@ -28,7 +28,7 @@ import sys
 if len(sys.argv)>1: # if input provided
   if "update" in sys.argv[1]:
     c= str(int(n + 1)) # increase number
-    open("VERSION.TXT","w").write(a+"  "+b+"  "+c)
+    open("VERSION.TXT","w").write(a+" "+b+" "+c)
 
 else:
   print("Version number not updated, current is",a,b,c)
