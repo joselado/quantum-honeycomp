@@ -39,7 +39,7 @@ def get_python():
   if platform.system()=="Linux":
     python = "/usr/bin/python3" # Python 3
   else:
-    python ="python" # python for mac
+    python = get_anaconda_command("python") # get Anaconda Python
   return python
 
 # get the python path
@@ -47,11 +47,6 @@ try:
   python = get_anaconda_command("python") # get Anaconda Python
 except:
   python = get_python() # get the Python path
-
-
-python = get_python() # get the Python path
-
-
 
 
 
