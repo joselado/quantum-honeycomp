@@ -1,0 +1,60 @@
+#!/usr/bin/python3
+
+import subprocess
+import sys
+import os
+
+def get_qhroot():
+  """Gets the root path of quantum honeycomp"""
+  return os.environ["QHROOT"]+"/"
+
+
+path = get_qhroot()  # get the root path
+print("QH Path is",path)
+
+
+from gi.repository import Gtk as gtk
+builder = gtk.Builder()
+
+
+# get the signls from python script
+sys.path.append(path+"systems")
+
+# import the library for the different modes
+import qhmodes
+modes_dict = {}
+for m in qhmodes.modes: # loop over modes
+  modes_dict[m] = qhmodes.call_mode(path,m)  # create a function for each mode
+modes_dict["on_window_destroy"] = gtk.main_quit  # close the main window
+
+
+def update_qh(self):
+  qhpath = get_qhroot()
+  os.chdir(qhpath) # go to the folder
+  os.system("cp download_latest.py ../") # copy script
+  os.chdir("..") # one folder less
+  os.system("python download_latest.py") # execute script
+  print(qhpath) # get the path
+
+
+def qh_pyqt(self):
+  os.system("quantum-honeycomp-pyqt")
+
+
+modes_dict["update_qh"] = update_qh
+modes_dict["qh_pyqt"] = qh_pyqt
+
+##### Main App #####
+class qhApp(object):
+        def __init__(self):
+            builder.add_from_file(path+"/systems/qhApp.xml")
+            builder.connect_signals(modes_dict)  # add the different modes
+            self.window = builder.get_object("qh_window")
+            self.window.show()
+
+
+
+app = qhApp()  # launch the app
+gtk.main()  # infinite loop
+
+

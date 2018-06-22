@@ -1,0 +1,36 @@
+#!/usr/bin/python
+# this script performs the installation of all the needed
+# packages, it will ask for your sudo permision!!!!!
+
+
+import os
+
+print("This script will install all the dependencies, it will ask for sudo permission!!!")
+
+
+def install(what):
+  print "=========================="
+  print "=========================="
+  print "Installing ",what
+  print "=========================="
+  print "=========================="
+  os.system("sudo apt-get install -y "+what)
+
+
+packages = ["python3-scipy"]
+packages += ["python3-numpy"]
+packages += ["python3-dev"]
+packages += ["python3-matplotlib"]
+packages += ["python3-pyqt5"]
+packages += ["python-visual"]
+packages += ["gfortran"]
+packages += ["liblapack-dev"]
+packages += ["mayavi2"]
+packages += ["gi"]
+
+for p in packages:
+  install(p)
+
+
+print("All needed packages installed")
+
