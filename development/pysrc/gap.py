@@ -138,3 +138,45 @@ def optimize_gap(h,direct=True,ntries=10):
   
 #  else: # indirect gap
 
+
+
+
+def indirect_gap(h,sparse=True,mode="refine"):
+  """Calculates the gap for a 2d Hamiltonian by doing
+  a kmesh sampling. It will return the positive energy with smaller value"""
+  from scipy.optimize import minimize
+  hk_gen = h.get_hk_gen() # generator
+  def gete(k): # return the energies
+    hk = hk_gen(k) # Hamiltonian 
+    if h.is_sparse: es,ew = lgs.eigsh(hk,k=10,which="LM",sigma=0.0,tol=1e-06)
+    else: es = lg.eigvalsh(hk) # get eigenvalues
+    return es # get the energies
+  # We will assume that the chemical potential is at zero
+  def func(k): # conduction band eigenvalues
+    es = gete(k) # get eigenvalues
+    es = es[es>0.] # conduction band
+    return min(es) # minimum energy
+  def funv(k): # valence band eigenvalues
+    es = gete(k) # get eigenvalues
+    es = -es[es<0.] # valence band
+    return min(es) # maximum energy
+  def opte(f):
+    """Optimize the eigenvalues"""
+    from scipy.optimize import differential_evolution
+    from scipy.optimize import minimize
+    bounds = [(0.,1.) for i in range(h.dimensionality)]
+    x0 = np.random.random(h.dimensionality) # inital vector
+#    res = minimize(f,x0,bounds=bounds)
+    res = differential_evolution(f,bounds=bounds)
+    return f(res.x)
+  ev = opte(funv) # optimize valence band
+#  return ev
+  ec = opte(func) # optimize conduction band
+  return ec+ev # return result
+#  return np.min(gaps)
+
+
+
+
+
+

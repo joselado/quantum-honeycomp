@@ -78,6 +78,12 @@ def set_value(name,text):
   app.processEvents() # update the interface
 
 
+def is_checked(name):
+  obj = getattr(form,name) # get the object
+  return obj.isChecked()
+
+
+
 def set_image(name,path):
   """Set a certain image"""
   label = getattr(form,name) # get the object

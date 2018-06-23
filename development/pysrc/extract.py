@@ -56,7 +56,7 @@ def my(m):
   n = m.shape[0]//2 # number of sites
   ds = np.zeros(n).real # pairing
   for i in range(n):
-    ds[i] = m[2*i,2*i+1].imag
+    ds[i] = -m[2*i,2*i+1].imag
   return ds
 
 

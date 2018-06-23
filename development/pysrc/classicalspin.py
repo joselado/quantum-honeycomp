@@ -1,7 +1,7 @@
 import numpy as np
 import classicalspinf90
 import neighbor
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix,csc_matrix,coo_matrix
 
 zero = np.matrix(np.zeros((3,3)))  # real matrix
 iden = np.matrix(np.identity(3))  # real matrix
@@ -17,10 +17,13 @@ class SpinModel(): # class for a spin Hamiltonian
     self.b = np.zeros((len(g.r),3)) # magnetic field
     self.j = np.array([zero]) # empty list
     self.pairs = np.array([[0,0]]) # empty list
-  def add_heisenberg(self):
+  def add_heisenberg(self,fun=None):
+    h = self.geometry.get_hamiltonian(has_spin=False,fun=fun)
+    m = coo_matrix(h.get_hk_gen()([0.,0.,0.])) # get onsite matrix
     (pairs,js) = add_heisenberg(self.geometry.r)
+    pairs = np.array([m.row,m.col]).transpose() # convert to array
     self.pairs = pairs
-    self.j = -js
+    self.j = [ j.real*np.identity(3) for j in m.data] # store
   def add_field(self,v):
     """Add magnetic field"""
     self.b += np.array([v for i in range(self.nspin)])
@@ -30,7 +33,7 @@ class SpinModel(): # class for a spin Hamiltonian
       eout = classicalspinf90.energy(self.theta,self.phi,self.b,self.j,
                self.pairs)
     return eout
-  def minimize_energy(self,theta0=None,phi0=None,tries=1,calle=None):
+  def minimize_energy(self,theta0=None,phi0=None,tries=10,calle=None):
     """Minimize the energy of the spin model"""
     thetas = [None for i in range(tries)]
     phis = [None for i in range(tries)]
@@ -45,6 +48,7 @@ class SpinModel(): # class for a spin Hamiltonian
       es[i] = e
     imin = es.index(min(es)) # minimum
     print("Minimum energy",es[imin])
+    print("Minimum energy per spin",es[imin]/len(self.phi))
     self.theta = thetas[imin].copy()
     self.phi = phis[imin].copy()
     self.update_magnetization()
@@ -52,7 +56,7 @@ class SpinModel(): # class for a spin Hamiltonian
   def write(self,label=""):
     """Write in file"""
     self.geometry.write() # write the geometry
-    write_magnetization(self.theta,self.phi) # write maagnetization
+    write_magnetization(self) # write maagnetization
   def add_tensor(self,fun):
     """Add a tensor interaction"""
     pairs,js = add_tensor(self,fun)
@@ -64,6 +68,7 @@ class SpinModel(): # class for a spin Hamiltonian
     self.j = np.concatenate([self.j,js])
   def get_jacobian(self):
     """Return a function that calculated the Jacobian"""
+#    return None
     return get_jacobian(self.b,self.j,self.pairs)
   def load_magnetism(self,name="MAGNETIZATION.OUT"):
     """Read the magnetization from a file"""
@@ -135,13 +140,17 @@ def minimize_energy(sm,theta0=None,phi0=None,tol=1e-5,calle=None):
   phi = result.x[sm.nspin:sm.nspin*2]
   return theta,phi
 
-def write_magnetization(theta,phi):
+def write_magnetization(self):
+  theta = self.theta
+  phi = self.phi
   mx = np.sin(theta)*np.cos(phi)
   my = np.sin(theta)*np.sin(phi)
   mz = np.cos(theta)
-  fo = open("MAGNETIZATION.OUT","w")
+  fo = open("MAGNETISM.OUT","w")
   for i in range(len(mx)):
-    fo.write(str(i+1)+"   ")
+    fo.write(str(self.geometry.x[i])+"   ")
+    fo.write(str(self.geometry.y[i])+"   ")
+    fo.write(str(self.geometry.z[i])+"   ")
     fo.write(str(mx[i])+"   ")
     fo.write(str(my[i])+"   ")
     fo.write(str(mz[i])+"\n")

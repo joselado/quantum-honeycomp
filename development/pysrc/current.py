@@ -2,6 +2,9 @@ import numpy as np
 import scipy.sparse.linalg as lg
 import scipy.linalg as lg
 
+def braket_wAw(w,A):
+  w = np.matrix(w) # convert to matrix
+  return ((w.T).H*A*w.T)[0,0] # expectation value
 
 def current_operator(h0):
   """Get the current operator"""
@@ -23,7 +26,6 @@ def current_operator(h0):
   return fj
 
 
-from bandstructure import braket_wAw,ket_Aw
 
 def gs_current(h,nk=400):
   weighted_current(h,nk=nk)

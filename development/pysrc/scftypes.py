@@ -37,6 +37,7 @@ class scfclass():
     self.fermi = 0.0 # fermi energy
     self.error = 0.0 # error in the selfconsistency
     self.gap = 0.0 # gap of the system
+    self.smearing = None
     self.correlator_mode = "multicorrelator" # multicorrelator mode 
 #    self.correlator_mode = "1by1" # multicorrelator mode 
     self.bloch_multicorrelator = False # multicorrelator with Bloch phases
@@ -53,7 +54,7 @@ class scfclass():
     self.energy_cutoff = 1.0 # energy for the selfconsistency
     self.num_waves = 10 # number of waves to compute
     self.use_weights = False # calculate SCF using weights
-  def update_occupied_states(self,filling=0.5,fermi_shift=0.0):
+  def update_occupied_states(self,fermi_shift=0.0):
     """Get the eigenvectors for a mesh of kpoints"""
     mine = None # minimum energy
     if self.scfmode=="fermi" and self.is_sparse:
@@ -74,7 +75,7 @@ class scfclass():
 #    mine = min(es)*0.9 # minimum energy retained
     self.kfac = len(klist.kmesh(self.hamiltonian.dimensionality,nk=self.nkgrid))
     if self.scfmode=="filling": # get the fermi energy if the mode requires it 
-      self.fermi = get_fermi_energy(es,filling,fermi_shift=fermi_shift) 
+      self.fermi = get_fermi_energy(es,self.filling,fermi_shift=fermi_shift) 
     elif self.scfmode=="fermi": pass # do nothing
     self.gap = get_gap(es,self.fermi) # store the gap
     if self.energy_cutoff is not None:
@@ -83,7 +84,7 @@ class scfclass():
         raise
       print("Warning!!!! Performing calculation with an energy cutoff")
     eoccs,voccs,koccs = get_occupied_states(es,ws,ks,self.fermi,
-                            mine=self.energy_cutoff) # occupied states
+                            mine=self.energy_cutoff,smearing = self.smearing)
     self.wavefunctions = voccs # store wavefunctions
 #    print(len(voccs),voccs.shape,len(voccs[0]))
     self.energies = eoccs # store energies
@@ -381,7 +382,20 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
     voccs = np.matrix(np.array(voccs))  # as array
     eoccs = np.array(eoccs)  # as array
     koccs = np.array(koccs)  # as array
-  else: raise
+  else:
+    voccs = [] # occupied vectors
+    eoccs = [] # occupied eigenvalues
+    koccs = [] # occupied eigenvalues
+    if mine is None: mine = -1000000 # accept all
+    else: mine = -np.abs(mine)
+    for (e,v,k) in zip(es,ws,ks): # loop over eigenvals,eigenvecs
+      weight = np.sqrt((-np.tanh((e-fermi)/smearing) + 1.0)/2.0) # smearing
+      voccs.append(v*weight) # store
+      eoccs.append(e*weight) # store
+      koccs.append(k) # store
+    voccs = np.matrix(np.array(voccs))  # as array
+    eoccs = np.array(eoccs)  # as array
+    koccs = np.array(koccs)  # as array
   return eoccs,voccs,koccs
 
 
@@ -637,6 +651,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   ite = 0 # iteration counter
   scf = scfclass(h) # create scf class
   scf.nkgrid = nkp
+  scf.smearing = smearing
   scf.energy_cutoff = energy_cutoff # energy_cutoff
   scf.filling = filling # filling of the system
 #  scf.mf0 = old_mf # initial mean field
@@ -675,6 +690,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
     if scf.error<maxerror or os.path.exists("STOP"): # if converged break
       stop_scf = True # stop the calculation after the next iteration
       scf.mixing = 1.0 # last iteration with mixing one
+      scf.smearing = None # last iteration without smearing
   file_etot.close() # close file
   file_error.close() # close file
   file_gap.close() # close file

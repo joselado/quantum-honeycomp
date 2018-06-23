@@ -22,6 +22,7 @@ from rotate_spin import sx,sy,sz
 from increase_hilbert import get_spinless2full,get_spinful2full
 import tails
 from scipy.sparse import diags as sparse_diag
+import pickle
 
 #import data
 
@@ -136,47 +137,15 @@ class hamiltonian():
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""
     return set_finite_system(self,periodic=periodic) 
-  def write(self,output_file="hamiltonian.in"):
+  def get_gap(self):
+    """Returns the gap of the Hamiltonian"""
+    import gap
+    return gap.indirect_gap(self) # return the gap
+  def save(self,output_file="hamiltonian.pkl"):
     """ Write the hamiltonian in hamiltonian_0.in"""
-    from input_tb90 import write_hamiltonian
-    # save multicell Hamiltonian
-    if self.is_multicell: 
-      ps = [(t.dir,t.m) for t in self.hopping] # create pairs
-      inout.save_sparse_pairs(output_file,ps) # save multicell
-      inout.save_sparse_csr(output_file+"/INTRA.npz",self.intra) # intracell
-    else: # old way
-      if self.is_sparse and self.dimensionality == 0:  # zero dimensional
-          print("Saving as sparse")
-          inout.save_sparse_csr("INTRA.npz",csr_matrix(self.intra))
-      else: # normal Hamiltonians
-          write_hamiltonian(self,output_file=output_file)
-
-
-
-    self.geometry.write()
-  def read(self,input_file="hamiltonian.in",dimensionality=None):
-    """ Write the hamiltonian in hamiltonian_0.in"""
-    # if given on input
-    if dimensionality is not None: self.dimensionality = dimensionality
-    # try to read geometry
-    try: 
-      import geometry
-      self.geometry = geometry.read(input_file="POSITIONS.OUT")
-    except: 
-      print("No geometry found")
-    # read the matrices
-    if self.is_multicell: # multicell Hamiltonians
-      ps = inout.read_sparse_pairs(input_file,is_sparse=self.is_sparse) # read pairs
-      self.hopping = multicell.pairs2hopping(ps) # create hopping
-      self.intra = inout.load_sparse_csr(input_file+"/INTRA.npz",
-                         is_sparse=self.is_sparse) # intracell
-    else:
-      if self.is_sparse and self.dimensionality == 0:  # zero dimensional
-          print("Reading as sparse")
-          self.intra = csc_matrix(inout.load_sparse_csr("INTRA.npz"))
-      else:
-        from input_tb90 import read_hamiltonian
-        read_hamiltonian(self,input_file=input_file)
+    with open(output_file, 'wb') as output:
+      pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+  write = save # just in case
   def total_energy(self,nkpoints=30,nbands=None,random=False,kp=None):
     """ Get total energy of the system"""
     return total_energy(self,nk=nkpoints,nbands=nbands,random=random,kp=kp)
@@ -1134,5 +1103,10 @@ def turn_nambu(self):
   self.has_eh = True
 
 
+
+def load(input_file="hamiltonian.pkl"):
+    """Load the hamiltonian"""
+    with open(input_file, 'rb') as input:
+      return pickle.load(input)
 
 

@@ -5,8 +5,15 @@ from scipy.sparse import csc_matrix as csc
 from scipy.sparse import bmat
 from superconductivity import build_eh
 import superconductivity
-from bandstructure import braket_wAw
+#from bandstructure import braket_wAw
 import current
+
+
+def braket_wAw(w,A):
+  w = np.matrix(w) # convert to matrix
+  return ((w.T).H*A*w.T)[0,0] # expectation value
+
+
 
 
 

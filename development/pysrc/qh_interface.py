@@ -31,10 +31,14 @@ import indexing
 
 
 import platform
-if platform.system()=="Linux":
-  python = "/usr/bin/python3" # Python 3
-else:
-  python ="python" # Python for mac
+
+def get_python():
+  
+  if platform.system()=="Linux":
+    python = "/usr/bin/python3" # Python 3
+  else:
+    python ="python" # Python for mac
+  return python
 
 
 
@@ -80,12 +84,14 @@ def save_outputs(inipath,tmppath):
   return
 
 
-def execute_script(name,background=True):
+def execute_script(name,background=True,mayavi=False):
   """Executes a certain script from the folder utilities"""
   try: qhpath = get_qhroot() # get the main path
   except: qhpath = "" 
   print("Root path",qhpath)
   scriptpath = qhpath+"utilities/"+name # name of the script
+  if mayavi: python = "/usr/bin/python2"
+  else: python = get_python() # get the correct interpreter
   if background: os.system(python+" "+scriptpath+" &") # execute the script
   else: os.system(python+" "+scriptpath) # execute the script
 

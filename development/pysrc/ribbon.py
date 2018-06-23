@@ -38,7 +38,8 @@ def hamiltonian_ribbon(hin,n=10):
   hopout = [] # list
   for i in range(len(h.hopping)): # loop over hoppings
     if abs(h.hopping[i].dir[2])<0.1: 
-      hopout.append(h.hopping[i])
+      if abs(h.hopping[i].dir[1])<0.1: 
+        hopout.append(h.hopping[i])
   h.hopping = hopout
   h.dimensionality = 1
   h.geometry.dimensionality = 1

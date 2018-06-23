@@ -21,31 +21,7 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def custom_scf(h):
-  """Modifies the properties of tb90.in input"""
-  # begin SCF options
-  scfin = builder.get_object("scf_initialization").get_active_text()
-  import random
-  rand = random.random
-  def rv():
-    return .5 - np.random.random(3) # 3 component random vector
-  def rvxy():
-    v = np.random.random(3) -.5 # 3 component random vector
-    v[0] = 0.0
-    return v
-  ###################################
-  if scfin == "Reconverge": # no new mean field
-    mf = np.load("MEAN_FIELD.npy") # load the mean field from file
-  else: # if create new mean field matrix
-    mf = interactions.initialization(h.geometry,scfin=scfin)  # create the mean field mat
-  U = get("hubbard") # value of Hubbard
-  mix = 0.5
-  if U > 1.5: mix = 0.1 # slow mixing
-  # perform the selfconsistent calculation
-  scf = interactions.hubbardscf(h,U=U,nkp=1,mf=mf,silent=False,mix=mix,
-                                  maxerror=1e-5,filling=get("filling"))
-  scf.hamiltonian.write() # write in a file
-  np.save("MEAN_FIELD.npy",np.array(scf.mean_field)) # save in a file
+
 
 
 
@@ -135,9 +111,8 @@ def show_dos(self):
 
 
 def pickup_hamiltonian():
-  return initialize()
-  if builder.get_object("activate_scf").get_active():
-    return read_hamiltonian()
+  if qtwrap.is_checked("do_scf"):
+    return hamiltonians.load() # load the Hamiltonian
   else: # generate from scratch
     return initialize()
 
@@ -217,6 +192,27 @@ def show_z2(self):
 
 
 
+def solve_scf():
+  """Perform a selfconsistent calculation"""
+#  scfin = builder.get_object("scf_initialization").get_active_text()
+  h = initialize() # initialize the Hamiltonian
+  mf = scftypes.guess(h,mode="antiferro")
+  nk = int(get("nk_scf"))
+  filling = 0.5
+  U = get("hubbard")
+  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
+                mf=mf,mode="U",smearing=get("smearing_scf"),
+                mix = get("mix_scf"))
+  scf.hamiltonian.save() # save in a file
+
+
+
+def show_magnetism():
+  """Show the magnetism of the system"""
+  h = pickup_hamiltonian() # get the Hamiltonian
+  h.write_magnetization() # write the magnetism
+  execute_script("qh-moments",mayavi=True)
+
 
 
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
@@ -224,7 +220,7 @@ save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
 # create signals
 signals = dict()
-signals["initialize"] = initialize  # initialize and run
+signals["solve_scf"] = solve_scf  # initialize and run
 signals["show_bands"] = show_bands  # show bandstructure
 signals["show_structure"] = show_structure  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
@@ -233,6 +229,7 @@ signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
+signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_stm"] = show_stm  # show STM
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism
