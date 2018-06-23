@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from scipy.sparse import csr_matrix
+import pickle
 
 def save_sparse_csr(filename,array):
     array = csr_matrix(array)
@@ -52,3 +53,16 @@ def read_sparse_pairs(filename,is_sparse=True):
     pairs.append((v,m)) # append this pair
   return pairs
 
+
+
+
+
+def load(input_file):
+    """Load the hamiltonian"""
+    with open(input_file, 'rb') as input:
+      return pickle.load(input)
+
+def save(self,output_file):
+  """ Write an object"""
+  with open(output_file, 'wb') as output:
+    pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)

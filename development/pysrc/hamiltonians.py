@@ -142,9 +142,8 @@ class hamiltonian():
     import gap
     return gap.indirect_gap(self) # return the gap
   def save(self,output_file="hamiltonian.pkl"):
-    """ Write the hamiltonian in hamiltonian_0.in"""
-    with open(output_file, 'wb') as output:
-      pickle.dump(self, output, pickle.HIGHEST_PROTOCOL)
+    """ Write the hamiltonian in a file"""
+    inout.save(self,output_file) # write in a file
   write = save # just in case
   def total_energy(self,nkpoints=30,nbands=None,random=False,kp=None):
     """ Get total energy of the system"""
@@ -1103,10 +1102,10 @@ def turn_nambu(self):
   self.has_eh = True
 
 
+import inout
 
-def load(input_file="hamiltonian.pkl"):
-    """Load the hamiltonian"""
-    with open(input_file, 'rb') as input:
-      return pickle.load(input)
+
+
+def load(input_file="hamiltonian.pkl"):  return inout.load(input_file)
 
 

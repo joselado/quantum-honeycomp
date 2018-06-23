@@ -168,6 +168,8 @@ def guess(h,mode="ferro",fun=0.01):
   h0.intra *= 0. # initialize
   if mode=="ferro":
     h0.add_zeeman(fun)
+  if mode=="random":
+    h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
   elif mode=="antiferro":
     h0.add_antiferromagnetism(fun)
   elif mode=="imbalance":

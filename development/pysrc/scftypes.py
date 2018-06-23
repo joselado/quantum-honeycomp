@@ -15,8 +15,10 @@ try:
   import correlatorsf90
   multicorrelator = correlatorsf90.multicorrelator
   multicorrelator_bloch = correlatorsf90.multicorrelator_bloch
+  use_multicorrelator = True
 except:
   print("WARNING, FORTRAN not working in scftypes.py")
+  use_multicorrelator = False
 #  raise
 #  def multicorrelator
 
@@ -38,7 +40,10 @@ class scfclass():
     self.error = 0.0 # error in the selfconsistency
     self.gap = 0.0 # gap of the system
     self.smearing = None
-    self.correlator_mode = "multicorrelator" # multicorrelator mode 
+    if use_multicorrelator: # fortran library is present
+      self.correlator_mode = "multicorrelator" # multicorrelator mode 
+    else:
+      self.correlator_mode = "plain" # multicorrelator mode 
 #    self.correlator_mode = "1by1" # multicorrelator mode 
     self.bloch_multicorrelator = False # multicorrelator with Bloch phases
     self.enforce_symmetry = "none" # do not enforce any symmetry
@@ -251,7 +256,8 @@ class scfclass():
     mfnew = dict() # new mean field
     accu = 0.0 # accumulator
     for key in self.mf: mfnew[key] = self.hamiltonian.intra*0.  # initialize 
-    np.savetxt("VS_SCF.OUT",np.matrix([range(len(self.cij)),np.abs(self.cij)]).T)
+    if self.correlator_mode == "multicorrelator":
+      np.savetxt("VS_SCF.OUT",np.matrix([range(len(self.cij)),np.abs(self.cij)]).T)
     fvs = open("VAV_VBV.OUT","w") # open file
     fvs.write("# dx dy dz i j abs(v)\n")
     for v in self.interactions: # loop over interactions
@@ -261,11 +267,6 @@ class scfclass():
       elif v.contribution=="A":
         tmp = v.a*v.vbv*v.g 
         accu += np.abs(v.vbv) 
-#        print("\n",v.dir,v.i,v.j)
-#        print(v.a)
-#        print(v.b)
-#        print(np.abs(v.vav),np.abs(v.vbv))
-#        print(np.angle(v.vav)/np.pi*180,np.angle(v.vbv)/np.pi*180)
       else: raise
       fvs.write(str(v.dir[0])+"   ")
       fvs.write(str(v.dir[1])+"   ")
