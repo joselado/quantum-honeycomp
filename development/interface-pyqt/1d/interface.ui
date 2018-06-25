@@ -44,7 +44,7 @@
        <rect>
         <x>50</x>
         <y>30</y>
-        <width>240</width>
+        <width>275</width>
         <height>100</height>
        </rect>
       </property>
@@ -60,12 +60,12 @@
         <widget class="QComboBox" name="lattice">
          <item>
           <property name="text">
-           <string>Chain</string>
+           <string>Square</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>Square</string>
+           <string>Chain</string>
           </property>
          </item>
          <item>
@@ -112,7 +112,7 @@
        <item row="2" column="1">
         <widget class="QLineEdit" name="width">
          <property name="text">
-          <string>1</string>
+          <string>3</string>
          </property>
         </widget>
        </item>
@@ -341,7 +341,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -385,6 +385,19 @@
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QPushButton" name="show_structure_3d">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>150</y>
+        <width>188</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show structure 3D</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_5">
@@ -730,7 +743,7 @@
      <x>0</x>
      <y>0</y>
      <width>878</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

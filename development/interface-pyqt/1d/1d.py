@@ -191,6 +191,16 @@ def show_structure(self):
 
 
 
+def show_structure_3d(self):
+  """Show the lattice of the system"""
+  g = get_geometry() # get the geometry
+  nsuper = int(get("nsuper_struct"))
+  g = g.supercell(nsuper)
+  g.write()
+  execute_script("qh-structure3d POSITIONS.OUT")
+
+
+
 
 
 
@@ -206,7 +216,7 @@ signals["show_structure"] = show_structure  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
-
+signals["show_structure_3d"] = show_structure_3d
 
 
 

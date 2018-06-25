@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -76,6 +76,9 @@ class Ui_MainWindow(object):
         self.label_12 = QtWidgets.QLabel(self.gridLayoutWidget_5)
         self.label_12.setObjectName("label_12")
         self.gridLayout_5.addWidget(self.label_12, 0, 0, 1, 1)
+        self.show_structure_3d = QtWidgets.QPushButton(self.tab_2)
+        self.show_structure_3d.setGeometry(QtCore.QRect(240, 180, 161, 28))
+        self.show_structure_3d.setObjectName("show_structure_3d")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -241,7 +244,7 @@ class Ui_MainWindow(object):
         self.tabWidget.addTab(self.tab_5, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 973, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 973, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -249,7 +252,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(4)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -268,6 +271,7 @@ class Ui_MainWindow(object):
         self.show_structure.setText(_translate("MainWindow", "Show structure"))
         self.nsuper_struct.setText(_translate("MainWindow", "3"))
         self.label_12.setText(_translate("MainWindow", "Supercell"))
+        self.show_structure_3d.setText(_translate("MainWindow", "Show structure 3D"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Structure"))
         self.label_7.setText(_translate("MainWindow", "nbands"))
         self.label_6.setText(_translate("MainWindow", "nkpoints"))

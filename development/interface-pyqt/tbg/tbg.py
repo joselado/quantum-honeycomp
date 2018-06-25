@@ -247,6 +247,32 @@ def show_2dband(self):
   for n in ns: string += "BANDS2D__"+str(n)+".OUT "
   execute_script("qh-plot3d "+string +"  ")
 
+
+
+
+
+
+
+
+
+
+def show_structure_3d(self):
+  """Show the lattice of the system"""
+  g = get_geometry2d() # get the geometry
+  nsuper = int(get("nsuper_struct"))
+  g = g.supercell(nsuper)
+  g.write()
+#  execute_script("qh-structure3d POSITIONS.OUT")
+#  execute_script("qh-magnetism nomag nobonds POSITIONS.OUT")
+  execute_script("qh-pick ")
+
+
+
+
+
+
+
+
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
 # create signals
@@ -262,6 +288,7 @@ signals["show_ldos"] = show_ldos  # show Berry curvature
 #signals["show_z2_invariant"] = show_z2_invariant  # show Berry curvature
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["show_structure"] = show_structure  # show magnetism
+signals["show_structure_3d"] = show_structure_3d
 signals["show_dosbands"] = show_dosbands  # show magnetism
 #signals["show_2dband"] = show_2dband  # show magnetism
 #signals["show_kdos"] = show_kdos  # show kdos

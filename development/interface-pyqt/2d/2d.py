@@ -216,6 +216,21 @@ def show_magnetism():
 
 
 
+
+def show_structure_3d(self):
+  """Show the lattice of the system"""
+  g = get_geometry() # get the geometry
+  nsuper = int(get("nsuper_struct"))
+  g = g.supercell(nsuper)
+  g.write()
+  execute_script("qh-structure3d POSITIONS.OUT")
+
+
+
+
+
+
+
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
 
@@ -231,6 +246,7 @@ signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism
+signals["show_structure_3d"] = show_structure_3d
 #signals["show_stm"] = show_stm  # show STM
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism

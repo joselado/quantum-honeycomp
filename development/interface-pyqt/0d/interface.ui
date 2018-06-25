@@ -345,7 +345,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -362,6 +362,19 @@
       </property>
       <property name="text">
        <string>Show structure</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="show_structure_3d">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>90</y>
+        <width>188</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show structure 3D</string>
       </property>
      </widget>
     </widget>
@@ -528,7 +541,7 @@
      <x>0</x>
      <y>0</y>
      <width>878</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

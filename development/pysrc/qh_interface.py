@@ -33,12 +33,47 @@ import indexing
 import platform
 
 def get_python():
-  
-  if platform.system()=="Linux":
-    python = "/usr/bin/python3" # Python 3
-  else:
-    python ="python" # Python for mac
-  return python
+  try:
+    return get_anaconda_command("python") # retunr anaconda
+  except:
+    if platform.system()=="Linux":
+      python = "/usr/bin/python3" # Python 3
+    else:
+      python ="python" # Python for mac
+    return python
+
+
+
+
+
+def get_anaconda_command(name="python"):
+  """Return the path for Anaconda Python, which has pyqt by default"""
+  os.system("rm -f /tmp/qh_commands.txt") # remove
+  os.system("which -a "+name+"  > /tmp/qh_commands.txt") # run the command
+  lines = open("/tmp/qh_commands.txt").read() # read the lines
+  lines = lines.split("\n") # split the lines
+  del lines[-1] # remove the last one
+  print("Found ",len(lines),"python paths\n")
+  for l in lines: print(l)
+  for l in lines: # loop over pythons
+    l = l.split(" ")[-1] # get last line 
+    if "anaconda" in l:
+      print("\nFound Anaconda ",name,"in",l)
+      return l
+  print("Anaconda",name,"not found")
+  raise
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -90,8 +125,11 @@ def execute_script(name,background=True,mayavi=False):
   except: qhpath = "" 
   print("Root path",qhpath)
   scriptpath = qhpath+"utilities/"+name # name of the script
-  if mayavi: python = "/usr/bin/python2"
-  else: python = get_python() # get the correct interpreter
+  try:
+    python = get_anaconda_command("python") # get the anaconda python
+  except:
+    if mayavi: python = "/usr/bin/python2"
+    else: python = get_python() # get the correct interpreter
   if background: os.system(python+" "+scriptpath+" &") # execute the script
   else: os.system(python+" "+scriptpath) # execute the script
 

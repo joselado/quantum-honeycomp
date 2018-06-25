@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayoutWidget_4 = QtWidgets.QWidget(self.tab_2)
-        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(50, 30, 240, 100))
+        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(50, 30, 275, 100))
         self.gridLayoutWidget_4.setObjectName("gridLayoutWidget_4")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.gridLayoutWidget_4)
         self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -160,6 +160,9 @@ class Ui_MainWindow(object):
         self.label_7 = QtWidgets.QLabel(self.gridLayoutWidget_3)
         self.label_7.setObjectName("label_7")
         self.gridLayout_3.addWidget(self.label_7, 0, 0, 1, 1)
+        self.show_structure_3d = QtWidgets.QPushButton(self.tab_4)
+        self.show_structure_3d.setGeometry(QtCore.QRect(300, 150, 188, 28))
+        self.show_structure_3d.setObjectName("show_structure_3d")
         self.tabWidget_3.addTab(self.tab_4, "")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
@@ -295,7 +298,7 @@ class Ui_MainWindow(object):
         self.tabWidget_3.addTab(self.tab_7, "")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 24))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -305,7 +308,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(1)
+        self.tabWidget_3.setCurrentIndex(0)
         self.bands_color.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -313,8 +316,8 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "1D systems"))
         self.label_8.setText(_translate("MainWindow", "Type of lattice"))
-        self.lattice.setItemText(0, _translate("MainWindow", "Chain"))
-        self.lattice.setItemText(1, _translate("MainWindow", "Square"))
+        self.lattice.setItemText(0, _translate("MainWindow", "Square"))
+        self.lattice.setItemText(1, _translate("MainWindow", "Chain"))
         self.lattice.setItemText(2, _translate("MainWindow", "Honeycomb zigzag"))
         self.lattice.setItemText(3, _translate("MainWindow", "Honeycomb armchair"))
         self.lattice.setItemText(4, _translate("MainWindow", "Triangular"))
@@ -322,7 +325,7 @@ class Ui_MainWindow(object):
         self.lattice.setItemText(6, _translate("MainWindow", "Lieb"))
         self.nsuper.setText(_translate("MainWindow", "1"))
         self.label_6.setText(_translate("MainWindow", "Supercell"))
-        self.width.setText(_translate("MainWindow", "1"))
+        self.width.setText(_translate("MainWindow", "3"))
         self.label_2.setText(_translate("MainWindow", "Width"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))
         self.Bx.setText(_translate("MainWindow", "0.0"))
@@ -353,6 +356,7 @@ class Ui_MainWindow(object):
         self.show_structure.setText(_translate("MainWindow", "Show structure"))
         self.nsuper_struct.setText(_translate("MainWindow", "5"))
         self.label_7.setText(_translate("MainWindow", "Supercell"))
+        self.show_structure_3d.setText(_translate("MainWindow", "Show structure 3D"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_4), _translate("MainWindow", "Structure"))
         self.show_bands.setText(_translate("MainWindow", "Band structure"))
         self.label_15.setText(_translate("MainWindow", "Operator"))

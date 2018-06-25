@@ -214,6 +214,17 @@ def show_z2(self):
   execute_script("qh-wannier-center  ") # plot the result
 
 
+def show_structure_3d(self):
+  """Show the lattice of the system"""
+  g = get_geometry() # get the geometry
+  nsuper = int(get("nsuper_struct"))
+  g = g.supercell(nsuper)
+  g.write()
+  execute_script("qh-structure3d POSITIONS.OUT")
+
+
+
+
 
 
 
@@ -226,6 +237,7 @@ signals = dict()
 signals["show_bands"] = show_bands  # show bandstructure
 signals["show_structure"] = show_structure  # show bandstructure
 #signals["show_dos"] = show_dos  # show DOS
+signals["show_structure_3d"] = show_structure_3d
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 
 
