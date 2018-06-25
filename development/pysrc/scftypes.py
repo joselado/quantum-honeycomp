@@ -9,6 +9,7 @@ import meanfield
 import groundstate
 import scipy.optimize as optimize
 import klist
+import inout
 
 from meanfield import guess # function to calculate guesses
 try:
@@ -26,9 +27,14 @@ except:
 timing = True
 
 
+def load(input_file="SCF.pkl"):
+  """Get a selfconsistent calculation"""
+  return inout.load(input_file)
 
 class scfclass(): 
   """Class for a selfconsistent calculation"""
+  def save(self,output_file="SCF.pkl"):
+    inout.save(self,output_file)
   def __init__(self,h):
     self.iteration = 0 # initialize
     self.scfmode = "filling" # do SCF fixing the number of filled states

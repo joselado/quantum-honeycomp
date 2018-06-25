@@ -165,10 +165,12 @@ def guess(h,mode="ferro",fun=0.01):
   """Return a mean field matrix guess given a certain Hamiltonian"""
   h0 = h.copy() # copy Hamiltonian
   h0 = h0.get_multicell() # multicell
-  h0.intra *= 0. # initialize
+#  h0.intra *= 0. # initialize
+  h0.clean() # clean the Hamiltonian
   if mode=="ferro":
+    print("AAA")
     h0.add_zeeman(fun)
-  if mode=="random":
+  elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
   elif mode=="antiferro":
     h0.add_antiferromagnetism(fun)
