@@ -168,14 +168,6 @@ def pickup_hamiltonian():
 
 
 
-  
-
-def show_magnetism(self):
-  h = pickup_hamiltonian() # get hamiltonian
-  h.get_magnetization() # get the magnetization
-  execute_script("tb90-magnetism  ")
-#  execute_script("qh-magnetism  ")
-
 
 def show_structure(self):
   """Show the lattice of the system"""
@@ -189,30 +181,6 @@ def show_structure(self):
 
 
 
-def show_kdos(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  ew = get("ewindow_kdos")
-  new = int(get("mesh_kdos")) # scale as kpoints
-  energies = np.linspace(-ew,ew,new) # number of ene
-  klist = np.linspace(0.,1.,new)
-  kdos.write_surface_2d(h,energies=energies,delta=ew/new,klist=klist)
-  execute_script("qh-kdos-both KDOS.OUT  ")
-
-
-
-def show_berry1d(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  topology.write_berry(h,ks)
-  execute_script("qh-berry1d  label  ")
-
-
-def show_z2(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nk_topology")
-  topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
-  execute_script("qh-wannier-center  ") # plot the result
-
 
 def show_structure_3d(self):
   """Show the lattice of the system"""
@@ -221,6 +189,41 @@ def show_structure_3d(self):
   g = g.supercell(nsuper)
   g.write()
   execute_script("qh-structure3d POSITIONS.OUT")
+
+
+
+def solve_scf():
+  """Perform a selfconsistent calculation"""
+  scfin = getbox("scf_initialization")
+  h = initialize() # initialize the Hamiltonian
+  mf = scftypes.guess(h,mode=scfin)
+  nk = int(get("nk_scf"))
+  nk = 1
+  U = get("hubbard")
+  filling = get("filling_scf")
+  filling = filling%1.
+  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
+                mf=mf,mode="U",smearing=get("smearing_scf"),
+                mix = get("mix_scf"))
+  scf.hamiltonian.save() # save in a file
+
+
+def pickup_hamiltonian():
+  if qtwrap.is_checked("do_scf"):
+    return hamiltonians.load() # load the Hamiltonian
+  else: # generate from scratch
+    return initialize()
+
+
+
+
+
+def show_magnetism():
+  """Show the magnetism of the system"""
+  h = pickup_hamiltonian() # get the Hamiltonian
+  h.write_magnetization() # write the magnetism
+  execute_script("qh-moments",mayavi=True)
+
 
 
 
@@ -234,11 +237,13 @@ save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 # create signals
 signals = dict()
 #signals["initialize"] = initialize  # initialize and run
+signals["solve_scf"] = solve_scf
 signals["show_bands"] = show_bands  # show bandstructure
 signals["show_structure"] = show_structure  # show bandstructure
 #signals["show_dos"] = show_dos  # show DOS
 signals["show_structure_3d"] = show_structure_3d
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
+signals["show_magnetism"] = show_magnetism
 
 
 

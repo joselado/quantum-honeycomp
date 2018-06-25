@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>328</x>
-      <y>290</y>
+      <y>350</y>
       <width>471</width>
-      <height>261</height>
+      <height>201</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -341,11 +341,11 @@
       <x>330</x>
       <y>30</y>
       <width>521</width>
-      <height>231</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -531,6 +531,184 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>SCF</string>
+     </attribute>
+     <widget class="QTabWidget" name="tabWidget_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>461</width>
+        <height>251</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_12">
+       <attribute name="title">
+        <string>Basic</string>
+       </attribute>
+       <widget class="QWidget" name="gridLayoutWidget_10">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>10</y>
+          <width>279</width>
+          <height>109</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_10">
+         <item row="0" column="1">
+          <widget class="QComboBox" name="scf_initialization">
+           <item>
+            <property name="text">
+             <string>antiferro</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ferro</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>random</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>Initialization</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_23">
+           <property name="text">
+            <string>Hubbard</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="hubbard">
+           <property name="text">
+            <string>2.0</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_34">
+           <property name="text">
+            <string>Filling</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="filling_scf">
+           <property name="text">
+            <string>0.5</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QCheckBox" name="do_scf">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>170</y>
+          <width>179</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Include mean field</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="solve_scf">
+        <property name="geometry">
+         <rect>
+          <x>220</x>
+          <y>170</y>
+          <width>188</width>
+          <height>28</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Solve SCF</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_11">
+       <attribute name="title">
+        <string>Convergence</string>
+       </attribute>
+       <widget class="QWidget" name="gridLayoutWidget_12">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>30</y>
+          <width>215</width>
+          <height>161</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_12">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>Mixing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="mix_scf">
+           <property name="text">
+            <string>0.9</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_33">
+           <property name="text">
+            <string>Smearing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="smearing_scf">
+           <property name="text">
+            <string>0.01</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_6">
+     <attribute name="title">
+      <string>Magnetism</string>
+     </attribute>
+     <widget class="QPushButton" name="show_magnetism">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>110</y>
+        <width>191</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Show magnetism</string>
+      </property>
      </widget>
     </widget>
    </widget>

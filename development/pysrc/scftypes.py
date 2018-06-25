@@ -118,10 +118,11 @@ class scfclass():
     """Updates the total mean field Hamiltonian"""
     self.hamiltonian = self.hamiltonian0.copy() # copy original
     self.hamiltonian.intra += self.mf[(0,0,0)] # add mean field
-    for i in range(len(self.hamiltonian.hopping)):
-      d = self.hamiltonian.hopping[i].dir
-      if tuple(d) in self.mf:
-        self.hamiltonian.hopping[i].m += self.mf[tuple(d)]
+    if self.hamiltonian.dimensionality>0:
+      for i in range(len(self.hamiltonian.hopping)):
+        d = self.hamiltonian.hopping[i].dir
+        if tuple(d) in self.mf:
+          self.hamiltonian.hopping[i].m += self.mf[tuple(d)]
     
   def setup_interaction(self,mode="Hubbard",g=1.0):
     """Create the operators that will determine the interactions"""
