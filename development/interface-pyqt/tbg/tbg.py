@@ -264,7 +264,7 @@ def show_structure_3d(self):
   g.write()
 #  execute_script("qh-structure3d POSITIONS.OUT")
 #  execute_script("qh-magnetism nomag nobonds POSITIONS.OUT")
-  execute_script("qh-pick ")
+  execute_script("qh-structure-tbg ")
 
 
 
