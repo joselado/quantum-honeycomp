@@ -128,12 +128,12 @@ class hamiltonian():
         raise # error
   def supercell(self,nsuper):
     """ Creates a supercell of a one dimensional system"""
-    raise # I think the function is buggy
-    import supercell
-    if self.dimensionality==1:
-      hout = supercell.supercell1d(self,nsuper,sparse=self.is_sparse) # modify hoppings
+    if self.dimensionality==0: return self
+    elif self.dimensionality==1: ns = [nsuper,1,1]
+    elif self.dimensionality==2: ns = [nsuper,nsuper,1]
+    elif self.dimensionality==3: ns = [nsuper,nsuper,nsuper]
     else: raise
-    return hout
+    return multicell.supercell_hamiltonian(self,nsuper=ns)
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""
     return set_finite_system(self,periodic=periodic) 

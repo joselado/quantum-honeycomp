@@ -1,6 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import scipy.linalg as lg
+import multicell
 
 
 #try:
@@ -452,21 +453,72 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
 
 
 
-def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,error=0.0001):
-  """ Calculates the green function of a kdependent chain for a 2d system """
-  def gr(ons,hop):
-    """ Calculates G by renormalization"""
-    gf,sf = green_renormalization(ons,hop,energy=energy,nite=None,
-                            error=error,info=False,delta=delta)
-    if only_bulk:  return gf
-    else:  return gf,sf
+
+def get1dhamiltonian(hin,k=0.0,reverse=False):
+  """Return onsite and hopping matrix for a 1D Hamiltonian"""
+  h = hin.copy() # copy Hamiltonian
+  if h.dimensionality != 2: raise # only for 2d
+  if h.is_multicell: # multicell Hamiltonian
+    h = multicell.turn_no_multicell(h) # convert into a normal Hamiltonian
   tky = h.ty*np.exp(1j*np.pi*2.*k)
   tkxy = h.txy*np.exp(1j*np.pi*2.*k)
   tkxmy = h.txmy*np.exp(-1j*np.pi*2.*k)  # notice the minus sign !!!!
   # chain in the x direction
   ons = h.intra + tky + tky.H  # intra of k dependent chain
   hop = h.tx + tkxy + tkxmy  # hopping of k-dependent chain
+  if reverse: return (ons,hop.H) # return 
+  else: return (ons,hop) # return 
+  
+
+
+
+
+def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,
+                    error=0.0001,hs=None,reverse=False):
+  """ Calculates the green function of a kdependent chain for a 2d system """
+  def gr(ons,hop):
+    """ Calculates G by renormalization"""
+    gf,sf = green_renormalization(ons,hop,energy=energy,nite=None,
+                            error=error,info=False,delta=delta)
+    if hs is not None: # surface matrix provided
+      ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
+      sigma = hop*sf*hop.H # selfenergy
+      sf = (ez - ons - sigma).I # return Dyson
+    if only_bulk:  return gf
+    else:  return gf,sf
+  (ons,hop) = get1dhamiltonian(h,k,reverse=reverse) # get 1D Hamiltonian
   return gr(ons,hop)  # return green function
+
+
+
+
+
+def interface(h1,h2,k=0.0,energy=0.0,delta=0.01):
+  """Get the Green function of an interface"""
+  from scipy.sparse import csc_matrix as csc
+  from scipy.sparse import bmat
+  gs1,sf1 = green_kchain(h1,k=k,energy=energy,delta=delta,
+                   only_bulk=False,reverse=True) # surface green function 
+  gs2,sf2 = green_kchain(h2,k=k,energy=energy,delta=delta,
+                   only_bulk=False,reverse=False) # surface green function 
+  #############
+  ## 1  C  2 ##
+  #############
+  # Now apply the Dyson equation
+  (ons1,hop1) = get1dhamiltonian(h1,k,reverse=True) # get 1D Hamiltonian
+  (ons2,hop2) = get1dhamiltonian(h2,k,reverse=False) # get 1D Hamiltonian
+  havg = (hop1.H + hop2)/2. # average hopping
+  ons = bmat([[csc(ons1),csc(havg)],[csc(havg.H),csc(ons2)]]) # onsite
+  self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2*sf2*hop2.H)]])
+  self1 = bmat([[csc(hop1*sf1*hop1.H),None],[None,csc(ons2)*0.0]])
+  # Dyson equation
+  ez = (energy+1j*delta)*np.identity(ons1.shape[0]+ons2.shape[0]) # energy
+  ginter = (ez - ons - self1 - self2).I # Green function
+  # now return everything, first, second and hybrid
+  return (gs1,sf1,gs2,sf2,ginter)
+
+
+
 
 
 

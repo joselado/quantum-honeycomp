@@ -16,6 +16,17 @@ def braket_wAw(w,A):
 
 
 
+def index(h,n=[0]):
+  """Return a projector onto a site"""
+  num = len(h.geometry.r)
+  val = [1. for i in n]
+  m = csc((val,(n,n)),shape=(num,num),dtype=np.complex)
+  return h.spinless2full(m) # return matrix
+
+
+
+
+
 
 def operator2list(operator):
   """Convert an input operator in a list of operators"""

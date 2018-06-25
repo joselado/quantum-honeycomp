@@ -121,7 +121,10 @@ def add_frustrated_antiferromagnetism(h,m):
   ms = []
   for i in range(len(h.geometry.r)): # loop
     ii = h.geometry.sublattice[i] # index of the sublattice
-    ms.append(-g.r[int(ii)]*m) # save this one
+    if callable(m):
+      ms.append(-g.r[int(ii)]*m(h.geometry.r[i])) # save this one
+    else:
+      ms.append(-g.r[int(ii)]*m) # save this one
   h.add_magnetism(ms) # add the magnetization
 
 
