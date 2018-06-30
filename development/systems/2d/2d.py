@@ -245,8 +245,8 @@ def show_kdos(self):
   ew = get("e_kdos")
   new = int(get("nkpoints")/10) # scale as kpoints
   energies = np.linspace(-ew,ew,new) # number of ene
-  klist = np.linspace(0.,1.,new)
-  kdos.write_surface_2d(h,energies=energies,delta=ew/new,klist=klist)
+  klist = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+  kdos.surface(h,energies=energies,delta=ew/new,klist=klist)
   execute_script("qh-kdos KDOS.OUT  ")
 
 

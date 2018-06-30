@@ -128,7 +128,7 @@
       <x>70</x>
       <y>210</y>
       <width>261</width>
-      <height>331</height>
+      <height>341</height>
      </rect>
     </property>
     <widget class="QWidget" name="tab_3">
@@ -141,7 +141,7 @@
         <x>30</x>
         <y>10</y>
         <width>176</width>
-        <height>268</height>
+        <height>293</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -152,14 +152,14 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QPushButton" name="hybridribbon_pyqt">
          <property name="text">
           <string>Hybrid ribbons</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QPushButton" name="twisted_bilayer">
          <property name="text">
           <string>Twisted bilayer</string>
@@ -173,7 +173,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QPushButton" name="heterostructure">
          <property name="text">
           <string>Hybrid films</string>
@@ -194,10 +194,17 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QPushButton" name="hofstader_pyqt">
          <property name="text">
           <string>Hofstader butterflies</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QPushButton" name="crystal3d_pyqt">
+         <property name="text">
+          <string>3D crystals</string>
          </property>
         </widget>
        </item>

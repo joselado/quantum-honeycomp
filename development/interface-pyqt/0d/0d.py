@@ -21,34 +21,6 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def custom_scf(h):
-  """Modifies the properties of tb90.in input"""
-  # begin SCF options
-  scfin = builder.get_object("scf_initialization").get_active_text()
-  import random
-  rand = random.random
-  def rv():
-    return .5 - np.random.random(3) # 3 component random vector
-  def rvxy():
-    v = np.random.random(3) -.5 # 3 component random vector
-    v[0] = 0.0
-    return v
-  ###################################
-  if scfin == "Reconverge": # no new mean field
-    mf = np.load("MEAN_FIELD.npy") # load the mean field from file
-  else: # if create new mean field matrix
-    mf = interactions.initialization(h.geometry,scfin=scfin)  # create the mean field mat
-  U = get("hubbard") # value of Hubbard
-  mix = 0.5
-  if U > 1.5: mix = 0.1 # slow mixing
-  # perform the selfconsistent calculation
-  scf = interactions.hubbardscf(h,U=U,nkp=1,mf=mf,silent=False,mix=mix,
-                                  maxerror=1e-5,filling=get("filling"))
-  scf.hamiltonian.write() # write in a file
-  np.save("MEAN_FIELD.npy",np.array(scf.mean_field)) # save in a file
-
-
-
 
 def get_geometry():
   """ Create a 0d island"""
@@ -156,7 +128,7 @@ def show_dos(self):
   elif h.dimensionality==2:
     dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
   else: raise
-  execute_script("tb90-dos  ")
+  execute_script("qh-dos  ")
 
 
 def pickup_hamiltonian():

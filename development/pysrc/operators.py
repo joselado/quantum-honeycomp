@@ -5,6 +5,7 @@ from scipy.sparse import csc_matrix as csc
 from scipy.sparse import bmat
 from superconductivity import build_eh
 import superconductivity
+import scipy.linalg as lg
 #from bandstructure import braket_wAw
 import current
 
@@ -286,17 +287,37 @@ def get_velocity(h):
 
 
 
-def get_valley(h):
+def get_valley(h,projector=False,delta=None):
   """Return a callable that calculates the valley expectation value
   using the modified Haldane coupling"""
   ho = h.copy() # copy Hamiltonian
   ho.clean() # set to zero
   ho.add_modified_haldane(1.0/4.5) # add modified Haldane coupling
   hkgen = ho.get_hk_gen() # get generator for the hk Hamiltonian
-  def fun(w,k=None):
-    if h.dimensionality>0 and k is None: raise # requires a kpoint
-    hk = hkgen(k) # evaluate Hamiltonian
-    return braket_wAw(w,hk).real # return the braket
+  from scipy.sparse import issparse
+  def sharpen(m):
+    """Sharpen the eigenvalues of a matrix"""
+#    return m
+    if delta is None: return m # do nothing
+    if issparse(m): return m # temporal workaround
+    if issparse(m): m = m.todense()
+    (es,vs) = lg.eigh(m) # diagonalize
+    es = es/(np.abs(es)+delta) # renormalize
+    vs = np.matrix(vs) # convert
+    m0 = np.matrix(np.diag(es)) # build new hamiltonian
+    return vs*m0*vs.H
+  if projector: # function returns a matrix
+    def fun(m,k=None):
+      if h.dimensionality>0 and k is None: raise # requires a kpoint
+      hk = hkgen(k) # evaluate Hamiltonian
+      hk = sharpen(hk) # sharpen the valley
+      return m*hk # return the projector
+  else: # conventional way
+    def fun(w,k=None):
+      if h.dimensionality>0 and k is None: raise # requires a kpoint
+      hk = hkgen(k) # evaluate Hamiltonian
+      hk = sharpen(hk) # sharpen the valley
+      return braket_wAw(w,hk).real # return the braket
   return fun # return function
 
 

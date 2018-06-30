@@ -141,8 +141,12 @@ def show_stm(self):
 
 def show_berry2d():
   h = pickup_hamiltonian() # get hamiltonian
-  nk = int(get("nk_topology"))
-  topology.berry_map(h,nk=nk)
+  nk = int(np.sqrt(get("nk_topology")))
+  opname = getbox("operator_topology")
+  if opname=="None": op=None
+  elif opname=="Valley": op = operators.get_valley(h,projector=True)
+  else: raise 
+  topology.berry_map(h,nk=nk,operator=op)
   execute_script("qh-berry2d BERRY_MAP.OUT")
 
   
@@ -171,8 +175,8 @@ def show_kdos(self):
   ew = get("ewindow_kdos")
   new = int(get("mesh_kdos")) # scale as kpoints
   energies = np.linspace(-ew,ew,new) # number of ene
-  klist = np.linspace(0.,1.,new)
-  kdos.write_surface_2d(h,energies=energies,delta=ew/new,klist=klist)
+  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+  kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
   execute_script("qh-kdos-both KDOS.OUT  ")
 
 
@@ -180,7 +184,11 @@ def show_kdos(self):
 def show_berry1d(self):
   h = pickup_hamiltonian()  # get the hamiltonian
   ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  topology.write_berry(h,ks)
+  opname = getbox("operator_topology")
+  if opname=="None": op=None
+  elif opname=="Valley": op = operators.get_valley(h,projector=True)
+  else: raise 
+  topology.write_berry(h,ks,operator=op)
   execute_script("qh-berry1d  label  ")
 
 

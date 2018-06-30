@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -370,6 +370,15 @@ class Ui_MainWindow(object):
         self.label_19 = QtWidgets.QLabel(self.gridLayoutWidget_8)
         self.label_19.setObjectName("label_19")
         self.gridLayout_8.addWidget(self.label_19, 0, 0, 1, 1)
+        self.label_35 = QtWidgets.QLabel(self.gridLayoutWidget_8)
+        self.label_35.setObjectName("label_35")
+        self.gridLayout_8.addWidget(self.label_35, 1, 0, 1, 1)
+        self.operator_topology = QtWidgets.QComboBox(self.gridLayoutWidget_8)
+        self.operator_topology.setObjectName("operator_topology")
+        self.operator_topology.addItem("")
+        self.operator_topology.addItem("")
+        self.operator_topology.addItem("")
+        self.gridLayout_8.addWidget(self.operator_topology, 1, 1, 1, 1)
         self.tabWidget_3.addTab(self.tab_10, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -413,7 +422,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(0)
+        self.tabWidget_3.setCurrentIndex(6)
         self.bands_color.setCurrentIndex(0)
         self.tabWidget_4.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -516,6 +525,10 @@ class Ui_MainWindow(object):
         self.show_berry1d.setText(_translate("MainWindow", "1D Berry curvature"))
         self.nk_topology.setText(_translate("MainWindow", "200"))
         self.label_19.setText(_translate("MainWindow", "# kpoints"))
+        self.label_35.setText(_translate("MainWindow", "Operator"))
+        self.operator_topology.setItemText(0, _translate("MainWindow", "None"))
+        self.operator_topology.setItemText(1, _translate("MainWindow", "Sz"))
+        self.operator_topology.setItemText(2, _translate("MainWindow", "Valley"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_10), _translate("MainWindow", "Topology 2D"))
         self.ewindow_kdos.setText(_translate("MainWindow", "0.5"))
         self.label_20.setText(_translate("MainWindow", "Energy window"))

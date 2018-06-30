@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.10.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -56,12 +56,12 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.multilayers, 1, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
         self.tabWidget_2 = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget_2.setGeometry(QtCore.QRect(70, 210, 261, 331))
+        self.tabWidget_2.setGeometry(QtCore.QRect(70, 210, 261, 341))
         self.tabWidget_2.setObjectName("tabWidget_2")
         self.tab_3 = QtWidgets.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.gridLayoutWidget_2 = QtWidgets.QWidget(self.tab_3)
-        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(30, 10, 176, 268))
+        self.gridLayoutWidget_2.setGeometry(QtCore.QRect(30, 10, 176, 293))
         self.gridLayoutWidget_2.setObjectName("gridLayoutWidget_2")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.gridLayoutWidget_2)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -71,16 +71,16 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.ribbons_pyqt, 2, 0, 1, 1)
         self.hybridribbon_pyqt = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.hybridribbon_pyqt.setObjectName("hybridribbon_pyqt")
-        self.gridLayout_2.addWidget(self.hybridribbon_pyqt, 7, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.hybridribbon_pyqt, 8, 0, 1, 1)
         self.twisted_bilayer = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.twisted_bilayer.setObjectName("twisted_bilayer")
-        self.gridLayout_2.addWidget(self.twisted_bilayer, 8, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.twisted_bilayer, 9, 0, 1, 1)
         self.film2d_pyqt = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.film2d_pyqt.setObjectName("film2d_pyqt")
         self.gridLayout_2.addWidget(self.film2d_pyqt, 5, 0, 1, 1)
         self.heterostructure = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.heterostructure.setObjectName("heterostructure")
-        self.gridLayout_2.addWidget(self.heterostructure, 6, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.heterostructure, 7, 0, 1, 1)
         self.islands_pyqt = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.islands_pyqt.setObjectName("islands_pyqt")
         self.gridLayout_2.addWidget(self.islands_pyqt, 1, 0, 1, 1)
@@ -89,7 +89,10 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.sheets, 3, 0, 1, 1)
         self.hofstader_pyqt = QtWidgets.QPushButton(self.gridLayoutWidget_2)
         self.hofstader_pyqt.setObjectName("hofstader_pyqt")
-        self.gridLayout_2.addWidget(self.hofstader_pyqt, 9, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.hofstader_pyqt, 10, 0, 1, 1)
+        self.crystal3d_pyqt = QtWidgets.QPushButton(self.gridLayoutWidget_2)
+        self.crystal3d_pyqt.setObjectName("crystal3d_pyqt")
+        self.gridLayout_2.addWidget(self.crystal3d_pyqt, 6, 0, 1, 1)
         self.tabWidget_2.addTab(self.tab_3, "")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(260, 170, 331, 18))
@@ -131,6 +134,7 @@ class Ui_MainWindow(object):
         self.islands_pyqt.setText(_translate("MainWindow", "Islands"))
         self.sheets.setText(_translate("MainWindow", "Sheets"))
         self.hofstader_pyqt.setText(_translate("MainWindow", "Hofstader butterflies"))
+        self.crystal3d_pyqt.setText(_translate("MainWindow", "3D crystals"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), _translate("MainWindow", "Linux and MacOSX compatible"))
         self.label.setText(_translate("MainWindow", "Select the system you want to compute"))
 

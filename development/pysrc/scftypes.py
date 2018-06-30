@@ -33,6 +33,9 @@ def load(input_file="SCF.pkl"):
 
 class scfclass(): 
   """Class for a selfconsistent calculation"""
+  def copy(self):
+    from copy import deepcopy
+    return deepcopy(self)
   def save(self,output_file="SCF.pkl"):
     inout.save(self,output_file)
   def __init__(self,h):
@@ -639,7 +642,7 @@ def write_magnetization(mag):
 def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,
-                  mode="Hubbard",energy_cutoff=None):
+                  mode="Hubbard",energy_cutoff=None,maxite=1000):
   """ Solve a selfcnsistent Hubbard mean field"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
@@ -695,7 +698,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
       print("Fermi energy =",scf.fermi)
       print("Gap =",scf.gap)
     if stop_scf: break # stop the calculation
-    if scf.error<maxerror or os.path.exists("STOP"): # if converged break
+    if scf.error<maxerror or os.path.exists("STOP") or scf.iteration==maxite: 
       stop_scf = True # stop the calculation after the next iteration
       scf.mixing = 1.0 # last iteration with mixing one
       scf.smearing = None # last iteration without smearing

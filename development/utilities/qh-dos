@@ -15,7 +15,10 @@ matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
 fig = pl.figure(1)
 fig.subplots_adjust(0.2,0.2)
 
-m = np.genfromtxt("DOS.OUT").transpose()
+import sys
+if len(sys.argv[1])>1: name = sys.argv[1]
+else: name = "DOS.OUT"
+m = np.genfromtxt(name).transpose()
 num_dos = len(m) - 1
 e = m[0]
 d = m[1]

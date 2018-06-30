@@ -82,6 +82,7 @@ signals["islands_pyqt"] = call_mode("0d",pyqt=True)
 signals["film2d_pyqt"] = call_mode("2dslab",pyqt=True)  
 signals["hybridribbon_pyqt"] = call_mode("hybridribbon",pyqt=True)  
 signals["hofstader_pyqt"] = call_mode("hofstader1d",pyqt=True)  
+signals["crystal3d_pyqt"] = call_mode("3d",pyqt=True)  
 
 
 

@@ -12,6 +12,7 @@ import superconductivity
 import kanemele 
 import magnetism
 import checkclass
+import extract
 
 from bandstructure import get_bands_0d
 from bandstructure import get_bands_1d
@@ -46,6 +47,11 @@ class hamiltonian():
   def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
+  def set_filling(self,filling=0.5,nk=10):
+    """Set the Fillign of the Hamiltonian"""
+    es,ws = self.eigenvectors(nk=nk)
+    from scftypes import get_fermi_energy
+    self.shift_fermi(-get_fermi_energy(es,filling)) # shift the fermi energy
   def __init__(self,geometry=None):
     self.has_spin = True # has spin degree of freedom
     self.prefix = "" # a string used a prefix for different files
@@ -66,6 +72,14 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
+  def get_gk_gen(self,delta=0.05,operator=None):
+    """Return the Green function generator"""
+    hkgen = self.get_hk_gen() # Hamiltonian generator
+    def f(k=[0.,0.,0.],e=0.0):
+      hk = hkgen(k) # get matrix
+      if operator is not None: hk = operator.H*hk*operator # project
+      return (np.identity(hk.shape[0])*(e+1j*delta) - hkgen(k)).I 
+    return f
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""
     print_hamiltonian(self)
@@ -385,7 +399,7 @@ class hamiltonian():
     """Clean a Hamiltonian"""
     from clean import clean_hamiltonian
     clean_hamiltonian(self)
-  def get_operator(self,name):
+  def get_operator(self,name,projector=False):
     """Return a certain operator"""
     if name=="sx": return operators.get_sx(self)
     elif name=="sy": return operators.get_sy(self)
@@ -411,7 +425,7 @@ class hamiltonian():
       return self.get_operator("sy")*self.get_operator("electron")
     elif name=="mz": 
       return self.get_operator("sz")*self.get_operator("electron")
-    elif name=="valley": return operators.get_valley(self)
+    elif name=="valley": return operators.get_valley(self,projector=projector)
     elif name=="inplane_valley": return operators.get_inplane_valley(self)
     elif name=="valley_upper": 
       print("This operator only makes sense for TBG")
@@ -429,11 +443,22 @@ class hamiltonian():
       ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
       return operators.get_valley(ht)
     else: raise
+  def extract(self,name="mz"): 
+    """Extract somethign from the Hamiltonian"""
+    if self.has_eh: raise # not implemented
+    if name=="density":
+      return extract.onsite(self.intra,has_spin=self.has_spin)
+    elif name=="mx" and self.has_spin:
+      return extract.mx(self.intra)
+    elif name=="my" and self.has_spin:
+      return extract.my(self.intra)
+    elif name=="mz" and self.has_spin:
+      return extract.mz(self.intra)
+    else: raise
   def write_magnetization(self):
     """Extract the magnetization and write in in a file"""
     if not self.has_eh: # without electron hole
       if self.has_spin: # for spinful
-        import extract
         mx = extract.mx(self.intra)
         my = extract.my(self.intra)
         mz = extract.mz(self.intra)

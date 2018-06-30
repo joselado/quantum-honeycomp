@@ -18,7 +18,7 @@ except:
   try:
     import os
     qhpath = os.environ["QHROOT"]+"/" # path to quantum honeycomp
-    os.system("/usr/bin/python2.7 "+qhpath+"utilities/qh-magnetism")
+    os.system("/usr/bin/python2.7 "+qhpath+"utilities/qh-moments")
   except:
     print("Something wrong")
     exit()

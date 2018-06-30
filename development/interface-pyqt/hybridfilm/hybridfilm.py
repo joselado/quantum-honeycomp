@@ -232,14 +232,24 @@ def show_structure_3d(self):
   execute_script("qh-structure3d POSITIONS.OUT")
 
 
+
+
+
+
 def show_kdos(self):
   h = pickup_hamiltonian()  # get the hamiltonian
   ew = get("ewindow_kdos")
   new = int(get("mesh_kdos")) # scale as kpoints
   energies = np.linspace(-ew,ew,new) # number of ene
-  klist = np.linspace(0.,1.,new)
-  kdos.write_surface_2d(h,energies=energies,delta=ew/new,klist=klist)
+  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+  kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
   execute_script("qh-kdos-both KDOS.OUT  ")
+
+
+
+
+
+
 
 
 

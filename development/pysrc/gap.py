@@ -141,7 +141,7 @@ def optimize_gap(h,direct=True,ntries=10):
 
 
 
-def indirect_gap(h,sparse=True,mode="refine"):
+def indirect_gap(h):
   """Calculates the gap for a 2d Hamiltonian by doing
   a kmesh sampling. It will return the positive energy with smaller value"""
   from scipy.optimize import minimize

@@ -392,4 +392,35 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
 
 
 
+def bulkandsurface(h1,energies=np.linspace(-1.,1.,100),operator=None,
+                    delta=0.01,hs=None,nk=30):
+  """Compute the DOS of the bulk and the surface"""
+  tr = timing.Testimator("KDOS") # generate object
+  ik = 0
+  h1 = h1.get_multicell() # multicell Hamiltonian
+  kpath = [np.random.random(3) for i in range(nk)] # loop
+  dosout = np.zeros((2,len(energies))) # output DOS
+  for k in kpath:
+    tr.remaining(ik,len(kpath)) # generate object
+    ik += 1
+    outs = green.surface_multienergy(h1,k=k,energies=energies,delta=delta,hs=hs)
+    ie = 0
+    for (energy,out) in zip(energies,outs): # loop over energies
+      # compute dos
+      ig = 0
+      for g in out: # loop
+        if operator is None: d = -g.trace()[0,0].imag # only the trace 
+        elif callable(operator): d = operator(g,k=k) # call the operator
+        else:  d = -(g*operator).trace()[0,0].imag # assume it is a matrix
+        dosout[ig,ie] += d # store
+        ig += 1 # increase site
+      ie += 1 # increase energy
+  # write in file
+  dosout/=nk # normalize
+  np.savetxt("DOS_BULK_SURFACE.OUT",np.matrix([energies,dosout[0],dosout[1]]).T)
+
+
+
+
+
 

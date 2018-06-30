@@ -156,10 +156,10 @@ def show_dos(self):
   execute_script("tb90-dos  ")
 
 
+
 def pickup_hamiltonian():
-  return initialize()
-  if builder.get_object("activate_scf").get_active():
-    return read_hamiltonian()
+  if qtwrap.is_checked("do_scf"):
+    return hamiltonians.load() # load the Hamiltonian
   else: # generate from scratch
     return initialize()
 
@@ -171,19 +171,6 @@ def pickup_hamiltonian():
 
 
 
-
-def show_stm(self):
-  h = pickup_hamiltonian() # get hamiltonian
-#  ldos.multi_ldos()
-  ewin = abs(get("window_ldos")) # energy window
-  ne = int(get("num_ldos")) # number of LDOS
-  delta = ewin/ne # delta
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=1,delta=delta)
-  execute_script("qh-multildos ")
-#  hamiltonians.ldos(h,e=get("stm_bias"),delta=get("DOS_smearing")) # calculate the stm spectra
-#  print("Using semaring",get("DOS_smearing"))
-#  execute_script("qh-ldos  LDOS.OUT")
-  return
 
 
 def show_berry2d():
@@ -221,17 +208,16 @@ def show_structure_3d(self):
 
 
 
-
-
-
 def show_kdos(self):
   h = pickup_hamiltonian()  # get the hamiltonian
   ew = get("ewindow_kdos")
   new = int(get("mesh_kdos")) # scale as kpoints
   energies = np.linspace(-ew,ew,new) # number of ene
-  klist = np.linspace(0.,1.,new)
-  kdos.write_surface_2d(h,energies=energies,delta=ew/new,klist=klist)
+  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+  kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
   execute_script("qh-kdos-both KDOS.OUT  ")
+
+
 
 
 
@@ -248,6 +234,29 @@ def show_z2(self):
   topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
   execute_script("qh-wannier-center  ") # plot the result
 
+
+
+def solve_scf():
+  """Perform a selfconsistent calculation"""
+  scfin = getbox("scf_initialization")
+  h = initialize() # initialize the Hamiltonian
+  mf = scftypes.guess(h,mode=scfin)
+  nk = int(get("nk_scf"))
+  U = get("hubbard")
+  filling = get("filling_scf")
+  filling = filling%1.
+  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
+                mf=mf,mode="U",smearing=get("smearing_scf"),
+                mix = get("mix_scf"))
+  scf.hamiltonian.save() # save in a file
+
+
+
+def show_magnetism():
+  """Show the magnetism of the system"""
+  h = pickup_hamiltonian() # get the Hamiltonian
+  h.write_magnetization() # write the magnetism
+  execute_script("qh-moments",mayavi=True)
 
 
 
@@ -268,7 +277,8 @@ signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_ldos"] = show_ldos  # show DOS
-#signals["show_stm"] = show_stm  # show STM
+signals["show_magnetism"] = show_magnetism
+signals["solve_scf"] = solve_scf 
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism
 #signals["save_results"] = save_results  # save the results

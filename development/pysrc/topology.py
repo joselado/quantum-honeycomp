@@ -8,21 +8,34 @@ import multicell
 import klist
 import operators
 import inout
+import timing
 
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
 
 
-def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None):
+def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
+      mode="Wilson",delta=0.001,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   fo = open("BERRY_CURVATURE.OUT","w") # open file
+  tr = timing.Testimator("BERRY CURVATURE")
+  ik = 0
+  if operator is not None: mode="Green" # Green function mode
   for k in kpath:
-    b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+    tr.remaining(ik,len(kpath))
+    if reciprocal:  k = h.geometry.get_k2K_generator()(k) # convert
+    ik += 1
+    if mode=="Wilson":
+      b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+    if mode=="Green":
+      f = h.get_gk_gen(delta=delta) # get generator
+      b = berry_green(f,k=k,operator=operator) 
     fo.write(str(k[0])+"   ")
     fo.write(str(k[1])+"   ")
     fo.write(str(b)+"\n")
+    fo.flush()
   fo.close() # close file
 
 
@@ -64,14 +77,14 @@ def berry_curvature(h,k,dk=0.01,window=None,max_waves=None):
 # get the function that returns the occ states
   occf = occ_states_generator(h,k,window=window,max_waves=max_waves)  
   # get the waves
-  print("Doing k-point",k)
+#  print("Doing k-point",k)
   wf1 = occf(k-dx-dy) 
   wf2 = occf(k+dx-dy) 
   wf3 = occf(k+dx+dy) 
   wf4 = occf(k-dx+dy) 
   dims = [len(wf1),len(wf2),len(wf3),len(wf4)] # number of vectors
   if max(dims)!=min(dims): # check that the dimensions are fine 
-    print("WARNING, skipping this k-point",k)
+#    print("WARNING, skipping this k-point",k)
     return 0.0 # if different number of vectors
   # get the uij  
   m = uij(wf1,wf2)*uij(wf2,wf3)*uij(wf3,wf4)*uij(wf4,wf1)
@@ -128,30 +141,64 @@ def uij_slow(wf1,wf2):
   return m
 
 
-def precise_chern(h,dk=0.01):
+def precise_chern(h,dk=0.01, mode="Wilson",delta=0.0001,operator=None):
   """ Calculates the chern number of a 2d system """
   from scipy import integrate
-  err = {"epsabs" : 0.01, "epsrel": 0.01,"limit" : 10}
+  err = {"epsabs" : 1.0, "epsrel": 1.0,"limit" : 10}
 #  err = [err,err]
   def f(x,y): # function to integrate
-    return berry_curvature(h,np.array([x,y]),dk=dk)
-  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=1.,
-                          epsrel=1.)
+    if mode=="Wilson":
+      return berry_curvature(h,np.array([x,y]),dk=dk)
+    if mode=="Green":
+       f2 = h.get_gk_gen(delta=delta) # get generator
+       return berry_green(f2,k=[x,y,0.],operator=operator) 
+  c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=0.01,
+                          epsrel=0.01)
   chern = c[0]/(2.*np.pi)
   open("CHERN.OUT","w").write(str(chern)+"\n")
   return chern
 
 
-def chern(h,dk=-1,nk=10):
+def hall_conductivity(h,dk=-1,n=1000):
+  c = 0.0 
+  nk = int(np.sqrt(n)) # estimate
+  if dk<0: dk = 1./float(2*nk) # automatic dk
+  for i in range(n):
+    k = np.random.random(2) # random kpoint
+    c += berry_curvature(h,k,dk=dk)
+  c = c/(2*np.pi*n) # normalize
+  return c
+
+
+
+
+def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
   """ Calculates the chern number of a 2d system """
   c = 0.0
   ks = [] # array for kpoints
   bs = [] # array for berrys
   if dk<0: dk = 1./float(2*nk) # automatic dk
+  if operator is not None and mode=="Wilson":
+    print("Swuitching to Green mode in topology")
+    mode="Green"
+  # create the function
+  def fberry(k): # function to integrate
+    if mode=="Wilson":
+      return berry_curvature(h,k,dk=dk)
+    if mode=="Green":
+       f2 = h.get_gk_gen(delta=delta) # get generator
+       return berry_green(f2,k=[k[0],k[1],0.],operator=operator) 
+  ##################
   for x in np.linspace(0.,1.,nk,endpoint=False):
     for y in np.linspace(0.,1.,nk,endpoint=False):
-      ks.append([x,y])
-      bs.append(berry_curvature(h,np.array([x,y]),dk=dk))
+      ks.append([x,y]) # create kpoints
+  tr = timing.Testimator("CHERN NUMBER")
+  ik = 0
+  for k in ks: # loop
+    tr.remaining(ik,len(ks))
+    ik += 1 # increase
+    b = fberry(k) # get berry curvature
+    bs.append(b)
   # write in file
   fo = open("BERRY_CURVATURE.OUT","w") # open file
   for (k,b) in zip(ks,bs):
@@ -165,23 +212,35 @@ def chern(h,dk=-1,nk=10):
   open("CHERN.OUT","w").write(str(c)+"\n")
   return c
 
+hall_conductivity = chern
 
 
 def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
-               max_waves=None):
+               max_waves=None,mode="Wilson",delta=0.001,operator=None):
   """ Calculates the chern number of a 2d system """
+  if operator is not None: mode="Green" # Green function mode
   c = 0.0
   ks = [] # array for kpoints
   if dk<0: dk = 5./float(2*nk) # automatic dk
   if reciprocal: R = h.geometry.get_k2K()
   else: R = np.matrix(np.identity(3))
   fo = open("BERRY_MAP.OUT","w") # open file
+  nt = nk*nk # total number of points
+  tr = timing.Testimator("BERRY CURVATURE")
+  ik = 0
   for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
     for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+      tr.remaining(ik,nt)
+      ik += 1
       r = np.matrix([x,y,0.]).T # real space vectors
       k = np.array((R*r).T)[0] # change of basis
-      b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+      if mode=="Wilson":
+         b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
+      if mode=="Green":
+         f = h.get_gk_gen(delta=delta) # get generator
+         b = berry_green(f,k=k,operator=operator) 
       fo.write(str(x)+"   "+str(y)+"     "+str(b)+"\n")
+      fo.flush()
   fo.close() # close file
 
 
@@ -389,3 +448,75 @@ def precise_spin_chern(h,delta=0.00001,tol=0.1):
   c = integrate.dblquad(f,0.,1.,lambda x : 0., lambda x: 1.,epsabs=tol,
                           epsrel=tol)
   return c[0]/(2.*np.pi)
+
+
+
+
+def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,fh=None):
+  """Function that returns the energy resolved Berry curvature"""
+  k = np.array(k) # set as array
+  dx = np.array([dk,0.,0.])
+  dy = np.array([0.,dk,0.])
+  def fint(e): # function to integrate
+#    g = f(e=e,k=k) # compute at this k and this energy
+    gxp = f(e=e,k=k+dx) # compute at this k and this energy
+    gxm = f(e=e,k=k-dx) # compute at this k and this energy
+    gyp = f(e=e,k=k+dy) # compute at this k and this energy
+    gym = f(e=e,k=k-dy) # compute at this k and this energy
+    g = (gxp + gyp + gxm + gym)/4. # average Green function
+    # Now apply the formula
+    gI = g.I # inverse
+    omega = ((gxp-gxm)*(gyp-gym) - (gyp-gym)*(gxp-gxm))*gI
+#    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
+#    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
+    if operator is not None: omega = operator(omega,k=k) 
+    return omega.trace()[0,0]/(4.*dk*dk*2.*np.pi) # return contribution
+  return fint # return the function
+
+
+
+
+def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
+                  fh = None):
+  """Return the Berry curvature using Green functions"""
+  import scipy.integrate as integrate
+  fint = berry_green_generator(f,k=k,dk=dk,operator=operator,fh=fh) 
+  es = np.linspace(emin,0.,ne) # energies used for the integration
+  ### The original function is defined in the coplex plane,
+  # we will do a change of variables of the form z = re^(iphi) - r0
+  # so that dz = re^(iphi) i dphi
+  def fint2(x):
+    """Function to integrate using a complex contour, from 0 to 1"""
+    z0 = emin*np.exp(-1j*x*np.pi)/2.
+    z = z0 + emin/2.
+    return -(fint(z)*z0).imag*np.pi # integral after the change of variables
+  return integrate.quad(fint2,0.0,1.0,limit=60,epsabs=0.1,epsrel=0.1)[0]
+#  return integrate.quad(fint,emin,0.0,limit=60,epsabs=0.01,epsrel=0.01)[0]
+#  return np.sum([fint(e) for e in es]) # return
+
+
+
+def berry_density(h,delta=0.2,es=np.linspace(-3.0,3.0,100),nk=100,
+                     dk = 0.02):
+  """Write in a file an energy map of the Berry curvature"""
+  f = h.get_gk_gen(delta=delta)
+  ks = [np.random.random(3) for i in range(nk)] # random kpoints
+  out = [] # empty list
+  from scipy import integrate
+  for e in es:
+    def fint(kx,ky): # function to integrate
+      k = [kx,ky,0.]
+      fint2 = berry_green_generator(f,k=k,dk=dk) # get the function
+      return fint2(e)
+    o = integrate.dblquad(fint, 0, 1, lambda x: 0, lambda x: 1,epsabs=10.0,
+                epsrel=10.0)[0]
+    print(e,o)
+    out.append(o)
+  np.savetxt("BERRY_DENSITY.OUT",np.matrix([es,out]).T) 
+  return (es,outm)
+
+
+
+
+
+

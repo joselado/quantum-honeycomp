@@ -128,8 +128,8 @@ def execute_script(name,background=True,mayavi=False):
   try:
     python = get_anaconda_command("python") # get the anaconda python
   except:
-    if mayavi: python = "/usr/bin/python2"
-    else: python = get_python() # get the correct interpreter
+    python = get_python() # get the correct interpreter
+#    if mayavi: python = "/usr/bin/python3" # use the native
   if background: os.system(python+" "+scriptpath+" &") # execute the script
   else: os.system(python+" "+scriptpath) # execute the script
 

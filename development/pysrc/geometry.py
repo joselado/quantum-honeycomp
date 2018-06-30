@@ -137,6 +137,12 @@ class geometry:
         self.lattice_name = "triangular"
   def get_k2K(self):
     return get_k2K(self)
+  def get_k2K_generator(self):
+    R = self.get_k2K() # get the matrix
+    def f(k):
+      r = np.matrix(k).T # real space vectors
+      return np.array((R*r).T)[0]
+    return f # return function
   def get_fractional(self):
     """Fractional coordinates"""
     get_fractional(self) # get fractional coordinates

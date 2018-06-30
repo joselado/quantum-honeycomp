@@ -26,5 +26,5 @@ my_map = plt.get_cmap("bwr")
 m = np.genfromtxt(name).transpose()
 color = np.sign(m[2])*np.sqrt(np.abs(m[2]))
 size = 300
-plt.scatter(m[0],m[1],c=color,s=size,cmap=plt.get_cmap("bwr"), color ="black" ,edgecolors='none')
+plt.scatter(m[0],m[1],c=color,s=size,cmap=plt.get_cmap("bwr"), edgecolors='none')
 plt.show()

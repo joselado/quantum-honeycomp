@@ -1,5 +1,6 @@
 This is is the Quantum Honeycomp package, a software aimed to study
-the electronic properties of 2D graphene-like systems
+the electronic properties of simple tight binding models, in
+particular graphene-like materials
 
 Download at
 https://github.com/joselado/quantum-honeycomp
