@@ -34,7 +34,7 @@ def get_geometry():
   else: raise
   g = geometry_builder() # call the geometry
   nsuper = int(get("nsuper"))
-  g = supercell(nsuper)
+  g = g.supercell(nsuper)
   g.real2fractional()
   g.fractional2real()
   g.center()
