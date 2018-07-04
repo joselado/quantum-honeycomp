@@ -210,6 +210,10 @@ def ldos0d(m_in,i=0,scale=10.,npol=None,ne=500,kernel="jackson"):
 
 
 
+ldos = ldos0d
+
+
+
 def tdos(m_in,scale=10.,npol=None,ne=500,kernel="jackson",
               ntries=20,ewindow=None,frand=None):
   """Return two arrays with energies and local DOS"""

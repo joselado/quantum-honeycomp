@@ -709,10 +709,15 @@ def cubic_lattice():
   return g
 
 
+def cubic_lieb_lattice():
+  """Return a 3d Lieb lattice"""
+  g = cubic_lattice()
+  g = g.remove(0) # remove this atom
+  return g
 
 
 def lieb_lattice():
-  """ Create a Lieb lattice"""
+  """ Create a 2d Lieb lattice"""
   g = geometry() # create geometry
   g.x = np.array([-0.5,0.5,0.5])
   g.y = np.array([-0.5,-0.5,0.5])
@@ -1255,7 +1260,7 @@ def pyrochlore_lattice():
   g.dimensionality = 3 # three dimensional system
   g.has_sublattice = True
   g.sublattice_number = 4 # three sublattices
-  g.sublattice = [0,1,2,3] # the three sublattices
+  g.sublattice = [1,0,3,2] # the three sublattices
 #  g.sublattice = np.array([1,-1])
   g.r = np.array(rs) # store
   g.r2xyz() # create r coordinates
@@ -1279,7 +1284,8 @@ def tetrahedral_lattice():
 
 
 # use the cubic one as the default one
-diamond_lattice = cubic_diamond_lattice 
+#diamond_lattice = cubic_diamond_lattice 
+diamond_lattice = diamond_lattice_minimal
 
 
 
