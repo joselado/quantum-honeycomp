@@ -201,14 +201,7 @@ def pickup_hamiltonian():
 
 
 def read_hamiltonian():
-  g = get_geometry2d() # get the geometry
-  h = g.get_hamiltonian() # get the hamiltonian
-  h.read("hamiltonian.in") # read hamiltonian
-  h.has_eh = builder.get_object("has_eh").get_active()
-  h.has_spin = builder.get_object("has_spin").get_active()
-  return h
-
-
+  return hamiltonians.load()
 
 
 

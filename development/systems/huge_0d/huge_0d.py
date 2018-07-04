@@ -215,7 +215,8 @@ def initialize(self):
   # part for bilayer systems
   #####
   print("Time spent in creating the Hamiltonian =",time.clock() - t0)
-  h.write("hamiltonian.in")
+  h.geometry.write()
+  h.save() # save the Hamiltonian
 
 
   
@@ -249,9 +250,7 @@ def show_ldos(self):
 
 
 def show_full_spectrum(self):
-  h = hamiltonians.hamiltonian() # create hamiltonian object
-  h.is_sparse = True
-  h.read() # read hamiltonian from file
+  h = load_hamiltonian() # get the hmiltonian
   nmax = 10000
   if h.intra.shape[0]<nmax:
     h.get_bands()    
@@ -262,10 +261,7 @@ def show_full_spectrum(self):
 
 
 def load_hamiltonian():
-  h = hamiltonians.hamiltonian() # create hamiltonian object
-  h.is_sparse = True
-  h.read() # read hamiltonian from file
-  h.has_spin = builder.get_object("is_spinful").get_active()
+  h = hamiltonians.load() # load the Hamiltonian
   return h
 
 

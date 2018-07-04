@@ -144,10 +144,11 @@ def initialize(self):
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   h.shift_fermi(get("fermi")) # shift fermi energy
   h.add_peierls(get("peierls")) # shift fermi energy
-  h.write("hamiltonian.in") # write the Hamiltonian in file
+  h.write() # write the Hamiltonian in file
   if builder.get_object("activate_scf").get_active():
     hscf = custom_scf(h) # perform selfconsistent calculation
   else: pass
+  h.save() # save hamiltonian
   return h
 
 
@@ -185,12 +186,7 @@ def pickup_hamiltonian():
 
 
 def read_hamiltonian():
-  g = get_geometry0d() # get the geometry
-  h = g.get_hamiltonian() # get the hamiltonian
-  h.read("hamiltonian.in") # read hamiltonian
-#  h.has_eh = builder.get_object("has_eh").get_active()
-#  h.has_spin = builder.get_object("has_spin").get_active()
-  return h
+  return hamiltonians.load() # load Hamiltonian
 
 
 

@@ -114,7 +114,7 @@ def initialize(self):
   h.shift_fermi(get("fermi")) # shift fermi energy
   klist.default(g,nk=int(get("nkpoints")))  # write klist
   build_skyrmion(h) # add the zeeman field and write magnetization
-  h.write("hamiltonian.in")  # write in file
+  h.write()  # write in file
   return h
 
 

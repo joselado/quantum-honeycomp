@@ -159,6 +159,8 @@ class hamiltonian():
     """ Write the hamiltonian in a file"""
     inout.save(self,output_file) # write in a file
   write = save # just in case
+  def read(self,output_file="hamiltonian.pkl"):
+    self = load(output_file)
   def total_energy(self,nkpoints=30,nbands=None,random=False,kp=None):
     """ Get total energy of the system"""
     return total_energy(self,nk=nkpoints,nbands=nbands,random=random,kp=kp)

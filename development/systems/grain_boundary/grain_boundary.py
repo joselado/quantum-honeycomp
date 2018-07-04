@@ -138,7 +138,6 @@ def initialize(self):
     h = custom_scf(h) 
 #  else:
 
-#  h.write("hamiltonian.in")
   hscf = h.copy()
   return h # return the Hamiltonian
 
@@ -152,12 +151,7 @@ def pickup_hamiltonian():
 
 
 def read_hamiltonian():
-  g = get_geometry() # get the geometry
-  h = g.get_hamiltonian() # get the hamiltonian
-  h.read("hamiltonian.in") # read hamiltonian
-  h.has_eh = builder.get_object("has_eh").get_active()
-  h.has_spin = builder.get_object("has_spin").get_active()
-  return h
+  return hamiltonians.load()
 
 
 def show_bands(self):

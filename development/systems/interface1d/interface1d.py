@@ -18,16 +18,6 @@ from gi.repository import Gtk as gtk
 builder = gtk.Builder()
 
 from qh_interface import * # import all the libraries needed
-## These are the libraries imported
-#######################################
-##import subprocess
-##import os
-##import sys
-##import hamiltonians
-##import klist
-##import geometry
-##import input_tb90 
-#######################################
 
 
 
@@ -132,7 +122,7 @@ def initialize(self):
     elif r[1]>tlen: return 1.0
     else: return (r[1]+tlen)/(2*tlen) # interpolate
   h = hybrid.half_and_half(h1,h2,fun=fun) # create hybrid Hamiltonian
-  h.write("hamiltonian.in") # write Hamiltonian
+  h.write() # write Hamiltonian
   return h
 
 
@@ -140,7 +130,7 @@ def initialize(self):
   if builder.get_object("activate_scf").get_active():
     custom_scf(h) # cr
   else:
-    h.write("hamiltonian.in")
+    h.write()
 
 
 
@@ -154,14 +144,7 @@ def pickup_hamiltonian():
 
 
 def read_hamiltonian():
-  g = get_geometry() # get the geometry
-  h = g.get_hamiltonian() # get the hamiltonian
-  h.read("hamiltonian.in") # read hamiltonian
-  h.has_eh = builder.get_object("has_eh").get_active()
-  h.has_spin = builder.get_object("has_spin").get_active()
-  return h
-
-
+  return hamiltonians.load()
 
 
 

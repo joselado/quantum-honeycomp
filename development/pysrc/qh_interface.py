@@ -34,7 +34,7 @@ import platform
 
 def get_python():
   try:
-    return get_anaconda_command("python") # retunr anaconda
+    return get_anaconda_command("python") # return anaconda
   except:
     if platform.system()=="Linux":
       python = "/usr/bin/python3" # Python 3

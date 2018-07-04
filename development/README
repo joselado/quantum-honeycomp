@@ -26,7 +26,7 @@ python-numpy
 python-scipy
 python-matplotlib
 python-visual
-mayavi2
+mayavi
 liblapack
 gfortran
 

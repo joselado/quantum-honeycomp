@@ -97,9 +97,9 @@ def initialize(self):
   h.shift_fermi(get_function("fermi",g)) # shift fermi energy
   if builder.get_object("has_eh").get_active():
     h.add_swave(get_function("swave",g))
-    h.write("hamiltonian.in")
+    h.write()
   else:
-    h.write("hamiltonian.in")
+    h.write()
   klist.default(g,nk=int(get("nkpoints")))  # write klist
 #  klist.tr_path(nk=int(get("nkpoints")))  # write klist
   return h
