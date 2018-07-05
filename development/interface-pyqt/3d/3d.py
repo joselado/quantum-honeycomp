@@ -118,16 +118,11 @@ def show_dosbands(self=0):
 
 def show_dos(self):
   h = pickup_hamiltonian() # get hamiltonian
-#  mode = getbox("mode_dos") # mode for the DOS
-  if h.dimensionality==0:
-    dos.dos0d(h,es=np.linspace(-3.1,3.1,500),delta=get("DOS_smearing"))
-  elif h.dimensionality==1:
-#    dos.dos1d(h,ndos=400,delta=get("DOS_smearing"))
-    dos.dos1d(h,ndos=400)
-  elif h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
-  else: raise
-  execute_script("tb90-dos  ")
+  nk = get("nk_dos")
+  delta = get("smearing_dos")
+  ne = get("ne_dos")
+  dos.dos3d(h,ndos=int(ne),delta=delta,nk=int(nk))
+  execute_script("qh-dos  DOS.OUT")
 
 
 

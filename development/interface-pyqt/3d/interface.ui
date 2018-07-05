@@ -479,7 +479,7 @@
         <x>60</x>
         <y>87</y>
         <width>211</width>
-        <height>81</height>
+        <height>101</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_5">
@@ -491,9 +491,37 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="DOS_smearing">
+        <widget class="QLineEdit" name="smearing_dos">
          <property name="text">
-          <string>0.01</string>
+          <string>0.1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="nk_dos">
+         <property name="text">
+          <string>3000</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string># of kpoints</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="ne_dos">
+         <property name="text">
+          <string>600</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_17">
+         <property name="text">
+          <string># of energies</string>
          </property>
         </widget>
        </item>

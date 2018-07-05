@@ -238,12 +238,7 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
 def dos3d(h,scale=10.,nk=20,delta=None,ndos=100,random=False):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=3: raise # only for 2d
-  ks = []
-  for ik in np.linspace(0.,1.,nk,endpoint=False):
-    for jk in np.linspace(0.,1.,nk,endpoint=False):
-      for kk in np.linspace(0.,1.,nk,endpoint=False):
-        if random: ks.append(np.random.random(3)) # add point
-        else: ks.append(np.array([ik,jk,kk])) # add point
+  ks = [np.random.random(3) for i in range(nk)] # number of kpoints
   hkgen = h.get_hk_gen() # get generator
   if delta is None: delta = 10./ndos # smoothing
   calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta) # conventional algorithm
