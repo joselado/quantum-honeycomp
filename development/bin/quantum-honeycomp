@@ -55,12 +55,14 @@ if not platform.system()=="Linux": # For Mac
   os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
 
 else: # For Linux
-  try:
-    from gi.repository import Gtk as gtk
-    print("Running GTK interface")
-    os.system(python+" "+qhroot+"bin/quantum-honeycomp-gtk")
-  except:
-    os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
-  #  os.system("quantum-honeycomp-pyqt")
-    print("Running PyQt interface")
-  #  exit()
+  os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
+#  try:
+#    from gi.repository import Gtk as gtk
+#    print("Running GTK interface")
+#    os.system(python+" "+qhroot+"bin/quantum-honeycomp-gtk")
+#  except:
+#    os.system(python+" "+qhroot+"bin/quantum-honeycomp-gtk")
+##    os.system(python+" "+qhroot+"bin/quantum-honeycomp-pyqt")
+#  #  os.system("quantum-honeycomp-pyqt")
+#    print("Running PyQt interface")
+#  #  exit()

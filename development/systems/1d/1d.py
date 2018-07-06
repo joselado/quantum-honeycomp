@@ -105,11 +105,14 @@ def get_geometry():
       g = geometry.kagome_lattice()
       return ribbon.bulk2ribbon(g,n=n)
   g = geometry_builder(int(get("tetramers")))
-  g = g.supercell(int(get("nsuper"))) # number of supercells
-  g = sculpt.remove_central(g,int(get("nvac"))) # add the vacancies 
+  if get("nsuper")>1: 
+    g = g.supercell(int(get("nsuper"))) # number of supercells
+  if int(get("nvac"))>0: 
+    g = sculpt.remove_central(g,int(get("nvac"))) # add the vacancies 
   n_messed = int(get("messed_edge")) # number of messed edge atoms
-  mess = sculpt.get_furthest(g,n=2*n_messed,tol=400) # get edge atoms
-  g = sculpt.remove(g,mess) # remove messed atoms
+  if n_messed>0:
+    mess = sculpt.get_furthest(g,n=2*n_messed,tol=400) # get edge atoms
+    g = sculpt.remove(g,mess) # remove messed atoms
   g.write()
   return g
 
@@ -127,7 +130,7 @@ def initialize(self):
   h.add_sublattice_imbalance(get("AB_imbalance"))  # sublattice imbalance
   h.add_rashba(get("rashba_soc"))  # Rashba field
   h.add_antiferromagnetism(get("af_imbalance"))  # AF order
-  h.add_kane_mele(get("km_soc")) # intrinsic SOC
+  if get("km_soc")!=0.0: h.add_kane_mele(get("km_soc")) # intrinsic SOC
   h.add_peierls(get("peierls")) # gauge field
   if builder.get_object("has_eh").get_active():
     h.add_swave(get("swave"))
