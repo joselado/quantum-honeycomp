@@ -151,12 +151,6 @@ def show_berry2d():
 
   
 
-def show_magnetism(self):
-  h = pickup_hamiltonian() # get hamiltonian
-  h.get_magnetization() # get the magnetization
-  execute_script("tb90-magnetism  ")
-#  execute_script("qh-magnetism  ")
-
 
 def show_structure(self):
   """Show the lattice of the system"""

@@ -134,3 +134,17 @@ def execute_script(name,background=True,mayavi=False):
   else: os.system(python+" "+scriptpath) # execute the script
 
 
+
+def computing():
+  """Return an object that shows up a window saying computing"""
+  qhpath = get_qhroot()
+  python = get_python()
+  name = qhpath + "interface-pyqt/timer/timer.py"
+  import subprocess
+#  import psutil
+#  print(name)
+  subp = subprocess.Popen([python,name]) # execute the command
+#  p = psutil.Process(subp.pid) # return process
+  return subp
+
+

@@ -21,32 +21,6 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def custom_scf(h):
-  """Modifies the properties of tb90.in input"""
-  # begin SCF options
-  scfin = builder.get_object("scf_initialization").get_active_text()
-  import random
-  rand = random.random
-  def rv():
-    return .5 - np.random.random(3) # 3 component random vector
-  def rvxy():
-    v = np.random.random(3) -.5 # 3 component random vector
-    v[0] = 0.0
-    return v
-  ###################################
-  if scfin == "Reconverge": # no new mean field
-    mf = np.load("MEAN_FIELD.npy") # load the mean field from file
-  else: # if create new mean field matrix
-    mf = interactions.initialization(h.geometry,scfin=scfin)  # create the mean field mat
-  U = get("hubbard") # value of Hubbard
-  mix = 0.5
-  if U > 1.5: mix = 0.1 # slow mixing
-  # perform the selfconsistent calculation
-  scf = interactions.hubbardscf(h,U=U,nkp=1,mf=mf,silent=False,mix=mix,
-                                  maxerror=1e-5,filling=get("filling"))
-  scf.hamiltonian.write() # write in a file
-  np.save("MEAN_FIELD.npy",np.array(scf.mean_field)) # save in a file
-
 
 
 
@@ -117,22 +91,29 @@ def show_bands(self=0):
   elif opname=="Valley": op = h.get_operator("valley")
   elif opname=="y-position": op = h.get_operator("yposition")
   else: op =None
+  comp = computing() # create the computing window
   h.get_bands(operator=op)
+  comp.kill() # kill the window
   execute_script("qh-bands1d  ")
 
 
+#t = computing()
+#t.kill()
 
 def show_dosbands(self=0):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
   kdos.kdos_bands(h,scale=get("scale_kbands"),ewindow=get("window_kbands"),
                    ne=int(get("ne_kbands")),delta=get("delta_kbands"),
                    ntries=int(get("nv_kbands")))
+  comp.kill()
   execute_script("qh-dosbands1d  KDOS_BANDS.OUT ")
 
 
 
 
 def show_interactive_ldos():
+  comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
   ewin = get("window_ldos")
   nrep = int(get("nsuper_ldos"))
@@ -140,6 +121,7 @@ def show_interactive_ldos():
   ne = int(get("ne_ldos"))
   delta = get("delta_ldos")
   ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,nrep=nrep)
+  comp.kill()
   execute_script("qh-multildos ")
 
 
@@ -148,6 +130,7 @@ def show_interactive_ldos():
 
 
 def show_dos(self):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
 #  mode = getbox("mode_dos") # mode for the DOS
   if h.dimensionality==0:
@@ -158,25 +141,28 @@ def show_dos(self):
   elif h.dimensionality==2:
     dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
   else: raise
-  execute_script("tb90-dos  ")
+  comp.kill()
+  execute_script("qh-dos  DOS.OUT")
+
 
 
 def pickup_hamiltonian():
-  return initialize()
-  if builder.get_object("activate_scf").get_active():
-    return read_hamiltonian()
+  if qtwrap.is_checked("do_scf"):
+    return hamiltonians.load() # load the Hamiltonian
   else: # generate from scratch
     return initialize()
 
 
 
-  
+def show_magnetism():
+  """Show the magnetism of the system"""
+  h = pickup_hamiltonian() # get the Hamiltonian
+  h.write_magnetization() # write the magnetism
+  execute_script("qh-moments",mayavi=True)
 
-def show_magnetism(self):
-  h = pickup_hamiltonian() # get hamiltonian
-  h.get_magnetization() # get the magnetization
-  execute_script("tb90-magnetism  ")
-#  execute_script("qh-magnetism  ")
+
+
+  
 
 
 def show_structure(self):
@@ -203,6 +189,25 @@ def show_structure_3d(self):
 
 
 
+def solve_scf():
+  """Perform a selfconsistent calculation"""
+  comp = computing() # create the computing window
+  scfin = getbox("scf_initialization")
+  h = initialize() # initialize the Hamiltonian
+  mf = scftypes.guess(h,mode=scfin)
+  nk = int(get("nk_scf"))
+  U = get("hubbard")
+  filling = get("filling_scf")
+  filling = filling%1.
+  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
+                mf=mf,mode="U",smearing=get("smearing_scf"),
+                mix = get("mix_scf"))
+  scf.hamiltonian.save() # save in a file
+  comp.kill()
+
+
+
+
 
 
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
@@ -217,7 +222,8 @@ signals["show_dos"] = show_dos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 signals["show_structure_3d"] = show_structure_3d
-
+signals["show_magnetism"] = show_magnetism 
+signals["solve_scf"] = solve_scf
 
 
 
