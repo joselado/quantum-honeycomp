@@ -78,6 +78,7 @@ def initialize():
 
 
 def show_bands(self=0):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
   opname = getbox("bands_color")
   if opname=="None": op = None # no operators
@@ -88,6 +89,7 @@ def show_bands(self=0):
   elif opname=="Vy-position": op = h.get_operator("yposition")
   else: op =None
   h.get_bands(operator=op)
+  comp.kill()
   execute_script("qh-bands1d  ")
 
 
@@ -103,6 +105,7 @@ def show_dosbands(self=0):
 
 
 def show_interactive_ldos():
+  comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
   ewin = get("window_ldos")
   nrep = 1
@@ -110,6 +113,7 @@ def show_interactive_ldos():
   ne = int(get("ne_ldos"))
   delta = get("delta_ldos")
   ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,nrep=nrep)
+  comp.kill()
   execute_script("qh-multildos ")
 
 
@@ -166,6 +170,7 @@ def show_structure_3d(self):
 
 def solve_scf():
   """Perform a selfconsistent calculation"""
+  comp = computing() # create the computing window
   scfin = getbox("scf_initialization")
   h = initialize() # initialize the Hamiltonian
   mf = scftypes.guess(h,mode=scfin)
@@ -178,6 +183,7 @@ def solve_scf():
                 mf=mf,mode="U",smearing=get("smearing_scf"),
                 mix = get("mix_scf"))
   scf.hamiltonian.save() # save in a file
+  comp.kill()
 
 
 def pickup_hamiltonian():

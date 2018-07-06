@@ -72,6 +72,7 @@ def initialize():
 
 
 def show_bands(self):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
   if h.intra.shape[0]<4000:
     num_bands = int(get("nbands"))
@@ -87,7 +88,9 @@ def show_bands(self):
   if opname=="None": op = None # no operators
   elif opname=="Valley": op = h.get_operator("valley_upper") # no operators
   h.get_bands(kpath=kpath,num_bands=num_bands,operator=op) 
+  comp.kill()
   execute_script("qh-bands2d ")
+  
   
 
 
@@ -96,6 +99,7 @@ def show_bands(self):
   
 
 def show_dos(self):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
   nk = int(round(np.sqrt(get("nk_dos"))))
   ndos = int(get("nume_dos"))
@@ -107,6 +111,7 @@ def show_dos(self):
   dos.dos2d(h,use_kpm=True,nk=nk,ntries=1,delta=delta,random=True,
               ndos=ndos,kpm_window=ewindow,scale=scale)
   execute_script("tb90-dos  ")
+  comp.kill()
   return
 
 

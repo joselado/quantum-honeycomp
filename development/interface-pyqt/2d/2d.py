@@ -74,6 +74,7 @@ def initialize():
 
 
 def show_bands(self=0):
+  comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
   opname = getbox("bands_color")
   if opname=="None": op = None # no operators
@@ -84,6 +85,7 @@ def show_bands(self=0):
   else: op =None
   h.get_bands(operator=op)
   execute_script("qh-bands2d  ")
+  comp.kill()
 
 
 
@@ -196,6 +198,7 @@ def show_z2(self):
 
 def solve_scf():
   """Perform a selfconsistent calculation"""
+  comp = computing() # create the computing window
   scfin = getbox("scf_initialization")
   h = initialize() # initialize the Hamiltonian
   mf = scftypes.guess(h,mode=scfin)
@@ -207,6 +210,7 @@ def solve_scf():
                 mf=mf,mode="U",smearing=get("smearing_scf"),
                 mix = get("mix_scf"))
   scf.hamiltonian.save() # save in a file
+  comp.kill()
 
 
 
