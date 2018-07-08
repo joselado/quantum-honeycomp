@@ -46,7 +46,7 @@ except:
   axenergy = plt.axes([0.25, 0.1, 0.65, 0.03])
 
 
-senergy = Slider(axenergy, 'Energy', 0, len(names), valinit=0)
+senergy = Slider(axenergy, '', 0, len(names), valinit=0,valfmt='%0.0f')
 
 
 
@@ -65,8 +65,10 @@ def update(val):
 #  print(val)
 #  return
   ax.clear() # clear LDOS
-  name = names[int(round(val))] # get this file
-  energy = energies[int(round(val))] # get this energy
+  val = int(round(val))
+  if val>(len(names)-1): val = len(names)-1 # fix
+  name = names[val] # get this file
+  energy = energies[val] # get this energy
   print("Name",name)
   m = np.genfromtxt(folder+name).transpose() # read file
   x = m[0] # x position
@@ -114,9 +116,9 @@ def update(val):
 #  axd = fig.add_subplot(122) # axis for the DOS
   axd.clear()  # clear DOS
   axd.plot(md[0],md[1]) # plot DOS
-  ys = np.array([0,max(md[1])]) # y positions
-  xs = np.array([energy,energy]) # energy
-#  axd.plot(xs,ys,linewidth=3,c="red") # energy checked
+  yys = np.array([0,max(md[1])]) # y positions
+  xxs = np.array([energy,energy]) # energy
+#  axd.plot(xxs,yys,linewidth=3,c="red") # energy checked
   print("Energy",energy)
   axd.set_ylim([0,max(md[1])]) # ylim
   axd.set_xlim([min(md[0]),max(md[0])]) # xlim

@@ -167,21 +167,11 @@ def initialize():
     h.first_neighbors()  # first neighbor hopping
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   h.add_peierls(get("peierls")) # add magnetic field
-  modh = getbox("modify_hamiltonian") # way of modifying the Hamiltonian
-  edgesites = edge_atoms(h.geometry) # get the edge atoms
-  if modh == "None":
-    print("No modifications to the Hamiltonian")
-  elif modh == "Edge potential": 
-    print("Added an edge potential")
-    if not h.has_spin:
-      from scipy.sparse import diags
-      h.intra = h.intra + get("potval")*diags([edgesites],[0]) # Add
-    else: raise
-  elif modh == "Disorder": 
-    print("Added Anderson disorder")
-    adis = get("anderson_disorder") # value of the disorder
-    def rfun(x,y,z=0): return (np.random.random()-0.5)*adis
-    h.shift_fermi(rfun) # random onsites
+  if get("haldane")!=0.0:
+    h.add_haldane(get("haldane")) # add Haldane coupling
+  if get("edge_potential")!=0.0: # if there is edge potential
+    edgesites = edge_atoms(h.geometry) # get the edge atoms
+    h.shift_fermi(edgesites) # add onsites
   # part for bilayer systems
   #####
   print("Time spent in creating the Hamiltonian =",time.clock() - t0)
@@ -295,19 +285,22 @@ def edge_atoms(g,nn=3):
   cs = g.get_connections() # get the connections
   v1 = np.array([int(len(c)<nn) for c in cs]) # check if the atom is on the edge or not
   # and the first neighbors to the edge
-  v2 = np.zeros(len(v1)) # initialize
-  for i in range(len(v1)): # loop
-    if v1[i]==0: # not in the edge yet
-      for ic in cs[i]: # loop over neighbors
-        if v1[ic]==1: # edge atom
-          v2[i] = 1 # assign
-          break
-  v = v1 + v2*2./3. # sum
+#  v2 = np.zeros(len(v1)) # initialize
+#  for i in range(len(v1)): # loop
+#    if v1[i]==0: # not in the edge yet
+#      for ic in cs[i]: # loop over neighbors
+#        if v1[ic]==1: # edge atom
+#          v2[i] = 1 # assign
+#          break
+#  v = v1 + v2*2./3. # sum
+  v = v1
   np.savetxt("EDGE.OUT",np.matrix([g.x,g.y,v]).T) # save
   return v # return the array
 
 
 def show_potential():
+  g = get_geometry0d() # get the geometry
+  edge_atoms(g) 
   execute_script("qh-absolute-potential EDGE.OUT  ")
 
 
@@ -416,7 +409,7 @@ def calculate_path_dos():
     fo.write(str(i)+"    "+str(s)+"   "+str(g.x[i])+"    "+str(g.y[i])+"\n")
   fo.close() # close file
 
-
+inipath = os.getcwd() # get the initial directory
 
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
@@ -441,9 +434,9 @@ signals["show_dos"] = show_dos  # show DOS
 signals["show_spatial_dos"] = show_spatial_dos  # show DOS
 signals["show_lattice"] = show_lattice  # show magnetism
 #signals["show_full_spectrum"] = show_full_spectrum  # show all the eigenvalues
-#signals["show_path"] = show_path  # show the path
-#signals["show_path_dos"] = show_path_dos  # show the path
-#signals["show_potential"] = show_potential  # show the potential added
+signals["show_path"] = show_path  # show the path
+signals["show_path_dos"] = show_path_dos  # show the path
+signals["show_potential"] = show_potential  # show the potential added
 signals["save_results"] = save_results  # save the results
 #signals["clear_removal"] = clear_removal  # clear the file
 #signals["select_atoms"] = select_atoms  # select_atoms
@@ -454,5 +447,6 @@ signals["select_atoms_dos"] = select_atoms_dos  # select_atoms
 window.connect_clicks(signals)
 folder = create_folder()
 tmppath = os.getcwd() # get the initial directory
+initialize() # do it once
 window.run()
 
