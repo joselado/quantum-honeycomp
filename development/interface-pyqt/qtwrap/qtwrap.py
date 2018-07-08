@@ -44,12 +44,13 @@ def main():
     return form
 
 
-def get(name):
+def get(name,string=False):
   try:
     obj = getattr(form,name) # get the object
     out = obj.text()
     print(name,out)
-    return float(out)
+    if string: return out # return as string
+    else: return float(out) # return as float
   except:
     print(name,"not found, set to zero")
     return 0

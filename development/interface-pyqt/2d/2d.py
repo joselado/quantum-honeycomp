@@ -29,7 +29,6 @@ from qh_interface import * # import all the libraries needed
 def get_geometry():
   """ Create a 0d island"""
   lattice_name = getbox("lattice") # get the option
-#  lattice_name = builder.get_object("lattice").get_active_text()
   if lattice_name=="Honeycomb":
     geometry_builder = geometry.honeycomb_lattice
   elif lattice_name=="Square":
