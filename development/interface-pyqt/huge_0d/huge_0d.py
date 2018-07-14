@@ -171,7 +171,7 @@ def initialize():
     h.add_haldane(get("haldane")) # add Haldane coupling
   if get("edge_potential")!=0.0: # if there is edge potential
     edgesites = edge_atoms(h.geometry) # get the edge atoms
-    h.shift_fermi(edgesites) # add onsites
+    h.shift_fermi(get("edge_potential")*edgesites) # add onsites
   # part for bilayer systems
   #####
   print("Time spent in creating the Hamiltonian =",time.clock() - t0)
