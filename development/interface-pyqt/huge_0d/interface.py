@@ -12,6 +12,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(934, 706)
+        MainWindow.setMinimumSize(QtCore.QSize(934, 706))
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_21 = QtWidgets.QGridLayout(self.centralwidget)
@@ -171,8 +172,6 @@ class Ui_MainWindow(object):
         self.gridLayout_23.addLayout(self.gridLayout_2, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
         self.gridLayout_24.addWidget(self.tabWidget, 1, 0, 1, 1)
-        self.tabWidget.raise_()
-        self.groupBox_3.raise_()
         self.gridLayout_21.addWidget(self.groupBox, 2, 0, 1, 1)
         self.tabWidget_3 = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget_3.setToolTip("")

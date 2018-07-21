@@ -10,6 +10,12 @@
     <height>706</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>934</width>
+    <height>706</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Huge islands</string>
   </property>
@@ -178,7 +184,6 @@
       <property name="title">
        <string/>
       </property>
-      <zorder>label_11</zorder>
      </widget>
     </item>
     <item row="2" column="0">
@@ -375,9 +380,6 @@
         </widget>
        </item>
       </layout>
-      <zorder>gridLayoutWidget_4</zorder>
-      <zorder>tabWidget</zorder>
-      <zorder>groupBox_3</zorder>
      </widget>
     </item>
     <item row="2" column="1">
