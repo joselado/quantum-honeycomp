@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>763</width>
+    <width>459</width>
     <height>650</height>
    </rect>
   </property>
@@ -20,6 +20,12 @@
       <property name="minimumSize">
        <size>
         <width>441</width>
+        <height>101</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>745</width>
         <height>101</height>
        </size>
       </property>
@@ -47,7 +53,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -134,67 +140,61 @@
        <attribute name="title">
         <string>Only Linux compatible</string>
        </attribute>
-       <widget class="QWidget" name="gridLayoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>160</x>
-          <y>0</y>
-          <width>200</width>
-          <height>302</height>
-         </rect>
-        </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="6" column="0">
-          <widget class="QPushButton" name="skyrmion">
-           <property name="text">
-            <string>Skyrmion in 2D</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QPushButton" name="moire">
-           <property name="text">
-            <string>Moire potential 2D</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="ribbons">
-           <property name="text">
-            <string>Ribbons</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QPushButton" name="huge_islands">
-           <property name="text">
-            <string>Colossal islands</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QPushButton" name="vacancy2d">
-           <property name="text">
-            <string>Vancancies in 2D</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="islands">
-           <property name="text">
-            <string>Islands</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="multilayers">
-           <property name="text">
-            <string>Honeycomb multilayers</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="6" column="0">
+           <widget class="QPushButton" name="skyrmion">
+            <property name="text">
+             <string>Skyrmion in 2D</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QPushButton" name="moire">
+            <property name="text">
+             <string>Moire potential 2D</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="ribbons">
+            <property name="text">
+             <string>Ribbons</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QPushButton" name="huge_islands">
+            <property name="text">
+             <string>Colossal islands</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QPushButton" name="vacancy2d">
+            <property name="text">
+             <string>Vancancies in 2D</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="islands">
+            <property name="text">
+             <string>Islands</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="multilayers">
+            <property name="text">
+             <string>Honeycomb multilayers</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -222,7 +222,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>763</width>
+     <width>459</width>
      <height>25</height>
     </rect>
    </property>
