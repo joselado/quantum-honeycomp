@@ -39,6 +39,12 @@
       <height>101</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>441</width>
+      <height>101</height>
+     </size>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -51,9 +57,15 @@
      <rect>
       <x>150</x>
       <y>210</y>
-      <width>541</width>
-      <height>341</height>
+      <width>411</width>
+      <height>213</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>411</width>
+      <height>213</height>
+     </size>
     </property>
     <property name="currentIndex">
      <number>0</number>
@@ -62,88 +74,82 @@
      <attribute name="title">
       <string>Linux and MacOSX compatible</string>
      </attribute>
-     <widget class="QWidget" name="gridLayoutWidget_2">
-      <property name="geometry">
-       <rect>
-        <x>100</x>
-        <y>40</y>
-        <width>341</width>
-        <height>211</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="0">
-        <widget class="QPushButton" name="islands_pyqt">
-         <property name="text">
-          <string>Islands</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QPushButton" name="ribbons_pyqt">
-         <property name="text">
-          <string>Ribbons</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QPushButton" name="heterostructure">
-         <property name="text">
-          <string>Hybrid films</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QPushButton" name="hofstader_pyqt">
-         <property name="text">
-          <string>Hofstader butterflies</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QPushButton" name="film2d_pyqt">
-         <property name="text">
-          <string>Films</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QPushButton" name="huge0d_pyqt">
-         <property name="text">
-          <string>Huge islands</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <widget class="QPushButton" name="crystal3d_pyqt">
-         <property name="text">
-          <string>3D crystals</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="hybridribbon_pyqt">
-         <property name="text">
-          <string>Hybrid ribbons</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QPushButton" name="sheets">
-         <property name="text">
-          <string>Sheets</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="twisted_bilayer">
-         <property name="text">
-          <string>Twisted bilayer</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="islands_pyqt">
+          <property name="text">
+           <string>Islands</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="ribbons_pyqt">
+          <property name="text">
+           <string>Ribbons</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QPushButton" name="heterostructure">
+          <property name="text">
+           <string>Hybrid films</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="0">
+         <widget class="QPushButton" name="hofstader_pyqt">
+          <property name="text">
+           <string>Hofstader butterflies</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="film2d_pyqt">
+          <property name="text">
+           <string>Films</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="huge0d_pyqt">
+          <property name="text">
+           <string>Huge islands</string>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1">
+         <widget class="QPushButton" name="crystal3d_pyqt">
+          <property name="text">
+           <string>3D crystals</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="hybridribbon_pyqt">
+          <property name="text">
+           <string>Hybrid ribbons</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QPushButton" name="sheets">
+          <property name="text">
+           <string>Sheets</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="twisted_bilayer">
+          <property name="text">
+           <string>Twisted bilayer</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -245,7 +251,7 @@
      <x>0</x>
      <y>0</y>
      <width>890</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
