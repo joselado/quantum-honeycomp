@@ -216,7 +216,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="tabWidget_3">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -374,137 +374,133 @@
        <attribute name="title">
         <string>SCF</string>
        </attribute>
-       <widget class="QTabWidget" name="tabWidget_4">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>10</y>
-          <width>265</width>
-          <height>184</height>
-         </rect>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <widget class="QWidget" name="tab_12">
-         <attribute name="title">
-          <string>Basic</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0" colspan="2">
-           <layout class="QGridLayout" name="gridLayout_10">
-            <item row="0" column="1">
-             <widget class="QComboBox" name="scf_initialization">
-              <item>
-               <property name="text">
-                <string>antiferro</string>
-               </property>
+       <layout class="QGridLayout" name="gridLayout_14">
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget_4">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tab_12">
+           <attribute name="title">
+            <string>Basic</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0" colspan="2">
+             <layout class="QGridLayout" name="gridLayout_10">
+              <item row="0" column="1">
+               <widget class="QComboBox" name="scf_initialization">
+                <item>
+                 <property name="text">
+                  <string>antiferro</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>ferro</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>random</string>
+                 </property>
+                </item>
+               </widget>
               </item>
-              <item>
-               <property name="text">
-                <string>ferro</string>
-               </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_22">
+                <property name="text">
+                 <string>Initialization</string>
+                </property>
+               </widget>
               </item>
-              <item>
-               <property name="text">
-                <string>random</string>
-               </property>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_23">
+                <property name="text">
+                 <string>Hubbard</string>
+                </property>
+               </widget>
               </item>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_22">
-              <property name="text">
-               <string>Initialization</string>
-              </property>
-             </widget>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="hubbard">
+                <property name="text">
+                 <string>2.0</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_34">
+                <property name="text">
+                 <string>Filling</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="filling_scf">
+                <property name="text">
+                 <string>0.5</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
             <item row="1" column="0">
-             <widget class="QLabel" name="label_23">
+             <widget class="QCheckBox" name="do_scf">
               <property name="text">
-               <string>Hubbard</string>
+               <string>Include mean field</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLineEdit" name="hubbard">
+             <widget class="QPushButton" name="solve_scf">
               <property name="text">
-               <string>2.0</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_34">
-              <property name="text">
-               <string>Filling</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLineEdit" name="filling_scf">
-              <property name="text">
-               <string>0.5</string>
+               <string>Solve SCF</string>
               </property>
              </widget>
             </item>
            </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="do_scf">
-            <property name="text">
-             <string>Include mean field</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="solve_scf">
-            <property name="text">
-             <string>Solve SCF</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_11">
-         <attribute name="title">
-          <string>Convergence</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_7">
-          <item row="0" column="0">
-           <layout class="QGridLayout" name="gridLayout_12">
+          </widget>
+          <widget class="QWidget" name="tab_11">
+           <attribute name="title">
+            <string>Convergence</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_7">
             <item row="0" column="0">
-             <widget class="QLabel" name="label_32">
-              <property name="text">
-               <string>Mixing</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="mix_scf">
-              <property name="text">
-               <string>0.9</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_33">
-              <property name="text">
-               <string>Smearing</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="smearing_scf">
-              <property name="text">
-               <string>0.01</string>
-              </property>
-             </widget>
+             <layout class="QGridLayout" name="gridLayout_12">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_32">
+                <property name="text">
+                 <string>Mixing</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="mix_scf">
+                <property name="text">
+                 <string>0.9</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_33">
+                <property name="text">
+                 <string>Smearing</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="smearing_scf">
+                <property name="text">
+                 <string>0.01</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
