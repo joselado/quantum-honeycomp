@@ -11,14 +11,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(459, 650)
+        MainWindow.resize(459, 500)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.qhlogo = QtWidgets.QLabel(self.centralwidget)
         self.qhlogo.setMinimumSize(QtCore.QSize(441, 101))
-        self.qhlogo.setMaximumSize(QtCore.QSize(745, 101))
+        self.qhlogo.setMaximumSize(QtCore.QSize(441, 101))
         self.qhlogo.setText("")
         self.qhlogo.setScaledContents(True)
         self.qhlogo.setObjectName("qhlogo")
@@ -114,7 +114,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget_2.setCurrentIndex(1)
+        self.tabWidget_2.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
