@@ -131,8 +131,8 @@ def get_moments_ij(m0,n=100,i=0,j=0,use_fortran=use_fortran):
     return mus
 
 def get_moments_vivj(m0,vi,vj,n=100,use_fortran=False):
-  if not use_fortran: get_moments_vivj_python(m0,vi,vj,n=n)
-  else: get_moments_vivj_fortran(m0,vi,vj,n=n)
+  if not use_fortran: return get_moments_vivj_python(m0,vi,vj,n=n)
+  else: return get_moments_vivj_fortran(m0,vi,vj,n=n)
 
 
 def get_moments_vivj_python(m0,vi,vj,n=100):

@@ -101,11 +101,6 @@ def chi2d(h,energies = [0.],t=0.0001,delta=0.01,q=np.array([0.001,0.0]),nk=20,U=
 
 
 
-
-
-
-
-
 def sumchi(ms):
   """ Sums all the elements of the matrix"""
   n = ms[0].shape[0]

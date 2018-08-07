@@ -73,6 +73,7 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
     g1.z = np.round(g1.z,2) # delete the small shift
     g1.xyz2r() # update coordinates
     g1.sublattice = np.array(sl) # store sublattice
+  g1.get_fractional() # get fractional coordinates 
   return g1
 
 

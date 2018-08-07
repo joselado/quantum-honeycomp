@@ -4,17 +4,20 @@ import scipy.linalg as lg
 
 cores = 1 # call in a single by default
 
-def initialize():
+mainpool = None
+
+def initialize(): 
+  global mainpool
   if cores>1:
     from multiprocessing import Pool
     mainpool = Pool(cores) # create pool
-  return mainpool
+#  return mainpool
 
 
 
 def multieigh(ms):
   """Diagonalize a bunch of Hamiltonians at once"""
-  mainpool = initialize()
+#  mainpool = initialize()
   return mainpool.map(lg.eigh,ms)
 
 

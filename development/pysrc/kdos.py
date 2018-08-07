@@ -188,9 +188,11 @@ def write_surface_kpm(h,ne=400,klist=None,scale=4.,npol=200,w=20,ntries=20):
 
 
 def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
-                    delta=0.01,kpath=None):
+                    delta=None,kpath=None,dh1=None,dh2=None):
   """Get the surface DOS of an interface"""
   from scipy.sparse import csc_matrix,bmat
+  if delta is None:
+      delta = 1*(max(energies) - min(energies))/len(energies)
   if kpath is None: 
     if h1.dimensionality==3:
       g2d = h1.geometry.copy() # copy Hamiltonian
@@ -212,7 +214,8 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
 #    for energy in energies:
 #  (b1,s1,b2,s2,b12) = green.interface(h1,h2,k=k,energy=energy,delta=delta)
 #      out = green.interface(h1,h2,k=k,energy=energy,delta=delta)
-    outs = green.interface_multienergy(h1,h2,k=k,energies=energies,delta=delta)
+    outs = green.interface_multienergy(h1,h2,k=k,energies=energies,
+            delta=delta,dh1=dh1,dh2=dh2)
     for (energy,out) in zip(energies,outs):
       if operator is None: 
         op = np.identity(h1.intra.shape[0]*2) # normal cell

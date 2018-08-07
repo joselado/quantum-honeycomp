@@ -72,13 +72,24 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
-  def get_gk_gen(self,delta=0.05,operator=None):
+  def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator
     def f(k=[0.,0.,0.],e=0.0):
       hk = hkgen(k) # get matrix
+      if canonical_phase: # use a Bloch phase in all the sites
+        U = np.diag([self.geometry.bloch_phase(k,r) for r
+                             in self.geometry.frac_r])
+        U = np.matrix(U) # this is without .H
+        U = self.spinless2full(U) # increase the space if necessary
+        hk = U.H*hk*U
+#        print(csc_matrix(np.angle(hk)))
+#        exit()
       if operator is not None: hk = operator.H*hk*operator # project
-      return (np.identity(hk.shape[0])*(e+1j*delta) - hkgen(k)).I 
+      out = (np.identity(hk.shape[0])*(e+1j*delta) - hk).I 
+#      print(self.geometry.frac_r) 
+#      exit()
+      return out
     return f
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""

@@ -75,6 +75,7 @@ class geometry:
       s = supercell3d(self,n1=nsuper1,n2=nsuper2,n3=nsuper3)
     else: raise
     s.center()
+    s.get_fractional()
     return s
   def xyz2r(self):
     """Updates r atributte according to xyz"""
@@ -1116,9 +1117,12 @@ def get_fractional(g):
       rn = np.array([rn.T[0,i] for i in range(dim)]) # convert to array
       store.append(rn) # store
     store = np.array(store) # convert to array
-    if dim>0: g.frac_x = (store[:,0]+0.001)%1.
-    if dim>1: g.frac_y = (store[:,1]+0.001)%1.
-    if dim>2: g.frac_z = (store[:,2]+0.001)%1.
+    for i in range(dim):
+      store[:,i] = store[:,i] - np.min(store[:,i])
+    store = (store[:,:])%1.
+    if dim>0: g.frac_x = store[:,0]
+    if dim>1: g.frac_y = store[:,1]
+    if dim>2: g.frac_z = store[:,2]
     g.frac_r = np.array([store[:,i] for i in range(dim)]).transpose()
 
 

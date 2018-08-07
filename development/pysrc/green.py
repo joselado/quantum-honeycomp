@@ -511,8 +511,8 @@ def green_kchain_evaluator(h,k=0.,delta=0.01,only_bulk=True,
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
       sigma = hop*sf*hop.H # selfenergy
-      if callable(hs): ons2 = hs(k)
-      else: ons2 = hs
+      if callable(hs): ons2 = ons + hs(k)
+      else: ons2 = ons + hs
       sf = (ez - ons2 - sigma).I # return Dyson
     if only_bulk:  return gf
     else:  return gf,sf
@@ -560,13 +560,14 @@ def interface(h1,h2,k=[0.0,0.,0.],energy=0.0,delta=0.01):
   return (gs1,sf1,gs2,sf2,ginter)
 
 
-def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01):
+def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01,
+        dh1=None,dh2=None):
   """Get the Green function of an interface"""
   from scipy.sparse import csc_matrix as csc
   from scipy.sparse import bmat
-  fun1 = green_kchain_evaluator(h1,k=k,delta=delta,
+  fun1 = green_kchain_evaluator(h1,k=k,delta=delta,hs=None,
                    only_bulk=False,reverse=True) # surface green function 
-  fun2 = green_kchain_evaluator(h2,k=k,delta=delta,
+  fun2 = green_kchain_evaluator(h2,k=k,delta=delta,hs=None,
                    only_bulk=False,reverse=False) # surface green function 
   out = [] # output
   for energy in energies: # loop
@@ -579,6 +580,8 @@ def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01):
     (ons1,hop1) = get1dhamiltonian(h1,k,reverse=True) # get 1D Hamiltonian
     (ons2,hop2) = get1dhamiltonian(h2,k,reverse=False) # get 1D Hamiltonian
     havg = (hop1.H + hop2)/2. # average hopping
+    if dh1 is not None: ons1 = ons1 + dh1
+    if dh2 is not None: ons2 = ons2 + dh2
     ons = bmat([[csc(ons1),csc(havg)],[csc(havg.H),csc(ons2)]]) # onsite
     self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2*sf2*hop2.H)]])
     self1 = bmat([[csc(hop1*sf1*hop1.H),None],[None,csc(ons2)*0.0]])

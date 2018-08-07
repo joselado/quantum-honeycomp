@@ -520,39 +520,33 @@ def berry_density(h,delta=0.002,es=np.linspace(-3.0,3.0,100),nk=100,
 
 
 def berry_green_map(h,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
-                  delta=0.002):
+                  delta=0.002,nrep=2,integral=True):
   """Return the Berry curvature map at a certain kpoint"""
-  f = h.get_gk_gen(delta=delta) # green function generator
+  f = h.get_gk_gen(delta=delta,canonical_phase=True) # green function generator
   fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=True) 
   def fint(x):  
-#    print(x)
-#    print(x)
 #    return fgreen(x).trace()[0,0] # return diagonal
     return np.diag(fgreen(x)) # return diagonal
   es = np.linspace(emin,0.,ne) # energies used for the integration
-  ### The original function is defined in the coplex plane,
+  ### The original function is defined in the complex plane,
   # we will do a change of variables of the form z = re^(iphi) - r0
   # so that dz = re^(iphi) i dphi
-  def fint2(x):
-    """Function to integrate using a complex contour, from 0 to 1"""
-    z0 = emin*np.exp(-1j*x*np.pi)/2.
-    z = z0 + emin/2.
-    print("Evaluating",x)
-    return -(fint(z)*z0).imag*np.pi # integral after the change of variables
-  out = np.zeros(h.intra.shape[0],dtype=np.complex) # initialize
-  from integration import integrate_matrix
-  out = integrate_matrix(fint2,xlim=[0.,1.],eps=1e-8)
-#  tr = timing.Testimator("BERRY MAP") # initialize
-#  ix = 0
-#  ne = 500
-#  for x in np.linspace(0.,1.,ne):
-#    ix += 1
-#    tr.remaining(ix,ne)
-#    out = out + fint2(x) # add contribution
-  out = out.real # turn real
+  if integral: # integrate up to the fermi energy
+    def fint2(x):
+      """Function to integrate using a complex contour, from 0 to 1"""
+      z0 = emin*np.exp(-1j*x*np.pi)/2.
+      z = z0 + emin/2.
+      print("Evaluating",x)
+      return -(fint(z)*z0).imag*np.pi # integral after the change of variables
+    from integration import integrate_matrix
+    out = integrate_matrix(fint2,xlim=[0.,1.],eps=1e-1)
+    out = out.real # turn real
+  else: # evaluate at the fermi energy
+    out = fint(0.0).real
   print("Sum",np.sum(out))
   import geometry
-  geometry.write_profile(h.geometry,out,name="BERRY_MAP.OUT",nrep=2)
+  from ldos import spatial_dos
+  geometry.write_profile(h.geometry,spatial_dos(h,out),name="BERRY_MAP.OUT",nrep=nrep)
   return out
 
 

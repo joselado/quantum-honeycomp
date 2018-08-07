@@ -95,6 +95,7 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
   go.r2xyz() # update coordinates
   if go.has_sublattice: go.get_sublattice()
   go.center()
+  go.get_fractional()
   return go # return new geometry
   
 

@@ -3,8 +3,9 @@ import numpy as np
 
 import extract
 
-def swave(h,name="SWAVE.OUT",rep=1):
+def swave(h0,name="SWAVE.OUT",rep=1):
   """Write the swave pairing of a Hamiltonian"""
+  h = h0.supercell(rep)
   f1 = open("AMPLITUDE_"+name,"w")
   f2 = open("PHASE_"+name,"w")
   f3 = open(name,"w")

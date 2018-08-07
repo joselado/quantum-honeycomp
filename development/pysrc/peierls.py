@@ -27,6 +27,7 @@ def add_phase(m1,r1,r2,phasefun,has_spin=False):
 
 def add_peierls(h,mag_field=0.0,new=False):
   """ Adds Peierls phase to the Hamiltonian"""
+  if h.has_eh: raise
   x = h.geometry.x    # x coordinate 
   y = h.geometry.y    # x coordinate 
   a1 = h.geometry.a1    # distance to neighboring cell
@@ -73,7 +74,7 @@ def add_peierls(h,mag_field=0.0,new=False):
           for k in range(len(m.data)): # loop over non vanishing elements
             i = m.row[k]
             j = m.col[k]
-            if h.has_spin: i,j = i/2,j/2 # raise if spinful
+            if h.has_spin: i,j = i//2,j//2 # raise if spinful
             # peierls phase
             p = peierls(x[i],y[i],x[j]+numn*celldis,y[j],mag_field) 
             data[k] *= p # add phase
@@ -114,12 +115,11 @@ def add_peierls(h,mag_field=0.0,new=False):
 
 def peierls(x1,y1,x2,y2,mag_field):
   """ Returns the complex phase with magnetic field """
-  if is_number(mag_field): # if it is a number assumen Landau gauge
-    phase = mag_field*(x1-x2)*(y1+y2)/2.0
-  elif callable(mag_field): # if it is callable 
-    phase = mag_field(x1,y1,x2,y2)  # specific call to the value
-  else:  # if anything else error
-    raise
+  if is_number(mag_field): b = mag_field 
+  elif callable(mag_field): 
+      b = mag_field(np.array([x1,y1,0.0]),np.array([x2,y2,0.0]))
+  else: raise
+  phase = b*(x1-x2)*(y1+y2)/2.0
   return np.exp(1j*phase)
 
 

@@ -84,6 +84,7 @@ def initialize():
   if check("kanemele"):  h.add_kane_mele(fint("kanemele")) # intrinsic SOC
   if check("haldane"):  h.add_haldane(fint("haldane")) # intrinsic SOC
   if check("antihaldane"):  h.add_antihaldane(fint("antihaldane")) 
+  if check("peierls"):  h.add_peierls(fint("peierls")) 
   if check("swave"):  h.add_swave(fint("swave")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
   return h

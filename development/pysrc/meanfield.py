@@ -60,7 +60,7 @@ def hubbard_pairing_ud(i,n,g=1.0):
   v.dir = [0,0,0] # direction of the interaction 
   v.g = g
   v.i = i
-  v.i = i
+  v.j = i
   return v
 
 
@@ -72,7 +72,7 @@ def hubbard_pairing_du(i,n,g=1.0):
   v.dir = [0,0,0] # direction of the interaction 
   v.g = g
   v.i = i
-  v.i = i
+  v.j = i
   return v
 
 
