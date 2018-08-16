@@ -43,9 +43,9 @@ def dos_surface(h,output_file="DOS.OUT",
 
 
 
-def dos0d(h,es=None,delta=0.001):
+def dos0d(h,es=None,delta=0.01):
   """Calculate density of states of a 0d system"""
-  if es is None: es = np.linspace([-4,4,100])
+  if es is None: es = np.linspace(-4,4,500)
   ds = [] # empty list
   if h.dimensionality==0:  # only for 0d
     iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity

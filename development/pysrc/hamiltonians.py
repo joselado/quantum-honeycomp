@@ -509,11 +509,9 @@ def rashba(r1,r2=None,c=0.,d=[0.,0.,1.],is_sparse=False):
       rxs = [dy*sz-dz*sy,dz*sx-dx*sz,dx*sy-dy*sx]  # cross product
       ms = 1j*(d[0]*rxs[0] + d[1]*rxs[1] + d[2]*rxs[2]) # E dot r times s
       s = 0.0*ms
-      if callable(c): # call the coupling strength
-        s = ms*c(r1[i],r2[j]) 
-      else:
-        if 0.9<(rij.dot(rij))<1.1: # if nearest neighbor
-          s = ms*c # multiply
+      if 0.9<(rij.dot(rij))<1.1: # if nearest neighbor
+        if callable(c): s = ms*c((r1[i]+r2[j])/2.) # function
+        else:s = ms*c # multiply
       m[i][j] = s # rashba term
   if not is_sparse: m = bmat(m).todense()  # to normal matrix
   else: m = bmat(m) # sparse matrix

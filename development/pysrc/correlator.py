@@ -17,6 +17,16 @@ def correlator0d(m,energies=np.linspace(-10.,10.,400),i=0,j=0,delta=0.07):
 
 
 
+def gs_correlator(m,i=0,j=0):
+    """Compute the integrated correlator using wavefunctions"""
+    (es,vs) = lg.eigh(m) # diagonalize
+    vs = vs.transpose() # transpose matrix
+    c = 0.0
+    for (e,v) in zip(es,vs):
+        if e<0.0:
+            c += v[i]*np.conjugate(v[j])
+    return c.real
+
 
 def dm_ij_energy(m,ne=500,scale=10.,i=0,j=0,delta=0.07):
   """Calculate a certain correlator"""

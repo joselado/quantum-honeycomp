@@ -746,7 +746,7 @@ def effective_central_hamiltonian(hetero,energy=0.0,delta=0.0001,write=False):
    return heff
 
 
-def didv(ht,energy=0.0,delta=0.00001,kwant=True):
+def didv(ht,energy=0.0,delta=0.00001,kwant=False):
   """Calculate differential conductance"""
   if ht.has_eh: # for systems with electons and holes
     s = get_smatrix(ht,energy=energy,delta=delta,check=True) # get the smatrix

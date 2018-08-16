@@ -82,7 +82,7 @@ class geometry:
     self.r = np.array([self.x,self.y,self.z]).transpose()
   def r2xyz(self):
     """Updates x,y,z atributtes according to r"""
-    r = self.r.transpose()
+    r = np.array(self.r).transpose()
     self.x = r[0]
     self.y = r[1]
     self.z = r[2]
@@ -168,6 +168,8 @@ class geometry:
     self.y[:] -= r0[1]
     self.z[:] -= r0[2]
     self.xyz2r() # update
+    self.get_fractional()
+    self.fractional2real()
   def write_function(self,fun,name="FUNCTION.OUT"):
     """Write a certain function"""
     f = open(name,"w")
@@ -606,6 +608,28 @@ def triangular_lattice():
   g.has_sublattice = False # has sublattice index
   g.update_reciprocal() # update reciprocal lattice vectors
   return g
+
+
+
+
+def triangular_lattice_tripartite():
+  """ Creates a triangular lattice """
+  g0 = triangular_lattice() # generate a triangular lattice
+  g = g0.copy() # copy geometry
+  g.r = [g.r[0],g.r[0]+g.a1,g.r[0]+g.a2+g.a1] # positions
+  g.a1 = g0.a1 - g0.a2
+  g.a2 = g0.a1 + 2.*g0.a2
+  g.r2xyz() # 
+  g.center()
+  g.has_sublattice = True # does not have sublattice index
+  g.sublattice_number = 3 # three sublattices
+  g.sublattice = [0,1,2] # the three sublattices
+  g.has_sublattice = True # has sublattice index
+  g.update_reciprocal() # update reciprocal lattice vectors
+  return g
+
+
+
 
 
 
@@ -1118,7 +1142,7 @@ def get_fractional(g):
       store.append(rn) # store
     store = np.array(store) # convert to array
     for i in range(dim):
-      store[:,i] = store[:,i] - np.min(store[:,i])
+      store[:,i] = store[:,i] #- np.min(store[:,i])
     store = (store[:,:])%1.
     if dim>0: g.frac_x = store[:,0]
     if dim>1: g.frac_y = store[:,1]

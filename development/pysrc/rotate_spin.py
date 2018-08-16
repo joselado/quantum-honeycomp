@@ -77,7 +77,7 @@ def global_spin_rotation(m,vector = np.array([0.,0.,1.]),angle = 0.0,
     mout = R * csc_matrix(m)  # rotate matrix
   else:  # normal global roration
     mout = R * csc_matrix(m) * R.H  # rotate matrix
-  return mout.todense() # return dense matrix
+  return mout # return dense matrix
 
 
 

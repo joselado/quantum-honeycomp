@@ -38,7 +38,7 @@ def get_geometry():
   elif lattice_name=="Lieb":
     g = geometry.lieb_lattice()
   elif lattice_name=="Triangular":
-    g = geometry.triangular_lattice()
+    g = geometry.triangular_lattice_tripartite()
   elif lattice_name=="Honeycomb zigzag":
     g = geometry.honeycomb_zigzag_ribbon(n)
   elif lattice_name=="Honeycomb armchair":

@@ -39,6 +39,8 @@ def get_geometry():
     geometry_builder = geometry.lieb_lattice
   elif lattice_name=="Triangular":
     geometry_builder = geometry.triangular_lattice
+  elif lattice_name=="Triangular tripartite":
+    geometry_builder = geometry.triangular_lattice_tripartite
   g = geometry_builder() # call the geometry
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)

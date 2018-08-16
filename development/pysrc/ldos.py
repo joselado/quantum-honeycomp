@@ -189,6 +189,7 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
   write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
 
 
+ldos = ldos2d
 
 
 def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,random=False):
