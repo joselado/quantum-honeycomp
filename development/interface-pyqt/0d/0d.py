@@ -90,7 +90,7 @@ def show_bands(self=0):
   else: op =None
   h.get_bands(operator=op)
   comp.kill()
-  execute_script("qh-bands1d  ")
+  execute_script("qh-bands0d  ")
 
 
 
