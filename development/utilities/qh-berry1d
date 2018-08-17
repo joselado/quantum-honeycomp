@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 
 fig = py.figure()
+fig.subplots_adjust(0.3,0.2)
 fig.set_facecolor("white") # white face
 
 m = py.genfromtxt("BERRY_CURVATURE.OUT").transpose() # get the curvature
