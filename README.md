@@ -10,6 +10,8 @@ This program allows to perform tight binding calculations with a user friendly i
 The program has been developed to run in Linux machines. Execute the script "install" to compile all the necesary libraries,
 which will also add to your PATH the folder ../bin, where the script quantum-honeycomp is present. 
 
+Alternatively, you can download the file "quantum-honeycomp-latest.tar", uncompress it and execute the script "install"
+
 This program uses several python libraries. For Debian/Ubuntu machines, a script called "autoinstall" will install all the
 necessary libraries. This program partially runs on Mac OSX, the user interface
 shows which modes can be executed in a mac machine.
