@@ -29,5 +29,5 @@ a version of ubuntu in that virtual machine, and following the previous instruct
 - Selfconsistent mean field Hubbard calculations of 0d,1d,2d systems
 - Berry curvature, Chern number and Z2 invariant in 2d systems
 - Special module to deal with systems with 100000 atoms using the Kernel polynomial method
-- Special modeules to 1d and 2d study interfaces between different systems
+- Special modules to study 1d and 2d study interfaces between different systems
 
