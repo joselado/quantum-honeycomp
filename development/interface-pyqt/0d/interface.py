@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayoutWidget_4 = QtWidgets.QWidget(self.tab_2)
-        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(50, 30, 323, 136))
+        self.gridLayoutWidget_4.setGeometry(QtCore.QRect(50, 30, 323, 158))
         self.gridLayoutWidget_4.setObjectName("gridLayoutWidget_4")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.gridLayoutWidget_4)
         self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
@@ -287,10 +287,28 @@ class Ui_MainWindow(object):
         self.rotation.setObjectName("rotation")
         self.gridLayout_4.addWidget(self.rotation, 3, 1, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_8 = QtWidgets.QWidget()
+        self.tab_8.setObjectName("tab_8")
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.tab_8)
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.gridLayout_15 = QtWidgets.QGridLayout()
+        self.gridLayout_15.setObjectName("gridLayout_15")
+        self.remove_single_bonded = QtWidgets.QCheckBox(self.tab_8)
+        self.remove_single_bonded.setChecked(True)
+        self.remove_single_bonded.setObjectName("remove_single_bonded")
+        self.gridLayout_15.addWidget(self.remove_single_bonded, 0, 0, 1, 1)
+        self.remove_selected = QtWidgets.QCheckBox(self.tab_8)
+        self.remove_selected.setObjectName("remove_selected")
+        self.gridLayout_15.addWidget(self.remove_selected, 1, 0, 1, 1)
+        self.select_atoms_removal = QtWidgets.QPushButton(self.tab_8)
+        self.select_atoms_removal.setObjectName("select_atoms_removal")
+        self.gridLayout_15.addWidget(self.select_atoms_removal, 2, 0, 1, 1)
+        self.horizontalLayout_2.addLayout(self.gridLayout_15)
+        self.tabWidget.addTab(self.tab_8, "")
         self.gridLayout_3.addWidget(self.tabWidget, 1, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 28))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -299,9 +317,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(3)
+        self.tabWidget_3.setCurrentIndex(0)
         self.bands_color.setCurrentIndex(0)
-        self.tabWidget_4.setCurrentIndex(1)
+        self.tabWidget_4.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -386,4 +404,9 @@ class Ui_MainWindow(object):
         self.label_7.setText(_translate("MainWindow", "Rotation"))
         self.rotation.setText(_translate("MainWindow", "0"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))
+        self.remove_single_bonded.setToolTip(_translate("MainWindow", "Remove atoms that have a single bond in the structure"))
+        self.remove_single_bonded.setText(_translate("MainWindow", "Remove single bonds"))
+        self.remove_selected.setText(_translate("MainWindow", "Remove selected atoms"))
+        self.select_atoms_removal.setText(_translate("MainWindow", "Select atoms to remove"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_8), _translate("MainWindow", "Modify geometry"))
 

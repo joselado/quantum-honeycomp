@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(878, 600)
+        MainWindow.resize(878, 626)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.centralwidget)
@@ -368,10 +368,28 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.width, 2, 1, 1, 1)
         self.gridLayout_20.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_10 = QtWidgets.QWidget()
+        self.tab_10.setObjectName("tab_10")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_10)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayout_21 = QtWidgets.QGridLayout()
+        self.gridLayout_21.setObjectName("gridLayout_21")
+        self.remove_single_bonded = QtWidgets.QCheckBox(self.tab_10)
+        self.remove_single_bonded.setChecked(True)
+        self.remove_single_bonded.setObjectName("remove_single_bonded")
+        self.gridLayout_21.addWidget(self.remove_single_bonded, 0, 0, 1, 1)
+        self.remove_selected = QtWidgets.QCheckBox(self.tab_10)
+        self.remove_selected.setObjectName("remove_selected")
+        self.gridLayout_21.addWidget(self.remove_selected, 1, 0, 1, 1)
+        self.select_atoms_removal = QtWidgets.QPushButton(self.tab_10)
+        self.select_atoms_removal.setObjectName("select_atoms_removal")
+        self.gridLayout_21.addWidget(self.select_atoms_removal, 2, 0, 1, 1)
+        self.verticalLayout.addLayout(self.gridLayout_21)
+        self.tabWidget.addTab(self.tab_10, "")
         self.gridLayout_7.addWidget(self.tabWidget, 1, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 28))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -380,7 +398,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(5)
+        self.tabWidget_3.setCurrentIndex(0)
         self.bands_color.setCurrentIndex(0)
         self.tabWidget_4.setCurrentIndex(0)
         self.tabWidget.setCurrentIndex(0)
@@ -456,7 +474,7 @@ class Ui_MainWindow(object):
         self.label_19.setText(_translate("MainWindow", "Energy window"))
         self.window_ldos.setText(_translate("MainWindow", "0.5"))
         self.nsuper_ldos.setText(_translate("MainWindow", "1"))
-        self.label_21.setText(_translate("MainWindow", "SUpercell"))
+        self.label_21.setText(_translate("MainWindow", "Supercell"))
         self.show_interactive_ldos.setText(_translate("MainWindow", "Show LDOS"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_7), _translate("MainWindow", "LDOS"))
         self.scf_initialization.setItemText(0, _translate("MainWindow", "antiferro"))
@@ -493,4 +511,9 @@ class Ui_MainWindow(object):
         self.label_2.setText(_translate("MainWindow", "Width"))
         self.width.setText(_translate("MainWindow", "10"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))
+        self.remove_single_bonded.setToolTip(_translate("MainWindow", "Remove atoms that have a single bond in the structure"))
+        self.remove_single_bonded.setText(_translate("MainWindow", "Remove single bonds"))
+        self.remove_selected.setText(_translate("MainWindow", "Remove selected atoms"))
+        self.select_atoms_removal.setText(_translate("MainWindow", "Select atoms to remove"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_10), _translate("MainWindow", "Modify geometry"))
 

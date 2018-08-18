@@ -26,7 +26,7 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def get_geometry():
+def get_geometry(modify=True):
   """ Create a 0d island"""
   lattice_name = getbox("lattice") # get the option
   if lattice_name=="Honeycomb":
@@ -44,7 +44,31 @@ def get_geometry():
   g = geometry_builder() # call the geometry
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)
+  if modify: g = modify_geometry(g) # modify the geometry
   return g
+
+
+
+
+
+def select_atoms_removal(self):
+  g = get_geometry(modify=False) # get the unmodified geometry
+  g.write() # write geometry
+  execute_script("qh-remove-atoms-geometry") # remove the file
+
+
+def modify_geometry(g):
+  """Modify the geometry according to the interface"""
+  if qtwrap.is_checked("remove_selected"): # remove some atoms
+      try:
+        inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
+        if inds.shape==(): inds = [inds]
+      except: inds = [] # Nothing
+      print(inds)
+      g = sculpt.remove(g,inds) # remove those atoms
+  if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
+      g = sculpt.remove_unibonded(g,iterative=True)
+  return g # return geometry
 
 
 
@@ -254,6 +278,7 @@ signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["show_structure_3d"] = show_structure_3d
+signals["select_atoms_removal"] = select_atoms_removal
 #signals["show_stm"] = show_stm  # show STM
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism

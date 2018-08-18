@@ -22,7 +22,7 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def get_geometry():
+def get_geometry(modify=True):
   """ Create a 0d island"""
   lattice_name = getbox("lattice") # get the option
   n = int(get("width")) # thickness of the system
@@ -46,12 +46,32 @@ def get_geometry():
   import islands
   rot = get("rotation")*np.pi/180.
   g = islands.get_geometry(n=n,nedges=int(get("nsides")),rot=rot,geo=g)
+  if modify: g = modify_geometry(g) # modify the geometry
   return g
 
 
+def select_atoms_removal(self):
+  g = get_geometry(modify=False) # get the unmodified geometry
+  g.write() # write geometry
+  execute_script("qh-remove-atoms-geometry") # remove the file
 
 
+def modify_geometry(g):
+  """Modify the geometry according to the interface"""
+  if qtwrap.is_checked("remove_selected"): # remove some atoms
+      try: 
+        inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int)) 
+        if inds.shape==(): inds = [inds]
+      except: inds = [] # Nothing
+      print(inds)
+      g = sculpt.remove(g,inds) # remove those atoms
+  if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
+      g = sculpt.remove_unibonded(g,iterative=True)
+  return g # return geometry
+  
 
+
+     
 
 
 
@@ -135,12 +155,6 @@ def show_dos(self):
   execute_script("qh-dos  ")
 
 
-def pickup_hamiltonian():
-  return initialize()
-  if builder.get_object("activate_scf").get_active():
-    return read_hamiltonian()
-  else: # generate from scratch
-    return initialize()
 
 
 
@@ -209,6 +223,8 @@ def show_magnetism():
 
 
 
+
+
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
 
@@ -222,6 +238,7 @@ signals["show_structure"] = show_structure  # show bandstructure
 signals["show_structure_3d"] = show_structure_3d
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 signals["show_magnetism"] = show_magnetism
+signals["select_atoms_removal"] = select_atoms_removal
 
 
 
