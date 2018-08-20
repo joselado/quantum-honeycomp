@@ -34,7 +34,7 @@ plt.yticks([])
 for i in range(len(x)):
   for j in range(i,len(x)):
     dd = (x[i] -x[j])**2 + (y[i] -y[j])**2
-    if dd<1.01:
+    if 0.1<dd<1.01:
       plt.plot([x[i],x[j]],[y[i],y[j]],c="black")
 
 

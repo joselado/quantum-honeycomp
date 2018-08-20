@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -92,9 +92,11 @@ class Ui_MainWindow(object):
         self.swave.setObjectName("swave")
         self.gridLayout.addWidget(self.swave, 11, 1, 1, 1)
         self.label_44 = QtWidgets.QLabel(self.tab_3)
+        self.label_44.setEnabled(False)
         self.label_44.setObjectName("label_44")
         self.gridLayout.addWidget(self.label_44, 0, 0, 1, 1)
         self.strain = QtWidgets.QLineEdit(self.tab_3)
+        self.strain.setEnabled(False)
         self.strain.setObjectName("strain")
         self.gridLayout.addWidget(self.strain, 0, 1, 1, 1)
         self.gridLayout_7.addLayout(self.gridLayout, 0, 0, 1, 1)
@@ -316,7 +318,7 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addWidget(self.label_46, 2, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 28))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)

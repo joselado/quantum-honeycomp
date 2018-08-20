@@ -186,6 +186,9 @@
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_44">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Strain</string>
             </property>
@@ -193,6 +196,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="strain">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>0.0</string>
             </property>
@@ -682,7 +688,7 @@
      <x>0</x>
      <y>0</y>
      <width>950</width>
-     <height>25</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
