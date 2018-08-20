@@ -152,18 +152,6 @@ def pickup_hamiltonian():
 
 
 
-def show_stm(self):
-  h = pickup_hamiltonian() # get hamiltonian
-#  ldos.multi_ldos()
-  ewin = abs(get("window_ldos")) # energy window
-  ne = int(get("num_ldos")) # number of LDOS
-  delta = ewin/ne # delta
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=1,delta=delta)
-  execute_script("qh-multildos ")
-#  hamiltonians.ldos(h,e=get("stm_bias"),delta=get("DOS_smearing")) # calculate the stm spectra
-#  print("Using semaring",get("DOS_smearing"))
-#  execute_script("qh-ldos  LDOS.OUT")
-  return
 
 
 def show_berry2d():
@@ -258,6 +246,22 @@ def show_structure_3d(self):
 
 
 
+def show_interactive_ldos():
+  comp = computing() # create the computing window
+  h = pickup_hamiltonian()  # get the hamiltonian
+  ewin = get("window_ldos")
+  nrep = int(get("nsuper_ldos"))
+  nk = int(get("nk_ldos"))
+  ne = int(get("ne_ldos"))
+  delta = get("delta_ldos")
+  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,
+          nrep=nrep)
+  comp.kill()
+  execute_script("qh-multildos ")
+
+
+
+
 
 
 
@@ -279,10 +283,7 @@ signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["show_structure_3d"] = show_structure_3d
 signals["select_atoms_removal"] = select_atoms_removal
-#signals["show_stm"] = show_stm  # show STM
-#signals["show_magnetism"] = show_magnetism  # show magnetism
-#signals["show_lattice"] = show_lattice  # show magnetism
-#signals["save_results"] = save_results  # save the results
+signals["show_interactive_ldos"] = show_interactive_ldos
 
 
 

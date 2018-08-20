@@ -47,6 +47,7 @@ except:
 
 
 senergy = Slider(axenergy, '', 0, len(names), valinit=0,valfmt='%0.0f')
+senergy.valtext.set_visible(False)
 
 
 
@@ -91,15 +92,15 @@ def update(val):
   else:
     num = np.sqrt(len(z))
     scale = np.abs(z)/np.max(np.abs(z))
-    scale = scale
     scale = scale/np.sqrt(num)*700
     cmap = plt.get_cmap("inferno") 
-    color = scale # same as scale
+    color = scale/np.max(scale) # between 0 and 1
   
   
 #  plt.title(str(len(x))+" atoms")
 #  ax.scatter(x,y,color="black",s=1)
-  ax.scatter(x,y,s=scale,c=color,edgecolor="none",cmap=cmap)
+  cplot = ax.scatter(x,y,s=scale,c=color,edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
+#  fig.colorbar(cplot)
   ax.axis("equal")
   ax.set_xticks([])
   ax.set_yticks([])
