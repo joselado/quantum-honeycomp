@@ -229,7 +229,7 @@ def show_structure_3d(self):
   nsuper = int(get("nsuper_struct"))
   g = g.supercell(nsuper)
   g.write()
-  execute_script("qh-structure3d POSITIONS.OUT")
+  execute_script("qh-structure-tbg POSITIONS.OUT")
 
 
 

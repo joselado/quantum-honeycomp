@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -429,7 +429,7 @@ class Ui_MainWindow(object):
         self.gridLayout_12.addWidget(self.label_46, 2, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 28))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -499,7 +499,7 @@ class Ui_MainWindow(object):
         self.tabWidget_4.setTabText(self.tabWidget_4.indexOf(self.tab_11), _translate("MainWindow", "Lower"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), _translate("MainWindow", "Terms in the Hamiltonian"))
         self.label_7.setText(_translate("MainWindow", "Supercell"))
-        self.nsuper_struct.setText(_translate("MainWindow", "1"))
+        self.nsuper_struct.setText(_translate("MainWindow", "4"))
         self.show_structure.setText(_translate("MainWindow", "Show structure"))
         self.show_structure_3d.setText(_translate("MainWindow", "Show 3D structure"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_4), _translate("MainWindow", "Structure"))

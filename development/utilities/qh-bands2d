@@ -94,7 +94,10 @@ def plot_bands():
   bandstructure = plt.gcf()
   bandstructure.canvas.set_window_title('Bandstructure')
 # add the lines in the bandstructure
-  ll = open("BANDLINES.OUT","r").readlines()
+  try: ll = open("BANDLINES.OUT","r").readlines()
+  except:
+      print("BANDLINES.OUT not found")
+      ll = []
   ik = []
   names = []
   for l in ll:

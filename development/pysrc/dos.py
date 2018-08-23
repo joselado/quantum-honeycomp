@@ -159,7 +159,7 @@ def dos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,info=False,ewindow=None):
 
 
 def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
-         is_sparse=False,numw=10):
+         is_sparse=False,numw=10,window=None):
   """Calculate density of states using the ks given on input"""
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
   es = [] # empty list
@@ -176,7 +176,10 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
   if delta is None: delta = 5./nk # automatic delta
-  xs = np.linspace(np.min(es)-.5,np.max(es)+.5,ndos) # create x
+  if window is None:
+    xs = np.linspace(np.min(es)-.5,np.max(es)+.5,ndos) # create x
+  else:
+    xs = np.linspace(-window,window,ndos) # create x
   ys = calculate_dos(es,xs,delta) # use the Fortran routine
   ys /= nk # normalize 
   write_dos(xs,ys) # write in file
@@ -193,7 +196,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 
 
 def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
-          ndos=500,numw=20,random=True,kpm_window=1.0):
+          ndos=500,numw=20,random=True,kpm_window=1.0,window=None):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=2: raise # only for 2d
   ks = []
@@ -207,7 +210,7 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     if delta is None: delta = 6./nk
 # conventiona algorithm
     calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
-                          is_sparse=h.is_sparse,numw=numw) 
+                          is_sparse=h.is_sparse,numw=numw,window=window) 
   else: # use the kpm
     npol = ndos//10
     h.turn_sparse() # turn the hamiltonian sparse

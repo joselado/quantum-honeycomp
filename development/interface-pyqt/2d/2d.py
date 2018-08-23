@@ -123,18 +123,14 @@ def show_dosbands(self=0):
 
 
 
-def show_dos(self):
+def show_dos(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
-#  mode = getbox("mode_dos") # mode for the DOS
-  if h.dimensionality==0:
-    dos.dos0d(h,es=np.linspace(-3.1,3.1,500),delta=get("DOS_smearing"))
-  elif h.dimensionality==1:
-#    dos.dos1d(h,ndos=400,delta=get("DOS_smearing"))
-    dos.dos1d(h,ndos=400)
-  elif h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
+  ndos = int(get("ne_dos"))
+  if h.dimensionality==2:
+    dos.dos2d(h,ndos=500,delta=get("delta_dos"),nk=int(get("nk_dos")),
+            window=get("window_dos"))
   else: raise
-  execute_script("tb90-dos  ")
+  if not silent: execute_script("qh-dos DOS.OUT") # show the result
 
 
 def pickup_hamiltonian():
@@ -261,6 +257,56 @@ def show_interactive_ldos():
 
 
 
+def sweep_parameter():
+    """Perform a sweep in a parameter"""
+    pname = getbox("sweep_parameter") # get the parameter
+    ps = np.linspace(get("sweep_initial"),get("sweep_final"),
+               int(get("sweep_steps"))) # parameters
+    def modify(p): # function to change the parameter
+        if pname=="Sublattice imbalance": qtwrap.modify("mAB",p)
+        elif pname=="Kane-Mele": qtwrap.modify("kanemele",p)
+        elif pname=="Jx": qtwrap.modify("Bx",p)
+        elif pname=="Jy": qtwrap.modify("By",p)
+        elif pname=="Jz": qtwrap.modify("Bz",p)
+        elif pname=="Rashba": qtwrap.modify("rashba",p)
+        elif pname=="Haldane": qtwrap.modify("haldane",p)
+        elif pname=="Anti-Haldane": qtwrap.modify("antihaldane",p)
+        elif pname=="s-wave pairing": qtwrap.modify("swave",p)
+        elif pname=="Fermi": qtwrap.modify("fermi",p)
+        else: raise # not implemented
+    cname = getbox("sweep_task") # type of computation
+    out = [] # empty list
+    for p in ps: # loop over the values
+        modify(p) # modify the Hamiltonian
+        h = pickup_hamiltonian() # get hamiltonian
+        if cname=="DOS": 
+            show_dos(silent=True) # compute DOS
+            m = np.genfromtxt("DOS.OUT").transpose() # get dos
+            es,ds = m[0],m[1]
+            for (e,d) in zip(es,ds): # loop over energies
+                out.append([p,e,d])
+        elif cname=="Indirect gap": # compute the gap
+            g = h.get_gap() # compute Gap
+            out.append([p,g]) # store result
+        elif cname=="Chern number": # compute the gap
+            c = topology.chern(h,nk=int(np.sqrt(get("nk_topology"))))
+            out.append([p,c]) # store result
+        elif cname=="Eigenvalues": # compute the gap
+            kpath = [np.random.random(3) for i in range(int(get("nk_bands")))]
+            (ks,es) = h.get_bands() # compute eigenvalues
+            for e in es: out.append([p,e]) # store
+        else: raise
+    np.savetxt("SWEEP.OUT",np.matrix(out)) # store result
+    if cname=="DOS":
+        execute_script("qh-sweep-dos SWEEP.OUT") # remove the file
+    elif cname=="Indirect gap":
+        execute_script("qh-indirect-gap SWEEP.OUT") # remove the file
+    elif cname=="Chern number":
+        execute_script("qh-chern-evolution SWEEP.OUT") # remove the file
+    else:
+        execute_script("qh-indirect-gap SWEEP.OUT") # remove the file
+    
+
 
 
 
@@ -281,6 +327,7 @@ signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism
+signals["compute_sweep"] = sweep_parameter  
 signals["show_structure_3d"] = show_structure_3d
 signals["select_atoms_removal"] = select_atoms_removal
 signals["show_interactive_ldos"] = show_interactive_ldos

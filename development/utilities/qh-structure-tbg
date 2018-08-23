@@ -55,7 +55,6 @@ mlab.points3d(xu, yu, zu, color=(1, 0, 0), scale_factor = .8,
                 resolution=10)
 mlab.points3d(xl, yl, zl, color=(0, 0, 1), scale_factor = .8,
                 resolution=10)
-print("AAAAAAAAAAAAAA")
 
 
 # Every object has been created, we can reenable the rendering.

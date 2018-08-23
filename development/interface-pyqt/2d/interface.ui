@@ -417,27 +417,69 @@
        <attribute name="title">
         <string>DOS</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_17">
-        <item row="0" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
          <widget class="QPushButton" name="show_dos">
           <property name="text">
            <string>Density of states</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_16">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_36">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_50">
+            <property name="text">
+             <string># of kpoints</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_51">
+            <property name="text">
+             <string>Energy window</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="window_dos">
+            <property name="text">
+             <string>3.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="ne_dos">
+            <property name="text">
+             <string>300</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="delta_dos">
+            <property name="text">
+             <string>0.1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_48">
             <property name="text">
              <string>Smearing</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="DOS_smearing">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="nk_dos">
             <property name="text">
-             <string>0.01</string>
+             <string>100</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_49">
+            <property name="text">
+             <string># of energies</string>
             </property>
            </widget>
           </item>
@@ -689,7 +731,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="nk_topology">
             <property name="text">
-             <string>200</string>
+             <string>400</string>
             </property>
            </widget>
           </item>
@@ -820,6 +862,158 @@
          <widget class="QPushButton" name="show_magnetism">
           <property name="text">
            <string>Show magnetism</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_15">
+       <attribute name="title">
+        <string>Sweep</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <layout class="QGridLayout" name="gridLayout_26">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Parameter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="sweep_parameter">
+            <item>
+             <property name="text">
+              <string>Sublattice imbalance</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Jx</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Jy</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Jx</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Haldane</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Kane-Mele</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Antiferromagnetism</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Fermi</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>s-wave pairing</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Anti-Haldane</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="sweep_task">
+            <item>
+             <property name="text">
+              <string>Indirect gap</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>DOS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Chern number</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Eigenvalues</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Task</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>Initial value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="sweep_final">
+            <property name="text">
+             <string>1.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="sweep_initial">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="sweep_steps">
+            <property name="text">
+             <string>40</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string>Final value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>Steps</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="compute_sweep">
+          <property name="text">
+           <string>Perform sweep</string>
           </property>
          </widget>
         </item>

@@ -263,12 +263,13 @@ def smooth_gauge(w1,w2):
 
 
 
-def z2_vanderbilt(h,nk=30,nt=100,nocc=None):
+def z2_vanderbilt(h,nk=30,nt=100,nocc=None,full=False):
   """ Calculate Z2 invariant according to Vanderbilt algorithm"""
   out = [] # output list
   path = np.linspace(0.,1.,nk) # set of kpoints
   fo = open("WANNIER_CENTERS.OUT","w")
-  ts = np.linspace(0.,0.5,nt)
+  if full:  ts = np.linspace(0.,1.0,nt,endpoint=False)
+  else:  ts = np.linspace(0.,0.5,nt,endpoint=False)
   wfall = [[occ_states2d(h,np.array([k,t,0.,])) for k in path] for t in ts] 
   # select a continuos gauge for the first wave
   for it in range(len(ts)-1): # loop over ts
@@ -294,25 +295,37 @@ def z2_vanderbilt(h,nk=30,nt=100,nocc=None):
   return np.array(out).transpose() # transpose the map
 
 
-
-
 def z2_invariant(h,nk=20,nt=20,nocc=None):
-  m = z2_vanderbilt(h,nk=nk,nt=nt,nocc=nocc)
+  """Compute Z2 invariant with pumping of Wannier centers"""
+  return wannier_winding(h,nk=nk,nt=nt,nocc=nocc,full=False) 
+
+
+
+
+def chern(h,nk=20,nt=20,nocc=None):
+  """Compute Chern invariant with pumping of Wannier centers"""
+  return wannier_winding(h,nk=nk,nt=nt,nocc=nocc,full=True) 
+
+
+
+
+def wannier_winding(h,nk=20,nt=20,nocc=None,full=True):
+  m = z2_vanderbilt(h,nk=nk,nt=nt,nocc=nocc,full=full)
   x = m[0]
   # find the position of the maximum gap at every t
   fermis = x*0. # maximum gap
   for it in range(len(x)): # loop over times
     imax,jmax = None,None
     dmax = -1 # initialize
-    gapangle = None
+    gapangle = None # initialize
     maxgap = -1.0 # maximum gap
+    gapangle = ((m[1][it]+0.5)%1)*np.pi # initialize
     for i in range(1,len(m)):
       for j in range(i+1,len(m)):
         for ipi in [0.,1.]:
           ip = np.exp(1j*m[i][it]) # center of wave i
           jp = np.exp(1j*m[j][it]) # center of wave j
           angle = np.angle(ip+jp)+np.pi*ipi # get the angle
-          #angle = np.angle(ip+jp)+np.pi # get the angle
           dp = np.exp(1j*angle) # now obtain this middle point gap
           mindis = 4.0 # calculate minimum distance
           for k in range(1,len(m)): # loop over centers
@@ -320,28 +333,35 @@ def z2_invariant(h,nk=20,nt=20,nocc=None):
             dis = np.abs(dp-kp) # distance between the two points 
             if dis<mindis: mindis = dis+0. # update minimum distance
           if mindis>maxgap: # if found a bigger gap
-    #        print angle,m[i][it],m[j][it]
             maxgap = mindis+0. # maximum distance
             gapangle = np.angle(dp) # update of found bigger gap
     fermis[it] = gapangle
-  
-  
   # now check the number of cuts of each wannier center
-  
   def angleg(a,b,c):
     """Function to say if a jump has been made or not"""
     d = np.sin(a-b) + np.sin(b-c) + np.sin(c-a)
     return -d
-  
-  
-  parity = 1 # start with
-  for i in range(1,len(m)): # loop over waves 
-    cwf = m[i] # center of the wave
-    for it in range(len(x)-1): # loop over times
-      s = np.sign(angleg(fermis[it],fermis[it+1],cwf[it])) # calculate the sign
-      if s<0.:
-        parity *= -1 # add a minus -1
-  return parity
+
+  if full: # for the Chern number
+    cuts = 0 # start with 0
+    print(fermis)
+    for i in range(1,len(m)): # loop over waves 
+      cwf = m[i] # center of the wave
+      for it in range(len(x)-1): # loop over times
+        s1 = np.sign(fermis[it]-cwf[it])
+        s2 = np.sign(fermis[it+1]-cwf[it])
+        print(s1,s2)
+        cuts += (s1-s2)/2. 
+    return cuts
+
+  else: # for the Z2 invariant
+    parity = 1 # start with
+    for i in range(1,len(m)): # loop over waves 
+      cwf = m[i] # center of the wave
+      for it in range(len(x)-1): # loop over times
+        s = np.sign(angleg(fermis[it],fermis[it+1],cwf[it])) 
+        if s<0.:  parity *= -1 # add a minus sign
+    return parity
 
 
 
