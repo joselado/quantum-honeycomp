@@ -63,9 +63,13 @@ def kdos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,kshift=0.,
 
 
 
-def write_surface(h,energies=np.linspace(-.5,.5,100),klist=np.linspace(0.,1.,100),delta=None,operator=None,hs=None):
+def write_surface(h,energies=np.linspace(-.5,.5,300),
+        klist=np.linspace(0.,1.,100),delta=None,operator=None,hs=None):
   if delta is None: delta = (np.max(energies)-np.min(energies))/len(energies)
-  if h.dimensionality==2:
+  if h.dimensionality==1:
+    write_surface_1d(h,energies=energies,delta=delta,
+                         operator=operator)
+  elif h.dimensionality==2:
     write_surface_2d(h,energies=energies,klist=klist,delta=delta,
                          operator=operator,hs=hs)
   elif h.dimensionality==3:
@@ -74,6 +78,29 @@ def write_surface(h,energies=np.linspace(-.5,.5,100),klist=np.linspace(0.,1.,100
 
 
 import multicell
+
+
+def write_surface_1d(h,energies=None,delta=None,
+        operator=None):
+  if energies is None: energies = np.linspace(-.5,.5,200)
+  if delta is None: delta = (max(energies)-min(energies))/len(energies)
+  h = h.get_no_multicell()
+  fo  = open("SURFACE_DOS.OUT","w") # open file
+  for energy in energies:
+      gs,sf = green.green_renormalization(h.intra,h.inter,
+              energy=energy,delta=delta) # surface green function 
+      if operator is None: op = np.identity(h.intra.shape[0]) # identity matrix
+      elif callable(operator): op = callable(op)
+      else: op = operator # assume a matrix
+      db = -(gs*op).trace()[0,0].imag # bulk
+      ds = -(sf*op).trace()[0,0].imag # surface
+      fo.write(str(energy)+"   "+str(ds)+"   "+str(db)+"\n")
+      fo.flush()
+  fo.close()
+
+
+
+
 
 def write_surface_2d(h,energies=None,klist=None,delta=0.01,
                          operator=None,hs=None):

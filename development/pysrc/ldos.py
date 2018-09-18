@@ -192,15 +192,18 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
 ldos = ldos2d
 
 
-def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,random=False):
+def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,
+        random=False,op=None):
   """Calculate many LDOS, by diagonalizing the Hamiltonian"""
   print("Calculating eigenvectors in LDOS")
+  ps = [] # weights
+  evals,ws = [],[] # empty list
+  ks = klist.kmesh(h.dimensionality,nk=nk) # get grid
+  hk = h.get_hk_gen() # get generator
+  if op is None: op = lambda x,k: 1.0 # dummy function
   if h.is_sparse: # sparse Hamiltonian
     from bandstructure import smalleig
     print("SPARSE Matrix")
-    evals,ws = [],[] # empty list
-    ks = klist.kmesh(h.dimensionality,nk=nk) # get grid
-    hk = h.get_hk_gen() # get generator
     for k in ks: # loop
       print("Diagonalizing in LDOS, SPARSE mode")
       if random:
@@ -209,13 +212,24 @@ def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,random=False):
       e,w = smalleig(hk(k),numw=numw,evecs=True)
       evals += [ie for ie in e]
       ws += [iw for iw in w]
+      ps += [op(iw,k=k) for iw in w] # weights
 #      evals = np.concatenate([evals,e]) # store
 #      ws = np.concatenate([ws,w]) # store
 #    raise
 #    (evals,ws) = h.eigenvectors(nk) # get the different eigenvectors
   else:
-    print("DENSE Matrix")
-    (evals,ws) = h.eigenvectors(nk) # get the different eigenvectors
+    print("Diagonalizing in LDOS, DENSE mode")
+    for k in ks: # loop
+      if random:
+        k = np.random.random(3) # random vector
+        print("RANDOM vector in LDOS")
+      e,w = lg.eigh(hk(k))
+      w = w.transpose()
+      evals += [ie for ie in e]
+      ws += [iw for iw in w]
+      ps += [op(iw,k=k[0]) for iw in w] # weights
+#      evals = np.concatenate([evals,e]) # store
+#      ws = np.concatenate([ws,w]) # store
   ds = [(np.conjugate(v)*v).real for v in ws] # calculate densities
   del ws # remove the wavefunctions
   os.system("rm -rf MULTILDOS") # remove folder
@@ -226,9 +240,9 @@ def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,random=False):
   for e in es: # loop over energies
     print("MULTILDOS for energy",e)
     out = np.array([0.0 for i in range(h.intra.shape[0])]) # initialize
-    for (d,ie) in zip(ds,evals): # loop over wavefunctions
+    for (d,p,ie) in zip(ds,ps,evals): # loop over wavefunctions
       fac = delta/((e-ie)**2 + delta**2) # factor to create a delta
-      out += fac*d # add contribution
+      out += fac*d*p # add contribution
     out /= np.pi # normalize
     out = spatial_dos(h,out) # resum if necessary
     name0 = "LDOS_"+str(e)+"_.OUT" # name of the output

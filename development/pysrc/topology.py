@@ -43,10 +43,22 @@ def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
 
 
 
-def berry_phase(h,nk=20):
-  """ Calculates the Berry phase of a 1d hamiltonian"""
-  if h.dimensionality != 1: raise # only for 1d
-  ks = np.linspace(0.,1.,nk,endpoint=False) # list of kpoints
+
+
+
+
+def berry_phase(h,nk=20,kpath=None):
+  """ Calculates the Berry phase of a Hamiltonian"""
+  if h.dimensionality==0: raise
+  elif h.dimensionality == 1:
+    ks = np.linspace(0.,1.,nk,endpoint=False) # list of kpoints
+  elif h.dimensionality > 1: # you must provide a kpath
+      if kpath is None: 
+          print("You must provide a k-path")
+          raise # error
+      ks = kpath # continue
+      nk = len(kpath) # redefine
+  else: raise # otherwise
   hkgen = h.get_hk_gen() # get Hamiltonian generator
   wf0 = occupied_states(hkgen,ks[0]) # get occupied states, first k-point
   wfold = wf0.copy() # copy
@@ -179,7 +191,7 @@ def chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
   bs = [] # array for berrys
   if dk<0: dk = 1./float(2*nk) # automatic dk
   if operator is not None and mode=="Wilson":
-    print("Swuitching to Green mode in topology")
+    print("Switching to Green mode in topology")
     mode="Green"
   # create the function
   def fberry(k): # function to integrate
@@ -362,18 +374,6 @@ def wannier_winding(h,nk=20,nt=20,nocc=None,full=True):
         s = np.sign(angleg(fermis[it],fermis[it+1],cwf[it])) 
         if s<0.:  parity *= -1 # add a minus sign
     return parity
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

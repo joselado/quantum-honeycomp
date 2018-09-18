@@ -375,19 +375,37 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100):
 
 
 def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
-            use_kpm=False,scale=10.,ntries=10):
+            use_kpm=False,scale=10.,ntries=10,mode="ED"):
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
     dos_kpm(h,scale=scale,ewindow=ewindow,ne=len(energies),delta=delta,
                    ntries=ntries,nk=nk)
   else: # conventional methods
-    if h.dimensionality==0:
-      return dos0d(h,es=energies,delta=delta)
-    elif h.dimensionality==1:
-      return dos1d(h,ndos=len(energies),delta=delta)
-    else: raise
-
+    if mode=="ED": # exact diagonalization
+      if h.dimensionality==0:
+        return dos0d(h,es=energies,delta=delta)
+      elif h.dimensionality==1:
+        return dos1d(h,ndos=len(energies),delta=delta,nk=nk)
+      elif h.dimensionality==2:
+        return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
+            ndos=len(energies),random=True,window=np.max(np.abs(energies)))
+      else: raise
+    elif mode=="Green": # Green function formalism
+      if h.dimensionality==0:
+        return dos0d(h,es=energies,delta=delta) # same as before
+      elif h.dimensionality>0: # Bigger dimensionality
+        from green import bloch_selfenergy
+        tr = timing.Testimator("KDOS") # generate object
+        ie = 0
+        out = [] # storage
+        for e in energies: # loop
+          tr.remaining(ie,len(energies)) # print status
+          ie += 1 # increase
+          g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
+          out.append(-g.trace()[0,0].imag) # store dos
+        np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
+        return energies,np.array(out) # return
 
 
 def bulkandsurface(h1,energies=np.linspace(-1.,1.,100),operator=None,

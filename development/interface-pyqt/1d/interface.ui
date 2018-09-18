@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>878</width>
+    <width>770</width>
     <height>626</height>
    </rect>
   </property>
@@ -467,7 +467,7 @@
           <item row="3" column="1">
            <widget class="QLineEdit" name="delta_ldos">
             <property name="text">
-             <string>0.03</string>
+             <string>0.05</string>
             </property>
            </widget>
           </item>
@@ -481,7 +481,7 @@
           <item row="1" column="1">
            <widget class="QLineEdit" name="nk_ldos">
             <property name="text">
-             <string>20</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
@@ -509,14 +509,14 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="window_ldos">
             <property name="text">
-             <string>0.5</string>
+             <string>1.5</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="nsuper_ldos">
             <property name="text">
-             <string>1</string>
+             <string>10</string>
             </property>
            </widget>
           </item>
@@ -525,6 +525,32 @@
             <property name="text">
              <string>Supercell</string>
             </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_36">
+            <property name="text">
+             <string>Operator</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QComboBox" name="operator_ldos">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Current</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Spin current</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
@@ -852,8 +878,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>878</width>
-     <height>28</height>
+     <width>770</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

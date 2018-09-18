@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(878, 626)
+        MainWindow.resize(770, 626)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_7 = QtWidgets.QGridLayout(self.centralwidget)
@@ -246,6 +246,15 @@ class Ui_MainWindow(object):
         self.label_21 = QtWidgets.QLabel(self.tab_7)
         self.label_21.setObjectName("label_21")
         self.gridLayout_6.addWidget(self.label_21, 4, 0, 1, 1)
+        self.label_36 = QtWidgets.QLabel(self.tab_7)
+        self.label_36.setObjectName("label_36")
+        self.gridLayout_6.addWidget(self.label_36, 5, 0, 1, 1)
+        self.operator_ldos = QtWidgets.QComboBox(self.tab_7)
+        self.operator_ldos.setObjectName("operator_ldos")
+        self.operator_ldos.addItem("")
+        self.operator_ldos.addItem("")
+        self.operator_ldos.addItem("")
+        self.gridLayout_6.addWidget(self.operator_ldos, 5, 1, 1, 1)
         self.gridLayout_15.addLayout(self.gridLayout_6, 0, 0, 1, 1)
         self.show_interactive_ldos = QtWidgets.QPushButton(self.tab_7)
         self.show_interactive_ldos.setObjectName("show_interactive_ldos")
@@ -389,7 +398,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7.addWidget(self.tabWidget, 1, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 28))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 770, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -466,15 +475,19 @@ class Ui_MainWindow(object):
         self.DOS_smearing.setText(_translate("MainWindow", "0.01"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_6), _translate("MainWindow", "DOS"))
         self.ne_ldos.setText(_translate("MainWindow", "300"))
-        self.delta_ldos.setText(_translate("MainWindow", "0.03"))
+        self.delta_ldos.setText(_translate("MainWindow", "0.05"))
         self.label_20.setText(_translate("MainWindow", "Smearing"))
-        self.nk_ldos.setText(_translate("MainWindow", "20"))
+        self.nk_ldos.setText(_translate("MainWindow", "100"))
         self.label_17.setText(_translate("MainWindow", "# of energies"))
         self.label_18.setText(_translate("MainWindow", "# of kpoints"))
         self.label_19.setText(_translate("MainWindow", "Energy window"))
-        self.window_ldos.setText(_translate("MainWindow", "0.5"))
-        self.nsuper_ldos.setText(_translate("MainWindow", "1"))
+        self.window_ldos.setText(_translate("MainWindow", "1.5"))
+        self.nsuper_ldos.setText(_translate("MainWindow", "10"))
         self.label_21.setText(_translate("MainWindow", "Supercell"))
+        self.label_36.setText(_translate("MainWindow", "Operator"))
+        self.operator_ldos.setItemText(0, _translate("MainWindow", "None"))
+        self.operator_ldos.setItemText(1, _translate("MainWindow", "Current"))
+        self.operator_ldos.setItemText(2, _translate("MainWindow", "Spin current"))
         self.show_interactive_ldos.setText(_translate("MainWindow", "Show LDOS"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_7), _translate("MainWindow", "LDOS"))
         self.scf_initialization.setItemText(0, _translate("MainWindow", "antiferro"))

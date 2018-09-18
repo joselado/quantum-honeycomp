@@ -48,7 +48,7 @@ class hamiltonian():
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
   def set_filling(self,filling=0.5,nk=10):
-    """Set the Fillign of the Hamiltonian"""
+    """Set the filling of the Hamiltonian"""
     es,ws = self.eigenvectors(nk=nk)
     from scftypes import get_fermi_energy
     self.shift_fermi(-get_fermi_energy(es,filling)) # shift the fermi energy
@@ -63,6 +63,7 @@ class hamiltonian():
     self.is_sparse = False
     self.is_multicell = False # for hamiltonians with hoppings to several neighbors
     self.hopping_dict = {} # hopping dictonary
+    self.non_hermitian = False # non hermitian Hamiltonian
     if not geometry is None:
 # dimensionality of the system
       self.dimensionality = geometry.dimensionality 
@@ -408,6 +409,9 @@ class hamiltonian():
   def get_multicell(self):
     """Return a multicell Hamiltonian"""
     return multicell.turn_multicell(self)
+  def get_no_multicell(self):
+    """Return a multicell Hamiltonian"""
+    return multicell.turn_no_multicell(self)
   def clean(self):
     """Clean a Hamiltonian"""
     from clean import clean_hamiltonian

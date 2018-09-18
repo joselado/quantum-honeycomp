@@ -124,63 +124,19 @@ def dos_infinite(intra,inter,energies=[0.0],num_rep=100,
 
 
 
-def dos_semiinfinite(intra,inter,energies=[0.0],num_rep=100,
+def dos_semiinfinite(intra,inter,energies=np.linspace(-1.0,1.0,100),num_rep=100,
                       mixing=0.7,eps=0.0001,green_guess=None,max_error=0.0001):
    """ Calculates the surface density of states by using a 
     green function approach"""
    dos = [] # list with the density of states
    for energy in energies: # loop over energies
-     gf = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
-          eps=eps,green_guess=green_guess,max_error=max_error)
+#     gf = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
+     gb,gf = green_renormalization(intra,inter,energy=energy,delta=delta)
      dos.append(-gf.trace()[0,0].imag)  # calculate the trace of the Green function
-   return dos
+   return energies,dos
 
 
 
-
-
-
-
-def plot_dos_semiinfinite(intra,inter,energies=[0.0],num_rep=100,
-                      mixing=0.7,eps=0.0001,green_guess=None,max_error=0.0001):
-   """ Plots the surface density of states by using a 
-    green function approach"""
-   # get the dos
-   dos = dos_semiinfinite(intra,inter,energies=energies,
-             num_rep=num_rep,mixing=mixing,
-             eps=eps,green_guess=green_guess,max_error=max_error)
-   # plot the figure
-   fig = py.figure() # create figure
-   fig.subplots_adjust(0.2,0.2)
-   fig.set_facecolor("white") # face in white
-   sdos = fig.add_subplot(111) # create subplot
-   sdos.set_xlabel("Energy",size=20)
-   sdos.set_ylabel("Surface DOS",size=20)
-   sdos.plot(energies,dos,color="red") # create the plot
-   sdos.plot(energies,dos,color="red") # create the plot
-   sdos.fill_between(energies,0,dos,color="red")
-   sdos.tick_params(labelsize=20)
-   sdos.set_ylim([0.0,max(dos)])
-   return fig
-
-
-
-def plot_dos_infinite(intra,inter,energies=[0.0],num_rep=100,
-                      mixing=0.7,eps=0.0001,green_guess=None,max_error=0.0001):
-   """ Plots the density of states by using a 
-    green function approach"""
-   # get the dos
-   dos = dos_infinite(intra,inter,energies=energies,
-             num_rep=num_rep,mixing=mixing,
-             eps=eps,green_guess=green_guess,max_error=max_error)
-   # plot the figure
-   fig = py.figure() # create figure
-   fig.set_facecolor("white") # face in white
-   sp = fig.add_subplot(111) # create subplot
-   sp.set_xlabel("Energy",size=20)
-   sp.set_ylabel("Surface DOS",size=20)
-   sp.plot(energies,dos) # create the plot
-   return fig
 
 
 
@@ -409,13 +365,13 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
   e = np.matrix(np.identity(len(g)))*(energy + delta*1j) # complex energy
   if mode=="full":  # full integration
     if d==1: # one dimensional
-      ks = np.linspace(0.,1.,nk,endpoint=False) 
+      ks = [[k,0.,0.] for k in np.linspace(0.,1.,nk,endpoint=False)]
     elif d==2: # two dimensional
       ks = []
       kk = np.linspace(0.,1.,nk,endpoint=False)  # interval 0,1
       for ikx in kk:
         for iky in kk:
-          ks.append([ikx,iky])
+          ks.append([ikx,iky,0.])
       ks = np.array(ks)  # all the kpoints
     else: raise # raise error
     for k in ks:  # loop in BZ
@@ -427,22 +383,25 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
     if d==1: # full renormalization
       g,s = gr(h.intra,h.inter)  # perform renormalization
     elif d==2: # two dimensional, loop over k's
-      ks = np.linspace(0.,1.,nk,endpoint=False) 
+      ks = [[k,0.,0.] for k in np.linspace(0.,1.,nk,endpoint=False)]
       for k in ks:  # loop over k in y direction
  # add contribution to green function
         g += green_kchain(h,k=k,energy=energy,delta=delta,error=error) 
       g = g/len(ks)
+    else: raise
   #####################################################
   #####################################################
   if mode=="adaptive":
     if d==1: # full renormalization
       g,s = gr(h.intra,h.inter)  # perform renormalization
     elif d==2: # two dimensional, loop over k's
-      ks = np.linspace(0.,1.,nk,endpoint=False) 
+      ks = [[k,0.,0.] for k in np.linspace(0.,1.,nk,endpoint=False)]
+#      ks = np.linspace(0.,1.,nk,endpoint=False) 
       import integration
       def fint(k):
         """ Function to integrate """
-        return green_kchain(h,k=k,energy=energy,delta=delta,error=error) 
+        return green_kchain(h,k=[k,0.,0.],energy=energy,
+                delta=delta,error=error) 
       # eps is error, might work....
       g = integration.integrate_matrix(fint,xlim=[0.,1.],eps=error) 
         # chain in the y direction

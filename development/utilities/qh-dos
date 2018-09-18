@@ -29,6 +29,7 @@ if num_dos>1:
     splot = pl.subplot(num_dos/2,2,i+1)
     splot.plot(e,dos,color="black")
     splot.set_xlim([min(e),max(e)])
+    splot.set_ylim([min(dos),max(dos)])
     splot.set_xlabel("Energy")
     splot.set_ylabel("DOS")
 else:  # pot only one DOS

@@ -345,7 +345,7 @@ def parametric_hopping_hamiltonian(h,cutoff=5,fc=None,rcut=5.0):
           continue
         t.m = h.spinless2full(parametric_hopping(r,r2,fc))
         t.dir = [i1,i2,i3] # store direction
-        h.hopping.append(t) # append 
+        if np.sum(np.abs(t.m))>0.00001: h.hopping.append(t) # append 
   return h
 
 
@@ -437,16 +437,22 @@ def turn_no_multicell(h):
   if not h.is_multicell: return h # Hamiltonian is already fine
   ho = h.copy() # copy Hamiltonian
   ho.is_multicell = False
-  ho.tx = ho.intra*0.
-  ho.txy = ho.intra*0.
-  ho.txmy = ho.intra*0.
-  ho.ty = ho.intra*0.
+  if ho.dimensionality==0: pass
+  elif ho.dimensionality==1:
+    ho.inter = ho.intra*0.
+  elif ho.dimensionality==2:
+    ho.tx = ho.intra*0.
+    ho.txy = ho.intra*0.
+    ho.txmy = ho.intra*0.
+    ho.ty = ho.intra*0.
+  else: raise
   for t in h.hopping: # loop over hoppings
-    if h.dimensionality==2: # two dimensional
+    if h.dimensionality==0: pass # one dimensional
+    elif h.dimensionality==1: # one dimensional
       if t.dir[0]==1 and t.dir[1]==0 and t.dir[2]==0: # 
-        ho.tx = t.m # store
+        ho.inter = t.m # store
       elif np.sum(np.abs(t.m))>0.0001 and np.max(np.abs(t.dir))>1: raise # Uppps, not possible
-    if h.dimensionality==2: # two dimensional
+    elif h.dimensionality==2: # two dimensional
       if t.dir[0]==1 and t.dir[1]==0 and t.dir[2]==0: # 
         ho.tx = t.m # store
       elif t.dir[0]==0 and t.dir[1]==1 and t.dir[2]==0: # 
@@ -456,6 +462,7 @@ def turn_no_multicell(h):
       elif t.dir[0]==1 and t.dir[1]==-1 and t.dir[2]==0: # 
         ho.txmy = t.m # store
       elif np.sum(np.abs(t.m))>0.0001 and np.max(np.abs(t.dir))>1: raise # Uppps, not possible
+    else: raise
   ho.hopping = [] # empty list
   return ho
 

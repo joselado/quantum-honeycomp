@@ -10,16 +10,17 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
   g = gin.copy()
   if g.dimensionality==0: return
   if g.dimensionality==1:
-    g.a2 = np.array([0.,1.,0.])
-    g.a3 = np.array([0.,0.,1.])
+    g.a2 = np.array([0.,np.max(np.abs(gin.y))*2.+1.,0.])
+    g.a3 = np.array([0.,0.,np.max(np.abs(gin.z))*2.+1.])
   if g.dimensionality==2:
-    g.a3 = np.array([0.,0.,1.])
+    dz = np.max(np.abs(gin.z))*2.+1.
+    g.a3 = np.array([0.,0.,dz])
   a1,a2,a3 = g.a1,g.a2,g.a3 # cell vectors
   go = g.copy() # output unit cell
   # new cell vectors
-  go.a1 = m[0][0]*a1 + m[0][1]*a2 + + m[0][2]*a3
-  go.a2 = m[1][0]*a1 + m[1][1]*a2 + + m[1][2]*a3
-  go.a3 = m[2][0]*a1 + m[2][1]*a2 + + m[2][2]*a3
+  go.a1 = m[0][0]*a1 + m[0][1]*a2 + m[0][2]*a3
+  go.a2 = m[1][0]*a1 + m[1][1]*a2 + m[1][2]*a3
+  go.a3 = m[2][0]*a1 + m[2][1]*a2 + m[2][2]*a3
   # calculate old and new volume
   vold = a1.dot(np.cross(a2,a3))  
   vnew = go.a1.dot(np.cross(go.a2,go.a3))  
@@ -27,7 +28,6 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
     print("No volume",vnew,"\n",a1,"\n",a2,"\n",a3)
     raise
   c = vnew/vold
-#  print("Volume of the unit cell increased by",c)
   c = int(round(abs(c)))
   # now create replicas until there as c times as many atoms in the
   # unit cell
@@ -37,40 +37,35 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
     R = np.matrix([go.a1,go.a2,go.a3]).T # transformation matrix
     L = R.I # inverse matrix
     d0 = -np.random.random()*0.1 # accuracy
-    d0 = -0.1221321124
+    d0 = -0.122132112 # some random number
     d1 = 1.0 + d0 # accuracy
     from geometry import neighbor_cells
 # get as many cells as necessary
     cneigh = reducef(c) # cells to generate given the volume increase c
     cneigh = int(round(cneigh)) # integer
-#    print("Generating",cneigh,"neighboring cell indexes")
     inds = neighbor_cells(cneigh,dim=g.dimensionality) 
-#    print("Generated cell indexes")
-#    nx = c + 1
-#    ny = c + 1
-#    nz = c + 1
-#    if g.dimensionality==2: nz = 0
     for (i,j,k) in inds: # loop
-#    for k in range(-nz,nz+1):
-#      for i in range(-nx,nx+1):
-#        for j in range(-ny,ny+1):
           for ri in g.r: # loop over positions
             rj = ri + i*g.a1 + j*g.a2 + k*g.a3 # new position
             rn = L*np.matrix(rj).T  # transform
             rn = np.array([rn.T[0,ii] for ii in range(3)]) # convert to array
-#            print(ns)
             n1,n2,n3 = rn[0],rn[1],rn[2]
-            if d0<n1<d1 and d0<n2<d1 and d0<n3<d1:
-              rs.append(rj)
-          if len(rs)==len(g.r)*c:
+            if g.dimensionality==3 and d0<n1<d1 and d0<n2<d1 and d0<n3<d1: 
+                rs.append(rj)
+            if g.dimensionality==2 and d0<n1<d1 and d0<n2<d1: 
+                rs.append(rj)
+            if g.dimensionality==1 and d0<n1<d1: 
+                rs.append(rj)
+#          if len(rs)==len(g.r)*c:
 #            print("All the atoms found")
-            break
+#            break
 #    print(rs)
     go.r = np.array(rs) # store
     if len(rs)!=len(g.r)*c: 
       print("Not all the atoms have been found")
       print("New atoms",len(rs))
       print("Expected atoms",len(g.r)*c)
+      print("Volume of the cell increase",c)
       raise
   elif mode=="brute":
     if g.dimensionality==1:

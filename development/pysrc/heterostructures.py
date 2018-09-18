@@ -131,10 +131,12 @@ class heterostructure():
     fun_sl = intermatrix(fsl,xs=es) # get the function
     self.selfgen = [fun_sl,fun_sr] # store functions
     self.interpolated_selfenergy = True # set as true
-  def didv(self,energy=0.0,delta=None,error=1e-4,nk=500,kwant=False):
+  def didv(self,energy=0.0,delta=None,error=1e-4,nk=500,kwant=False,
+          opl=None,opr=None):
     if delta is None: delta = self.delta # set the own delta
     if self.dimensionality==1: # one dimensional
-      return didv(self,energy=energy,delta=delta,kwant=kwant) # return value
+      return didv(self,energy=energy,delta=delta,kwant=kwant,
+              opl=opl,opr=opr) # return value
     elif self.dimensionality==2: # two dimensional
       # function to integrate
       f = lambda k: self.generate(k).didv(energy=energy,delta=delta)
@@ -597,8 +599,12 @@ def create_leads_and_central_list(h_right,h_left,list_h_central,
   """ Creates an heterojunction by giving the hamiltonian
      of the leads and the list of the center """
   # check the hamiltonians
-#  h_right.check()
-#  h_left.check()
+  h_right.check()
+  h_left.check()
+  # convert to the classical way
+  h_right = h_right.get_no_multicell()
+  h_left = h_left.get_no_multicell()
+  list_h_central = [h.get_no_multicell() for h in list_h_central]
   if len(list_h_central)==1: # only one central part
     return create_leads_and_central(h_right,h_left,list_h_central[0])
   ht = heterostructure(h_right) # create heterostructure
@@ -746,7 +752,7 @@ def effective_central_hamiltonian(hetero,energy=0.0,delta=0.0001,write=False):
    return heff
 
 
-def didv(ht,energy=0.0,delta=0.00001,kwant=False):
+def didv(ht,energy=0.0,delta=0.00001,kwant=False,opl=None,opr=None):
   """Calculate differential conductance"""
   if ht.has_eh: # for systems with electons and holes
     s = get_smatrix(ht,energy=energy,delta=delta,check=True) # get the smatrix
@@ -766,16 +772,28 @@ def didv(ht,energy=0.0,delta=0.00001,kwant=False):
     return G
   else: 
     if kwant:
+      if opl is not None or opr is not None: raise # not implemented
       import kwantlink 
       return kwantlink.transport(ht,energy)
     s = get_smatrix(ht,energy=energy,delta=delta,check=True) # get the smatrix
+    if opl is not None or opr is not None: # some projector given
+      raise # this does not make sense
+      U = [[np.identity(s[0][0].shape[0]),None],
+               [None,np.identity(s[1][1].shape[0])]] # projector
+      if opl is not None: U[0][0] = opl # assign this matrix
+      if opr is not None: U[1][1] = opr # assign this matrix
+      #### those formulas are not ok
+      s[0][0] = U[0][0]*s[0][0]*U[0][0] # new smatrix
+      s[0][1] = U[0][0]*s[0][1]*U[1][1] # new smatrix
+      s[1][0] = U[1][1]*s[1][0]*U[0][0] # new smatrix
+      s[1][1] = U[1][1]*s[1][1]*U[1][1] # new smatrix
     r1,r2,t = s[0][0],s[1][1],s[0][1] # get the reflection matrices
-    # select the normal lead
+    # select a normal lead (both of them are)
     # r1 is normal
     ree = r1
     Ree = (ree.H*ree).trace()[0,0] # total e-e reflection 
     G1 = (ree.shape[0] - Ree).real # conductance
-    G2 = (s[0][1]*s[0][1].H).trace()[0,0].real # total e-e reflection 
+    G2 = (s[0][1]*s[0][1].H).trace()[0,0].real # total e-e transmission
     return (G1+G2)/2.
 #return landauer(ht,energy=energy,delta=delta) # call usual landauer 
     

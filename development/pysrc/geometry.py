@@ -36,6 +36,9 @@ class geometry:
     self.lattice_name = "" # lattice name
     self.atoms_names = [] # no name for the atoms
     self.atoms_have_names = False # atoms do not have names
+    self.ncells = 2 # number of neighboring cells returned
+  def get_index(self,r):
+    return get_index(self,r)
   def plot_geometry(self):
     """Plots the system"""
     return plot_geometry(self)
@@ -48,11 +51,12 @@ class geometry:
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
-    try:
-      nsuper[0][0] # if matrix is given
+    if np.array(nsuper).shape==(3,3):
+#    try:
+#      nsuper[0][0] # if matrix is given
       print("Supercell",nsuper)
       return non_orthogonal_supercell(self,nsuper)
-    except: pass # continue with normal way
+#    except: pass # continue with normal way
     if self.dimensionality==1:
       s = supercell1d(self,nsuper)
     elif self.dimensionality==2:
@@ -183,7 +187,7 @@ class geometry:
     f.close() # close file
   def neighbor_directions(self):
     """Return directions linking to neighbors"""
-    return neighbor_directions(self)
+    return neighbor_directions(self,self.ncells)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -1372,8 +1376,9 @@ def get_sublattice(rs):
   while True: # infinite loop
     for i in range(1,n): # look for a neighbor for site i
       for j in range(n): # loop over the rest of the atoms
+        if sublattice[j]==0: continue # next one
         dr = rs[i] - rs[j] # distance to site i
-        if 0.9<dr.dot(dr)<1.01 and sublattice[j]!=0: # if NN and sublattice 
+        if 0.9<dr.dot(dr)<1.01: # if NN and sublattice 
           sublattice[i] = -sublattice[j] + 0 # opposite
           print("Found ",i,sublattice,end="\r")
           continue # next one
@@ -1382,7 +1387,7 @@ def get_sublattice(rs):
 
 
 
-def neighbor_directions(g,cutoff=2):
+def neighbor_directions(g,cutoff=3):
   """Return the vectors pointing to neighbors"""
   dirs = []
   if g.dimensionality==0: return [[0.,0.,0.]] # zero dimensional
@@ -1436,6 +1441,18 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=1):
   go = go.supercell(nrep) # create supercell
   m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
   np.savetxt(name,m) # save in file
+
+
+
+
+
+def get_index(g,r):
+    """Given a certain position, return the index of it in the geometry"""
+    for i in range(len(g.r)):
+        ri = g.r[i] # get this position
+        if np.sum(np.abs(ri-r))<0.0001: return i # return index
+    return None # not found
+
 
 
 

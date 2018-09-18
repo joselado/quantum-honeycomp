@@ -25,8 +25,8 @@ packages += ["python3-pyqt5"]
 packages += ["python-visual"]
 packages += ["gfortran"]
 packages += ["liblapack-dev"]
-packages += ["mayavi2"]
-packages += ["gi"]
+#packages += ["mayavi"]
+#packages += ["gi"]
 
 for p in packages:
   install(p)

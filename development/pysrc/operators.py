@@ -284,6 +284,16 @@ def get_velocity(h):
   return f
 
 
+get_current = get_velocity
+
+def get_spin_current(h):
+  vk = current.current_operator(h)
+  sz = get_sz(h)
+  def f(w,k=[0.,0.,0.]):
+    return braket_wAw(w,vk(k)).real*braket_wAw(w,sz).real
+  return f
+
+
 
 
 
@@ -300,12 +310,12 @@ def get_valley(h,projector=False,delta=None):
 #    return m
     if delta is None: return m # do nothing
     if issparse(m): return m # temporal workaround
-    if issparse(m): m = m.todense()
+    if issparse(m): m = m.todense() # I should fix this
     (es,vs) = lg.eigh(m) # diagonalize
-    es = es/(np.abs(es)+delta) # renormalize
+    es = es/(np.abs(es)+delta) # renormalize the valley eigenvalues
     vs = np.matrix(vs) # convert
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
-    return vs*m0*vs.H
+    return vs*m0*vs.H # return renormalized operator
   if projector: # function returns a matrix
     def fun(m,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint

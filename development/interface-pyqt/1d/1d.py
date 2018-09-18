@@ -140,9 +140,16 @@ def show_interactive_ldos():
   nk = int(get("nk_ldos"))
   ne = int(get("ne_ldos"))
   delta = get("delta_ldos")
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,nrep=nrep)
+  opname = getbox("operator_ldos") # get the operator
+  if opname=="None": op = None
+  elif opname=="Current": op = operators.get_current(h)
+  elif opname=="Spin current": op = operators.get_spin_current(h)
+  else: raise
+  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,
+          delta=delta,nrep=nrep,op=op)
   comp.kill()
-  execute_script("qh-multildos ")
+  if op is None: execute_script("qh-multildos ")
+  else: execute_script("qh-multildos-signed ")
 
 
 
