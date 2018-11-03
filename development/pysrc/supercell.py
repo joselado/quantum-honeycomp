@@ -44,23 +44,31 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
     cneigh = reducef(c) # cells to generate given the volume increase c
     cneigh = int(round(cneigh)) # integer
     inds = neighbor_cells(cneigh,dim=g.dimensionality) 
+    sl = [] # list for the sublattice
     for (i,j,k) in inds: # loop
-          for ri in g.r: # loop over positions
+          ii = 0 # start count
+          for ir in range(len(g.r)): # loop over positions
+            ri = g.r[ir] # get the position
+            store = False
             rj = ri + i*g.a1 + j*g.a2 + k*g.a3 # new position
             rn = L*np.matrix(rj).T  # transform
             rn = np.array([rn.T[0,ii] for ii in range(3)]) # convert to array
             n1,n2,n3 = rn[0],rn[1],rn[2]
-            if g.dimensionality==3 and d0<n1<d1 and d0<n2<d1 and d0<n3<d1: 
-                rs.append(rj)
+            if g.dimensionality==3 and d0<n1<d1 and d0<n2<d1 and d0<n3<d1:
+                store = True
             if g.dimensionality==2 and d0<n1<d1 and d0<n2<d1: 
-                rs.append(rj)
+                store = True
             if g.dimensionality==1 and d0<n1<d1: 
+                store = True
+            if store:
                 rs.append(rj)
+                if g.has_sublattice: sl.append(g.sublattice[ir])
 #          if len(rs)==len(g.r)*c:
 #            print("All the atoms found")
 #            break
 #    print(rs)
     go.r = np.array(rs) # store
+    if go.has_sublattice: go.sublattice = sl # store sublattice
     if len(rs)!=len(g.r)*c: 
       print("Not all the atoms have been found")
       print("New atoms",len(rs))
@@ -87,8 +95,8 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
       if len(rs1)==len(rs3): break
       rs3 = np.array(rs1) 
     go.r = np.array(rs1) # store new positions
+    if go.has_sublattice: go.get_sublattice()
   go.r2xyz() # update coordinates
-  if go.has_sublattice: go.get_sublattice()
   go.center()
   go.get_fractional()
   return go # return new geometry

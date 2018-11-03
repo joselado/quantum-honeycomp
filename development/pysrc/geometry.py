@@ -102,8 +102,10 @@ class geometry:
     h.is_multicell = is_multicell
     if is_multicell:  # workaround for multicell hamiltonians
       from multicell import parametric_hopping_hamiltonian
-      if mgenerator is not None: raise # not implemented
-      h = parametric_hopping_hamiltonian(h,fc=fun) # add hopping
+      if mgenerator is not None: 
+          from multicell import parametric_matrix # not implemented
+          h = parametric_matrix(h,fm=mgenerator)
+      else: h = parametric_hopping_hamiltonian(h,fc=fun) # add hopping
       return h
     if fun is None and mgenerator is None: # no function given
       h.first_neighbors()  # create first neighbor hopping
@@ -148,9 +150,9 @@ class geometry:
       r = np.matrix(k).T # real space vectors
       return np.array((R*r).T)[0]
     return f # return function
-  def get_fractional(self):
+  def get_fractional(self,center=False):
     """Fractional coordinates"""
-    get_fractional(self) # get fractional coordinates
+    get_fractional(self,center=center) # get fractional coordinates
   def rotate(self,angle):
     """Rotate the geometry"""
     return sculpt.rotate(self,angle*np.pi/180)
@@ -172,7 +174,7 @@ class geometry:
     self.y[:] -= r0[1]
     self.z[:] -= r0[2]
     self.xyz2r() # update
-    self.get_fractional()
+    self.get_fractional(center=True)
     self.fractional2real()
   def write_function(self,fun,name="FUNCTION.OUT"):
     """Write a certain function"""
@@ -590,11 +592,11 @@ def honeycomb_lattice():
   return g
 
 
-def buckled_honeycomb_lattice():
+def buckled_honeycomb_lattice(n=1):
   """Return a buckled honeycomb lattice"""
   import films
   g = diamond_lattice_minimal()
-  g = films.geometry_film(g,nz=1)
+  g = films.geometry_film(g,nz=n)
   return g 
 
 
@@ -1098,8 +1100,11 @@ def get_k2K(g):
   """Return a matrix that converts vectors
   in the reciprocal space into natural units, useful for drawing
   2D quantities"""
-  if g.dimensionality != 2: raise
-  (ux,uy,uz) = (g.a1,g.a2,np.array([0.,0.,1]))
+  if g.dimensionality == 2:
+    (ux,uy,uz) = (g.a1,g.a2,np.array([0.,0.,1]))
+  elif g.dimensionality == 3:
+    (ux,uy,uz) = (g.a1,g.a2,g.a3)
+  else: raise
   ux = ux/np.sqrt(ux.dot(ux))
   uy = uy/np.sqrt(uy.dot(uy))
   uz = uz/np.sqrt(uz.dot(uz))
@@ -1127,7 +1132,7 @@ def get_reciprocal(a1,a2,a3):
   return b1,b2,b3
 
 
-def get_fractional(g):
+def get_fractional(g,center=False):
   """Get fractional coordinates"""
 #  if g.dimensionality<2: raise # stop 
   dim = g.dimensionality # dimensionality
@@ -1145,9 +1150,10 @@ def get_fractional(g):
       rn = np.array([rn.T[0,i] for i in range(dim)]) # convert to array
       store.append(rn) # store
     store = np.array(store) # convert to array
-    for i in range(dim):
-      store[:,i] = store[:,i] #- np.min(store[:,i])
-    store = (store[:,:])%1.
+    if center: # center the unit cell
+      for i in range(dim):
+        store[:,i] = store[:,i]%1.
+    # if you remove the shift the Berry Green formalism does not work
     if dim>0: g.frac_x = store[:,0]
     if dim>1: g.frac_y = store[:,1]
     if dim>2: g.frac_z = store[:,2]

@@ -349,6 +349,38 @@ def parametric_hopping_hamiltonian(h,cutoff=5,fc=None,rcut=5.0):
   return h
 
 
+
+
+
+
+
+def parametric_matrix(h,cutoff=5,fm=None):
+  """ Gets a first neighbor hamiltonian"""
+  from neighbor import parametric_hopping
+  if fm is None: raise
+  r = h.geometry.r    # x coordinate 
+  g = h.geometry
+  h.is_multicell = True
+# first neighbors hopping, all the matrices
+  a1, a2, a3 = g.a1, g.a2, g.a3
+  h.intra = h.spinless2full(fm(r,r)) # intra matrix
+  # generate directions
+  dirs = h.geometry.neighbor_directions() # directions of the hoppings
+  # generate hoppings
+  h.hopping = [] # empty list
+  for d in dirs: # loop over directions
+        i1,i2,i3 = d[0],d[1],d[2] # extract indexes
+        if i1==0 and i2==0 and i3==0: continue
+        t = Hopping() # hopping class
+        da = a1*i1+a2*i2+a3*i3 # direction
+        r2 = [ri + da for ri in r]
+        t.m = h.spinless2full(fm(r,r2))
+        t.dir = [i1,i2,i3] # store direction
+        if np.sum(np.abs(t.m))>0.00001: h.hopping.append(t) # append 
+  return h
+
+
+
 # rename this function
 first_neighbors = parametric_hopping_hamiltonian
 

@@ -38,6 +38,24 @@ def hubbard_density(i,n,g=1.0):
   return v
 
 
+
+def spinless_hubbard_density(i,n,g=1.0):
+  """Return pair of operators for a Hubbard mean field"""
+  v = interaction()
+  v.a = element(i,n,[0,0],d=1) # value of the coupling
+  v.b = element(i,n,[0,0],d=1) # value of the coupling
+  v.dir = [0,0,0] # direction of the interaction 
+  v.g = g
+  v.i = i
+  v.j = i
+  return v
+
+
+
+
+
+
+
 def hubbard_exchange(i,n,g=1.0):
   """Return pair of operators for a Hubbard mean field"""
   v = interaction()
@@ -168,7 +186,6 @@ def guess(h,mode="ferro",fun=0.01):
 #  h0.intra *= 0. # initialize
   h0.clean() # clean the Hamiltonian
   if mode=="ferro":
-    print("AAA")
     h0.add_zeeman(fun)
   elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
@@ -231,6 +248,23 @@ def enforce_eh(h,mf):
 
 
 
+def broyden_solver(scf):
+    """Broyden solver for selfconsistency"""
+    scf.mixing = 1.0 # perfect mixing
+    scf.iterate() # do one iteration
+    x0 = scf.cij # get the array with expectation values
+    def fun(x): # function to solve
+        scf.cij = x # impose those expectation values
+        scf.cij2v() # update mean field
+        scf.iterate() # perform an iteration
+        return scf.cij - x # difference with respect to input
+    from scipy.optimize import broyden1,broyden2,anderson
+#    x = anderson(fun,x0)
+    x = broyden1(fun,x0) # broyden solver
+    scf.cij = x # impose those expectation values
+    scf.cij2v() # update mean field
+    scf.iterate() # perform an iteration
+    return scf # return scf
 
 
 

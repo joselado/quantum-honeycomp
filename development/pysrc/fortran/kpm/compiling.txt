@@ -1,0 +1,105 @@
+running build
+running config_cc
+unifing config_cc, config, build_clib, build_ext, build commands --compiler options
+running config_fc
+unifing config_fc, config, build_clib, build_ext, build commands --fcompiler options
+running build_src
+build_src
+building extension "kpmf90" sources
+f2py options: []
+f2py:> /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.c
+creating /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6
+Reading fortran codes...
+	Reading file 'kpm.f90' (format:free)
+Post-processing...
+	Block: kpmf90
+			Block: get_momentsf90
+			Block: get_moments_ij
+			Block: generate_profile
+			Block: get_moments_vivj
+Post-processing (stage 2)...
+Building modules...
+	Building module "kpmf90"...
+		Constructing wrapper function "get_momentsf90"...
+		  mus = get_momentsf90(is,js,ms,v,numc,[numij,numm])
+		Constructing wrapper function "get_moments_ij"...
+		  mus = get_moments_ij(is,js,ms,numc,numm,ii,jj,[numij])
+		Constructing wrapper function "generate_profile"...
+		  ys = generate_profile(mus,xs,[dimmus,dimxs])
+		Constructing wrapper function "get_moments_vivj"...
+		  mus = get_moments_vivj(is,js,ms,vi,vj,numc,[numij,numm])
+	Wrote C/API module "kpmf90" to file "/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.c"
+  adding '/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.c' to sources.
+  adding '/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6' to include_dirs.
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6
+build_src: building npy-pkg config files
+running build_ext
+customize UnixCCompiler
+customize UnixCCompiler using build_ext
+get_default_fcompiler: matching types: '['gnu95', 'intel', 'lahey', 'pg', 'absoft', 'nag', 'vast', 'compaq', 'intele', 'intelem', 'gnu', 'g95', 'pathf95', 'nagfor']'
+customize Gnu95FCompiler
+Found executable /usr/bin/gfortran
+customize Gnu95FCompiler
+customize Gnu95FCompiler using build_ext
+building 'kpmf90' extension
+compiling C sources
+C compiler: gcc -pthread -B /home/jose/apps/anaconda3/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC
+
+creating /tmp/tmpbm6_hbvu/tmp
+creating /tmp/tmpbm6_hbvu/tmp/tmpbm6_hbvu
+creating /tmp/tmpbm6_hbvu/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6
+compile options: '-I/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gcc: /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.c
+gcc: /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.c
+In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.c:16:
+/home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it by " \
+  ^~~~~~~
+/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
+ static int f2py_size(PyArrayObject* var, ...)
+            ^~~~~~~~~
+In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.c:2:
+/home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it by " \
+  ^~~~~~~
+/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
+/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if (size < sizeof(notalloc)) {
+                  ^
+compiling Fortran sources
+Fortran f77 compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3 -funroll-loops
+Fortran f90 compiler: /usr/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
+Fortran fix compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
+compile options: '-I/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gfortran:f90: kpm.f90
+kpm.f90:97:23:
+
+ complex (kind=8) :: mu0,mu1
+                       1
+Warning: Unused variable ‘mu0’ declared at (1) [-Wunused-variable]
+kpm.f90:97:27:
+
+ complex (kind=8) :: mu0,mu1
+                           1
+Warning: Unused variable ‘mu1’ declared at (1) [-Wunused-variable]
+kpm.f90:200:23:
+
+ complex (kind=8) :: mu0,mu1
+                       1
+Warning: Unused variable ‘mu0’ declared at (1) [-Wunused-variable]
+kpm.f90:200:27:
+
+ complex (kind=8) :: mu0,mu1
+                           1
+Warning: Unused variable ‘mu1’ declared at (1) [-Wunused-variable]
+/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpbm6_hbvu/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/kpmf90module.o /tmp/tmpbm6_hbvu/tmp/tmpbm6_hbvu/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpbm6_hbvu/kpm.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./kpmf90.cpython-36m-x86_64-linux-gnu.so
+Removing build directory /tmp/tmpbm6_hbvu

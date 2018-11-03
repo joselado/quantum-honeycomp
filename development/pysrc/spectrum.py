@@ -254,6 +254,7 @@ def ev(h,operator=None,nk=30):
 
 def total_energy(h,nk=10,nbands=None,use_kpm=False,random=True,kp=None):
   """Return the total energy"""
+  h.turn_dense()
   if h.is_sparse and not use_kpm: 
     print("Sparse Hamiltonian but no bands given, taking 20")
     nbands=20
@@ -275,6 +276,26 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=True,kp=None):
       etot += np.sum(vv[vv<0.0]) # sum energies below fermi energy
   etot = etot/len(kp) # normalize
   return etot
+
+
+
+
+
+
+def eigenvalues(h,nk):
+    """Return all the eigenvalues of a Hamiltonian"""
+    import klist
+    h.turn_dense()
+    ks = klist.kmesh(h.dimensionality,nk=nk) # get grid
+    hkgen = h.get_hk_gen() # get generator
+    es = [] # empty list
+    import timing
+    est = timing.Testimator(maxite=len(ks))
+    for k in ks: # loop
+      est.iterate()
+      es += lg.eigvalsh(hkgen(k)).tolist() # add
+    return es # return all the eigenvalues
+
 
 
 

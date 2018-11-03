@@ -28,7 +28,8 @@ def get_anaconda_command(name="python"):
   for l in lines: # loop over pythons
     l = l.split(" ")[-1] # get last line 
     if "anaconda" in l:
-      print("\nFound Anaconda ",name,"in",l)
+#      print("\nFound Anaconda ",name,"in",l)
+      print("Python interpreter ",l)
       return l
   print("Anaconda",name,"not found")
   raise # not found
@@ -37,16 +38,13 @@ def get_anaconda_command(name="python"):
 
 
 
-def get_python():
-  if platform.system()=="Linux":
-    python = "/usr/bin/python3" # Python 3
-  else:
-    python = get_anaconda_command("python") # get Anaconda Python
-  return python
+# get anaconda command
+try:
+  python = get_anaconda_command("python3") # Anaconda command
+except:
+  python = "python" # hope for the best
 
-# get the python path
 
-python = get_python() # get the Python path
 
 def call_mode(mode,folder=None,pyqt=False):
   """ Returns a function which calls a particular quantum honeycomp mode"""
@@ -84,6 +82,7 @@ signals["hybridribbon_pyqt"] = call_mode("hybridribbon",pyqt=True)
 signals["hofstader_pyqt"] = call_mode("hofstader1d",pyqt=True)  
 signals["crystal3d_pyqt"] = call_mode("3d",pyqt=True)  
 signals["huge0d_pyqt"] = call_mode("huge_0d",pyqt=True)  
+signals["multilayergraphene"] = call_mode("multilayergraphene",pyqt=True)  
 
 
 

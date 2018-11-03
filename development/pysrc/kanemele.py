@@ -98,6 +98,13 @@ def add_modified_haldane(h,t):
   add_haldane_like(h,t,haldane,sublattice=h.geometry.sublattice) 
 
 
+def add_anti_kane_mele(h,t):
+  """Add Haldane to a Hamiltonian"""
+  if not h.has_spin: raise
+  if not h.geometry.has_sublattice: raise # if it does not have sublattice
+  add_haldane_like(h,t,haldane,sublattice=h.geometry.sublattice,
+          time_reversal = True) 
+
 
 def add_kane_mele(self,t):
   """Add to a Hamiltonian a Haldane-like hopping"""
@@ -195,13 +202,15 @@ from increase_hilbert import spinful,spinful_sparse
 
 
 
-def add_haldane_like(self,t,spinless_generator,sublattice=None):
+def add_haldane_like(self,t,spinless_generator,
+        sublattice=None,time_reversal=False):
   """Add to a Hamiltonian a Haldane-like hopping"""
   g = self.geometry
   if sublattice is None: sublattice = np.zeros(len(g.r)) + 1.0 # ones
   def generator(r1,r2,rs,fun=t,sublattice=sublattice): # define function
-     m = spinless_generator(r1,r2,rs,fun=t,sublattice=sublattice)
-     return self.spinless2full(m) # return matrix
+     m = spinless_generator(r1,r2,rs,fun=t,
+             sublattice=sublattice)
+     return self.spinless2full(m,time_reversal=time_reversal) # return matrix
 #     if self.has_spin: return spinful_sparse(m) # spinful
 #     else: return m # spinless
   from multicell import close_enough # check if two rs are close

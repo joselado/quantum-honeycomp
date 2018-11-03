@@ -7,6 +7,8 @@ from scipy.sparse import bmat
 import os
 import numpy as np
 import klist
+import operators
+import timing
 
 def ldos0d(h,e=0.0,delta=0.01):
   """Calculates the local density of states of a hamiltonian and
@@ -170,10 +172,11 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
     if nk is None: nk = 10
     hkgen = h.get_hk_gen() # get generator
     ds = [] # empty list
-    for k in klist.kmesh(h.dimensionality,nk=nk): # loop over kpoints
-      print("Doing",k)
+    ks = klist.kmesh(h.dimensionality,nk=nk)
+    ts = timing.Testimator(title="LDOS",maxite=len(ks))
+    for k in ks: # loop over kpoints
+      ts.iterate()
       if random:
-        print("Random k-point")
         k = np.random.random(3) # random k-point
       hk = csc_matrix(hkgen(k)) # get Hamiltonian
       ds += [ldos_arpack(hk,num_wf=num_wf,robust=False,
@@ -192,7 +195,7 @@ def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
 ldos = ldos2d
 
 
-def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,
+def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
         random=False,op=None):
   """Calculate many LDOS, by diagonalizing the Hamiltonian"""
   print("Calculating eigenvectors in LDOS")
@@ -200,7 +203,8 @@ def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,
   evals,ws = [],[] # empty list
   ks = klist.kmesh(h.dimensionality,nk=nk) # get grid
   hk = h.get_hk_gen() # get generator
-  if op is None: op = lambda x,k: 1.0 # dummy function
+  op = operators.tofunction(op) # turn into a function
+#  if op is None: op = lambda x,k: 1.0 # dummy function
   if h.is_sparse: # sparse Hamiltonian
     from bandstructure import smalleig
     print("SPARSE Matrix")
@@ -255,7 +259,7 @@ def multi_ldos(h,es=[0.0],delta=0.001,nrep=3,nk=2,numw=3,
   # Now calculate the DOS
   from dos import calculate_dos
   es2 = np.linspace(min(es),max(es),len(es)*10)
-  ys = calculate_dos(evals,es2,delta) # compute DOS
+  ys = calculate_dos(evals,es2,delta,w=None) # compute DOS
   from dos import write_dos
   write_dos(es2,ys,output_file="MULTILDOS/DOS.OUT")  
 

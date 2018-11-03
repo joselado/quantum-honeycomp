@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -42,6 +42,9 @@ class Ui_MainWindow(object):
         self.fermi = QtWidgets.QLineEdit(self.centralwidget)
         self.fermi.setObjectName("fermi")
         self.gridLayout.addWidget(self.fermi, 3, 1, 1, 1)
+        self.set_half_filling = QtWidgets.QRadioButton(self.centralwidget)
+        self.set_half_filling.setObjectName("set_half_filling")
+        self.gridLayout.addWidget(self.set_half_filling, 4, 1, 1, 1)
         self.gridLayout_7.addLayout(self.gridLayout, 0, 0, 1, 1)
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
@@ -257,6 +260,7 @@ class Ui_MainWindow(object):
         self.interlayer_bias.setText(_translate("MainWindow", "0.0"))
         self.mAB.setText(_translate("MainWindow", "0.0"))
         self.fermi.setText(_translate("MainWindow", "0.0"))
+        self.set_half_filling.setText(_translate("MainWindow", "Measure with respect to half filling"))
         self.nsuper_struct.setText(_translate("MainWindow", "3"))
         self.label_12.setText(_translate("MainWindow", "Supercell"))
         self.show_structure.setText(_translate("MainWindow", "Show structure"))

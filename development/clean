@@ -6,7 +6,7 @@ import os
 os.system("rm -f pysrc/*.pyc")
 
 # clean bin
-os.system("rm -f bin/qh-*")
+#os.system("rm -f bin/qh-*")
 
 
 pwd = os.getcwd()

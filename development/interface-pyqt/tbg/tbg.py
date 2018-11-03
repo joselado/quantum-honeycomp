@@ -14,6 +14,7 @@ sys.path.append(qhroot+"/pysrc/") # python libraries
 
 import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
+is_checked = qtwrap.is_checked  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
@@ -39,7 +40,7 @@ def initialize():
   g = get_geometry2d() # get the geometry
   from specialhopping import twisted,twisted_matrix
   has_spin = False
-  h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=False,
+  h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=True,
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))
 #  return h
 #  h.turn_dense()
@@ -55,6 +56,7 @@ def initialize():
     h.add_antiferromagnetism(get("mAF"))  # AF order
     h.add_kane_mele(get("kanemele")) # intrinsic SOC
   h.shift_fermi(get("fermi")) # shift fermi energy
+  if is_checked("set_half_filling"): h.set_filling(nk=2)
   if False:
     h.add_swave(get("swave"))
   if False:

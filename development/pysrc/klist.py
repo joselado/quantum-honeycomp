@@ -25,7 +25,7 @@ def default(g,nk=400):
 #    else np.abs(angle - np.pi*2./6.):  
     else:
       bm = np.array([1.,-1.,0.]) # temporal fix
-    print("Path along",bm)
+#    print("Path along",bm)
 #    b2 = np.array([.5,np.sqrt(3)/2])
 #    b2 = np.array([0.,-1.])
     fk = open("KPOINTS_BANDS.OUT","w")  

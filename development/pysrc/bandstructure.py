@@ -11,7 +11,7 @@ import numpy as np
 import timing
 import klist
 
-maxdim = 5000 # maximum dimension
+from limits import densedimension as maxdim
 arpack_tol = 1e-6
 arpack_maxiter = 10000
 

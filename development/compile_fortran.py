@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 # names is a lists with pairs of name of folder, f90 file and .so file
@@ -39,17 +40,22 @@ def get_anaconda_command(name="python"):
 
 
 import platform
-if platform.system()=="Linux":
-  compiler = "/usr/bin/f2py3" # name of the compiler
-else: 
-  compiler = get_anaconda_command("f2py") # name of the compiler
+#if platform.system()=="Linux":
+#  compiler = "/usr/bin/f2py3" # name of the compiler
+#else: 
+#  compiler = get_anaconda_command("f2py") # name of the compiler
 
+try:
+  compiler = get_anaconda_command("f2py") # name of the compiler
+except:
+  compiler = "f2py"
 
 for name in names:
   folder,f90,so = name[0],name[1],name[2] # different names
   os.chdir("pysrc/fortran/"+folder) # go to the folder
   os.system("rm -f *.so") # remove old libraries
-  os.system(compiler+" -c -m "+so+"  "+f90) # compile
+  print("Compiling",name[1])
+  os.system(compiler+" -c -m "+so+"  "+f90+"> compiling.txt") # compile
   os.system("cp *.so ../../"+so+".so") # copy library
   os.chdir("../../..") # return to parent
 

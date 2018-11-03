@@ -332,7 +332,6 @@ def get_valley(h,projector=False,delta=None):
 
 
 
-
 def get_inplane_valley(h):
   """Returns an operator that computes the absolute value
   of the intervalley mixing"""
@@ -352,6 +351,14 @@ def get_inplane_valley(h):
   return fun # return function
 
 
+
+
+
+def tofunction(A):
+    """Transform this object into a callable function"""
+    if A is None: return lambda x,k=0.0: 1.0 # no input
+    if callable(A): return A # if it is a function
+    else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
 
 
 

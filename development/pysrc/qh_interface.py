@@ -28,6 +28,8 @@ import potentials
 import supercell
 import scftypes
 import indexing
+import specialgeometry
+import specialhopping
 
 
 import platform

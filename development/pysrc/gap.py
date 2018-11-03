@@ -166,8 +166,8 @@ def indirect_gap(h):
     from scipy.optimize import minimize
     bounds = [(0.,1.) for i in range(h.dimensionality)]
     x0 = np.random.random(h.dimensionality) # inital vector
-#    res = minimize(f,x0,bounds=bounds)
     res = differential_evolution(f,bounds=bounds)
+#    res = minimize(f,res.x,method="Powell")
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev

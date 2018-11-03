@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -66,6 +66,9 @@ class Ui_MainWindow(object):
         self.twisted_bilayer = QtWidgets.QPushButton(self.tab_3)
         self.twisted_bilayer.setObjectName("twisted_bilayer")
         self.gridLayout_2.addWidget(self.twisted_bilayer, 3, 1, 1, 1)
+        self.multilayergraphene = QtWidgets.QPushButton(self.tab_3)
+        self.multilayergraphene.setObjectName("multilayergraphene")
+        self.gridLayout_2.addWidget(self.multilayergraphene, 11, 1, 1, 1)
         self.horizontalLayout.addLayout(self.gridLayout_2)
         self.tabWidget_2.addTab(self.tab_3, "")
         self.tab = QtWidgets.QWidget()
@@ -131,7 +134,8 @@ class Ui_MainWindow(object):
         self.crystal3d_pyqt.setText(_translate("MainWindow", "3D crystals"))
         self.hybridribbon_pyqt.setText(_translate("MainWindow", "Hybrid ribbons"))
         self.sheets.setText(_translate("MainWindow", "Sheets"))
-        self.twisted_bilayer.setText(_translate("MainWindow", "Twisted bilayer"))
+        self.twisted_bilayer.setText(_translate("MainWindow", "Twisted bilayer graphene"))
+        self.multilayergraphene.setText(_translate("MainWindow", "Multilayer graphene"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), _translate("MainWindow", "Linux and MacOSX compatible"))
         self.skyrmion.setText(_translate("MainWindow", "Skyrmion in 2D"))
         self.moire.setText(_translate("MainWindow", "Moire potential 2D"))

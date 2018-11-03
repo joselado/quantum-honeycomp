@@ -8,7 +8,7 @@ def bulk2ribbon(g,boundary=[1,0],n=10,clean=True):
   go = g.copy() # copy
   m = [[boundary[0],boundary[1],0],[0,1,0],[0,0,1]] # supercell
   if boundary[0]!=1 or boundary[1]!=0:
-    go = supercell.non_orthogonal_supercell(go,m,mode="brute") 
+    go = supercell.non_orthogonal_supercell(go,m,mode="fill") 
   go = go.supercell((1,n)) # create a supercell
   go = sculpt.rotate_a2b(go,go.a1,np.array([1.,0.,0.]))
   go.dimensionality = 1 # zero dimensional

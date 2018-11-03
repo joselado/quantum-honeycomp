@@ -134,7 +134,14 @@
           <item row="3" column="1">
            <widget class="QPushButton" name="twisted_bilayer">
             <property name="text">
-             <string>Twisted bilayer</string>
+             <string>Twisted bilayer graphene</string>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="1">
+           <widget class="QPushButton" name="multilayergraphene">
+            <property name="text">
+             <string>Multilayer graphene</string>
             </property>
            </widget>
           </item>
