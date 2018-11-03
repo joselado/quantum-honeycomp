@@ -118,8 +118,9 @@ def update(val):
   axd.clear()  # clear DOS
   axd.plot(md[0],md[1]) # plot DOS
   yys = np.array([0,max(md[1])]) # y positions
-  xxs = np.array([energy,energy]) # energy
-#  axd.plot(xxs,yys,linewidth=3,c="red") # energy checked
+  xxs = np.array([float(energy),float(energy)]) # energy
+  print(xxs)
+  axd.plot(xxs,yys,linewidth=3,c="red") # energy checked
   print("Energy",energy)
   axd.set_ylim([0,max(md[1])]) # ylim
   axd.set_xlim([min(md[0]),max(md[0])]) # xlim
