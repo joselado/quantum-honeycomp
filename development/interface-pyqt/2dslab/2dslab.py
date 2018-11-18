@@ -22,28 +22,31 @@ from qh_interface import * # import all the libraries needed
 
 
 
-def get_geometry():
-  """ Create a 0d island"""
-  lattice_name = getbox("lattice") # get the option
-#  lattice_name = builder.get_object("lattice").get_active_text()
-  if lattice_name=="Honeycomb":
-    geometry_builder = geometry.honeycomb_lattice
-  elif lattice_name=="Square":
-    geometry_builder = geometry.square_lattice
-  elif lattice_name=="Kagome":
-    geometry_builder = geometry.kagome_lattice
-  elif lattice_name=="Lieb":
-    geometry_builder = geometry.lieb_lattice
-  elif lattice_name=="Triangular":
-    geometry_builder = geometry.triangular_lattice
-  g = geometry_builder() # call the geometry
-  nsuper = int(get("nsuper"))
-  g = g.supercell(nsuper)
-  return g
+
+def select_atoms_removal(self):
+  g = get_geometry(modify=False) # get the unmodified geometry
+  g.write() # write geometry
+  execute_script("qh-remove-atoms-geometry-3d") # remove the file
+
+
+def modify_geometry(g):
+  """Modify the geometry according to the interface"""
+  if qtwrap.is_checked("remove_selected"): # remove some atoms
+      try:
+        inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
+        if inds.shape==(): inds = [inds]
+      except: inds = [] # Nothing
+      print(inds)
+      g = sculpt.remove(g,inds) # remove those atoms
+  if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
+      g = sculpt.remove_unibonded(g,iterative=True)
+#  g.save()
+  return g # return geometry
 
 
 
-def get_geometry_film():
+
+def get_geometry(modify=True):
   """ Create a 0d island"""
   lattice_name = getbox("lattice") # get the option
 #  lattice_name = builder.get_object("lattice").get_active_text()
@@ -57,13 +60,12 @@ def get_geometry_film():
   g = geometry_builder() # call the geometry
   import films
   g = films.geometry_film(g,int(get("thickness")))
-#  g = g.supercell(nsuper)
+  g = g.supercell(int(get("nsuper")))
   g.real2fractional()
   g.fractional2real()
   g.center()
+  if modify: g = modify_geometry(g) # modify the geometry
   return g
-
-get_geometry = get_geometry_film
 
 
 
@@ -114,7 +116,8 @@ def show_bands(self=0):
   elif opname=="Interface" and not h.has_eh: 
       op = h.get_operator("interface")
   else: op = None
-  h.get_bands(operator=op)
+  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
+  h.get_bands(operator=op,kpath=kpath)
   execute_script("qh-bands2d  ")
 
 
@@ -279,6 +282,7 @@ signals["show_z2"] = show_z2  # show DOS
 signals["show_ldos"] = show_ldos  # show DOS
 signals["show_magnetism"] = show_magnetism
 signals["solve_scf"] = solve_scf 
+signals["select_atoms_removal"] = select_atoms_removal
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism
 #signals["save_results"] = save_results  # save the results

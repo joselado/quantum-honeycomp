@@ -130,5 +130,27 @@ def add_frustrated_antiferromagnetism(h,m):
 
 
 
+def get_magnetization(h,nkp=20):
+  """Return the magnetization of the system"""
+  totkp = nkp**(h.dimensionality)
+  nat = h.intra.shape[0]//2 # number of atoms
+  eigvals,eigvecs = h.eigenvectors(nkp)
+  voccs = [] # accupied vectors
+  eoccs = [] # accupied eigenvalues
+  occs = [] # accupied eigenvalues
+  for (e,v) in zip(eigvals,eigvecs): # loop over eigenvals,eigenvecs
+    if e<0.0000001:  # if level is filled, add contribution
+      voccs.append(v) # store
+      eoccs.append(e) # store
+  pdup = np.array([[2*i,2*i] for i in range(nat)]) # up density
+  pddn = pdup + 1 # down density
+  pxc = np.array([[2*i,2*i+1] for i in range(nat)]) # exchange
+  import correlatorsf90
+  vdup = correlatorsf90.correlators(voccs,pdup)/totkp
+  vddn = correlatorsf90.correlators(voccs,pddn)/totkp
+  vxc = correlatorsf90.correlators(voccs,pxc)/totkp
+  magnetization = np.array([vxc.real,vxc.imag,vdup-vddn]).transpose().real
+  from scftypes import write_magnetization
+  write_magnetization(magnetization)
 
 

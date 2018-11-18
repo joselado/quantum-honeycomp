@@ -7,7 +7,7 @@ import os
 def install(name):
   os.system("pip install "+name)
 
-packages = ["scipy","numpy","matplotlib"]
+packages = ["scipy","numpy","matplotlib","multiprocess"]
 
 for p in packages: install(p)
 

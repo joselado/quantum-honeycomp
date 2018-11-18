@@ -245,15 +245,19 @@ def random_trace(m_in,ntries=20,n=200,fun=None):
     if len(v0) != m_in.shape[0]: raise
   if fun is None:
 #    def fun(): return rand.random(nd) -.5 + 1j*rand.random(nd) -.5j
-    def fun(): return rand.random(nd) - 0.5
+    def fun(): return (rand.random(nd) - 0.5)*np.exp(1j*np.pi*rand.random(nd))
   m = csc(m_in) # saprse matrix
   nd = m.shape[0] # length of the matrix
   mus = np.array([0.0j for j in range(2*n)])
-  for i in range(ntries): # loop over tries
+  def pfun(x):
     v = fun()
     v = v/np.sqrt(v.dot(np.conjugate(v))) # normalize the vector
     v = csc(v).transpose()
-    mus += get_moments(v,m,n=n) # get the chebychev moments
+    mus = get_moments(v,m,n=n) # get the chebychev moments
+    return mus
+  import parallel
+  out = parallel.pcall(pfun,range(ntries))
+  for o in out: mus = mus + o # add contribution
   return mus/ntries
 
 

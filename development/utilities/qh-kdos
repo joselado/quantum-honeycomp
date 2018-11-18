@@ -38,6 +38,7 @@ ny = int(ny)
 
 
 print("Detected",nx,ny,"grid")
+print("Use argument -wrie to write plotted data")
 
 Z = np.abs(z).reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
 Z = z.reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
@@ -55,6 +56,22 @@ x = np.linspace(0.,1.,1000)
 y = np.linspace(0.,1.,1000)
 
 z_inter = f(x,y)
+
+# save interpolated data
+
+if "-write" in sys.argv:
+  xi = np.linspace(np.min(m[0]),np.max(m[0]),1000)
+  yi = np.linspace(np.min(m[1]),np.max(m[1]),1000)
+  fo = open(name+"_INTERPOLATED","w")
+  for i in range(len(xi)):
+    for j in range(len(yi)):
+        fo.write(str(xi[i])+"   ")
+        fo.write(str(yi[j])+"   ")
+        fo.write(str(z_inter[i,j])+"\n")
+  fo.close()
+  print("Interpolated data writen to "+name+"_INTERPOLATED")
+
+##################
 
 # now plot the data
 

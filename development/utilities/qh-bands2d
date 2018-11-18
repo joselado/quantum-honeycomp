@@ -9,6 +9,9 @@ import sys
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
+fig = plt.figure()
+fig.subplots_adjust(0.3,0.3)
+
 
 
 ### script for ploting BANDS.OUT of tb90 ###
@@ -19,23 +22,6 @@ from os import system as sh
 
 def plot_bands():
   """ Plots the bandstructure from BANDS.OUT"""
-    
-  def onpick3(event):
-      ind = event.ind
-      kwave = np.take(k, ind)[0]
-      ewave = np.take(e, ind)[0]
-      print(kwave,ewave)
-      sh("tb90-wave "+str(kwave)+" "+str(ewave)+"&")
-      print('onpick3 scatter:', ind, np.take(k, ind), np.take(e, ind))
-              
-  fig = plt.figure()
-  
-  
-  
-  fig.subplots_adjust(0.2,0.2)
-  
-  # check if shift the bands by 0.5
-  
   # the color map
   import numpy as np
   cdict={'red': ((0., 0, 0),(0.6,0.0,0.0),(1, 1.0, 1.0)), 'green': ((0., 0.0, 0.0),(0.4,1.0,1.0),(0.6,1.0,1.0),(1, 0.0, 0.0)), 'blue': ((0., 1.0, 1.0),(0.4,0.0,0.0), (1, 0.0, 0.0))}
@@ -43,10 +29,6 @@ def plot_bands():
   my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
   if "-absmap" in sys.argv:
     my_cmap = plt.get_cmap("gray_r")
-  
-  
-  
-  
   
   
   m = np.genfromtxt("BANDS.OUT").transpose()
@@ -86,7 +68,7 @@ def plot_bands():
   
   # axis
   xlab = plt.xlabel("")
-  ylab = plt.ylabel("$E/t$")
+  ylab = plt.ylabel("E/t")
   # font size of the axis
   ylab.set_fontsize(30) # label of the y xis
   xlab.set_fontsize(30) # label of the y xis

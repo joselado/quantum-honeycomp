@@ -1,24 +1,41 @@
 # routines to call a function in parallel
 from __future__ import print_function
 import scipy.linalg as lg
+try:
+  from multiprocess import Pool
+#  raise
+except:
+    print("Multiprocess not working")
+    def Pool(n=1): # workaround
+            class mpool():
+                def map(self,f,xs):
+                  return [f(x) for x in xs]
+            return mpool()
 
 cores = 1 # call in a single by default
 
-mainpool = None
 
-def initialize(): 
-  global mainpool
-  if cores>1:
-    from multiprocessing import Pool
-    mainpool = Pool(cores) # create pool
+def set_cores(n=1):
+    global cores
+    cores = n
+
+
+#mainpool = None
+
+#def initialize(): 
+#  global mainpool
+#  if cores>1:
+#    mainpool = Pool(cores) # create pool
 #  return mainpool
 
+#def finish(): mainpool=None # delete pool
 
 
 def multieigh(ms):
   """Diagonalize a bunch of Hamiltonians at once"""
 #  mainpool = initialize()
-  return mainpool.map(lg.eigh,ms)
+  if mainpool is not None: mainpool.map(lg.eigh,ms)
+  else: return [lg.eigh(m) for m in ms]
 
 
 
@@ -29,18 +46,20 @@ def pcall_serial(fun,args):
   return [fun(a) for a in args]
 
 
-def pcall_mp(fun,args,cores=1): return pcall_serial(fun,args)
+#def pcall_mp(fun,args,cores=1): return pcall_serial(fun,args)
 
-try: # try to use the multiprocessing library
+#try: # try to use the multiprocessing library
 #  from pathos.multiprocessing import Pool
-  def pcall_mp(fun,args,cores=cores):
+def pcall_mp(fun,args,cores=cores):
     """Calls a function for every input in args"""
-    print("Using",cores,"cores")
-    return mainpool.map(fun,args) # return list
-
-except:
-  print("Multiprocessing not found, running in a single core")
-  def pcall_mp(fun,args,cores=1): return pcall_serial(fun,args)
+    mainpool = Pool(cores) # create pool
+#    print("Using",cores,"cores")
+    out = mainpool.map(fun,args) # return list
+    del mainpool # delete pool
+    return out
+#except:
+#  print("Multiprocessing not found, running in a single core")
+#  def pcall_mp(fun,args,cores=1): return pcall_serial(fun,args)
   
 
 
@@ -48,6 +67,7 @@ except:
 
 
 def pcall(fun,args): # define the function
+  global cores
   if cores==1: return pcall_serial(fun,args) # one core, simply iterate
-  else: return pcall_mp(fun,args) # call in parallel
+  else: return pcall_mp(fun,args,cores=cores) # call in parallel
 

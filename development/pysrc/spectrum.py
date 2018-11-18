@@ -5,6 +5,7 @@ import scipy.sparse.linalg as slg
 import kpm
 import os
 from operators import operator2list
+import timing
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
@@ -41,13 +42,15 @@ def fermi_surface(h,write=True,output_file="FERMI_MAP.OUT",
       return tdos.trace()[0,0].real # return traze
   elif mode=='lowest': # use full inversion
     def get_weight(hk):
-      es,waves = slg.eigsh(hk,k=num_waves,sigma=0.0,tol=arpack_tol,which="LM",
+      es,waves = slg.eigsh(hk,k=num_waves,sigma=e,tol=arpack_tol,which="LM",
                             maxiter = arpack_maxiter)
-      return np.sum(delta/(es*es+delta*delta)) # return weight
+      return np.sum(delta/((e-es)**2+delta**2)) # return weight
+  else: raise
 
 ##############################################
 
 
+  ts = timing.Testimator()
   # setup the operator
   for x in kxs:
     for y in kxs:

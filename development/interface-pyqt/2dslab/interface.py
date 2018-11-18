@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -410,6 +410,24 @@ class Ui_MainWindow(object):
         self.gridLayout_4.addWidget(self.label_43, 2, 0, 1, 1)
         self.gridLayout_26.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
+        self.tab_14 = QtWidgets.QWidget()
+        self.tab_14.setObjectName("tab_14")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_14)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.gridLayout_27 = QtWidgets.QGridLayout()
+        self.gridLayout_27.setObjectName("gridLayout_27")
+        self.remove_single_bonded = QtWidgets.QCheckBox(self.tab_14)
+        self.remove_single_bonded.setChecked(True)
+        self.remove_single_bonded.setObjectName("remove_single_bonded")
+        self.gridLayout_27.addWidget(self.remove_single_bonded, 0, 0, 1, 1)
+        self.remove_selected = QtWidgets.QCheckBox(self.tab_14)
+        self.remove_selected.setObjectName("remove_selected")
+        self.gridLayout_27.addWidget(self.remove_selected, 1, 0, 1, 1)
+        self.select_atoms_removal = QtWidgets.QPushButton(self.tab_14)
+        self.select_atoms_removal.setObjectName("select_atoms_removal")
+        self.gridLayout_27.addWidget(self.select_atoms_removal, 2, 0, 1, 1)
+        self.verticalLayout.addLayout(self.gridLayout_27)
+        self.tabWidget.addTab(self.tab_14, "")
         self.gridLayout_13.addWidget(self.tabWidget, 1, 1, 1, 1)
         self.label_46 = QtWidgets.QLabel(self.centralwidget)
         self.label_46.setObjectName("label_46")
@@ -425,10 +443,10 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(8)
+        self.tabWidget_3.setCurrentIndex(0)
         self.bands_color.setCurrentIndex(0)
         self.tabWidget_4.setCurrentIndex(1)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -546,6 +564,11 @@ class Ui_MainWindow(object):
         self.thickness.setText(_translate("MainWindow", "10"))
         self.label_43.setText(_translate("MainWindow", "Thickness"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))
+        self.remove_single_bonded.setToolTip(_translate("MainWindow", "Remove atoms that have a single bond in the structure"))
+        self.remove_single_bonded.setText(_translate("MainWindow", "Remove single bonds"))
+        self.remove_selected.setText(_translate("MainWindow", "Remove selected atoms"))
+        self.select_atoms_removal.setText(_translate("MainWindow", "Select atoms to remove"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_14), _translate("MainWindow", "Modify geometry"))
         self.label_46.setToolTip(_translate("MainWindow", "This module allows to compute heterostructures consisting of two different films. You have to specify the parameters of the two films"))
         self.label_46.setText(_translate("MainWindow", "About"))
 

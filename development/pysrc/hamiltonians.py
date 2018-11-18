@@ -14,9 +14,7 @@ import magnetism
 import checkclass
 import extract
 
-from bandstructure import get_bands_0d
-from bandstructure import get_bands_1d
-from bandstructure import get_bands_2d
+from bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
 from rotate_spin import sx,sy,sz
@@ -105,24 +103,12 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
-  def get_dos(self,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=100):
+  def get_dos(self,**kwargs):
       import dos
-      dos.dos(self,energies=energies,delta=delta,nk=nk)
-  def get_bands(self,nkpoints=100,use_lines=False,kpath=None,operator=None,
-                 num_bands=None,callback=None,central_energy = 0.0):
+      dos.dos(self,**kwargs)
+  def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
-    # workaround
-    if type(operator)==str: operator = self.get_operator(operator)
-    if self.dimensionality==0: # for 0d and 1d system
-      return get_bands_0d(self,operator=operator)
-    elif self.dimensionality==1: # for 0d and 1d system
-      return get_bands_1d(self,nkpoints=nkpoints,operator=operator,
-                         num_bands=num_bands,callback=callback)
-    elif self.dimensionality>1:  # for 2d system
-      return get_bands_2d(self,kpath=kpath,operator=operator,
-                           num_bands=num_bands,callback=callback,
-                           central_energy=central_energy)
-    else: raise
+    return get_bands_nd(self,**kwargs)
   def plot_bands(self,nkpoints=100,use_lines=False):
     """Dummy function"""
     self.get_bands()
@@ -313,6 +299,7 @@ class hamiltonian():
 
   def add_rashba(self,c):
     """Adds Rashba coupling"""
+    if not self.has_spin: raise
     g = self.geometry
     is_sparse = self.is_sparse # saprse Hamiltonian
     self.intra = self.intra + rashba(g.r,c=c,is_sparse=is_sparse)
@@ -403,12 +390,8 @@ class hamiltonian():
         self.txy = tmprot(self.txy,[1.,1.,0.])
         self.txmy = tmprot(self.txmy,[1.,-1.,0.])
       else: raise
-  def add_transverse_efield(self,efield=0.0):
-    """Adds a transverse electric field"""
-    def f(x,y):  # define function which shifts fermi energy
-      return y*efield
-    self.shift_fermi(f) # shift fermi energy locally
   def get_magnetization(self,nkp=10):
+    from magnetism import get_magnetization
     get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
     """Return a 1d Hamiltonian"""
@@ -684,7 +667,8 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     else: # dense Hamiltonians
       import parallel
       if parallel.cores>1: # in parallel
-        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
+#        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
+        vvs = parallel.pcall(lambda k: lg.eigh(f(k)),kp)
       else: vvs = [lg.eigh(f(k)) for k in kp] # 
     nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
     eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors
@@ -1008,67 +992,9 @@ def hk_gen(h):
 
 
 
-
-
-
-
-
-def generate_parametric_hopping(h,f=None,mgenerator=None,
-             spinful_generator=False):
-  """ Adds a parametric hopping to the hamiltonian based on an input function"""
-  rs = h.geometry.r # positions
-  g = h.geometry # geometry
-  has_spin = h.has_spin # check if it has spin
-  is_sparse = h.is_sparse
-  if mgenerator is None: # no matrix generator given on input
-    if f is None: raise # no function given on input
-    if spinful_generator: 
-      raise
-      print("WARNING, I am not sure why I programmed this")
-      h.has_spin = True
-      generator = parametric_hopping_spinful
-    else: 
-      h.has_spin = False
-      generator = parametric_hopping
-    def mgenerator(r1,r2):
-      return generator(r1,r2,f,is_sparse=is_sparse)
-  else:
-    if h.dimensionality==3: raise
-#    print("Generator matrix given on input")
-  h.intra = mgenerator(rs,rs)
-  if h.dimensionality == 0: pass
-  elif h.dimensionality == 1:
-    dr = np.array([g.celldis,0.,0.])
-    h.inter = mgenerator(rs,rs+dr)
-  elif h.dimensionality == 2:
-    h.tx = mgenerator(rs,rs+g.a1)
-    h.ty = mgenerator(rs,rs+g.a2)
-    h.txy = mgenerator(rs,rs+g.a1+g.a2)
-    h.txmy = mgenerator(rs,rs+g.a1-g.a2)
-  elif h.dimensionality == 3:
-    if spinful_generator: raise # not implemented
-    h.is_multicell = True # multicell Hamiltonian
-    import multicell
-    multicell.parametric_hopping_hamiltonian(h,fc=f)
-  else: raise
-  # check that the sparse mde is set ok
-  if is_sparse and type(h.intra)==type(np.matrix):
-    print("Sparse type is not ok, fixing")
-    h.is_sparse = False
-    h.turn_sparse() # turn the matrix sparse 
-  if not is_sparse and type(h.intra)!=type(np.matrix):
-    print("Sparse type is not ok, fixing")
-    h.is_sparse = True
-    h.turn_dense() # turn the matrix sparse 
-  if has_spin: # Hamiltonian should be spinful
-    print("Adding spin degree of freedom")
-    h.has_spin = False
-    h.turn_spinful()
-  return h
-
-
 from neighbor import parametric_hopping
 from neighbor import parametric_hopping_spinful
+from neighbor import generate_parametric_hopping
 
 
 
@@ -1091,33 +1017,6 @@ def kchain(h,k):
   ons = h.intra + tky + tky.H  # intra of k dependent chain
   hop = h.tx + tkxy + tkxmy  # hopping of k-dependent chain
   return (ons,hop)
-
-
-
-
-
-def get_magnetization(h,nkp=20):
-  """Return the magnetization of the system"""
-  totkp = nkp**(h.dimensionality)
-  nat = h.intra.shape[0]//2 # number of atoms
-  eigvals,eigvecs = h.eigenvectors(nkp)
-  voccs = [] # accupied vectors
-  eoccs = [] # accupied eigenvalues
-  occs = [] # accupied eigenvalues
-  for (e,v) in zip(eigvals,eigvecs): # loop over eigenvals,eigenvecs
-    if e<0.0000001:  # if level is filled, add contribution
-      voccs.append(v) # store
-      eoccs.append(e) # store
-  pdup = np.array([[2*i,2*i] for i in range(nat)]) # up density
-  pddn = pdup + 1 # down density
-  pxc = np.array([[2*i,2*i+1] for i in range(nat)]) # exchange
-  import correlatorsf90
-  vdup = correlatorsf90.correlators(voccs,pdup)/totkp
-  vddn = correlatorsf90.correlators(voccs,pddn)/totkp
-  vxc = correlatorsf90.correlators(voccs,pxc)/totkp
-  magnetization = np.array([vxc.real,vxc.imag,vdup-vddn]).transpose().real
-  from scftypes import write_magnetization
-  write_magnetization(magnetization)
 
 
 

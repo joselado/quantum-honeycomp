@@ -94,3 +94,61 @@ def parametric_hopping_spinful(r1,r2,fc,is_sparse=False):
   if not is_sparse: m = m.todense() # dense matrix
   return m
 
+
+
+
+
+
+
+def generate_parametric_hopping(h,f=None,mgenerator=None,
+             spinful_generator=False):
+  """ Adds a parametric hopping to the hamiltonian based on an input function"""
+  rs = h.geometry.r # positions
+  g = h.geometry # geometry
+  has_spin = h.has_spin # check if it has spin
+  is_sparse = h.is_sparse
+  if mgenerator is None: # no matrix generator given on input
+    if f is None: raise # no function given on input
+    if spinful_generator:
+      raise
+      print("WARNING, I am not sure why I programmed this")
+      h.has_spin = True
+      generator = parametric_hopping_spinful
+    else:
+      h.has_spin = False
+      generator = parametric_hopping
+    def mgenerator(r1,r2):
+      return generator(r1,r2,f,is_sparse=is_sparse)
+  else:
+    if h.dimensionality==3: raise
+  h.intra = mgenerator(rs,rs)
+  if h.dimensionality == 0: pass
+  elif h.dimensionality == 1:
+    dr = np.array([g.celldis,0.,0.])
+    h.inter = mgenerator(rs,rs+dr)
+  elif h.dimensionality == 2:
+    h.tx = mgenerator(rs,rs+g.a1)
+    h.ty = mgenerator(rs,rs+g.a2)
+    h.txy = mgenerator(rs,rs+g.a1+g.a2)
+    h.txmy = mgenerator(rs,rs+g.a1-g.a2)
+  elif h.dimensionality == 3:
+    if spinful_generator: raise # not implemented
+    h.is_multicell = True # multicell Hamiltonian
+    import multicell
+    multicell.parametric_hopping_hamiltonian(h,fc=f)
+  else: raise
+  # check that the sparse mde is set ok
+  if is_sparse and type(h.intra)==type(np.matrix([[]])):
+    print("Matrices should be sparse, fixing")
+    h.is_sparse = False
+    h.turn_sparse() # turn the matrix sparse
+  if not is_sparse and type(h.intra)!=type(np.matrix([[]])):
+    print("Matrices should be dense, fixing",type(h.intra),type(np.matrix))
+    h.is_sparse = True
+    h.turn_dense() # turn the matrix sparse
+  if has_spin: # Hamiltonian should be spinful
+    print("Adding spin degree of freedom")
+    h.has_spin = False
+    h.turn_spinful()
+  return h
+

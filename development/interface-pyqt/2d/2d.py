@@ -31,8 +31,12 @@ def get_geometry(modify=True):
   lattice_name = getbox("lattice") # get the option
   if lattice_name=="Honeycomb":
     geometry_builder = geometry.honeycomb_lattice
+  if lattice_name=="Honeycomb rectangular":
+    geometry_builder = geometry.honeycomb_lattice_square_cell
   elif lattice_name=="Square":
     geometry_builder = geometry.square_lattice
+  elif lattice_name=="Single square":
+    geometry_builder = geometry.single_square_lattice
   elif lattice_name=="Kagome":
     geometry_builder = geometry.kagome_lattice
   elif lattice_name=="Lieb":
@@ -68,6 +72,7 @@ def modify_geometry(g):
       g = sculpt.remove(g,inds) # remove those atoms
   if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
       g = sculpt.remove_unibonded(g,iterative=True)
+#  g.save()
   return g # return geometry
 
 
@@ -92,6 +97,7 @@ def initialize():
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
+  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
 
@@ -108,7 +114,8 @@ def show_bands(self=0):
   elif opname=="Sz": op = h.get_operator("sz")# off plane case
   elif opname=="Valley": op = h.get_operator("valley")
   else: op =None
-  h.get_bands(operator=op)
+  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
+  h.get_bands(operator=op,kpath=kpath)
   execute_script("qh-bands2d  ")
   comp.kill()
 

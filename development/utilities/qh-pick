@@ -6,11 +6,11 @@ import numpy as np
 try:
   from mayavi import mlab
 except:
-  print("Mayavi not present in python3, trying python2")
+  print("Default python does not work, trying python in PATH")
   try: 
     import os
     qhpath = os.environ["QHROOT"]+"/" # path to quantum honeycomp
-    os.system("/usr/bin/python2.7 "+qhpath+"utilities/qh-pick")
+    os.system("python "+qhpath+"utilities/qh-pick")
   except:
     print("Something wrong")
     exit()
@@ -37,7 +37,7 @@ def read_positions():
 (x1,y1,z1) = read_positions()
 
 
-red_glyphs = mlab.points3d(x1, y1, z1, color=(1, 0, 1), scale_factor = .5,
+red_glyphs = mlab.points3d(x1, y1, z1, color=(0, 0, 1), scale_factor = .5,
                 resolution=6)
 
 
@@ -67,6 +67,8 @@ def picker_callback(picker):
         # we have to account for the fact that each data point is
         # represented by a glyph with several points
         point_id = picker.point_id/glyph_points.shape[0]
+        print(point_id,picker.point_id)
+        point_id = int(point_id)
         # If the no points have been selected, we have '-1'
         if point_id != -1:
             # Retrieve the coordinnates coorresponding to that data

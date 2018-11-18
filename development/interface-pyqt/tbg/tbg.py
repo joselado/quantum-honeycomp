@@ -127,6 +127,18 @@ def show_magnetism(self):
 
 
 
+def show_fermi_surface(silent=False):
+  h = pickup_hamiltonian() # get hamiltonian
+  ndos = int(get("ne_dos"))
+  if h.dimensionality==2:
+    spectrum.fermi_surface(h,e=get("energy_fs"),nk=int(get("nk_fs")),
+            nsuper = 2,reciprocal=True,delta=get("delta_fs"),
+            mode="lowest",num_waves=10)
+  else: raise
+  if not silent:
+      execute_script("qh-fermi-surface FERMI_MAP.OUT") # show the result
+
+
 
 def show_chern(self):
   h = pickup_hamiltonian()  # get the hamiltonian
@@ -190,11 +202,11 @@ def read_hamiltonian():
 def show_ldos():
   h = pickup_hamiltonian()  # get the hamiltonian
 #  if h.intra.shape[0]<2000: h.turn_dense()
-  e = get("energy_ldos")
-  delta = get("delta_ldos")
-  nk = get("nk_ldos")
+  e = get("energy_ldos_single")
+  delta = get("delta_ldos_single")
+  nk = get("nk_ldos_single")
   nk = int(round(np.sqrt(nk)))
-  nsuper = int(get("nsuper_ldos"))
+  nsuper = int(get("nsuper_ldos_single"))
   ldos.ldos2d(h,e=e,delta=delta,nk=nk,mode="arpack",nrep=nsuper)
   execute_script("qh-fast-ldos LDOS.OUT  ")
 #  execute_script("qh-multildos ")
@@ -203,12 +215,6 @@ def show_ldos():
 #  execute_script("tb90-cmap LDOS.OUT-interpolated ")
 
 
-def show_fermi_surface(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-#  spectrum.fermi_surface(h,reciprocal=True,nk=get("nkpoints")/2) # calculate Fs
-  spectrum.boolean_fermi_surface(h,reciprocal=True,nk=get("nkpoints")/2) # calculate Fs
-#  execute_script("tb90-cmap FERMI_MAP.OUT  ") # plot the result
-  execute_script("tb90-cmap BOOL_FERMI_MAP.OUT  ") # plot the result
 
 def show_z2_invariant(self):
   h = pickup_hamiltonian()  # get the hamiltonian
@@ -276,6 +282,20 @@ def show_structure_3d(self):
 
 
 
+def show_interactive_ldos():
+  comp = computing() # create the computing window
+  h = pickup_hamiltonian()  # get the hamiltonian
+  h.turn_dense()
+  ewin = get("window_ldos")
+  nrep = int(get("nsuper_ldos"))
+  nk = int(np.sqrt(get("nk_ldos")))
+  ne = int(get("ne_ldos"))
+  delta = get("delta_ldos")
+  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,
+          nrep=nrep)
+  comp.kill()
+  execute_script("qh-multildos ")
+
 
 
 
@@ -290,13 +310,15 @@ signals["show_dos"] = show_dos  # show DOS
 #signals["show_chern"] = show_chern  # show Chern number 
 #signals["show_berry_1d"] = show_berry_1d  # show Berry curvature
 #signals["show_berry_2d"] = show_berry_2d  # show Berry curvature
-signals["show_ldos"] = show_ldos  # show Berry curvature
+signals["show_ldos_single"] = show_ldos  # show Berry curvature
 #signals["show_fermi_surface"] = show_fermi_surface  # show Berry curvature
 #signals["show_z2_invariant"] = show_z2_invariant  # show Berry curvature
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["show_structure"] = show_structure  # show magnetism
 signals["show_structure_3d"] = show_structure_3d
 signals["show_dosbands"] = show_dosbands  # show magnetism
+signals["show_fermi_surface"] = show_fermi_surface  # show magnetism
+signals["show_interactive_ldos"] = show_interactive_ldos  # show magnetism
 #signals["show_2dband"] = show_2dband  # show magnetism
 #signals["show_kdos"] = show_kdos  # show kdos
 #signals["save_results"] = save_results  # save the results

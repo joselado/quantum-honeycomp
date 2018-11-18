@@ -95,6 +95,7 @@ def initialize():
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
+  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
 
@@ -112,7 +113,9 @@ def show_bands(self=0):
   elif opname=="y-position": op = h.get_operator("yposition")
   else: op =None
   comp = computing() # create the computing window
-  h.get_bands(operator=op)
+  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
+  h.get_bands(operator=op,kpath=kpath)
+#  h.get_bands(operator=op)
   comp.kill() # kill the window
   execute_script("qh-bands1d  ")
 

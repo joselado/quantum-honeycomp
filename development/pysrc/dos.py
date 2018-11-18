@@ -6,6 +6,7 @@ from bandstructure import smalleig # arpack diagonalization
 import time
 import timing
 import kpm
+import checkclass
 
 try:
 #  raise
@@ -58,7 +59,7 @@ def dos_surface(h,output_file="DOS.OUT",
 
 
 
-def dos0d(h,es=None,delta=0.01):
+def dos0d(h,es=None,delta=0.01,i=None):
   """Calculate density of states of a 0d system"""
   if es is None: es = np.linspace(-4,4,500)
   ds = [] # empty list
@@ -66,7 +67,11 @@ def dos0d(h,es=None,delta=0.01):
     iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity
     for e in es: # loop over energies
       g = ( (e+1j*delta)*iden -h.intra ).I # calculate green function
-      ds.append(-g.trace()[0,0].imag)  # add this dos
+      if i is None: d = -g.trace()[0,0].imag
+      elif checkclass.is_iterable(i): # iterable list 
+          d = sum([-g[ii,ii].imag for ii in i])
+      else: d = -g[i,i].imag # assume an integer
+      ds.append(d)  # add this dos
   else: raise # not implemented...
   write_dos(es,ds)
   return ds
@@ -177,16 +182,21 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
          is_sparse=False,numw=10,window=None):
   """Calculate density of states using the ks given on input"""
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
-  es = [] # empty list
-  tr = timing.Testimator("DOS")
-  for ik in range(len(ks)):  
-    tr.remaining(ik,len(ks))
-    hk = hkgen(ks[ik]) # Hamiltonian
+  tr = timing.Testimator("DOS",maxite=len(ks))
+  import parallel
+  def fun(k): # function to execute
+    if parallel.cores==1: tr.iterate() # print the info
+    hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      es += smalleig(hk,numw=numw).tolist() # eigenvalues
+      return smalleig(hk,numw=numw).tolist() # eigenvalues
     else: # dense Hamiltonian
-      es += lg.eigvalsh(hk).tolist() # get eigenvalues
+      return lg.eigvalsh(hk).tolist() # get eigenvalues
+#  for ik in range(len(ks)):  
+  out = parallel.pcall(fun,ks) # launch all the processes
+  es = [] # empty list
+  for o in out: es += o # concatenate
+#    tr.remaining(ik,len(ks))
 #  es = es.reshape(len(es)*len(es[0])) # 1d array
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
@@ -374,11 +384,11 @@ def convolve(x,y,delta=None):
 def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100):
   """Calculate the KDOS bands using the KPM"""
   hkgen = h.get_hk_gen() # get generator
-  tr = timing.Testimator("DOS") # generate object
-  if h.dimensionality==0: nk = 0 # single kpoint
+  numk = nk**h.dimensionality
+  tr = timing.Testimator("DOS",maxite=numk) # generate object
   ytot = np.zeros(ne) # initialize
-  for ik in range(nk): # loop over kpoints
-    tr.remaining(ik,nk)
+  for ik in range(numk): # loop over kpoints
+    tr.iterate()
     hk = hkgen(np.random.random(3)) # get Hamiltonian
     npol = int(scale/delta) # number of polynomials
     (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,

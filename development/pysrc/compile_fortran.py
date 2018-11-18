@@ -16,6 +16,7 @@ names += [("density_matrix","density_matrixf90.f90","density_matrixf90")]
 names += [("kanemele","kanemelef90.f90","kanemelef90")] 
 names += [("green","greenf90.f90","greenf90")] 
 names += [("specialhopping","specialhoppingf90.f90","specialhoppingf90")] 
+names += [("chi","chif90.f90","chif90")] 
 
 
 
@@ -54,6 +55,7 @@ for name in names:
   os.system("rm -f *.so") # remove old libraries
   print("Compiling",name[1])
   os.system(compiler+" -c -m "+so+"  "+f90+"> ../../compiling.txt") # compile
+#  os.system(compiler+" -c -m "+so+"  "+f90)#+"> ../../compiling.txt") # compile
   os.system("cp *.so ../../"+so+".so") # copy library
   os.chdir("../..") # return to parent
 

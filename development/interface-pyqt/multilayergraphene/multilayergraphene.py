@@ -89,6 +89,7 @@ def initialize():
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
+  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
 
@@ -105,7 +106,8 @@ def show_bands(self=0):
   elif opname=="Sz": op = h.get_operator("sz")# off plane case
   elif opname=="Valley": op = h.get_operator("valley")
   else: op =None
-  h.get_bands(operator=op)
+  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
+  h.get_bands(operator=op,kpath=kpath)
   execute_script("qh-bands2d  ")
   comp.kill()
 
@@ -117,6 +119,20 @@ def show_dosbands(self=0):
                    ne=int(get("ne_kbands")),delta=get("delta_kbands"),
                    ntries=int(get("nv_kbands")))
   execute_script("qh-dosbands  KDOS_BANDS.OUT ")
+
+
+def show_fermi_surface(silent=False):
+  h = pickup_hamiltonian() # get hamiltonian
+  ndos = int(get("ne_dos"))
+  if h.dimensionality==2:
+    spectrum.fermi_surface(h,e=get("energy_fs"),nk=int(get("nk_fs")),
+            nsuper = 2,reciprocal=True,delta=get("delta_fs"))
+#    dos.dos2d(h,ndos=500,delta=get("delta_dos"),nk=int(get("nk_dos")),
+#            window=get("window_dos"))
+  else: raise
+  if not silent: 
+      execute_script("qh-fermi-surface FERMI_MAP.OUT") # show the result
+
 
 
 
@@ -328,6 +344,7 @@ signals["compute_sweep"] = sweep_parameter
 signals["show_structure_3d"] = show_structure_3d
 signals["select_atoms_removal"] = select_atoms_removal
 signals["show_interactive_ldos"] = show_interactive_ldos
+signals["show_fermi_surface"] = show_fermi_surface
 
 
 

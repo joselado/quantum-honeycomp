@@ -27,6 +27,13 @@
        <layout class="QGridLayout" name="gridLayout_24">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="Bz">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="QLineEdit" name="Bx">
             <property name="text">
@@ -41,7 +48,7 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="10" column="1">
            <widget class="QLineEdit" name="mAB">
             <property name="text">
              <string>0.0</string>
@@ -93,7 +100,7 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="12" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
              <string>swave pairing</string>
@@ -124,7 +131,7 @@
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="11" column="1">
            <widget class="QLineEdit" name="mAF">
             <property name="text">
              <string>0.0</string>
@@ -159,7 +166,7 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Sublattice imbalance</string>
@@ -173,21 +180,14 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="1">
+          <item row="12" column="1">
            <widget class="QLineEdit" name="swave">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="Bz">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
+          <item row="11" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Antiferromagnetism</string>
@@ -198,6 +198,20 @@
            <widget class="QLabel" name="label_25">
             <property name="text">
              <string>Anti-Haldane</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="antikanemele">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Anti Kane-Mele</string>
             </property>
            </widget>
           </item>
@@ -1058,7 +1072,17 @@
             </item>
             <item>
              <property name="text">
+              <string>Honeycomb rectangular</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Square</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Single square</string>
              </property>
             </item>
             <item>
@@ -1144,7 +1168,7 @@
      <x>0</x>
      <y>0</y>
      <width>980</width>
-     <height>28</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

@@ -37,6 +37,8 @@ def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
     fo.write(str(b)+"\n")
     fo.flush()
   fo.close() # close file
+  m = np.genfromtxt("BERRY_CURVATURE.OUT").transpose()
+  return range(len(m[0])),m[2]
 
 
 
@@ -238,20 +240,27 @@ def berry_map(h,dk=-1,nk=40,reciprocal=True,nsuper=1,window=None,
   else: R = np.matrix(np.identity(3))
   fo = open("BERRY_MAP.OUT","w") # open file
   nt = nk*nk # total number of points
-  tr = timing.Testimator("BERRY CURVATURE")
   ik = 0
+  ks = [] # list with kpoints
+  import parallel
   for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
     for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
-      tr.remaining(ik,nt)
-      ik += 1
-      r = np.matrix([x,y,0.]).T # real space vectors
+        ks.append([x,y,0.])
+  tr = timing.Testimator("BERRY CURVATURE",maxite=len(ks))
+  def fp(ki): # function to compute the Berry curvature
+      if parallel.cores == 1: tr.iterate()
+      else: print("Doing",ki)
+      r = np.matrix(ki).T # real space vectors
       k = np.array((R*r).T)[0] # change of basis
       if mode=="Wilson":
          b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
       if mode=="Green":
          f = h.get_gk_gen(delta=delta) # get generator
          b = berry_green(f,k=k,operator=operator) 
-      fo.write(str(x)+"   "+str(y)+"     "+str(b)+"\n")
+      return b
+  bs = parallel.pcall(fp,ks) # compute all the Berry curvatures
+  for (b,k) in zip(bs,ks): # write everything
+      fo.write(str(k[0])+"   "+str(k[1])+"     "+str(b)+"\n")
       fo.flush()
   fo.close() # close file
 
@@ -568,5 +577,72 @@ def berry_green_map(h,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
   from ldos import spatial_dos
   geometry.write_profile(h.geometry,spatial_dos(h,out),name="BERRY_MAP.OUT",nrep=nrep)
   return out
+
+
+
+def berry_density(h,k=[0.,0.,0.],operator=None,delta=0.02,dk=0.02):
+  """Compute the Berry density"""
+  f = h.get_gk_gen(delta=delta,canonical_phase=True) # green function generator
+  fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=False) 
+  return fgreen(0.0).real
+
+
+def berry_density_map(h,nk=40,reciprocal=True,nsuper=1,
+               delta=None,operator=None,dk=0.01):
+  """Compute a Berry density map"""
+  if delta is None: delta = 5./nk
+  if reciprocal: R = h.geometry.get_k2K()
+  else: R = np.matrix(np.identity(3))
+  fo = open("BERRY_DENSITY_MAP.OUT","w") # open file
+  nt = nk*nk # total number of points
+  ik = 0
+  ks = [] # list with kpoints
+  import parallel
+  for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+    for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
+        ks.append([x,y,0.])
+  tr = timing.Testimator("BERRY DENSITY",maxite=len(ks))
+  def fp(ki): # function to compute the Berry curvature
+      if parallel.cores == 1: tr.iterate()
+      else: print("Doing",ki)
+      r = np.matrix(ki).T # real space vectors
+      k = np.array((R*r).T)[0] # change of basis
+      b = berry_density(h,k=k,operator=operator,dk=dk) # get the density
+      return b
+  bs = parallel.pcall(fp,ks) # compute all the Berry curvatures
+  for (b,k) in zip(bs,ks): # write everything
+      fo.write(str(k[0])+"   "+str(k[1])+"     "+str(b)+"\n")
+      fo.flush()
+  fo.close() # close file
+
+
+
+def chern_density(h,nk=10,operator=None,delta=0.02,dk=0.02,
+        es=np.linspace(-1.0,1.0,40)):
+  """Compute the Chern density as a function of the energy"""
+  ks = klist.kmesh(h.dimensionality,nk=nk)
+  cs = np.zeros(es.shape[0]) # initialize
+  f = h.get_gk_gen(delta=delta,canonical_phase=True) # green function generator
+  tr = timing.Testimator("CHERN DENSITY",maxite=len(ks))
+  import parallel
+  def fp(k): # compute berry curvatures
+    if parallel.cores==1: tr.iterate()
+    else: print(k)
+    k = np.random.random(3)
+    fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=False) 
+    return np.array([fgreen(e).real for e in es])
+  out = parallel.pcall(fp,ks) # compute everything
+  for o in out: cs += o # add contributions
+  cs = cs/(len(ks)*np.pi*2) # normalize
+  from scipy.integrate import cumtrapz
+  csi = cumtrapz(cs,x=es,initial=0) # integrate
+  np.savetxt("CHERN_DENSITY.OUT",np.matrix([es,cs]).T)
+  np.savetxt("CHERN_DENSITY_INTEGRATED.OUT",np.matrix([es,csi]).T)
+
+
+
+
+
+
 
 

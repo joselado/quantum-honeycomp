@@ -589,6 +589,7 @@ def honeycomb_lattice():
   g.has_sublattice = True # has sublattice index
   g.sublattice = [(-1.)**i for i in range(len(g.x))] # subattice number
   g.update_reciprocal() # update reciprocal lattice vectors
+  g.get_fractional()
   return g
 
 

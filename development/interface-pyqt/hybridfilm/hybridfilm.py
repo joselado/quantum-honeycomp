@@ -57,7 +57,7 @@ def get_geometry_film():
   g = geometry_builder() # call the geometry
   import films
   g = films.geometry_film(g,int(get("thickness")))
-#  g = g.supercell(nsuper)
+  g = g.supercell(int(get("nsuper")))
   g.real2fractional()
   g.fractional2real()
   g.center()

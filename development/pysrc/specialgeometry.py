@@ -6,9 +6,9 @@ import geometry
 
 
 def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
-  sublattice=True,r=1):
+  sublattice=True,r=1,g=None):
   """Return the geometry for twisted bilayer graphene"""
-  g = geometry.honeycomb_lattice()
+  if g is None: g = geometry.honeycomb_lattice()
   g.has_sublattice = False
   if sublattice: # trace the sublattice using a dirty trick
     g.z[0] += 0.001
@@ -20,6 +20,7 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
 #  r = 1
   theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
   print("Theta",theta*180.0/np.pi)
+  g.angle = theta # terrible workaround
   nsuper = [[m0,m0+r,0],[-m0-r,2*m0+r,0],[0,0,1]]
   g = geometry.non_orthogonal_supercell(g,m=nsuper,
            reducef=lambda x: 3*np.sqrt(x))
@@ -80,9 +81,9 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
 
 
 def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
-  sublattice=True,r=1,rot=[1,1,0,0]):
+  sublattice=True,r=1,rot=[1,1,0,0],g=None,dz=3.0):
   """Return the geometry for twisted bilayer graphene"""
-  g = geometry.honeycomb_lattice()
+  if g is None: g = geometry.honeycomb_lattice() # default is honeycomb
   g.has_sublattice = False # no sublattice
   g = geometry.non_orthogonal_supercell(g,m=[[-1,0,0],[0,1,0],[0,0,1]])
   theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
@@ -96,7 +97,7 @@ def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
     for i in rot: # loop
         print(i)
         if i!=0 and i!=1: raise # nope
-        gs.append(rotate_layer(g,i*theta,dr=[0.,0.,3.0*(ii-len(rot)/2.+.5)]))
+        gs.append(rotate_layer(g,i*theta,dr=[0.,0.,dz*(ii-len(rot)/2.+.5)]))
         ii += 1 # increase counter
   else: raise
 #  g.r = np.concatenate([g1.r,g.r,g2.r]).copy()

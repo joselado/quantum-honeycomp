@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>980</width>
-    <height>626</height>
+    <height>659</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,14 @@
        <layout class="QGridLayout" name="gridLayout_24">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="13" column="1">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string>Magnetic field</string>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="1">
            <widget class="QLineEdit" name="swave">
             <property name="text">
              <string>0.0</string>
@@ -55,7 +62,7 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="1">
+          <item row="12" column="1">
            <widget class="QLineEdit" name="mAB">
             <property name="text">
              <string>0.0</string>
@@ -93,21 +100,21 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="label_24">
             <property name="text">
              <string>Haldane</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="11" column="1">
            <widget class="QLineEdit" name="antihaldane">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="13" column="0">
+          <item row="14" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
              <string>swave pairing</string>
@@ -131,14 +138,14 @@
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="10" column="1">
            <widget class="QLineEdit" name="haldane">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="1">
+          <item row="13" column="1">
            <widget class="QLineEdit" name="mAF">
             <property name="text">
              <string>0.0</string>
@@ -173,28 +180,21 @@
             </property>
            </widget>
           </item>
-          <item row="11" column="0">
+          <item row="12" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Sublattice imbalance</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Magnetic field</string>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Antiferromagnetism</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="11" column="0">
            <widget class="QLabel" name="label_25">
             <property name="text">
              <string>Anti-Haldane</string>
@@ -226,6 +226,20 @@
            <widget class="QLineEdit" name="bias">
             <property name="text">
              <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="QLineEdit" name="antikanemele">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_41">
+            <property name="text">
+             <string>Anti Kane-Mele</string>
             </property>
            </widget>
           </item>
@@ -895,6 +909,66 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_16">
+       <attribute name="title">
+        <string>Fermi surface</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QPushButton" name="show_fermi_surface">
+          <property name="text">
+           <string>Fermi surface</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_37">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_52">
+            <property name="text">
+             <string># of kpoints</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="delta_fs">
+            <property name="text">
+             <string>0.1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="energy_fs">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_54">
+            <property name="text">
+             <string>Smearing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="nk_fs">
+            <property name="text">
+             <string>100</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>Energy</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_15">
        <attribute name="title">
         <string>Sweep</string>
@@ -1092,6 +1166,11 @@
             <item>
              <property name="text">
               <string>AB</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ABB</string>
              </property>
             </item>
             <item>
