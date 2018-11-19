@@ -49,7 +49,7 @@ def get_geometry(modify=True):
 def select_atoms_removal(self):
   g = get_geometry(modify=False) # get the unmodified geometry
   g.write() # write geometry
-  execute_script("qh-remove-atoms-geometry") # remove the file
+  execute_script("qh-remove-atoms-geometry-3d") # remove the file
 
 
 def modify_geometry(g):

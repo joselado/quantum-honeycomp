@@ -98,10 +98,35 @@ def initialize():
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
   if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
-  if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
+  if abs(get("swave"))>0.0: 
+      h.add_swave(special_pairing(h.geometry)) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
 
   return h
+
+
+
+def special_pairing(g):
+    """Create a special pairing function"""
+    delta = get("swave") # value
+    deltatype = getbox("pairing_type") # type of pairing
+    if deltatype=="Uniform":
+        return lambda x: delta # identity
+    if deltatype=="One sublattice": # only in one sublattice
+      def f(r):
+          """One sublattice"""
+          for i in range(len(g.r)): # loop over positions
+              dr = r - g.r[i]
+              dr = dr.dot(dr) # distance
+              if dr<0.001: # found site
+                  if g.sublattice[i]==-1: return delta # only pairing in one
+                  else: return 0.0 # no pairing
+      return f
+    else: raise # not implemented
+
+
+
+
 
 
 def show_bands(self=0):

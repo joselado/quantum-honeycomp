@@ -27,6 +27,13 @@
        <layout class="QGridLayout" name="gridLayout_24">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
+          <item row="12" column="1">
+           <widget class="QLineEdit" name="swave">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="Bz">
             <property name="text">
@@ -103,7 +110,7 @@
           <item row="12" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>swave pairing</string>
+             <string>superconducting pairing</string>
             </property>
            </widget>
           </item>
@@ -180,13 +187,6 @@
             </property>
            </widget>
           </item>
-          <item row="12" column="1">
-           <widget class="QLineEdit" name="swave">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
           <item row="11" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
@@ -213,6 +213,27 @@
             <property name="text">
              <string>Anti Kane-Mele</string>
             </property>
+           </widget>
+          </item>
+          <item row="13" column="0">
+           <widget class="QLabel" name="label_39">
+            <property name="text">
+             <string>Pairing kind</string>
+            </property>
+           </widget>
+          </item>
+          <item row="13" column="1">
+           <widget class="QComboBox" name="pairing_type">
+            <item>
+             <property name="text">
+              <string>Uniform</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>One sublattice</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
