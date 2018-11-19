@@ -121,6 +121,8 @@ def special_pairing(g):
               if dr<0.001: # found site
                   if g.sublattice[i]==-1: return delta # only pairing in one
                   else: return 0.0 # no pairing
+          raise
+      return f
     elif deltatype=="sigma_z": # only in one sublattice
       def f(r):
           """One sublattice"""
