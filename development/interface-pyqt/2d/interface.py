@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(980, 626)
+        MainWindow.resize(980, 653)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_6 = QtWidgets.QGridLayout(self.centralwidget)
@@ -109,6 +109,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.label_39, 13, 0, 1, 1)
         self.pairing_type = QtWidgets.QComboBox(self.tab_3)
         self.pairing_type.setObjectName("pairing_type")
+        self.pairing_type.addItem("")
         self.pairing_type.addItem("")
         self.pairing_type.addItem("")
         self.gridLayout.addWidget(self.pairing_type, 13, 1, 1, 1)
@@ -577,6 +578,7 @@ class Ui_MainWindow(object):
         self.label_39.setText(_translate("MainWindow", "Pairing kind"))
         self.pairing_type.setItemText(0, _translate("MainWindow", "Uniform"))
         self.pairing_type.setItemText(1, _translate("MainWindow", "One sublattice"))
+        self.pairing_type.setItemText(2, _translate("MainWindow", "sigma_z"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_3), _translate("MainWindow", "Terms in the Hamiltonian"))
         self.nsuper_struct.setText(_translate("MainWindow", "5"))
         self.label_7.setText(_translate("MainWindow", "Supercell"))

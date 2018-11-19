@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>980</width>
-    <height>626</height>
+    <height>653</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -232,6 +232,11 @@
             <item>
              <property name="text">
               <string>One sublattice</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>sigma_z</string>
              </property>
             </item>
            </widget>

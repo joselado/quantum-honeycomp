@@ -112,7 +112,7 @@ def special_pairing(g):
     deltatype = getbox("pairing_type") # type of pairing
     if deltatype=="Uniform":
         return lambda x: delta # identity
-    if deltatype=="One sublattice": # only in one sublattice
+    elif deltatype=="One sublattice": # only in one sublattice
       def f(r):
           """One sublattice"""
           for i in range(len(g.r)): # loop over positions
@@ -121,6 +121,16 @@ def special_pairing(g):
               if dr<0.001: # found site
                   if g.sublattice[i]==-1: return delta # only pairing in one
                   else: return 0.0 # no pairing
+    elif deltatype=="sigma_z": # only in one sublattice
+      def f(r):
+          """One sublattice"""
+          for i in range(len(g.r)): # loop over positions
+              dr = r - g.r[i]
+              dr = dr.dot(dr) # distance
+              if dr<0.001: # found site
+                  if g.sublattice[i]==-1: return delta # only pairing in one
+                  elif g.sublattice[i]==1: return -delta # only pairing in one
+                  else: raise
       return f
     else: raise # not implemented
 
