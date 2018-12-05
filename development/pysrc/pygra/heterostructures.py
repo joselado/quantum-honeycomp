@@ -3,7 +3,7 @@ import numpy as np
 import pylab as py
 from copy import deepcopy as dc
 from scipy.sparse import bmat,coo_matrix,csc_matrix
-import green
+from . import green
 
 
 
@@ -57,17 +57,17 @@ class heterostructure():
                     left_channel=left_channel,right_channel=right_channel)
   def write_green(self):
     """Writes the green functions in a file"""
-    from green import write_matrix
+    from .green import write_matrix
     write_matrix(self.file_right_green,self.right_green)
     write_matrix(self.file_left_green,self.left_green)
   def read_green(self):
     """Reads the green functions from a file"""
-    from green import read_matrix
+    from .green import read_matrix
     self.right_green = read_matrix(self.file_right_green)
     self.left_green = read_matrix(self.file_left_green)
   def write_heff(self):
     """ Writes effective hamiltonian in a file"""
-    from green import write_sparse
+    from .green import write_sparse
     write_sparse(self.file_heff,self.heff)
   def eigenvalues(self,numeig = 10,effective=False,full=False):
     """ Calculates eigenvalues of the central part """
@@ -106,7 +106,7 @@ class heterostructure():
      if lead==1: return np.matrix(self.selfgen[1](energy)) # return selfenergy
 # run the calculation
    else:
-     from green import green_renormalization
+     from .green import green_renormalization
      if lead==0:
        intra = self.left_intra
        inter = self.left_inter
@@ -326,8 +326,8 @@ def landauer(hetero,energy=0.0,delta = 0.0001,error=0.0000001,do_leads=True,
                       do_leads=do_leads,gr=gr,gl=gl,has_eh=has_eh) for e in energy]
    except: # contnue if it is not a list
      pass
-   import green
-   from hamiltonians import is_number
+   from . import green
+   from .hamiltonians import is_number
    if not hetero.block_diagonal:
      intra = hetero.central_intra # central intraterm   
      dimhc = len(intra) # dimension of the central part
@@ -373,7 +373,7 @@ def landauer(hetero,energy=0.0,delta = 0.0001,error=0.0000001,do_leads=True,
          if heff[i][j] is not None:
            heff[i][j] = -heff[i][j]
      # calculate green function
-     from green import gauss_inverse  # routine to invert the matrix
+     from .green import gauss_inverse  # routine to invert the matrix
      # calculate only some elements of the central green function
      gcn1 = gauss_inverse(heff,len(heff)-1,0) # calculate element 1,n 
      # and apply Landauer formula
@@ -445,9 +445,9 @@ def plot_landauer(ht,energy=[0.0],delta=0.001,has_eh=False):
 
 def plot_local_central_dos(hetero,energies=0.0,gf=None):
    """ Plots the local density of states in the central part"""
-   from green import dyson
-   from green import gf_convergence
-   from hamiltonians import is_number
+   from .green import dyson
+   from .green import gf_convergence
+   from .hamiltonians import is_number
    if gf==None: gf = gf_convergence("lead")
    if not hetero.block_diagonal:
      intra = hetero.central_intra # central intraterm   
@@ -518,7 +518,7 @@ def plot_local_central_dos(hetero,energies=0.0,gf=None):
 #         hetero.heff = bmat(heff)
 #         hetero.write_heff() 
       # calculate the inverse
-       from green import gauss_inverse  # routine to invert the matrix
+       from .green import gauss_inverse  # routine to invert the matrix
        # list with the diagonal matrices
        ldos_e = ldos*0.0 # initialice ldos at this energy
        ii = 0 # counter for the element
@@ -703,9 +703,9 @@ def eigenvalues(hetero,numeig=10,effective=False,gf=None,full=False):
 
 def effective_central_hamiltonian(hetero,energy=0.0,delta=0.0001,write=False):
    """ Plots the local density of states in the central part"""
-   from green import green_renormalization
-   from green import dyson
-   from hamiltonians import is_number
+   from .green import green_renormalization
+   from .green import dyson
+   from .hamiltonians import is_number
    # perform dyson calculation
    intra = hetero.right_intra
    inter = hetero.right_inter
@@ -773,7 +773,7 @@ def didv(ht,energy=0.0,delta=0.00001,kwant=False,opl=None,opr=None):
   else: 
     if kwant:
       if opl is not None or opr is not None: raise # not implemented
-      import kwantlink 
+      from . import kwantlink 
       return kwantlink.transport(ht,energy)
     s = get_smatrix(ht,energy=energy,delta=delta,check=True) # get the smatrix
     if opl is not None or opr is not None: # some projector given
@@ -811,7 +811,7 @@ def get_smatrix(ht,energy=0.0,delta=0.000001,as_matrix=False,check=True):
   """Calculate the S-matrix of an heterostructure"""
   # now do the Fisher Lee trick
   smatrix = [[None,None],[None,None]] # smatrix in list form
-  from green import gauss_inverse # calculate the desired green functions
+  from .green import gauss_inverse # calculate the desired green functions
   # get the selfenergies, using the same coupling as the lead
   selfl = ht.get_selfenergy(energy,delta=delta,lead=0,pristine=True)
   selfr = ht.get_selfenergy(energy,delta=delta,lead=1,pristine=True)
@@ -947,7 +947,7 @@ def sqrtm_rotated(M):
 
 def get_surface_green(hetero,energy=0.0,delta=0.0001):
    """Calculate left and right greeen functions"""
-   from green import green_renormalization
+   from .green import green_renormalization
    # right lead
    intra = hetero.right_intra
    inter = hetero.right_inter
@@ -964,7 +964,7 @@ def get_surface_green(hetero,energy=0.0,delta=0.0001):
 
 def get_bulk_green(hetero,energy=0.0,delta=0.0001):
    """Calculate left and right bulk green functions"""
-   from green import green_renormalization
+   from .green import green_renormalization
    # right lead
    intra = hetero.right_intra
    inter = hetero.right_inter

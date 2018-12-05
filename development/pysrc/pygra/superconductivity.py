@@ -69,7 +69,7 @@ def project_holes(m):
 def eh_operator(m):
   """Return the electron hole symmetry operator, as a function"""
   n = m.shape[0]//4 # number of sites 
-  from hamiltonians import sy
+  from .hamiltonians import sy
   msy = [[None for ri in range(n)] for j in range(n)]
   for i in range(n): msy[i][i] = sy # add sy
   msy = bmat(msy) # sy matrix in the electron subspace
@@ -136,7 +136,7 @@ deltaz = deltaz.H
 
 def time_reversal(m):
   """Do the spinful time reversal of this matrix"""
-  from hamiltonians import sy
+  from .hamiltonians import sy
   n = m.shape[0]//2 # number of spinful blocks
   msy = [[None for ri in range(n)] for j in range(n)]
   for i in range(n): msy[i][i] = sy # add sy
@@ -314,10 +314,10 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
 #    self.get_eh_sector = get_eh_sector_odd_even # assign function
 #    if mode is None: df = delta # assume function is given
     if mode=="swave":
-        from geometry import same_site
+        from .geometry import same_site
         df = lambda r1,r2: delta*same_site(r1,r2)*np.identity(2)
     elif mode=="swavez":
-        from geometry import same_site
+        from .geometry import same_site
         df = lambda r1,r2: delta*same_site(r1,r2)*tauz
     elif mode=="px":
         df = lambda r1,r2: delta*px(r1,r2)
@@ -338,7 +338,7 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     self.intra = self.intra + m + m.H
     if self.dimensionality>0:
       if self.is_multicell: # for multicell hamiltonians
-        from multicell import Hopping
+        from .multicell import Hopping
         for d in self.geometry.neighbor_directions(): # loop over directions
           # this is a workaround to be able to do triplets
           # do it for +k and -k
@@ -351,7 +351,7 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
               self.hopping.append(Hopping(d=d,m=m)) # add pairing
           if np.max(np.abs(m2))>0.0001: # non zero
               self.hopping.append(Hopping(d=-np.array(d),m=m2.H)) # add pairing
-        from multicell import collect_hopping
+        from .multicell import collect_hopping
         self.hopping = collect_hopping(self)
       else: # conventional way
         raise # error

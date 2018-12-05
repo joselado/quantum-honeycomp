@@ -22,7 +22,7 @@ def check_hamiltonian(h):
     v = np.random.random(3) # random kpoint
     m1 = hk(v) # Hamiltonian
     m2 = hk(-v) # Hamiltonian in time reversal point
-    from superconductivity import eh_operator
+    from .superconductivity import eh_operator
     eh = eh_operator(m1) # get the function
     if not equal(m1,-eh(m2)): 
       print("CHECK FAILED, Hamiltonian does not have electron-hole symmetry")
