@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -350,7 +349,6 @@ signals["show_fermi_surface"] = show_fermi_surface
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

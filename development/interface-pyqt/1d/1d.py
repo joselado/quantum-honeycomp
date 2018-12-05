@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -46,7 +45,6 @@ def get_geometry(modify=True):
   elif lattice_name=="Honeycomb armchair":
     g = geometry.honeycomb_armchair_ribbon(n)
   if g.dimensionality==2: # original is a 2d geometry
-    import ribbon
     g = ribbon.bulk2ribbon(g,n=n)
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)
@@ -258,7 +256,6 @@ signals["select_atoms_removal"] = select_atoms_removal
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -95,7 +94,6 @@ def show_bands(self=0):
 def show_ldos():
   """Return the LDOS"""
   h = pickup_hamiltonian() # get hamiltonian
-  import ldos
   ewin = abs(get("window_ldos"))
   energies = np.linspace(-ewin,ewin,int(get("ne_ldos")))
   delta = get("delta_ldos")

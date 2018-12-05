@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -51,7 +50,6 @@ def get_geometry():
   elif lattice_name=="Bilayer graphene AA":
     g = multilayers.get_geometry("AA")
   if g.dimensionality==2: # original is a 2d geometry
-    import ribbon
     g = ribbon.bulk2ribbon(g,n=n,clean=False)
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)
@@ -217,7 +215,6 @@ signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

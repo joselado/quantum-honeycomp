@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -99,41 +98,24 @@ def initialize():
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
   if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("swave"))>0.0: 
-      h.add_swave(special_pairing(h.geometry)) 
+      h = h.get_multicell()
+      special_pairing(h)
 #  h.add_peierls(get("peierls")) # shift fermi energy
 
   return h
 
 
 
-def special_pairing(g):
+def special_pairing(h):
     """Create a special pairing function"""
     delta = get("swave") # value
     deltatype = getbox("pairing_type") # type of pairing
     if deltatype=="Uniform":
-        return lambda x: delta # identity
+        h.add_pairing(delta,mode="swave")
     elif deltatype=="One sublattice": # only in one sublattice
-      def f(r):
-          """One sublattice"""
-          for i in range(len(g.r)): # loop over positions
-              dr = r - g.r[i]
-              dr = dr.dot(dr) # distance
-              if dr<0.001: # found site
-                  if g.sublattice[i]==-1: return delta # only pairing in one
-                  else: return 0.0 # no pairing
-          raise
-      return f
+        h.add_pairing(delta,mode="swaveA")
     elif deltatype=="sigma_z": # only in one sublattice
-      def f(r):
-          """One sublattice"""
-          for i in range(len(g.r)): # loop over positions
-              dr = r - g.r[i]
-              dr = dr.dot(dr) # distance
-              if dr<0.001: # found site
-                  if g.sublattice[i]==-1: return delta # only pairing in one
-                  elif g.sublattice[i]==1: return -delta # only pairing in one
-                  else: raise
-      return f
+        h.add_pairing(delta,mode="swavez")
     else: raise # not implemented
 
 
@@ -380,7 +362,6 @@ signals["show_interactive_ldos"] = show_interactive_ldos
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

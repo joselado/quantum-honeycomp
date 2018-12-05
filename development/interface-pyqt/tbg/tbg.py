@@ -7,7 +7,6 @@ import os
 qhroot = os.environ["QHROOT"] # root path
 
 # Add path of the wrapper
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 
 
 sys.path.append(qhroot+"/pysrc/") # python libraries
@@ -27,7 +26,6 @@ from qh_interface import * # import all the libraries needed
 def get_geometry2d():
   """ Create a 2d honeycomb lattice"""
   n = int(get("cell_size")) # size of the unit cell
-  import specialgeometry
   g = specialgeometry.twisted_bilayer(n)
 #  g = geometry.honeycomb_lattice()
 #  g = g.supercell(n)
@@ -38,7 +36,7 @@ def get_geometry2d():
 def initialize():
   """ Initialize the calculation"""
   g = get_geometry2d() # get the geometry
-  from specialhopping import twisted,twisted_matrix
+  twisted_matrix = specialhopping.twisted_matrix
   has_spin = False
   h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=True,
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))

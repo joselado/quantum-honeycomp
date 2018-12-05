@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -55,7 +54,6 @@ def get_geometry_film():
     geometry_builder = geometry.pyrochlore_lattice
   else: raise
   g = geometry_builder() # call the geometry
-  import films
   g = films.geometry_film(g,int(get("thickness")))
   g = g.supercell(int(get("nsuper")))
   g.real2fractional()
@@ -132,7 +130,6 @@ def show_bands(self=0):
 def show_ldos():
   """Return the LDOS"""
   h = pickup_hamiltonian() # get hamiltonian
-  import ldos
   ewin = abs(get("window_ldos"))
   energies = np.linspace(-ewin,ewin,int(get("ne_ldos")))
   delta = get("delta_ldos")
@@ -295,7 +292,6 @@ signals["show_ldos"] = show_ldos  # show DOS
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

@@ -2,34 +2,36 @@ from __future__ import print_function
 import subprocess
 import os
 import sys
-# import the different libraries for the quantum honeycomp
-import hamiltonians
-import klist
-import geometry
-import input_tb90 
-import sculpt
-import interactions
-import multilayers
-import dos
-import ldos
-import kpm
-import current
-import spectrum
-import topology
-import heterostructures
 import numpy as np
-import inout
-import operators
-import bandstructure
-import islands
-import hybrid
-import kdos
-import potentials
-import supercell
-import scftypes
-import indexing
-import specialgeometry
-import specialhopping
+# import the different libraries for quantum honeycomp
+from pygra import hamiltonians
+from pygra import klist
+from pygra import geometry
+from pygra import input_tb90 
+from pygra import sculpt
+from pygra import interactions
+from pygra import multilayers
+from pygra import dos
+from pygra import ldos
+from pygra import films
+from pygra import kpm
+from pygra import current
+from pygra import spectrum
+from pygra import topology
+#from pygra import heterostructures
+from pygra import inout
+from pygra import operators
+from pygra import bandstructure
+from pygra import islands
+from pygra import ribbon
+from pygra import hybrid
+from pygra import kdos
+from pygra import potentials
+from pygra import supercell
+from pygra import scftypes
+from pygra import indexing
+from pygra import specialgeometry
+from pygra import specialhopping
 
 
 import platform

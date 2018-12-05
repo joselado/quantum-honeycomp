@@ -6,7 +6,6 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
@@ -44,7 +43,6 @@ def get_geometry():
   elif lattice_name=="Honeycomb armchair":
     g = geometry.honeycomb_armchair_ribbon(n)
   if g.dimensionality==2: # original is a 2d geometry
-    import ribbon
     g = ribbon.bulk2ribbon(g,n=n)
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)
@@ -109,7 +107,6 @@ def show_bands(self=0):
 def show_ldos():
   """Return the LDOS"""
   h = pickup_hamiltonian() # get hamiltonian
-  import ldos
   ewin = abs(get("window_ldos"))
   energies = np.linspace(-ewin,ewin,int(get("ne_ldos")))
   delta = get("delta_ldos")
@@ -255,7 +252,6 @@ signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 
 
 
-#from qh_interface import create_folder # import all the libraries needed
 
 window.connect_clicks(signals)
 folder = create_folder()

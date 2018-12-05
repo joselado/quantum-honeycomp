@@ -6,11 +6,10 @@ import sys
 import os
 
 qhroot = os.environ["QHROOT"] # root path
-sys.path.append(qhroot+"/interface-pyqt/qtwrap")
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
-import qtwrap # import the library with simple wrappaers to qt4
+import qtwrap # import the library with simple wrappers to qt4
 get = qtwrap.get  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
@@ -43,7 +42,6 @@ def get_geometry(modify=True):
     g = geometry.honeycomb_zigzag_ribbon(n)
   elif lattice_name=="Honeycomb armchair":
     g = geometry.honeycomb_armchair_ribbon(n)
-  import islands
   rot = get("rotation")*np.pi/180.
   g = islands.get_geometry(n=n,nedges=int(get("nsides")),rot=rot,geo=g)
   if modify: g = modify_geometry(g) # modify the geometry
