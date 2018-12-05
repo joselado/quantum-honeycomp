@@ -8,8 +8,9 @@ import sys
 pwd = os.getcwd() # get the current location
 
 # compile f2py routines
-os.chdir(pwd)
+os.chdir("pysrc/pygra")
 os.system("python compile_fortran.py") # compile fortran programs
+os.chdir(pwd)
 
 
 os.chdir(pwd+'/bin') # go to bin directory

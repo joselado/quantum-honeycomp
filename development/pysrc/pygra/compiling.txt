@@ -7,8 +7,8 @@ running build_src
 build_src
 building extension "chif90" sources
 f2py options: []
-f2py:> /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.c
-creating /tmp/tmpr1y89k1g/src.linux-x86_64-3.6
+f2py:> /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.c
+creating /tmp/tmpo64pj4r4/src.linux-x86_64-3.6
 Reading fortran codes...
 	Reading file 'chif90.f90' (format:free)
 Post-processing...
@@ -25,11 +25,11 @@ Building modules...
 		  occ = occupation(energy,temperature)
 		Constructing wrapper function "elementchi_nowf"...
 		  chi_total = elementchi_nowf(ene_chi_i,ene_chi_j,ene_chi,ichi,jchi,temperature_chi,delta,norbitals,[num_wf_i,num_wf_j,num_ene_chi])
-	Wrote C/API module "chif90" to file "/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.c"
-  adding '/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.c' to sources.
-  adding '/tmp/tmpr1y89k1g/src.linux-x86_64-3.6' to include_dirs.
-copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpr1y89k1g/src.linux-x86_64-3.6
-copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpr1y89k1g/src.linux-x86_64-3.6
+	Wrote C/API module "chif90" to file "/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.c"
+  adding '/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.c' to sources.
+  adding '/tmp/tmpo64pj4r4/src.linux-x86_64-3.6' to include_dirs.
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpo64pj4r4/src.linux-x86_64-3.6
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpo64pj4r4/src.linux-x86_64-3.6
 build_src: building npy-pkg config files
 running build_ext
 customize UnixCCompiler
@@ -43,40 +43,40 @@ building 'chif90' extension
 compiling C sources
 C compiler: gcc -pthread -B /home/jose/apps/anaconda3/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC
 
-creating /tmp/tmpr1y89k1g/tmp
-creating /tmp/tmpr1y89k1g/tmp/tmpr1y89k1g
-creating /tmp/tmpr1y89k1g/tmp/tmpr1y89k1g/src.linux-x86_64-3.6
-compile options: '-I/tmp/tmpr1y89k1g/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
-gcc: /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.c
-gcc: /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.c
+creating /tmp/tmpo64pj4r4/tmp
+creating /tmp/tmpo64pj4r4/tmp/tmpo64pj4r4
+creating /tmp/tmpo64pj4r4/tmp/tmpo64pj4r4/src.linux-x86_64-3.6
+compile options: '-I/tmp/tmpo64pj4r4/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gcc: /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.c
+gcc: /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.c
 In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
                  from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
                  from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
-                 from /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.h:13,
-                 from /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.c:16:
+                 from /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.c:16:
 /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
  #warning "Using deprecated NumPy API, disable it by " \
   ^~~~~~~
-/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
+/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
  static int f2py_size(PyArrayObject* var, ...)
             ^~~~~~~~~
 In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
                  from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
                  from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
-                 from /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.h:13,
-                 from /tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.c:2:
+                 from /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.c:2:
 /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
  #warning "Using deprecated NumPy API, disable it by " \
   ^~~~~~~
-/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
-/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
+/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
          if (size < sizeof(notalloc)) {
                   ^
 compiling Fortran sources
 Fortran f77 compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran f90 compiler: /usr/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran fix compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
-compile options: '-I/tmp/tmpr1y89k1g/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+compile options: '-I/tmp/tmpo64pj4r4/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
 gfortran:f90: chif90.f90
 chif90.f90:43:35:
 
@@ -108,5 +108,5 @@ chif90.f90:141:57:
    complex (kind=8) :: wftmp1(norbitals),wftmp2(norbitals)
                                                          1
 Warning: Unused variable ‘wftmp2’ declared at (1) [-Wunused-variable]
-/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpr1y89k1g/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/chif90module.o /tmp/tmpr1y89k1g/tmp/tmpr1y89k1g/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpr1y89k1g/chif90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./chif90.cpython-36m-x86_64-linux-gnu.so
-Removing build directory /tmp/tmpr1y89k1g
+/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpo64pj4r4/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/chif90module.o /tmp/tmpo64pj4r4/tmp/tmpo64pj4r4/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpo64pj4r4/chif90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./chif90.cpython-36m-x86_64-linux-gnu.so
+Removing build directory /tmp/tmpo64pj4r4
