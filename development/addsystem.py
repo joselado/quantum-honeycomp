@@ -3,7 +3,28 @@ from __future__ import print_function
 import os
 
 
-pwd = os.getcwd() # get the current location
+pwd = os.path.dirname(os.path.realpath(__file__))
+#pwd = os.getcwd() # get the current location
+
+qhpath = pwd + "/bin/quantum-honeycomp"
+
+
+# different files for Linux and Mac
+import platform
+#if platform.system()=="Linux":
+#  print("Detected Linux system")
+binpath = os.environ["HOME"]+"/.local/bin/quantum-honeycomp" # path to .bashrc
+os.system("rm -f "+binpath)
+os.system("ln -s "+qhpath+"  "+binpath)
+print("Added link to ",binpath)
+exit()
+#else:
+
+
+# old way
+
+
+
 
 # different files for Linux and Mac
 import platform
@@ -19,7 +40,7 @@ route = "\n###############################\n"
 route += "# Added by Quantum Honeycomp\n"
 route += "###############################\n"
 route += "  export PATH=\""+pwd+"/bin\":$PATH\n"
-route += "  export QHROOT=\""+pwd+"\"\n"
+#route += "  export QHROOT=\""+pwd+"\"\n"
 route += "###############################\n"
 
 

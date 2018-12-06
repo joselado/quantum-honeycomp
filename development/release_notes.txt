@@ -15,6 +15,17 @@ FEATURES
 #########################################
 #########################################
 
+
+Updates on version 0.16.1
+  # Simplified installation of the library
+
+Updates on version 0.16
+  # Major library rearrangement
+
+Updates on version 0.15
+  # Multilayer graphene module
+  # Various optimizations
+
 Updates on version 0.13
   # Bug fixes
   # New autoupdate feature in the main window

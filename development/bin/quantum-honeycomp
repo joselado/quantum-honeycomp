@@ -5,9 +5,11 @@ import platform
 
 def get_qhroot():
   """Gets the root path of quantum honeycomp"""
-  return os.environ["QHROOT"]+"/"
+  return os.path.dirname(os.path.realpath(__file__))+"/../" 
+#  return os.environ["QHROOT"]+"/"
 
 qhroot = get_qhroot()  # get the root path
+os.environ["QHROOT"] = qhroot # create the environmental variable
 
 
 def get_anaconda_command(name="python"):
