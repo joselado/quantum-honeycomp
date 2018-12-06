@@ -6,14 +6,7 @@ import numpy as np
 try:
   from mayavi import mlab
 except:
-  print("Default python does not work, trying python in PATH")
-  try: 
-    import os
-    qhpath = os.environ["QHROOT"]+"/" # path to quantum honeycomp
-    os.system("python "+qhpath+"utilities/qh-remove-atoms-geometry-3d")
-  except:
-    print("Something wrong")
-    exit()
+  print("Mayavi is not working")
   exit()
 
 

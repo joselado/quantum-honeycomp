@@ -14,14 +14,7 @@ import numpy as np
 try:
   from mayavi import mlab
 except:
-  print("Mayavi not present in python3, trying python2")
-  try:
-    import os
-    qhpath = os.environ["QHROOT"]+"/" # path to quantum honeycomp
-    os.system("/usr/bin/python2.7 "+qhpath+"utilities/qh-moments")
-  except:
-    print("Something wrong")
-    exit()
+  print("Mayavi is not working")
   exit()
 
 
