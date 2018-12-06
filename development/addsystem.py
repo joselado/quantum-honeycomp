@@ -11,18 +11,13 @@ qhpath = pwd + "/bin/quantum-honeycomp"
 
 # different files for Linux and Mac
 import platform
-#if platform.system()=="Linux":
-#  print("Detected Linux system")
-binpath = os.environ["HOME"]+"/.local/bin/quantum-honeycomp" # path to .bashrc
-os.system("rm -f "+binpath)
-os.system("ln -s "+qhpath+"  "+binpath)
-print("Added link to ",binpath)
-exit()
-#else:
-
-
-# old way
-
+if platform.system()=="Linux":
+  if os.path.isdir(os.environ["HOME"]+"/.local/bin"):
+    binpath = os.environ["HOME"]+"/.local/bin/quantum-honeycomp" # path to .bashrc
+    os.system("rm -f "+binpath)
+    os.system("ln -s "+qhpath+"  "+binpath)
+    print("Added link to ",binpath)
+    exit()
 
 
 
