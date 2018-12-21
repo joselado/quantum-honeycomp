@@ -15,6 +15,9 @@ try:
   from mayavi import mlab
 except:
   print("Mayavi is not working")
+  path = os.path.realpath(__file__) 
+  import sys
+  os.system("python "+path)
   exit()
 
 
