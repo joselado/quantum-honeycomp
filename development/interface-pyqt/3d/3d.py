@@ -30,6 +30,8 @@ def get_geometry():
     geometry_builder = geometry.diamond_lattice_minimal
   elif lattice_name=="Pyrochlore":
     geometry_builder = geometry.pyrochlore_lattice
+  elif lattice_name=="Hyperhoneycomb":
+    geometry_builder = geometry.hyperhoneycomb_lattice
   else: raise
   g = geometry_builder() # call the geometry
   nsuper = int(get("nsuper"))

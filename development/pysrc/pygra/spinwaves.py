@@ -2,7 +2,7 @@
 # routines for dealing with spin models, using the Holfstein Primakov
 # transformation
 
-import neighbor
+from . import neighbor
 import numpy as np
 from scipy.sparse import csc_matrix,coo_matrix
 from scipy.sparse import identity as sparseiden

@@ -1,9 +1,9 @@
 from __future__ import print_function
 import numpy as np
 import scipy.linalg as lg
-import wannier
-import multicell
-import angular
+from . import wannier
+from . import multicell
+from . import angular
 from scipy.sparse import csc_matrix, bmat
 
 debug = True

@@ -2,12 +2,11 @@ from __future__ import print_function, division
 import numpy as np
 
 try:
-  import density_matrixf90
+  from . import density_matrixf90
   use_fortran = True
 except:
   use_fortran = False
-
-print("Fortran routines not working in densitymatrix.py")
+  print("Fortran routines not working in densitymatrix.py")
  
 
 def full_dm(h,use_fortran=True,nk=10):
@@ -47,7 +46,7 @@ def restricted_dm(h,use_fortran=True,mode="KPM",pairs=[],
     return outm # return elements
   elif mode=="KPM": # use Kernel polynomial method
     if ne is None: ne = npol*4
-    import kpm
+    from . import kpm
     xin = np.linspace(-.99*scale,0.0,ne) # input x array
     out = np.zeros(len(pairs),dtype=np.complex)
     ii = 0

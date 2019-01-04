@@ -219,6 +219,7 @@ def kmesh(dimensionality,nk=10):
       for k2 in np.linspace(0.,1.0,nk,endpoint=False):
         for k3 in np.linspace(0.,1.0,nk,endpoint=False):
           kp.append([k1,k2,k3]) # store
+  else: raise
   return kp
 
 

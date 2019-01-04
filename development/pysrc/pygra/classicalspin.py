@@ -1,6 +1,6 @@
 import numpy as np
-import classicalspinf90
-import neighbor
+from . import classicalspinf90
+from . import neighbor
 from scipy.sparse import csr_matrix,csc_matrix,coo_matrix
 
 zero = np.matrix(np.zeros((3,3)))  # real matrix

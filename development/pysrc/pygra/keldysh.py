@@ -131,9 +131,9 @@ def calculate_current(ht,v=0.01,delta=0.01):
   ham[2][2] = ht.right_intra
   ham = bmat(ham).todense() # dense matrix
   # get the Nambu tauz
-  from hamiltonians import get_nambu_tauz
-  from hamiltonians import project_electrons as eproj
-  from hamiltonians import project_holes as hproj
+  from .hamiltonians import get_nambu_tauz
+  from .hamiltonians import project_electrons as eproj
+  from .hamiltonians import project_holes as hproj
   tauz = get_nambu_tauz(ham,has_eh=True) # Nambu tauz
   # now calculate the time dependent coupling (positive frequency)
   tfreq = [[None for i in range(3)] for j in range(3)]  

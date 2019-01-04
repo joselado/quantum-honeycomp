@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.linalg as lg
 try:
-    import chif90
+    from . import chif90
 except:
     print("Error, chif90 not found")
 

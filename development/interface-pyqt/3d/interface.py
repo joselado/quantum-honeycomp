@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -309,6 +309,7 @@ class Ui_MainWindow(object):
         self.lattice.addItem("")
         self.lattice.addItem("")
         self.lattice.addItem("")
+        self.lattice.addItem("")
         self.gridLayout_4.addWidget(self.lattice, 0, 1, 1, 1)
         self.gridLayout_17.addLayout(self.gridLayout_4, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, "")
@@ -318,7 +319,7 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addWidget(self.label_46, 2, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 28))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 950, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -419,6 +420,7 @@ class Ui_MainWindow(object):
         self.lattice.setItemText(0, _translate("MainWindow", "Diamond"))
         self.lattice.setItemText(1, _translate("MainWindow", "Cubic"))
         self.lattice.setItemText(2, _translate("MainWindow", "Pyrochlore"))
+        self.lattice.setItemText(3, _translate("MainWindow", "Hyperhoneycomb"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))
         self.label_46.setToolTip(_translate("MainWindow", "This module allows to compute heterostructures consisting of two different films. You have to specify the parameters of the two films"))
         self.label_46.setText(_translate("MainWindow", "About"))

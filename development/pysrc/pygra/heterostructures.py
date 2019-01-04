@@ -20,6 +20,8 @@ class heterostructure():
     self.file_right_green = "green_right.dat"  # in/out file for right green
     self.file_left_green = "green_left.dat"   # in/out file for left green
     self.file_heff = "heff.dat"   # out for the effective hamiltonian
+    self.scale_rc = 1.0 # scale coupling to the right lead
+    self.scale_lc = 1.0 # scale coupling to the left lead
     self.is_sparse = False
     self.dimensionality = 1 # default is one dimensional
     self.delta = 0.0001
@@ -111,12 +113,12 @@ class heterostructure():
        intra = self.left_intra
        inter = self.left_inter
        if pristine: cou = self.left_inter
-       else: cou = self.left_coupling
+       else: cou = self.left_coupling*self.scale_lc
      if lead==1:
        intra = self.right_intra
        inter = self.right_inter
        if pristine: cou = self.right_inter
-       else: cou = self.right_coupling
+       else: cou = self.right_coupling*self.scale_rc
      ggg,gr = green_renormalization(intra,inter,energy=energy,delta=delta)
      selfr = cou*gr*cou.H # selfenergy
      return selfr # return selfenergy
@@ -131,7 +133,7 @@ class heterostructure():
     fun_sl = intermatrix(fsl,xs=es) # get the function
     self.selfgen = [fun_sl,fun_sr] # store functions
     self.interpolated_selfenergy = True # set as true
-  def didv(self,energy=0.0,delta=None,error=1e-4,nk=500,kwant=False,
+  def didv(self,energy=0.0,delta=None,error=1e-4,nk=10,kwant=False,
           opl=None,opr=None):
     if delta is None: delta = self.delta # set the own delta
     if self.dimensionality==1: # one dimensional
@@ -139,6 +141,7 @@ class heterostructure():
               opl=opl,opr=opr) # return value
     elif self.dimensionality==2: # two dimensional
       # function to integrate
+      print("Computing",energy)
       f = lambda k: self.generate(k).didv(energy=energy,delta=delta)
       return np.mean([f(x) for x in np.linspace(0.,1.,nk,endpoint=False)])
     else: raise
@@ -156,9 +159,9 @@ def create_leads_and_central(h_right,h_left,h_central,num_central=1,
      in the center  """
   # check the hamiltonians
   if num_central==1: block_diagonal = False
-  h_right.check()
-  h_left.check()
-  h_central.check()
+#  h_right.check()
+#  h_left.check()
+#  h_central.check()
   ht = heterostructure(h_central) # create heterostructure
   ht.has_eh = h_right.has_eh # if it has electron-hole
   ht.get_eh_sector = h_right.get_eh_sector # if it has electron-hole
@@ -599,8 +602,8 @@ def create_leads_and_central_list(h_right,h_left,list_h_central,
   """ Creates an heterojunction by giving the hamiltonian
      of the leads and the list of the center """
   # check the hamiltonians
-  h_right.check()
-  h_left.check()
+#  h_right.check()
+#  h_left.check()
   # convert to the classical way
   h_right = h_right.get_no_multicell()
   h_left = h_left.get_no_multicell()
@@ -875,11 +878,11 @@ def enlarge_hlist(ht):
     hcentral[i+2][i+1] = ht.central_intra[i+1][i] # common
   # now the new terms
   hcentral[0][0] = ht.left_intra # left
-  hcentral[0][1] = ht.left_coupling.H # left
-  hcentral[1][0] = ht.left_coupling # left
+  hcentral[0][1] = ht.left_coupling.H*ht.scale_lc # left
+  hcentral[1][0] = ht.left_coupling*ht.scale_lc # left
   hcentral[-1][-1] = ht.right_intra # right
-  hcentral[-2][-1] = ht.right_coupling # right
-  hcentral[-1][-2] = ht.right_coupling.H # right
+  hcentral[-2][-1] = ht.right_coupling*ht.scale_rc # right
+  hcentral[-1][-2] = ht.right_coupling.H*ht.scale_rc # right
   # store in the object
   ho.central_intra = hcentral    
   # and redefine the new lead couplings
@@ -1034,7 +1037,7 @@ def effective_tridiagonal_hamiltonian(intra,selfl,selfr,
 
 
 
-def build(h1,h2,central=None,**kwargs):
+def build(h1,h2,central=None,lc=1.0,rc=1.0,**kwargs):
   """Create a heterostructure, works also for 2d"""
   if central is None: central = [h1,h2] # list
   if h1.dimensionality==1: # one dimensional
@@ -1045,7 +1048,10 @@ def build(h1,h2,central=None,**kwargs):
       h1p = h1.get_1dh(k)
       h2p = h2.get_1dh(k)
       centralp = [hc.get_1dh(k) for hc in central]
-      return create_leads_and_central_list(h1p,h2p,centralp) # standard way
+      out = create_leads_and_central_list(h1p,h2p,centralp) # standard way
+      out.scale_lc = lc
+      out.scale_rc = rc
+      return out # return 1d heterostructure
     hout = heterostructure() # create
     hout.dimensionality = 2 # two dimensional
     hout.generate = fun # function that generates the heterostructure

@@ -1,5 +1,5 @@
 import numpy as np
-import klist
+from . import klist
 import scipy.linalg as lg
 
 
@@ -26,3 +26,19 @@ def ipr2d(h,nk=10,random=True,window=[-0.1,0.1]):
     out += tmp # add
   return out/len(ks)
         
+
+
+
+
+
+def ipr(m,retain=lambda x: True):
+  """Calculate the inverse participation ratio"""
+  es,ws = lg.eigh(m) # diagonalize
+  ws = ws.transpose() # transpose
+  eout = []
+  dout = []
+  for (ie,iw) in zip(es,ws): # loop
+    if retain(iw): # if retain
+        dout.append(np.sum(np.abs(iw)**4))
+        eout.append(ie) # store energy
+  return np.array(eout),np.array(dout) # return value

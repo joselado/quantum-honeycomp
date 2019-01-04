@@ -5,7 +5,7 @@ from . import sculpt
 
 
 def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
-  sublattice=True,r=1,g=None):
+  sublattice=True,r=1,g=None,dz=1.5):
   """Return the geometry for twisted bilayer graphene"""
   if g is None: g = geometry.honeycomb_lattice()
   g.has_sublattice = False
@@ -25,12 +25,12 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
            reducef=lambda x: 3*np.sqrt(x))
   g1 = g.copy()
   g1.shift([1.,0.,0.]) 
-  g.z -= 1.5
+  g.z -= dz
   g.xyz2r() # update
   if rotate: # rotate one of the layers
     g1 = g1.rotate(theta*180/np.pi)
     g1s = g1.supercell(2) # supercell
-    g1s.z += 1.5
+    g1s.z += dz
     g1s.x += shift[0] # shift upper layer
     g1s.y += shift[1] # shift upper layer
     g1s.xyz2r() # update

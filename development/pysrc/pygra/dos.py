@@ -175,7 +175,7 @@ def dos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,info=False,ewindow=None):
 
 
 def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
-         is_sparse=False,numw=10,window=None):
+         is_sparse=False,numw=10,window=None,energies=None):
   """Calculate density of states using the ks given on input"""
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
   tr = timing.Testimator("DOS",maxite=len(ks))
@@ -197,14 +197,18 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
   if delta is None: delta = 5./nk # automatic delta
-  if window is None:
-    xs = np.linspace(np.min(es)-.5,np.max(es)+.5,ndos) # create x
+  if energies is not None: # energies given on input
+    xs = energies
   else:
-    xs = np.linspace(-window,window,ndos) # create x
+    if window is None:
+      xs = np.linspace(np.min(es)-.5,np.max(es)+.5,ndos) # create x
+    else:
+      xs = np.linspace(-window,window,ndos) # create x
   ys = calculate_dos(es,xs,delta) # use the Fortran routine
   ys /= nk # normalize 
   write_dos(xs,ys) # write in file
   print("\nDOS finished")
+  return (xs,ys) # return result
 
 
 
@@ -230,7 +234,7 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     hkgen = h.get_hk_gen() # get generator
     if delta is None: delta = 6./nk
 # conventiona algorithm
-    calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
+    return calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
                           is_sparse=h.is_sparse,numw=numw,window=window) 
   else: # use the kpm
     npol = ndos//10
@@ -258,13 +262,14 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
 
 
 
-def dos3d(h,scale=10.,nk=20,delta=None,ndos=100,random=False):
+def dos3d(h,scale=10.,nk=20,delta=None,ndos=100,
+        random=False,energies=None):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=3: raise # only for 2d
   ks = [np.random.random(3) for i in range(nk)] # number of kpoints
   hkgen = h.get_hk_gen() # get generator
   if delta is None: delta = 10./ndos # smoothing
-  calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta) # conventional algorithm
+  return calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,energies=energies) 
 
 
 
@@ -395,7 +400,8 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100):
 
 
 def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
-            use_kpm=False,scale=10.,ntries=10,mode="ED"):
+            use_kpm=False,scale=10.,ntries=10,mode="ED",
+            random=True):
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
@@ -409,7 +415,9 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
         return dos1d(h,ndos=len(energies),delta=delta,nk=nk)
       elif h.dimensionality==2:
         return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
-            ndos=len(energies),random=True,window=np.max(np.abs(energies)))
+            ndos=len(energies),random=random,window=np.max(np.abs(energies)))
+      elif h.dimensionality==3:
+        return dos3d(h,nk=nk,delta=delta,energies=energies)
       else: raise
     elif mode=="Green": # Green function formalism
       if h.dimensionality==0:
@@ -426,6 +434,21 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
           out.append(-g.trace()[0,0].imag) # store dos
         np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
         return energies,np.array(out) # return
+    else: raise
+
+
+def autodos(h,auto=True,**kwargs):
+    """Automatic computation of DOS"""
+    if auto: # automatic integration
+        def f(): return dos(h,**kwargs)[1] # return dos
+        x = dos(h,**kwargs)[0] # energies
+        from .integration import random_integrate
+        y = random_integrate(f)
+        np.savetxt("DOS.OUT",np.matrix([x,y]).T)
+        return (x,y)
+    return dos(h,**kwargs)
+
+
 
 
 def bulkandsurface(h1,energies=np.linspace(-1.,1.,100),operator=None,

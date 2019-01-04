@@ -63,6 +63,21 @@ def adaptive_simpsons_rule(f,a,b,eps,only_imag=False):
 
 
 
+def random_integrate(f,df=1e-4):
+    """Iterate a function until its result shows small enough fluctuations"""
+    y0 = f() # compute once
+    yt = y0 + 0. # initialize the total result
+    yold = y0 + 0. # initialize the old result
+    it = 0 # initialize
+    while True: # infinite loop
+      it += 1 # number of iterations
+      y0 = f() # execute the function
+      yt += y0 # add contribution
+      diff = yold/it - yt/(it+1.) # difference between current and previous
+      if np.mean(np.abs(diff))<np.mean(np.max(yt/(it+1.)))*df:
+          break
+      yold = yt + 0. # update
+    return yt/(it+1.) # return result
 
 
 

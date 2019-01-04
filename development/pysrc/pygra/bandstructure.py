@@ -12,7 +12,7 @@ from . import topology
 from . import operators
 
 from .limits import densedimension as maxdim
-arpack_tol = 1e-6
+arpack_tol = 1e-8
 arpack_maxiter = 10000
 
 

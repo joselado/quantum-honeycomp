@@ -5,6 +5,7 @@ from scipy.sparse import bmat
 from scipy.sparse import csc_matrix as csc
 from . import sculpt
 from .supercell import non_orthogonal_supercell
+from . import checkclass
 
 try:
   from . import supercellf90
@@ -25,9 +26,9 @@ class geometry:
     self.z = [] # positions in z
     self.r = [] # full positions 
     self.celldis = 1.0 # distance to the nearest cell (for 1d)
-    self.a1 = np.array([1.0,0.0,0.])  # first vector to the nearest cell
-    self.a2 = np.array([0.0,1.0,0.])  # first vector to the nearest cell
-    self.a3 = np.array([0.0,0.0,1.])  # first vector to the nearest cell
+    self.a1 = np.array([100.0,0.0,0.])  # first vector to the nearest cell
+    self.a2 = np.array([0.0,100.0,0.])  # first vector to the nearest cell
+    self.a3 = np.array([0.0,0.0,100.])  # first vector to the nearest cell
     self.b1 = np.array([1.0,0.0,0.])  # first vector to the nearest cell
     self.b2 = np.array([0.0,1.0,0.])  # first vector to the nearest cell
     self.b3 = np.array([0.0,0.0,1.])  # first vector to the nearest cell
@@ -58,7 +59,8 @@ class geometry:
       return non_orthogonal_supercell(self,nsuper)
 #    except: pass # continue with normal way
     if self.dimensionality==1:
-      s = supercell1d(self,nsuper)
+      if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
+      s = supercell3d(self,n1=nsuper)
     elif self.dimensionality==2:
       try: # two number given
         nsuper1 = nsuper[0]
@@ -190,6 +192,9 @@ class geometry:
   def neighbor_directions(self):
     """Return directions linking to neighbors"""
     return neighbor_directions(self,self.ncells)
+  def write_profile(self,d,**kwargs):
+      """Write a profile in a file"""
+      write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -541,7 +546,7 @@ def supercell1d(g,nsuper):
   celldis = g.a1[0]
   if np.abs(g.a1.dot(g.a1) - g.a1[0]**2)>0.001:
     print("Something weird in supercell 1d")
-    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.sqrt([1.,0.,0.]))) 
+    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.sqrt([1.,0.,0.])),nsuper) 
   # position of the supercell
   yout = []
   xout = []
@@ -727,7 +732,7 @@ def cubic_lattice():
     for j in range(2):
       for k in range(2):
         ss.append((-1)**(i+j+k)) # sublattice
-        rs.append(i*g.a1 + j*g.a2 + k*g.a3) # position
+        rs.append(i*a1 + j*a2 + k*a3) # position
   g.a1 = a1*2      
   g.a2 = a2*2      
   g.a3 = a3*2      
@@ -1440,13 +1445,16 @@ def neighbor_cells(num,dim=3):
 
 
 
-def write_profile(g,d,name="PROFILE.OUT",nrep=1):
+def write_profile(g,d,name="PROFILE.OUT",nrep=1,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep =1
   x,y = g.x,g.y # get the coordinates
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
-  m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
+  if normal_order:
+      m = np.matrix([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
+  else:
+      m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
   np.savetxt(name,m) # save in file
 
 
@@ -1476,3 +1484,33 @@ def same_site(r1,r2):
 
 
 
+def hyperhoneycomb_lattice():
+  """Return a hyperhoneycomb lattice"""
+  g = geometry() # create geometry
+  g.a1 = np.array([np.sqrt(3.),0.,0.]) # lattice vector
+  g.a2 = np.array([0.,np.sqrt(3.),0.]) # lattice vector
+  g.a3 = np.array([-np.sqrt(3.)/2.,np.sqrt(3.)/2.,3.]) # lattice vector
+  rs = [] # vectors in the unit cell
+  rs.append(np.array([0.,0.,-0.5])+g.a1/2.) # site
+  rs.append(np.array([0.,0.,0.])) # site
+  rs.append(np.array([0.,0.,1.])) # site
+  rs.append(np.array([0.,0.,1.5])+g.a2/2.) # site
+  g.dimensionality = 3 # three dimensional system
+  g.has_sublattice = True
+  g.sublattice = np.array([1,-1,1,-1])
+  g.r = np.array(rs) # store
+  g.r2xyz() # create r coordinates
+  g.get_fractional()
+  return g
+
+
+
+
+def pyrochlore_lattice():
+  """Return a pyrochlore lattice"""
+  rs = [np.array([0.,0.,0.])]
+  rs += [np.array([-.25,.25,0.])]
+  rs += [np.array([0.,.25,.25])]
+  rs += [np.array([-.25,0.,.25])]
+  fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
+  rs = [np.array(r)/fac for r in rs] # positions

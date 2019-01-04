@@ -401,6 +401,7 @@ class Ui_MainWindow(object):
         self.lattice.addItem("")
         self.lattice.addItem("")
         self.lattice.addItem("")
+        self.lattice.addItem("")
         self.gridLayout_4.addWidget(self.lattice, 0, 1, 1, 1)
         self.thickness = QtWidgets.QLineEdit(self.tab_2)
         self.thickness.setObjectName("thickness")
@@ -446,7 +447,7 @@ class Ui_MainWindow(object):
         self.tabWidget_3.setCurrentIndex(0)
         self.bands_color.setCurrentIndex(0)
         self.tabWidget_4.setCurrentIndex(1)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -561,6 +562,7 @@ class Ui_MainWindow(object):
         self.lattice.setItemText(0, _translate("MainWindow", "Diamond"))
         self.lattice.setItemText(1, _translate("MainWindow", "Cubic"))
         self.lattice.setItemText(2, _translate("MainWindow", "Pyrochlore"))
+        self.lattice.setItemText(3, _translate("MainWindow", "Hyperhoneycomb"))
         self.thickness.setText(_translate("MainWindow", "10"))
         self.label_43.setText(_translate("MainWindow", "Thickness"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Geometry"))

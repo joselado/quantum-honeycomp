@@ -25,7 +25,7 @@ def degenerate_points(h,n=0):
 def dirac_points(h,n=0,dk=0.01):
     """Look for Dirac points in a Hamiltonian"""
     k = degenerate_points(h,n=n)
-    from topology import berry_phase
+    from .topology import berry_phase
     kpath = [[np.cos(i), np.sin(i)] for i in np.pi*np.linspace(0.,2.,10)]
     kpath = [k+dk*np.array(ik) for ik in kpath] # loop
     b = berry_phase(h,kpath=kpath)/np.pi # normalize

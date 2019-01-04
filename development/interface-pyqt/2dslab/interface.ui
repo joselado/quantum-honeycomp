@@ -797,7 +797,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -851,6 +851,11 @@
             <item>
              <property name="text">
               <string>Pyrochlore</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hyperhoneycomb</string>
              </property>
             </item>
            </widget>

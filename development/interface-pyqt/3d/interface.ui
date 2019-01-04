@@ -662,6 +662,11 @@
               <string>Pyrochlore</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Hyperhoneycomb</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
@@ -688,7 +693,7 @@
      <x>0</x>
      <y>0</y>
      <width>950</width>
-     <height>28</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

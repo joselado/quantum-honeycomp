@@ -433,7 +433,7 @@ def ylm2xyz_l2(has_spin=True):
   """Return the matrix that converts the cartesian into spherical harmonics"""
   m = angular.ylm2xyz_l2() # return change of bassi matrix
   if has_spin:
-    from increase_hilbert import spinful
+    from .increase_hilbert import spinful
     m = spinful(m) # with spin degree of freedom
   return m
 
@@ -443,7 +443,7 @@ def ylm2xyz_l1(has_spin=True):
   """Return the matrix that converts the cartesian into spherical harmonics"""
   m = angular.ylm2xyz_l1() # return change of bassi matrix
   if has_spin:
-    from increase_hilbert import spinful
+    from .increase_hilbert import spinful
     m = spinful(m) # with spin degree of freedom
   return m
 
@@ -577,7 +577,7 @@ def get_atomic_projection(specie,input_file="wannier.win",has_spin=False):
       i = get_index_orbital(specie,iat+1,iorb) - 1 
       proj[i,i] = 1.0 # non vanishing
   if has_spin:
-    from increase_hilbert import spinful
+    from .increase_hilbert import spinful
     return spinful(proj)
   else: return proj
 

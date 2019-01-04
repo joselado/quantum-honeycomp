@@ -13,6 +13,7 @@ from . import magnetism
 from . import checkclass
 from . import extract
 from . import multicell
+from . import spectrum
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -45,9 +46,14 @@ class hamiltonian():
   def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
     return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
                                  sparse=sparse,numw=numw)
+  def get_filling(self,energy=0.5,nk=10):
+    """Get the filling of a Hamiltonian at this energy"""
+    es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
+    es = np.array(es)
+    esf = es[es<energy]
+    return len(esf)/len(es) # return filling
   def set_filling(self,filling=0.5,nk=10,extrae=0.):
     """Set the filling of the Hamiltonian"""
-    from . import spectrum
     es = spectrum.eigenvalues(self,nk=nk)
     from .scftypes import get_fermi_energy
     fill = filling + extrae/self.intra.shape[0] # filling
@@ -225,9 +231,10 @@ class hamiltonian():
           self.txmy = des_spin(self.txmy,component=0)
         else: raise
       self.has_spin = False  # flag for nonspin calculation
-  def shift_fermi(self,fermi):
+  def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
+  def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
     if self.dimensionality == 0:
@@ -471,20 +478,29 @@ class hamiltonian():
     elif name=="mz" and self.has_spin:
       return extract.mz(self.intra)
     else: raise
-  def write_magnetization(self):
-    """Extract the magnetization and write in in a file"""
+  def write_magnetization(self,nrep=3):
+    """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole
       if self.has_spin: # for spinful
         mx = extract.mx(self.intra)
         my = extract.my(self.intra)
         mz = extract.mz(self.intra)
         g = self.geometry
-        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
-        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
-        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
+        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=3)
+        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=3)
+        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=3)
+#        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
+#        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
+#        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
         np.savetxt("MAGNETISM.OUT",np.matrix([g.x,g.y,g.z,mx,my,mz]).T)
         return np.array([mx,my,mz])
-    return np.array([mx,my,mz]).transpose()
+#    return np.array([mx,my,mz]).transpose()
+  def get_ipr(self,**kwargs):
+      """Return the IPR"""
+      from . import ipr
+      if self.dimensionality==0:
+          return ipr.ipr(self.intra,**kwargs) 
+      else: raise # not implemented
 
 
 

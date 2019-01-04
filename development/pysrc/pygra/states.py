@@ -1,8 +1,8 @@
 # library to write in file the different states
 import scipy.linalg as lg
 import numpy as np
-from ldos import spatial_dos as spatial_wave
-from ldos import write_ldos as write_wave
+from .ldos import spatial_dos as spatial_wave
+from .ldos import write_ldos as write_wave
 
 def states0d(h,ewindow=[-.5,.5],signed=False,prefix=""):
   """Write in files the different states"""
@@ -73,7 +73,7 @@ def multi_states(h,ewindow=[-0.5,0.5],signed=False,
   and write them in a folder"""
   import os
   if ks is None:
-    import klist
+    from . import klist
     ks = klist.default(h.geometry) # generate default klist
   os.system("rm -rf MULTISTATES_KPATH") # delete folder
   os.system("mkdir MULTISTATES_KPATH") # create folder

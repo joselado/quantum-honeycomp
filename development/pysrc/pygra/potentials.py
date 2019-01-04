@@ -22,7 +22,7 @@ def cnpot(n=4,k=0.0,v=1.0,angle=0.):
 
 
 
-def aahf1d(n0=0,beta=0.0000001,k=None,b=None,v=1.0):
+def aahf1d(n0=0,beta=0.0000001,k=None,b=None,v=1.0,normalize=False):
   """Return the generalized AAHF potential"""
   tau = (1.+np.sqrt(5))/2.
   if b is None: b = 1/tau # default field

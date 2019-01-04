@@ -59,7 +59,7 @@ def density(h,e=0.0,nk=20,mode="arpack",random=True,num_wf=20,
     hk = csc_matrix(hkgen(k)) # get Hamiltonian
     d = d + restricted_density(hk,n=num_wf,e=e,window=window,
                    mode=mode,window_mode=window_mode) 
-  d /=nk # normalize
+  d /= nk # normalize
   d = spatial_density(h,d) # sum if necessary
   geometry.write_profile(h.geometry,d,name=name,nrep=nrep)
   return d # return density
