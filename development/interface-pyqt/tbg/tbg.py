@@ -21,21 +21,24 @@ window = qtwrap.main() # this is the main interface
 from qh_interface import * # import all the libraries needed
 
 
+from interfacetk import interfacetk
+modify_geometry = lambda x: interfacetk.modify_geometry(x,qtwrap)
 
 
-def get_geometry2d():
+def get_geometry(modify=True):
   """ Create a 2d honeycomb lattice"""
   n = int(get("cell_size")) # size of the unit cell
   g = specialgeometry.twisted_bilayer(n)
 #  g = geometry.honeycomb_lattice()
 #  g = g.supercell(n)
+  if modify: g = modify_geometry(g) # remove atoms if necessary
   return g
 
 
 
 def initialize():
   """ Initialize the calculation"""
-  g = get_geometry2d() # get the geometry
+  g = get_geometry() # get the geometry
   twisted_matrix = specialhopping.twisted_matrix
   has_spin = False
   h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=True,
@@ -165,7 +168,7 @@ def show_berry_1d(self):
 
 
 def show_structure():
-  g = get_geometry2d() # get the geometry
+  g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct")) 
   g = g.supercell(nsuper) # build a supercell
   g.write()
@@ -182,7 +185,7 @@ def pickup_hamiltonian():
 
 
 def read_hamiltonian():
-  g = get_geometry2d() # get the geometry
+  g = get_geometry() # get the geometry
   h = g.get_hamiltonian() # get the hamiltonian
   h.read("hamiltonian.in") # read hamiltonian
   h.has_eh = builder.get_object("has_eh").get_active()
@@ -269,7 +272,7 @@ def show_2dband(self):
 
 def show_structure_3d(self):
   """Show the lattice of the system"""
-  g = get_geometry2d() # get the geometry
+  g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))
   g = g.supercell(nsuper)
   g.write()
@@ -295,7 +298,10 @@ def show_interactive_ldos():
   execute_script("qh-multildos ")
 
 
-
+def select_atoms_removal(self):
+  g = get_geometry(modify=False) # get the unmodified geometry
+  g.write() # write geometry
+  execute_script("qh-remove-atoms-geometry-3d") # remove the file
 
 
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
@@ -317,6 +323,7 @@ signals["show_structure_3d"] = show_structure_3d
 signals["show_dosbands"] = show_dosbands  # show magnetism
 signals["show_fermi_surface"] = show_fermi_surface  # show magnetism
 signals["show_interactive_ldos"] = show_interactive_ldos  # show magnetism
+signals["select_atoms_removal"] = select_atoms_removal
 #signals["show_2dband"] = show_2dband  # show magnetism
 #signals["show_kdos"] = show_kdos  # show kdos
 #signals["save_results"] = save_results  # save the results

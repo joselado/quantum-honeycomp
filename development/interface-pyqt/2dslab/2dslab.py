@@ -28,21 +28,21 @@ def select_atoms_removal(self):
   execute_script("qh-remove-atoms-geometry-3d") # remove the file
 
 
-def modify_geometry(g):
-  """Modify the geometry according to the interface"""
-  if qtwrap.is_checked("remove_selected"): # remove some atoms
-      try:
-        inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
-        if inds.shape==(): inds = [inds]
-      except: inds = [] # Nothing
-      print(inds)
-      g = sculpt.remove(g,inds) # remove those atoms
-  if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
-      g = sculpt.remove_unibonded(g,iterative=True)
-#  g.save()
-  return g # return geometry
+#def modify_geometry(g):
+#  """Modify the geometry according to the interface"""
+#  if qtwrap.is_checked("remove_selected"): # remove some atoms
+#      try:
+#        inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
+#        if inds.shape==(): inds = [inds]
+#      except: inds = [] # Nothing
+#      print(inds)
+#      g = sculpt.remove(g,inds) # remove those atoms
+#  if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
+#      g = sculpt.remove_unibonded(g,iterative=True)
+#  return g # return geometry
 
-
+from interfacetk import interfacetk
+modify_geometry = lambda x: interfacetk.modify_geometry(x,qtwrap)
 
 
 def get_geometry(modify=True):
