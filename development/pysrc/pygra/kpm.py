@@ -6,6 +6,7 @@ import numpy.random as rand
 from scipy.sparse import coo_matrix,csc_matrix,bmat
 import numpy as np
 from scipy.signal import hilbert
+from . import algebra
 
 # check that the fortran library exists
 try: 
@@ -138,7 +139,7 @@ def get_moments_vivj(m0,vi,vj,n=100,use_fortran=False):
 def get_moments_vivj_python(m0,vi,vj,n=100):
   """ Get the first n moments of a the |i><j| operator
   using the Chebychev recursion relations"""
-  m = coo_matrix(m0,dtype=np.complex)
+  m = csc_matrix(m0,dtype=np.complex)
   mus = np.zeros(n,dtype=np.complex) # empty arrray for the moments
   v = vi.copy()
   am = v.copy()

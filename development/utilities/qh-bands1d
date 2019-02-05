@@ -20,14 +20,6 @@ from os import system as sh
 def plot_bands():
   """ Plots the bandstructure from BANDS.OUT"""
     
-  def onpick3(event):
-      ind = event.ind
-      kwave = np.take(k, ind)[0]
-      ewave = np.take(e, ind)[0]
-      print(kwave,ewave)
-      sh("tb90-wave "+str(kwave)+" "+str(ewave)+"&")
-      print('onpick3 scatter:', ind, np.take(k, ind), np.take(e, ind))
-              
   fig = plt.figure()
   fig.subplots_adjust(0.2,0.2)
   
@@ -57,12 +49,6 @@ def plot_bands():
     for i in range(len(m[1])):
       if m[1][i]<0.0: tc += m[2][i]
     print("Total color below Ef", tc)
-  
-  # plot in black
-  if "-bw" in sys.argv:
-    draw_color = False
-  
-  
   
   
   k = m[0] # default x axis

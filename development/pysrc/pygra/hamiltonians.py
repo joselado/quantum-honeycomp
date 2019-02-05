@@ -14,6 +14,7 @@ from . import checkclass
 from . import extract
 from . import multicell
 from . import spectrum
+from . import kekule
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -247,16 +248,51 @@ class hamiltonian():
       from .multicell import first_neighbors as fnm
       fnm(self)
     else: raise
+  def add_hopping_matrix(self,fm):
+      """
+      Add a certain hopping matrix to the Hamiltonian
+      """
+      if not self.is_multicell: raise # this may not work for multicell
+      h = self.geometry.get_hamiltonian(has_spin=self.has_spin,
+              is_multicell=self.is_multicell,
+              mgenerator=fm) # generate a new Hamiltonian
+      self.add_hamiltonian(h) # add this contribution
+  def add_hamiltonian(self,h):
+      """
+      Add the hoppings of another Hamiltonian
+      """
+      if not self.is_multicell: raise # not implemented
+      hd = h.get_dict() # get the dictionary
+      self.intra = self.intra + hd[(0,0,0)] # add the matrix
+      for i in range(len(self.hopping)):
+          d = tuple(self.hopping[i].dir)
+          if d in hd:
+            self.hopping[i].m = self.hopping[i].m + hd[d]
+  def get_dict(self):
+      """
+      Return the dictionary that yields the hoppings
+      """
+      if not self.is_multicell: raise # not implemented
+      hop = dict()
+      hop[(0,0,0)] = self.intra
+      for t in self.hopping: hop[tuple(t.dir)] = t.m
+      return hop # return dictionary
   def copy(self):
-    """ Returns a copy of the hamiltonian"""
+    """
+    Return a copy of the hamiltonian
+    """
     from copy import deepcopy
     return deepcopy(self)
   def check(self):
-    """Checks if the Hamiltonian is hermitic"""
+    """
+    Check if the Hamiltonian is OK
+    """
     from . import check
     check.check_hamiltonian(self) # check the Hamiltonian
   def turn_sparse(self):
-    """ Transforms the hamiltonian into a sparse hamiltonian"""
+    """
+    Transforms the hamiltonian into a sparse hamiltonian
+    """
     from scipy.sparse import csc_matrix
 #    if self.is_sparse: return # if it is sparse return
     self.is_sparse = True # sparse flag to true
@@ -335,15 +371,39 @@ class hamiltonian():
   def add_haldane(self,t):
     """ Adds a Haldane term"""  
     kanemele.add_haldane(self,t) # return Haldane SOC
+  def add_kekule(self,t):
+      """
+      Add Kekule coupling
+      """
+      if self.dimensionality==0: # zero dimensional
+        m = kekule.kekule_matrix(self.geometry.r,t=t)
+        self.intra = self.intra + self.spinless2full(m)
+      else: # workaround for higher dimensionality
+        r = self.geometry.multireplicas(2) # get many replicas
+        fm = kekule.kekule_function(r,t=t)
+        self.add_hopping_matrix(fm) # add the Kekule hopping
+  def add_chiral_kekule(self,**kwargs):
+      """
+      Add a chiral kekule hopping
+      """
+      fun = kekule.chiral_kekule(self.geometry,**kwargs)
+      self.add_kekule(fun)
+
   def add_modified_haldane(self,t):
-    """ Adds a Haldane term"""  
+    """
+    Adds a Haldane term
+    """  
     kanemele.add_modified_haldane(self,t) # return Haldane SOC
   def add_anti_kane_mele(self,t):
-    """ Adds a Haldane term"""  
+    """
+    Adds an anti Kane-Mele term
+    """  
     kanemele.add_anti_kane_mele(self,t) # return anti kane mele SOC
   def add_antihaldane(self,t): self.add_modified_haldane(t) # second name
   def add_peierls(self,mag_field,new=False):
-    """Add magnetic field"""
+    """
+    Add magnetic field
+    """
     from .peierls import add_peierls
     add_peierls(self,mag_field=mag_field,new=new)
   def align_magnetism(self,vectors):
@@ -465,6 +525,7 @@ class hamiltonian():
       ht = self.copy()
       ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
       return operators.get_valley(ht)
+    elif name=="ipr": return operators.ipr 
     else: raise
   def extract(self,name="mz"): 
     """Extract somethign from the Hamiltonian"""
@@ -478,7 +539,7 @@ class hamiltonian():
     elif name=="mz" and self.has_spin:
       return extract.mz(self.intra)
     else: raise
-  def write_magnetization(self,nrep=3):
+  def write_magnetization(self,nrep=5):
     """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole
       if self.has_spin: # for spinful
@@ -486,13 +547,13 @@ class hamiltonian():
         my = extract.my(self.intra)
         mz = extract.mz(self.intra)
         g = self.geometry
-        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=3)
-        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=3)
-        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=3)
+        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
+        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
+        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
 #        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
 #        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
 #        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
-        np.savetxt("MAGNETISM.OUT",np.matrix([g.x,g.y,g.z,mx,my,mz]).T)
+        np.savetxt("MAGNETISM.OUT",np.array([g.x,g.y,g.z,mx,my,mz]).T)
         return np.array([mx,my,mz])
 #    return np.array([mx,my,mz]).transpose()
   def get_ipr(self,**kwargs):
@@ -1081,5 +1142,10 @@ def print_hopping(h):
     for t in h.hopping:
         print("Hopping",t.dir)
         pprint(t.m)
+
+
+
+
+
 
 

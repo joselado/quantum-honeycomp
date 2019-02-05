@@ -215,7 +215,7 @@ def write_surface_kpm(h,ne=400,klist=None,scale=4.,npol=200,w=20,ntries=20):
 
 
 def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
-                    delta=None,kpath=None,dh1=None,dh2=None):
+                    delta=None,kpath=None,dh1=None,dh2=None,nk=50):
   """Get the surface DOS of an interface"""
   from scipy.sparse import csc_matrix,bmat
   if delta is None:
@@ -224,9 +224,9 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
     if h1.dimensionality==3:
       g2d = h1.geometry.copy() # copy Hamiltonian
       g2d = sculpt.set_xy_plane(g2d)
-      kpath = klist.default(g2d,nk=100)
+      kpath = klist.default(g2d,nk=nk)
     elif h1.dimensionality==2:
-      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,40)]
+      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,nk)]
     else: raise
   fo = open("KDOS_INTERFACE.OUT","w")
   fo.write("# k, E, Bulk1, Surf1, Bulk2, Surf2, interface\n")

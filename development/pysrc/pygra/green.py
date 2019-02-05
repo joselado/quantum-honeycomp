@@ -81,7 +81,7 @@ def dyson(intra,inter,energy=0.0,gf=None,is_sparse=False,initial = None):
     iden = np.matrix(np.identity(len(intra),dtype=complex)) # create identity
     e = iden*(energy+1j*eps) # complex energy
     while True: # loop over iterations
-      self = inter*g_old*inter.H # selfenergy
+      self = inter@g_old@inter.H # selfenergy
       g = (e - intra - self).I # dyson equation
       if np.max(np.abs(g-g_old))<gf.max_error: break
       g_old = mixing*g + (1.-mixing)*g_old # new green function
@@ -114,8 +114,8 @@ def dos_infinite(intra,inter,energies=[0.0],num_rep=100,
      gl = dyson(intra,inter.H,energy=energy,num_rep=num_rep,mixing=mixing,
           eps=eps,green_guess=green_guess,max_error=max_error)
      # central green function
-     selfl = inter.H*gl*inter # left selfenergy
-     selfr = inter*gr*inter.H # right selfenergy
+     selfl = inter.H@gl@inter # left selfenergy
+     selfr = inter@gr@inter.H # right selfenergy
      gc = energy*iden -intra -selfl -selfr # dyson equation for the center
      gc = gc.I # calculate inverse
      dos.append(-gc.trace()[0,0].imag)  # calculate the trace of the Green function
@@ -162,8 +162,8 @@ def dos_heterostructure(hetero,energies=[0.0],num_rep=100,
      gl = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
           eps=eps,green_guess=green_guess,max_error=max_error)
      # central green function
-     selfl = inter.H*gl*inter # left selfenergy
-     selfr = inter*gr*inter.H # right selfenergy
+     selfl = inter.H@gl@inter # left selfenergy
+     selfr = inter@gr@inter.H # right selfenergy
      gc = energy*iden -intra -selfl -selfr # dyson equation for the center
      gc = gc.I # calculate inverse
      dos.append(-gc.trace()[0,0].imag)  # calculate the trace of the Green function
@@ -328,10 +328,10 @@ def green_renormalization(intra,inter,energy=0.0,nite=None,
     epsilon_s = intra.copy()
     while True: # implementation of Eq 11
       einv = (e - epsilon).I # inverse
-      epsilon_s = epsilon_s + alpha * einv * beta
-      epsilon = epsilon + alpha * einv * beta + beta * einv * alpha
-      alpha = alpha * einv * alpha  # new alpha
-      beta = beta * einv * beta  # new beta
+      epsilon_s = epsilon_s + alpha @ einv @ beta
+      epsilon = epsilon + alpha * einv @ beta + beta @ einv @ alpha
+      alpha = alpha @ einv @ alpha  # new alpha
+      beta = beta @ einv @ beta  # new beta
       ite += 1
       # stop conditions
       if not nite is None:
@@ -443,7 +443,7 @@ def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,
                             error=error,info=False,delta=delta)
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
-      sigma = hop*sf*hop.H # selfenergy
+      sigma = hop@sf@hop.H # selfenergy
       if callable(hs): ons2 = hs(k)
       else: ons2 = hs
       sf = (ez - ons2 - sigma).I # return Dyson
@@ -469,7 +469,7 @@ def green_kchain_evaluator(h,k=0.,delta=0.01,only_bulk=True,
 #    print(hs)
     if hs is not None: # surface matrix provided
       ez = (energy+1j*delta)*np.identity(h.intra.shape[0]) # energy
-      sigma = hop*sf*hop.H # selfenergy
+      sigma = hop@sf@hop.H # selfenergy
       if callable(hs): ons2 = ons + hs(k)
       else: ons2 = ons + hs
       sf = (ez - ons2 - sigma).I # return Dyson
@@ -510,8 +510,8 @@ def interface(h1,h2,k=[0.0,0.,0.],energy=0.0,delta=0.01):
   (ons2,hop2) = get1dhamiltonian(h2,k,reverse=False) # get 1D Hamiltonian
   havg = (hop1.H + hop2)/2. # average hopping
   ons = bmat([[csc(ons1),csc(havg)],[csc(havg.H),csc(ons2)]]) # onsite
-  self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2*sf2*hop2.H)]])
-  self1 = bmat([[csc(hop1*sf1*hop1.H),None],[None,csc(ons2)*0.0]])
+  self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2@sf2@hop2.H)]])
+  self1 = bmat([[csc(hop1@sf1@hop1.H),None],[None,csc(ons2)*0.0]])
   # Dyson equation
   ez = (energy+1j*delta)*np.identity(ons1.shape[0]+ons2.shape[0]) # energy
   ginter = (ez - ons - self1 - self2).I # Green function
@@ -542,8 +542,8 @@ def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01,
     if dh1 is not None: ons1 = ons1 + dh1
     if dh2 is not None: ons2 = ons2 + dh2
     ons = bmat([[csc(ons1),csc(havg)],[csc(havg.H),csc(ons2)]]) # onsite
-    self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2*sf2*hop2.H)]])
-    self1 = bmat([[csc(hop1*sf1*hop1.H),None],[None,csc(ons2)*0.0]])
+    self2 = bmat([[csc(ons1)*0.0,None],[None,csc(hop2@sf2@hop2.H)]])
+    self1 = bmat([[csc(hop1@sf1@hop1.H),None],[None,csc(ons2)*0.0]])
     # Dyson equation
     ez = (energy+1j*delta)*np.identity(ons1.shape[0]+ons2.shape[0]) # energy
     ginter = (ez - ons - self1 - self2).I # Green function
@@ -668,7 +668,7 @@ def green_generator(h,nk=20):
       C = np.matrix(np.diag(1./v)) # matrix
       A = np.matrix(wfs[ii,:,:]) # get the matrix with wavefunctions
 #      store[ii,:,:] = A.H*C*A # store contribution
-      zero += A.H*C*A # add contribution
+      zero += A.H@C@A # add contribution
 #    for i in range(shape[0]): # loop 
 #      for j in range(shape[0]): # loop 
 #        m = store[:,i,j].reshape((nk,nk)) # transform into a grid

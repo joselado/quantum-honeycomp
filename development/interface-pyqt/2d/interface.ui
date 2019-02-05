@@ -1118,6 +1118,11 @@
             </item>
             <item>
              <property name="text">
+              <string>Triangular tripartite</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Kagome</string>
              </property>
             </item>

@@ -11,7 +11,8 @@ from ..scftypes import directional_mean_field
 
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
                   maxerror=1e-05,silent=False,mf=None,
-                  smearing=None,collinear=False,fermi_shift=0.0):
+                  smearing=None,collinear=False,fermi_shift=0.0,
+                  maxite=1000):
   """ Solve a selfconsistent Hubbard mean field"""
   mix = 1. - mix
   U = g # redefine
@@ -71,6 +72,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     old_mf = old_mf*mix + mf*(1.-mix) # mixing
     if error<maxerror or os.path.exists("STOP"): # if converged break
       break
+    if ite>=maxite: break # if too many iterations
   file_etot.close() # close file
   file_error.close() # close file
   # output result
@@ -79,7 +81,7 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   scf.hamiltonian = htmp.copy() # copy Hamiltonian
   scf.hamiltonian.intra -= fermi*np.identity(ndim) # shift Fermi energy
   scf.total_energy = etot # store total energy
-  scf.mean_field = mf # store mean field matrix
+  scf.mf = mf # store mean field matrix
   scf.magnetization = mag
   scf.hamiltonian.write_magnetization() # write magnetization into a file
   return scf # return mean field
@@ -224,14 +226,15 @@ def hubbardscf_spinless(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     old_mf = old_mf*mix + mf*(1.-mix) # mixing
     if error<maxerror or os.path.exists("STOP"): # if converged break
       break
+    if ite>maxite: break # if too many iterations
   file_etot.close() # close file
   file_error.close() # close file
   # output result
-  class scftmp(): pass # create an empty class
+  class scfclass(): pass # create an empty class
   scf = scftmp() # empty class
   scf.hamiltonian = htmp.copy() # copy Hamiltonian
   scf.hamiltonian.intra -= fermi*np.identity(ndim) # shift Fermi energy
   scf.total_energy = etot # store total energy
-  scf.mean_field = mf # store mean field matrix
+  scf.mf = mf # store mean field matrix
   scf.magnetization = mag
   scf.hamiltonian.write_magnetization() # write magnetization into a file

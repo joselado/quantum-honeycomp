@@ -14,7 +14,7 @@ except:
   use_fortran = False
   print("FORTRAN routines not present in geometry.py")
 
-class geometry:
+class Geometry:
   """ Class for a geometry in a system """
   def __init__(self):
     self.has_sublattice = False # has sublattice index
@@ -189,17 +189,25 @@ class geometry:
       f.write("\n")
       ir += 1
     f.close() # close file
-  def neighbor_directions(self):
+  def neighbor_directions(self,n=None):
     """Return directions linking to neighbors"""
-    return neighbor_directions(self,self.ncells)
+    if n is None: n = self.ncells
+    return neighbor_directions(self,n)
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
       write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
+  def multireplicas(self,n):
+      """
+      Return several replicas of the unit cell
+      """
+      return multireplicas(self,n)
   def bloch_phase(self,d,k):
-    """Return the Bloch phase for this d vector"""
+    """
+    Return the Bloch phase for this d vector
+    """
     if self.dimensionality == 0: return 1.0
     elif self.dimensionality == 1: 
       try: kp = k[0] # extract the first component
@@ -216,31 +224,51 @@ class geometry:
       kt = np.array(k)[0:3]
       return np.exp(1j*dt.dot(kt)*np.pi*2.) 
   def remove(self,i=0):
-    """Remove one site"""
+    """
+    Remove one site
+    """
     return sculpt.remove(self,[i])
   def center_in_atom(self):
-    """Center the geometry in an atom"""
+    """
+    Center the geometry in an atom
+    """
     n0 = sculpt.get_central(self)[0] # get the index
     sculpt.shift(self,r=self.r[n0]) # shift the geometry
+  def get_central(self,n=1):
+      """
+      Return a list of central atoms
+      """
+      return sculpt.get_central(self,n=n) # get the index
   def update_reciprocal(self):
-    """Update reciprocal lattice vectors"""
+    """
+    Update reciprocal lattice vectors
+    """
     self.b1,self.b2,self.b3 = get_reciprocal(self.a1,self.a2,self.a3)
-  def get_k2K_generator(self):
-    """Function to turn a reciprocal lattice vector to natural units"""
+  def get_k2K_generator(self,toreal=False):
+    """
+    Function to turn a reciprocal lattice vector to natural units
+    """
     R = self.get_k2K() # get matrix
-    def fun(k):
-      if len(k)!=3: raise
+    if toreal: R = R.H # transform to real coordinates
+    def fun(k0):
+      if len(k0)==3: k = k0 # do nothing
+      elif len(k0)==2: k = np.array([k0[0],k0[1],0.]) # convert to three comp
       r = np.matrix(k).T # real space vectors
       out = np.array((R*r).T)[0] # change of basis
+      if len(k0)==2: return np.array([out[0],out[1]]) # return two
       return out
     return fun
   def fractional2real(self):
-    """Convert fractional coordinates to real coordinates"""
+    """
+    Convert fractional coordinates to real coordinates
+    """
     fractional2real(self)
   def real2fractional(self):
     self.get_fractional() # same function
   def get_connections(self):
-    """Return the connections of each site"""
+    """
+    Return the connections of each site
+    """
     from . import neighbor
     if self.dimensionality==0:
       self.connections = neighbor.connections(self.r,self.r)
@@ -249,9 +277,11 @@ class geometry:
 
 
 def add(g1,g2):
-  """ Adds two geometries """
+  """
+  Adds two geometries
+  """
   raise
-  gs = geometry()
+  gs = Geometry()
   gs.x = np.array(g1.x.tolist() + g2.x.tolist())  
   gs.y = np.array(g1.y.tolist() + g2.y.tolist())  
   gs.z = np.array(g1.z.tolist() + g2.z.tolist())  
@@ -265,7 +295,7 @@ def add(g1,g2):
 
 def squid_square(width=4,inner_radius=6,arm_length=8,arm_width=2,fill=False):
   nt = width + inner_radius # half side of the big square
-  g = geometry() # create the geometry of the system
+  g = Geometry() # create the geometry of the system
   xc = [] # empty list
   yc = [] # empty list
   shift_y = float(arm_width-1)/2.0
@@ -328,7 +358,7 @@ def honeycomb_armchair_ribbon(ntetramers=10):
     y[i+3]=fi+s3
   x=x-sum(x)/float(4*n)
   y=y-sum(y)/float(4*n)
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = y  # add to the y atribute
   g.z = y*0.0  # add to the y atribute
@@ -349,7 +379,7 @@ def square_ribbon(natoms):
   x=array([0.0 for i in range(natoms)]) # create x coordinates
   y=array([float(i) for i in range(natoms)])  # create y coordinates
   y=y-sum(y)/float(natoms) # shift to the center
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = y  # add to the y atribute
   g.z = y*0.0  # add to the y atribute
@@ -408,7 +438,7 @@ def square_tetramer_ribbon(ntetramers):
     y[4*i+3] = 2.*i +1.0
   y=y-sum(y)/float(natoms) # shift to the center
   x=x-sum(x)/float(natoms) # shift to the center
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = y  # add to the y atribute
   g.z = y*0.  # add to the z atribute
@@ -439,7 +469,7 @@ def square_zigzag_ribbon(npairs):
     y[2*i] = yp[i]
     y[2*i+1] = yp[i] + s2/2.
   y=y-sum(y)/float(natoms) # shift to the center
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = y  # add to the y atribute
   g.celldis = s2 # add distance to the nearest cell
@@ -469,7 +499,7 @@ def honeycomb_zigzag_ribbon(ntetramers=10):
     y[i+3]=fi-2.0
   x=x-sum(x)/float(4*n)
   y=y-sum(y)/float(4*n)
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = y  # add to the y atribute
   g.z = y*0.0  # add to the z atribute
@@ -501,7 +531,7 @@ def honeycomb_lattice_zigzag_cell():
     y[i+1]=fi-0.5
     y[i+2]=fi-1.5
     y[i+3]=fi-2.0
-  g = geometry() # create geometry class
+  g = Geometry() # create geometry class
   g.x = x  # add to the x atribute
   g.y = -y  # add to the y atribute
   g.z = y*0.0  # add to the z atribute
@@ -538,7 +568,9 @@ def plot_geometry(g):
 
 
 def supercell1d(g,nsuper):
-  """Creates a supercell of the system"""
+  """
+  Creates a supercell of the system
+  """
   # get the old geometry 
   y = g.y
   x = g.x
@@ -580,8 +612,10 @@ def supercell1d(g,nsuper):
 ################################################
 
 def honeycomb_lattice():
-  """ Creates a honeycomb lattice """
-  g = geometry() # create geometry
+  """
+  Create a honeycomb lattice
+  """
+  g = Geometry() # create geometry
   g.x = np.array([-0.5,0.5])
   g.y = np.array([0.0,0.0])
   g.z = np.array([0.0,0.0])
@@ -598,7 +632,9 @@ def honeycomb_lattice():
 
 
 def buckled_honeycomb_lattice(n=1):
-  """Return a buckled honeycomb lattice"""
+  """
+  Return a buckled honeycomb lattice
+  """
   from . import films
   g = diamond_lattice_minimal()
   g = films.geometry_film(g,nz=n)
@@ -607,8 +643,10 @@ def buckled_honeycomb_lattice(n=1):
 
 
 def triangular_lattice():
-  """ Creates a triangular lattice """
-  g = geometry() # create geometry
+  """
+  Creates a triangular lattice
+  """
+  g = Geometry() # create geometry
   g.x = np.array([0.0])
   g.y = np.array([0.0])
   g.z = np.array([0.0])
@@ -624,7 +662,9 @@ def triangular_lattice():
 
 
 def triangular_lattice_tripartite():
-  """ Creates a triangular lattice """
+  """
+  Creates a triangular lattice with three sites per unit cell
+  """
   g0 = triangular_lattice() # generate a triangular lattice
   g = g0.copy() # copy geometry
   g.r = [g.r[0],g.r[0]+g.a1,g.r[0]+g.a2+g.a1] # positions
@@ -671,8 +711,10 @@ def triangular_ribbon(n):
 
 
 def square_lattice():
-  """ Creates a square lattice """
-  g = geometry() # create geometry
+  """
+  Creates a square lattice
+  """
+  g = Geometry() # create geometry
   g.x = np.array([-0.5,0.5,0.5,-0.5])
   g.y = np.array([-0.5,-0.5,0.5,0.5])
   g.z = g.x*0.
@@ -688,8 +730,10 @@ def square_lattice():
 
 
 def single_square_lattice():
-  """ Creates a square lattice """
-  g = geometry() # create geometry
+  """
+  Creates a square lattice
+  """
+  g = Geometry() # create geometry
   g.x = np.array([0.])
   g.y = np.array([0.])
   g.z = g.x*0.
@@ -707,7 +751,10 @@ def single_square_lattice():
 
 
 def cubic_lattice_minimal():
-  g = geometry() # create geometry
+  """
+  Creates a cubic lattice
+  """
+  g = Geometry() # create geometry
   g.r = [np.array([0.,0.,0.])]
   g.x = [0.0]
   g.y = [0.0]
@@ -722,7 +769,10 @@ def cubic_lattice_minimal():
 
 
 def cubic_lattice():
-  g = geometry() # create geometry
+  """
+  Creates a cubic lattice
+  """
+  g = Geometry() # create geometry
   a1 = np.array([1.,0.,0.]) # first lattice vector
   a2 = np.array([0.,1.,0.]) # second lattice vector
   a3 = np.array([0.,0.,1.]) # second lattice vector
@@ -746,15 +796,19 @@ def cubic_lattice():
 
 
 def cubic_lieb_lattice():
-  """Return a 3d Lieb lattice"""
+  """
+  Return a 3d Lieb lattice
+  """
   g = cubic_lattice()
   g = g.remove(0) # remove this atom
   return g
 
 
 def lieb_lattice():
-  """ Create a 2d Lieb lattice"""
-  g = geometry() # create geometry
+  """
+  Create a 2d Lieb lattice
+  """
+  g = Geometry() # create geometry
   g.x = np.array([-0.5,0.5,0.5])
   g.y = np.array([-0.5,-0.5,0.5])
   g.z = g.x*0.
@@ -770,8 +824,10 @@ def lieb_lattice():
 
 
 def kagome_lattice():
-  """ Creates a honeycomb lattice """
-  g = geometry() # create geometry
+  """
+  Creates a honeycomb lattice
+  """
+  g = Geometry() # create geometry
   dx = 1./2.
   dy = np.sqrt(3)/2.
   g.x = np.array([-dx,dx,0.])
@@ -789,7 +845,9 @@ def kagome_lattice():
 
 
 def rectangular_kagome_lattice():
-  """ Creates a square kagome lattice"""
+  """
+  Creates a square kagome lattice
+  """
   g = kagome_lattice()
   g = g.supercell(2) # create a supercell
   go = g.copy()
@@ -803,7 +861,9 @@ def rectangular_kagome_lattice():
 
 
 def honeycomb_lattice_square_cell():
-  """ Creates a honeycomb lattice """
+  """
+  Creates a honeycomb lattice
+  """
   g = honeycomb_lattice() # create geometry
   go = deepcopy(g)
   go.a1 =  g.a1 + g.a2
@@ -819,7 +879,9 @@ def honeycomb_lattice_square_cell():
   return go
 
 def honeycomb_lattice_square_cell_v2():
-  """ Creates a honeycomb lattice """
+  """
+  Creates a honeycomb lattice
+  """
   g = honeycomb_lattice() # create geometry
   go = deepcopy(g)
   go.a1 =  g.a1
@@ -834,8 +896,10 @@ def honeycomb_lattice_square_cell_v2():
 
 
 def honeycomb_lattice_C6():
-  """Geometry for a honeycomb lattice, taking a unit cell
-  with C6 rotational symmetry"""
+  """
+  Geometry for a honeycomb lattice, taking a unit cell
+  with C6 rotational symmetry
+  """
   g = honeycomb_lattice() # create geometry
   m = [[2,1,0],[1,2,0],[0,0,1]]
   g = non_orthogonal_supercell(g,m)
@@ -942,7 +1006,7 @@ def supercell3d(g,n1=1,n2=1,n3=1):
 def read(input_file="POSITIONS.OUT"):
   """ Reads a geometry """
   m = np.genfromtxt(input_file).transpose()
-  g = geometry() # cretae geometry
+  g = Geometry() # cretae geometry
   g.dimensionality = 0
   g.x = m[0]
   g.y = m[1]
@@ -1083,9 +1147,16 @@ def remove_duplicated(g):
   """ Remove duplicated atoms"""
   if not g.atoms_have_names: raise
   go = g.copy() # copy geometry
+  rs = remove_duplicated_positions(g.r)
+  go.r = np.array(rs)
+  go.r2xyz() # update the other coordinates
+  go.atoms_names = names
+  return go
+
+
+def remove_duplicated_positions(r):
   rs = []
-  names = []
-  for (n,ir) in zip(g.atoms_names,g.r): # loop over atoms
+  for ir in r: # loop over atoms
      store = True # store this atom
      for jr in rs: # loop over stored
        dr = ir-jr
@@ -1093,11 +1164,8 @@ def remove_duplicated(g):
        if dr<0.01: store = False
      if store: # store this atom
        rs.append(ir.copy())
-       names.append(n)
-  go.r = np.array(rs)
-  go.r2xyz() # update the other coordinates
-  go.atoms_names = names
-  return go
+  return rs # return unrepeated atoms
+
 
 
 
@@ -1252,7 +1320,7 @@ def cubic_diamond_lattice():
   rs = fcc + [r + np.array([.25,.25,.25]) for r in fcc] # all the positions
   fac = np.sqrt(3)/4. # distance to FN
   rs = [r/fac for r in rs] # positions
-  g = geometry() # create geometry
+  g = Geometry() # create geometry
   g.a1 = np.array([1.,0.,0.])/fac # lattice vector
   g.a2 = np.array([0.,1.,0.])/fac # lattice vector
   g.a3 = np.array([0.,0.,1.])/fac # lattice vector
@@ -1273,7 +1341,7 @@ def diamond_lattice_minimal():
   rs = fcc + [r + np.array([-.25,.25,.25]) for r in fcc] # all the positions
   fac = np.sqrt(3)/4. # distance to FN
   rs = [r/fac for r in rs] # positions
-  g = geometry() # create geometry
+  g = Geometry() # create geometry
   g.a1 = np.array([-.5,.5,0.])/fac # lattice vector
   g.a2 = np.array([0.,.5,.5])/fac # lattice vector
   g.a3 = np.array([-.5,0.,.5])/fac # lattice vector
@@ -1296,7 +1364,7 @@ def pyrochlore_lattice():
   rs += [np.array([-.25,0.,.25])]
   fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
   rs = [np.array(r)/fac for r in rs] # positions
-  g = geometry() # create geometry
+  g = Geometry() # create geometry
   g.a1 = np.array([-.5,.5,0.])/fac # lattice vector
   g.a2 = np.array([0.,.5,.5])/fac # lattice vector
   g.a3 = np.array([-.5,0.,.5])/fac # lattice vector
@@ -1486,7 +1554,7 @@ def same_site(r1,r2):
 
 def hyperhoneycomb_lattice():
   """Return a hyperhoneycomb lattice"""
-  g = geometry() # create geometry
+  g = Geometry() # create geometry
   g.a1 = np.array([np.sqrt(3.),0.,0.]) # lattice vector
   g.a2 = np.array([0.,np.sqrt(3.),0.]) # lattice vector
   g.a3 = np.array([-np.sqrt(3.)/2.,np.sqrt(3.)/2.,3.]) # lattice vector
@@ -1514,3 +1582,23 @@ def pyrochlore_lattice():
   rs += [np.array([-.25,0.,.25])]
   fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
   rs = [np.array(r)/fac for r in rs] # positions
+
+
+
+
+
+
+
+def multireplicas(self,n):
+    """
+    Return several replicas of the unit cell, it is similar
+    to supercell but without the shift of the center and going to positive
+    and negative positions
+    """
+    out = [] # empty list with positions
+    dl = self.neighbor_directions(n) # list with neighboring cells to take
+    if self.dimensionality==0: return self.r
+    else: # bigger dimensionality
+        for d in dl:  out += self.replicas(d) # add this direction
+    return out
+

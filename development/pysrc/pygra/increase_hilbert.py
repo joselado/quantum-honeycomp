@@ -52,8 +52,8 @@ def get_spinless2full(h,time_reversal=False):
   elif h.has_spin and h.has_eh: # spinful and no eh
     from .superconductivity import build_eh
     def outf(m): 
-        if time_reversal: return m2spin_sparse(m,np.conjugate(m)) # spinful
-        else: return m2spin_sparse(m) # spinful
+        if time_reversal: m2 = m2spin_sparse(m,np.conjugate(m)) # spinful
+        else: m2 = m2spin_sparse(m) # spinful
 #        m2 = m2spin_sparse(m) # spinful
         return build_eh(m2) # add e-h
   elif not h.has_spin and h.has_eh: raise # not implemented

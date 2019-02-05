@@ -560,7 +560,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
     if scf.hamiltonian.has_spin: 
         scf.hamiltonian.write_magnetization() # write the magnetization
     eout = scf.get_total_energy() # total energy
-    print("Total energy",eout)
+    if not silent: print("Total energy",eout)
 #    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
     ite = scf.iteration
     file_etot.write(str(ite)+"    "+str(scf.get_total_energy())+"\n") 

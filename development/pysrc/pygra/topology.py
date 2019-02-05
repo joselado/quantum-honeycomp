@@ -67,9 +67,9 @@ def berry_phase(h,nk=20,kpath=None):
   m = np.matrix(np.identity(len(wf0))) # initialize as the identity matrix
   for ik in range(1,len(ks)): # loop over k-points, except first one
     wf = occupied_states(hkgen,ks[ik])  # get waves
-    m = m*uij(wfold,wf)   # get the uij   and multiply
+    m = m@uij(wfold,wf)   # get the uij   and multiply
     wfold = wf.copy() # this is the new old
-  m = m*uij(wfold,wf0)   # last one
+  m = m@uij(wfold,wf0)   # last one
   d = lg.det(m) # calculate determinant
   phi = np.arctan2(d.imag,d.real)
   open("BERRY_PHASE.OUT","w").write(str(phi/np.pi)+"\n")
@@ -101,7 +101,7 @@ def berry_curvature(h,k,dk=0.01,window=None,max_waves=None):
 #    print("WARNING, skipping this k-point",k)
     return 0.0 # if different number of vectors
   # get the uij  
-  m = uij(wf1,wf2)*uij(wf2,wf3)*uij(wf3,wf4)*uij(wf4,wf1)
+  m = uij(wf1,wf2)@uij(wf2,wf3)@uij(wf3,wf4)@uij(wf4,wf1)
   d = lg.det(m) # calculate determinant
   phi = np.arctan2(d.imag,d.real)/(4.*dk*dk)
   return phi
@@ -143,7 +143,7 @@ def occupied_states(hkgen,k,window=None,max_waves=None):
 
 def uij(wf1,wf2):
   """ Calcultes the matrix product of two sets of input wavefunctions"""
-  out =  np.matrix(np.conjugate(wf1))*(np.matrix(wf2).T)  # faster way
+  out =  np.matrix(np.conjugate(wf1))@(np.matrix(wf2).T)  # faster way
   return out
 
 
@@ -151,7 +151,7 @@ def uij_slow(wf1,wf2):
   m = np.matrix(np.zeros((len(wf1),len(wf2)),dtype=np.complex))
   for i in range(len(wf1)):
     for j in range(len(wf2)):
-      m[i,j] = np.sum(np.conjugate(wf1[i])*wf2[j])
+      m[i,j] = np.conjugate(wf1[i]).dot(wf2[j])
   return m
 
 
@@ -274,7 +274,7 @@ def smooth_gauge(w1,w2):
   with respect to the first one"""
   m = uij(w1,w2) # matrix of wavefunctions
   U, s, V = np.linalg.svd(m, full_matrices=True) # sing val decomp
-  R = (U*V).H # rotation matrix
+  R = (U@V).H # rotation matrix
   wnew = w2.copy()*0. # initialize
   wold = w2.copy() # old waves
   for ii in range(R.shape[0]):
@@ -504,7 +504,7 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,
     g = (gxp + gyp + gxm + gym)/4. # average Green function
     # Now apply the formula
     gI = g.I # inverse
-    omega = ((gxp-gxm)*(gyp-gym) - (gyp-gym)*(gxp-gxm))*gI
+    omega = ((gxp-gxm)@(gyp-gym) - (gyp-gym)@(gxp-gxm))@gI
 #    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
 #    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
     if operator is not None: omega = operator(omega,k=k) 

@@ -55,8 +55,8 @@ def read_dout():
 
 def get_mag():
   """ Get the magnetization """
-  m = np.genfromtxt("MAGNETIZATION.OUT").transpose()
-  return (m[0],np.array([m[1],m[2],m[3]]))
+  return np.genfromtxt("MAGNETISM.OUT").transpose()[3:6]
+  
 
 
 
@@ -69,7 +69,7 @@ def read_color():
 
 def read_positions():
   """Reads the positions of the system"""
-  return np.genfromtxt("POSITIONS.OUT")
+  return np.genfromtxt("MAGNETISM.OUT").transpose()[0:3]
 
 
 def get_lattice(crys):
@@ -118,8 +118,7 @@ get_magnetization = get_mag # use a particular function
 get_positions = read_positions # use a particular function
 
 
-
-xyz = get_positions().transpose()
+xyz = get_positions()
 
 
 
@@ -328,7 +327,7 @@ if crys.dimensionality == 2:
 #plot_magnetization_arrow(xyz,mag)   # plot the magnetization as arrows
 try:
   if not "nomag" in sys.argv:
-    (ind,mag) = get_magnetization() # get the orbital index and magnetizations
+    mag = get_magnetization() # get the orbital index and magnetizations
     plot_magnetization(xyz,mag)   # plot the magnetization as cylinders
     for da in das: # and loop over replicas
       plot_magnetization(xyz,mag,dr=crys.a1*da[0] + crys.a2*da[1]) 

@@ -119,14 +119,6 @@ def show_dos(self):
 
 
 
-def show_magnetism(self):
-  h = pickup_hamiltonian() # get hamiltonian
-  h.get_magnetization(nkp=int(get("nkpoints"))) # get the magnetization
-  execute_script("qh-magnetism 2  ")
-#  execute_script("qh-structure 2  ")
-
-
-
 
 def show_fermi_surface(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
@@ -140,33 +132,6 @@ def show_fermi_surface(silent=False):
       execute_script("qh-fermi-surface FERMI_MAP.OUT") # show the result
 
 
-
-def show_chern(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nkpoints")
-  nk = int(round(np.sqrt(nk)))
-  topology.chern(h,nk=nk) # calculate chern number
-  execute_script("tb90-chern") 
-#  execute_script("qh-plotchern") 
-
-
-
-def show_berry_2d(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nkpoints")
-  nk = int(round(np.sqrt(nk)))
-  topology.berry_map(h,nk=nk) 
-  execute_script("qh-berry2d BERRY_MAP.OUT") 
-
- 
-
-def show_berry_1d(self):
-  h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nkpoints")))  # write klist
-  topology.write_berry(h,ks) 
-  execute_script("tb90-berry1d  label  ")
-
-
 def show_structure():
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct")) 
@@ -177,22 +142,7 @@ def show_structure():
 
 
 def pickup_hamiltonian():
-  if False:
-    return read_hamiltonian()
-  else: # generate from scratch
     return initialize()
-
-
-
-def read_hamiltonian():
-  g = get_geometry() # get the geometry
-  h = g.get_hamiltonian() # get the hamiltonian
-  h.read("hamiltonian.in") # read hamiltonian
-  h.has_eh = builder.get_object("has_eh").get_active()
-  h.has_spin = builder.get_object("has_spin").get_active()
-  return h
-
-
 
 
 
@@ -315,7 +265,6 @@ signals["show_dos"] = show_dos  # show DOS
 #signals["show_berry_1d"] = show_berry_1d  # show Berry curvature
 #signals["show_berry_2d"] = show_berry_2d  # show Berry curvature
 signals["show_ldos_single"] = show_ldos  # show Berry curvature
-#signals["show_fermi_surface"] = show_fermi_surface  # show Berry curvature
 #signals["show_z2_invariant"] = show_z2_invariant  # show Berry curvature
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["show_structure"] = show_structure  # show magnetism

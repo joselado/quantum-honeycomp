@@ -3,6 +3,12 @@
 import numpy as np
 import numpy 
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--nx",default=50)
+parser.add_argument("--ny",default=50)
+#        description="Frames per second in the video")
+args = parser.parse_args() # get the arguments
 
 
 
@@ -20,13 +26,8 @@ def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
     xs = [c[0] for c in centers] # get x coordinates
     ys = [c[1] for c in centers] # get y coordinates
     dxy = (max(xs) - min(xs))/200
-    try: 
-      n = int(float(sys.argv[2]))
-    except:
-      n = 80
-    print n,"points"
-    x = np.linspace(min(xs),max(xs),n)
-    y = np.linspace(min(ys),max(ys),n)
+    x = np.linspace(min(xs),max(xs),args.nx)
+    y = np.linspace(min(ys),max(ys),args.ny)
     fo = open(name,"w") # open output file
     for ix in x:
       for iy in y:
@@ -43,7 +44,7 @@ import sys
 try:
   name = sys.argv[1]
 except:
-  print "Usage qh-interpolate name"
+  print("Usage qh-interpolate name")
   exit() # exit
 m = np.genfromtxt(name).transpose()
 

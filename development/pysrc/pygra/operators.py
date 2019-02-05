@@ -2,17 +2,14 @@
 from __future__ import division
 import numpy as np
 from scipy.sparse import csc_matrix as csc
-from scipy.sparse import bmat
+from scipy.sparse import bmat,diags
 from .superconductivity import build_eh
 import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
 from . import superconductivity
+from .algebra import braket_wAw
 
-
-def braket_wAw(w,A):
-  w = np.matrix(w) # convert to matrix
-  return ((w.T).H*A*w.T)[0,0] # expectation value
 
 
 
@@ -317,11 +314,12 @@ def get_valley(h,projector=False,delta=None):
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
     return vs*m0*vs.H # return renormalized operator
   if projector: # function returns a matrix
-    def fun(m,k=None):
+    def fun(m=None,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint
       hk = hkgen(k) # evaluate Hamiltonian
       hk = sharpen(hk) # sharpen the valley
-      return m*hk # return the projector
+      if m is None: return hk # just return the valley operator
+      else: return m@hk # return the projector
   else: # conventional way
     def fun(w,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint
@@ -359,6 +357,73 @@ def tofunction(A):
     if A is None: return lambda x,k=0.0: 1.0 # no input
     if callable(A): return A # if it is a function
     else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
+
+
+def ipr(w,k=None):
+    """IPR operator"""
+    return np.sum(np.abs(w)**4)
+
+
+def get_envelop(h,sites=[],d=0.3):
+    """
+    Return a list of operators that project on the different
+    sites
+    """
+    # get a first neighbor Hamiltonian
+    h0 = h.geometry.get_hamiltonian(has_spin=h.has_spin,is_sparse=True)
+    m = h0.get_hk_gen()([0.,0.,0.]) # evaluate Hamiltonian at Gamma
+    out = [] # output list
+    for s in sites: # loop over sites
+      c = m.getcol(s) # get column
+      c = np.array(c.todense()) # transform into a dense matrix
+      c = c.reshape(m.shape[0]) # 1D vector
+      c = c*d # renormalize all the hoppings
+      c[s] = 1.0 # set same atom to 1
+      c = c/np.sum(c) # normalize the whole vector
+      c = diags([c],[0],dtype=np.complex) # create matrix
+      out.append(c) # store matrix
+    return out # return matrices
+
+
+def get_sigma_minus(h):
+    """
+    Return the sublattice Pauli matrix \sigma_-
+    """
+    def fun(r1,r2):
+        i1 = h.geometry.get_index(r1,replicas=True)
+        if not h.geometry.sublattice[i1]==1: return 0.0
+        i2 = h.geometry.get_index(r2,replicas=True)
+        dr = r1-r2 # distance
+        if 0.9<dr.dot(dr)<1.1: return 1.0 # get first neighbor
+        return 0.0
+    h0 = h.geometry.get_hamiltonian(has_spin=h.has_spin,fun=fun) # FN coupling
+    hk = h0.get_hk_gen() # get generator
+    return hk # return function
+
+
+
+
+
+def get_valley_taux(h,projector=False):
+    """
+    Return the tau x valley operator
+    """
+    raise # this function is not ok
+    h0 = h.geometry.get_hamiltonian(has_spin=h.has_spin) # FN coupling
+    z = np.exp(1j*2.*np.pi/3.)
+    h0.clean()
+    # add the special hopping in the non-hermitian way
+    h0.add_chiral_kekule(t1=-1.+z,t2=-1.+1/z,hermitian=False) 
+    ## this operator should be sigma^+tau^+
+    hk1 = get_sigma_minus(h) # return sigma minus
+#    hk1 = lambda k: np.identity(h.intra.shape[0],dtype=np.complex)
+    hk0 = h0.get_hk_gen()
+    # now multiply in each side by \sigma_- to get rid of sigma_+
+    hk2 = lambda k: hk1(k)@hk0(k) + hk0(k)@hk1(k)
+    # now make it Hermitian to get sigma_x
+    hk3 = lambda k: hk2(k) + hk2(k).H
+    if projector: return lambda k: hk3(k) # return matrix
+    else: return lambda wf,k=None: braket_wAw(wf,hk3(k)) # return number
 
 
 

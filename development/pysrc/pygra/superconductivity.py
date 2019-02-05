@@ -313,25 +313,30 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     """ Add a general pairing matrix to a Hamiltonian"""
 #    self.get_eh_sector = get_eh_sector_odd_even # assign function
 #    if mode is None: df = delta # assume function is given
+    if callable(delta): deltaf = delta # input is a function
+    else: deltaf = lambda x: delta
     if mode=="swave":
         from .geometry import same_site
-        df = lambda r1,r2: delta*same_site(r1,r2)*np.identity(2)
+        df = lambda r1,r2: same_site(r1,r2)*np.identity(2)
     elif mode=="swavez":
         from .geometry import same_site
-        df = lambda r1,r2: delta*same_site(r1,r2)*tauz
+        df = lambda r1,r2: same_site(r1,r2)*tauz
     elif mode=="px":
-        df = lambda r1,r2: delta*px(r1,r2)
+        weightf = lambda r1,r2: px(r1,r2)
     elif mode=="swaveA":
-        df = lambda r1,r2: delta*swaveA(self.geometry,r1,r2)
+        weightf = lambda r1,r2: swaveA(self.geometry,r1,r2)
+    elif mode=="swaveB":
+        weightf = lambda r1,r2: swaveB(self.geometry,r1,r2)
     elif mode=="dx2y2":
-        df = lambda r1,r2: delta*dx2y2(r1,r2)
+        weightf = lambda r1,r2: dx2y2(r1,r2)
     elif mode=="snn":
-        df = lambda r1,r2: delta*swavenn(r1,r2)
+        weightf = lambda r1,r2: swavenn(r1,r2)
     elif mode=="C3nn":
-        df = lambda r1,r2: delta*C3nn(r1,r2)
+        weightf = lambda r1,r2: C3nn(r1,r2)
     elif mode=="SnnAB":
-        df = lambda r1,r2: delta*SnnAB(self.geometry,r1,r2)
+        weightf = lambda r1,r2: SnnAB(self.geometry,r1,r2)
     else: raise
+    df = lambda r1,r2: deltaf((r1+r2)/2.)*weightf(r1,r2) # delta times weight
     self.turn_nambu() # add electron hole terms
     r = self.geometry.r # positions 
     m = add_pairing(df,r1=r,r2=r) # intra cell
@@ -420,6 +425,18 @@ def swaveA(g,r1,r2):
         i = g.get_index(r1,replicas=False)
         if i is None: return 0.0
         if g.sublattice[i]==1:
+          return 1.0*iden
+    return 0.0*iden
+
+
+def swaveB(g,r1,r2):
+    """Swave only in A"""
+    dr = r1-r2
+    dr2 = dr.dot(dr)
+    if dr2<0.001: # first neighbor
+        i = g.get_index(r1,replicas=False)
+        if i is None: return 0.0
+        if g.sublattice[i]==-1:
           return 1.0*iden
     return 0.0*iden
 

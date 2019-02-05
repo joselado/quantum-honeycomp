@@ -1,6 +1,7 @@
 from __future__ import print_function
 from scipy.sparse import csc_matrix,bmat
 import numpy as np
+#from .scftypes import selfconsistency
 
 dup = csc_matrix(([1.0],[[0],[0]]),shape=(2,2),dtype=np.complex)
 ddn = csc_matrix(([1.0],[[1],[1]]),shape=(2,2),dtype=np.complex)

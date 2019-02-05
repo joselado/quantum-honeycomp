@@ -5,11 +5,13 @@ from __future__ import print_function
 import scipy.linalg as lg
 from scipy.sparse import csc_matrix
 import scipy.sparse.linalg as slg
+from scipy.sparse import issparse
 import numpy as np
 from . import timing
 from . import klist
 from . import topology
 from . import operators
+from .algebra import braket_wAw
 
 from .limits import densedimension as maxdim
 arpack_tol = 1e-8
@@ -57,10 +59,21 @@ def current_bands(h,klist=None):
 
 
 
-
-def braket_wAw(w,A):
-  w = np.matrix(w) # convert to matrix
-  return ((w.T).H*A*w.T)[0,0] # expectation value
+#
+#def braket_wAw(w,A,wi=None):
+#  """
+#  Compute the braket of a wavefunction
+#  """
+#  if wi is None: wi = w
+#  if issparse(A): # sparse matrices
+#    return (np.conjugate(wi)@A@w) # modern way
+#  else: # matrices and arrays
+#    return (np.conjugate(wi)@A@w)[0,0] # modern way
+#
+#  w = np.matrix(w) # convert to matrix
+#  if wi is None: wi = w
+#  else: wi = np.matrix(wi) # convert to matrix
+#  return ((wi.T).H*A*w.T)[0,0] # expectation value
 
 
 def ket_Aw(A,w):
@@ -144,7 +157,9 @@ def ket_Aw(A,w):
 
 def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
                     callback=None,central_energy=0.0,nk=400):
-  """Get a 2d bandstructure"""
+  """
+  Get an n-dimensional bandstructure
+  """
   if type(operator)==str: operator = h.get_operator(operator)
   if num_bands is None: # all the bands
     if operator is not None: 
@@ -186,14 +201,21 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     else:
       es,ws = diagf(hk)
       ws = ws.transpose() # transpose eigenvectors
-      for (e,w) in zip(es,ws):  # loop over waves
-        if callable(operator):  
-          try: waw = operator(w,k=kpath[k]) # call the operator
+      def evaluate(w,k,A): # evaluate the operator
+        if callable(A):  
+          try: waw = A(w,k=kpath[k]) # call the operator
           except: 
             print("Check out the k optional argument in operator")
-            waw = operator(w) # call the operator
-        else: waw = braket_wAw(w,operator).real # calculate expectation value
-        f.write(str(k)+"   "+str(e)+"  "+str(waw)+"\n") # write in file
+            waw = A(w) # call the operator
+        else: waw = braket_wAw(w,A).real # calculate expectation value
+        return waw # return the result
+      for (e,w) in zip(es,ws):  # loop over waves
+        if isinstance(operator, (list,)): # input is a list
+            waws = [evaluate(w,k,A) for A in operator]
+        else: waws = [evaluate(w,k,operator)]
+        f.write(str(k)+"   "+str(e)+"  ") # write in file
+        for waw in waws:  f.write(str(waw)+"  ") # write in file
+        f.write("\n") # next line
       # callback function in each iteration
       if callback is not None: callback(k,es,ws) # call the function
     f.flush()
@@ -204,7 +226,9 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
 
 
 def smalleig(m,numw=10,evecs=False):
-  """Return the smallest eigenvalues using arpack"""
+  """
+  Return the smallest eigenvalues using arpack
+  """
   tol = arpack_tol
   eig,eigvec = slg.eigsh(m,k=numw,which="LM",sigma=0.0,
                                   tol=tol,maxiter=arpack_maxiter)
@@ -214,7 +238,9 @@ def smalleig(m,numw=10,evecs=False):
 
 def lowest_bands(h,nkpoints=100,nbands=10,operator = None,
                    info = False,kpath = None,discard=None):
-  """ Returns a figure with the bandstructure of the system"""
+  """
+  Returns the lowest eigenvaleus of the system
+  """
   from scipy.sparse import csc_matrix
   if kpath is None: 
     k = klist.default(h.geometry) # default path

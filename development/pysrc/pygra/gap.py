@@ -5,9 +5,9 @@ import numpy as np
 import scipy.sparse.linalg as lgs
 from scipy.sparse import csc_matrix
 
-def minimize_gap(f,tol=0.001):
+def minimize_gap(f,tol=0.001,bounds=(0,1.)):
   """Miimizes the gap of the system, the argument is between 0 and 1"""
-  return f(minimize_scalar(f,method="Bounded",bounds=(0.,1.),tol=tol).x)
+  return f(minimize_scalar(f,method="Bounded",bounds=bounds,tol=tol).x)
 
 
 
