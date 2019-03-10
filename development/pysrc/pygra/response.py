@@ -1,5 +1,5 @@
 import numpy as np
-import timing
+from . import timing
 
 
 

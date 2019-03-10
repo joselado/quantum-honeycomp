@@ -43,9 +43,9 @@ def initialize():
   has_spin = False
   h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=True,
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))
-#  return h
-#  h.turn_dense()
-  h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
+  mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
+  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
+  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
   efield = get("interlayer_bias")
   def bias(r):
     if r[2]<0.0: return efield

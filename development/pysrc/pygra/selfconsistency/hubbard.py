@@ -1,18 +1,27 @@
 import os
 import numpy as np
-from .. import correlatorsf90
 from ..scftypes import scfclass
 from ..scftypes import get_fermi_energy
 from ..scftypes import get_occupied_states
 from scipy.sparse import csc_matrix
 import time
 from ..scftypes import directional_mean_field
+from .. import limits
+from .. import inout
 
+
+try:
+  from .. import correlatorsf90
+except: pass
+
+
+
+mf_file = "MF.pkl" # mean field file
 
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,collinear=False,fermi_shift=0.0,
-                  maxite=1000):
+                  maxite=1000,save=False):
   """ Solve a selfconsistent Hubbard mean field"""
   mix = 1. - mix
   U = g # redefine
@@ -21,11 +30,16 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   from scipy.linalg import eigh
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
-  # generalate the necessary list of correlators
+  htmp.turn_dense() # turn into a dense Hamiltonian
+  # generate the necessary list of correlators
   if mf is None: # generate initial mean field
-    if mag is None: mag = np.random.random((nat,3))
+    try:  
+        old_mf = inout.load(mf_file) # load the file
+        print("Mean field read from file")
+    except: # generate mean field
+      if mag is None: mag = np.random.random((nat,3))
 # get mean field matrix
-    old_mf = selective_U_matrix(U,directional_mean_field(mag))
+      old_mf = selective_U_matrix(U,directional_mean_field(mag))
   else: old_mf = mf # use guess
   # get the pairs for the correlators
   ndim = h.intra.shape[0] # dimension
@@ -50,24 +64,32 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     mf,edc,charge,mag = magnetic_mean_field(voccs,U,collinear=collinear,
                                 totkp=totkp)
     t3 = time.clock()
-    print("Times in diagonalization",t2-t1)
-    print("Times in new mean field",t3-t2)
     error = np.max(np.abs(old_mf-mf)) # absolute difference
     # total energy
     etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
     file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
     file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file
+    file_etot.flush()
+    file_error.flush()
     totcharge = np.sum(charge).real # total charge
     avcharge = totcharge/nat # average charge
     htmp.write_magnetization() # write in a file
+    if save: inout.save(mf,mf_file) # save the mean field
     ######
     if not silent:
+      print("Times in diagonalization",t2-t1)
+      print("Times in new mean field",t3-t2)
       print("\n")
       print("Iteration number =",ite)
       print("Error in SCF =",error)
       print("Fermi energy =",fermi)
       print("Total energy =",etot)
       print("Total charge =",totcharge)
+      mx = htmp.extract(name="mx")
+      my = htmp.extract(name="my")
+      mz = htmp.extract(name="mz")
+      print("Mag =",np.sum(mx),np.sum(my),np.sum(mz))
+      print("Abs mag =",np.sum(np.abs(mx)),np.sum(np.abs(my)),np.sum(np.abs(mz)))
       print("Average charge =",avcharge)
     old_mf = old_mf*mix + mf*(1.-mix) # mixing
     if error<maxerror or os.path.exists("STOP"): # if converged break

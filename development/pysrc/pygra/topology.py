@@ -9,6 +9,7 @@ from . import klist
 from . import operators
 from . import inout
 from . import timing
+from . import algebra
 
 
 arpack_tol = 1e-5
@@ -124,7 +125,7 @@ def occ_states2d(h,k):
 def occupied_states(hkgen,k,window=None,max_waves=None):
   """ Returns the WF of the occupied states in a 2d hamiltonian"""
   hk = hkgen(k) # get hamiltonian
-  if max_waves is None: es,wfs = lg.eigh(hk) # diagonalize all waves
+  if max_waves is None: es,wfs = algebra.eigh(hk) # diagonalize all waves
   else:  es,wfs = slg.eigsh(csc_matrix(hk),k=max_waves,which="SA",
                       sigma=0.0,tol=arpack_tol,maxiter=arpack_maxiter)
   wfs = np.conjugate(wfs.transpose()) # wavefunctions
@@ -408,7 +409,7 @@ def operator_berry(hin,k=[0.,0.],operator=None,delta=0.00001,ewindow=None):
   dhdy = multicell.derivative(h,k,order=[0,1]) # derivative
   hkgen = h.get_hk_gen() # get generator
   hk = hkgen(k) # get hamiltonian
-  (es,ws) = lg.eigh(hkgen(k)) # initial waves
+  (es,ws) = algebra.eigh(hkgen(k)) # initial waves
   ws = np.conjugate(np.transpose(ws)) # transpose the waves
   n = len(es) # number of energies
   from .berry_curvaturef90 import berry_curvature as bc90
@@ -425,7 +426,7 @@ def operator_berry_bands(hin,k=[0.,0.],operator=None,delta=0.00001):
   dhdy = multicell.derivative(h,k,order=[0,1]) # derivative
   hkgen = h.get_hk_gen() # get generator
   hk = hkgen(k) # get hamiltonian
-  (es,ws) = lg.eigh(hkgen(k)) # initial waves
+  (es,ws) = algebra.eigh(hkgen(k)) # initial waves
   ws = np.conjugate(np.transpose(ws)) # transpose the waves
   from .berry_curvaturef90 import berry_curvature_bands as bcb90
   if operator is None: operator = np.identity(dhdx.shape[0],dtype=np.complex)

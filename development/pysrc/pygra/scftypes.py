@@ -517,6 +517,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
+  htmp.turn_dense() # turn to dense Hamiltonian
   # generalate the necessary list of correlators
   if mf is None: # generate initial mean field
     if mag is None: mag = np.random.random((nat,3)) 
@@ -530,7 +531,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   file_gap = open("SCF_GAP.OUT","w")
   file_error = open("SCF_ERROR.OUT","w")
   ite = 0 # iteration counter
-  scf = scfclass(h) # create scf class
+  scf = scfclass(htmp) # create scf class
   scf.nkgrid = nkp
   scf.silent = silent
   scf.mixing = mix

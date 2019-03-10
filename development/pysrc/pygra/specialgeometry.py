@@ -78,10 +78,23 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
   return g1
 
 
+def twisted_supercell(g,m0=3,r=1):
+  """Return the supercell for a twisted system"""
+  g.has_sublattice = False # no sublattice
+  g = geometry.non_orthogonal_supercell(g,m=[[-1,0,0],[0,1,0],[0,0,1]])
+  theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
+  print("Theta",theta*180.0/np.pi)
+  nsuper = [[m0,m0+r,0],[-m0-r,2*m0+r,0],[0,0,1]]
+  g = geometry.non_orthogonal_supercell(g,m=nsuper,
+           reducef=lambda x: 3*np.sqrt(x))
+  return g
+
+
+
 
 def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   sublattice=True,r=1,rot=[1,1,0,0],g=None,dz=3.0):
-  """Return the geometry for twisted bilayer graphene"""
+  """Return the geometry for twisted multilayer graphene"""
   if g is None: g = geometry.honeycomb_lattice() # default is honeycomb
   g.has_sublattice = False # no sublattice
   g = geometry.non_orthogonal_supercell(g,m=[[-1,0,0],[0,1,0],[0,0,1]])
@@ -114,8 +127,41 @@ def twisted_trilayer(m0=3):
   return twisted_multilayer(m0=m0,shift=[-1.,0.,1.])
 
 
+
+
+
+def generalized_twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
+  sublattice=True,r=1,rot=[1,1,0,0],gf=None,dz=3.0):
+  """Return the geometry for twisted bilayer graphene"""
+  theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
+  if rotate: # rotate one of the layers
+    gs = [] # empty list with geometries
+    ii = 0
+    for i in rot: # loop
+        g = gf[ii] # get the geometry
+        g = twisted_supercell(g,m0=m0,r=r) # get the twisted supercell
+        print(i)
+        if i!=0 and i!=1: raise # nope
+        gs.append(rotate_layer(g,i*theta,dr=[0.,0.,dz*(ii-len(rot)/2.+.5)]))
+        ii += 1 # increase counter
+  else: raise
+#  g.r = np.concatenate([g1.r,g.r,g2.r]).copy()
+  g.r = np.concatenate([gi.r for gi in gs]).copy() # all the positions
+#  g.r = np.concatenate([g2.r,g.r]).copy()
+ # g.r = g1.r
+  g.r2xyz() # update
+  g.real2fractional() # update fractional coordinates 
+  g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # rotate
+  g.get_fractional() # get fractional coordinates 
+  return g
+
+
+
+
+
+
 def rotate_layer(g,theta,dr=[0.,0.,0.]):
-    """Rotate one of the layers, reatinign the same unit cell"""
+    """Rotate one of the layers, retainign the same unit cell"""
     g1 = g.copy() # copy geometry
     g1 = g1.rotate(theta*180/np.pi)
     g1s = g1.supercell(2) # supercell

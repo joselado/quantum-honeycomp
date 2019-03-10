@@ -5,31 +5,25 @@ running config_fc
 unifing config_fc, config, build_clib, build_ext, build commands --fcompiler options
 running build_src
 build_src
-building extension "chif90" sources
+building extension "algebraf90" sources
 f2py options: []
-f2py:> /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.c
-creating /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6
+f2py:> /tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.c
+creating /tmp/tmp26jvwu04/src.linux-x86_64-3.6
 Reading fortran codes...
-	Reading file 'chif90.f90' (format:free)
+	Reading file 'algebraf90.f90' (format:free)
 Post-processing...
-	Block: chif90
-			Block: elementchi
-			Block: occupation
-			Block: elementchi_nowf
+	Block: algebraf90
+			Block: todouble
 Post-processing (stage 2)...
 Building modules...
-	Building module "chif90"...
-		Constructing wrapper function "elementchi"...
-		  chi_total = elementchi(wf_chi_i,ene_chi_i,wf_chi_j,ene_chi_j,ene_chi,ichi,jchi,temperature_chi,delta,[norbitals,num_wf_i,num_wf_j,num_ene_chi])
-		Constructing wrapper function "occupation"...
-		  occ = occupation(energy,temperature)
-		Constructing wrapper function "elementchi_nowf"...
-		  chi_total = elementchi_nowf(ene_chi_i,ene_chi_j,ene_chi,ichi,jchi,temperature_chi,delta,norbitals,[num_wf_i,num_wf_j,num_ene_chi])
-	Wrote C/API module "chif90" to file "/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.c"
-  adding '/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.c' to sources.
-  adding '/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6' to include_dirs.
-copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6
-copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6
+	Building module "algebraf90"...
+		Constructing wrapper function "todouble"...
+		  vout = todouble(vin,shift,[n])
+	Wrote C/API module "algebraf90" to file "/tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.c"
+  adding '/tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.c' to sources.
+  adding '/tmp/tmp26jvwu04/src.linux-x86_64-3.6' to include_dirs.
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmp26jvwu04/src.linux-x86_64-3.6
+copying /home/jose/.local/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmp26jvwu04/src.linux-x86_64-3.6
 build_src: building npy-pkg config files
 running build_ext
 customize UnixCCompiler
@@ -39,74 +33,44 @@ customize Gnu95FCompiler
 Found executable /usr/bin/gfortran
 customize Gnu95FCompiler
 customize Gnu95FCompiler using build_ext
-building 'chif90' extension
+building 'algebraf90' extension
 compiling C sources
 C compiler: gcc -pthread -B /home/jose/apps/anaconda3/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC
 
-creating /tmp/tmpi1xnjvmd/tmp
-creating /tmp/tmpi1xnjvmd/tmp/tmpi1xnjvmd
-creating /tmp/tmpi1xnjvmd/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6
-compile options: '-I/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
-gcc: /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.c
-In file included from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1818:0,
-                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
-                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
-                 from /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.h:13,
-                 from /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.c:16:
-/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+creating /tmp/tmp26jvwu04/tmp
+creating /tmp/tmp26jvwu04/tmp/tmp26jvwu04
+creating /tmp/tmp26jvwu04/tmp/tmp26jvwu04/src.linux-x86_64-3.6
+compile options: '-I/tmp/tmp26jvwu04/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gcc: /tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.c
+gcc: /tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.c
+In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.c:16:
+/home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
  #warning "Using deprecated NumPy API, disable it by " \
   ^~~~~~~
-/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
+/tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
  static int f2py_size(PyArrayObject* var, ...)
             ^~~~~~~~~
-gcc: /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.c
-In file included from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1818:0,
-                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
-                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
-                 from /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.h:13,
-                 from /tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.c:2:
-/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+In file included from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1821:0,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.c:2:
+/home/jose/.local/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
  #warning "Using deprecated NumPy API, disable it by " \
   ^~~~~~~
-/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
-/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+/tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
+/tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
          if (size < sizeof(notalloc)) {
                   ^
 compiling Fortran sources
 Fortran f77 compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran f90 compiler: /usr/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran fix compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
-compile options: '-I/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
-gfortran:f90: chif90.f90
-chif90.f90:43:35:
-
-   complex (kind=8) :: vawwbv,holdab  ! matrix element of the response
-                                   1
-Warning: Unused variable ‘holdab’ declared at (1) [-Wunused-variable]
-chif90.f90:144:35:
-
-   complex (kind=8) :: vawwbv,holdab  ! matrix element of the response
-                                   1
-Warning: Unused variable ‘holdab’ declared at (1) [-Wunused-variable]
-chif90.f90:110:31:
-
-                            ichi, &
-                               1
-Warning: Unused dummy argument ‘ichi’ at (1) [-Wunused-dummy-argument]
-chif90.f90:111:31:
-
-                            jchi, &
-                               1
-Warning: Unused dummy argument ‘jchi’ at (1) [-Wunused-dummy-argument]
-chif90.f90:141:39:
-
-   complex (kind=8) :: wftmp1(norbitals),wftmp2(norbitals)
-                                       1
-Warning: Unused variable ‘wftmp1’ declared at (1) [-Wunused-variable]
-chif90.f90:141:57:
-
-   complex (kind=8) :: wftmp1(norbitals),wftmp2(norbitals)
-                                                         1
-Warning: Unused variable ‘wftmp2’ declared at (1) [-Wunused-variable]
-/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpi1xnjvmd/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/chif90module.o /tmp/tmpi1xnjvmd/tmp/tmpi1xnjvmd/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpi1xnjvmd/chif90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./chif90.cpython-36m-x86_64-linux-gnu.so
-Removing build directory /tmp/tmpi1xnjvmd
+compile options: '-I/tmp/tmp26jvwu04/src.linux-x86_64-3.6 -I/home/jose/.local/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gfortran:f90: algebraf90.f90
+/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmp26jvwu04/tmp/tmp26jvwu04/src.linux-x86_64-3.6/algebraf90module.o /tmp/tmp26jvwu04/tmp/tmp26jvwu04/src.linux-x86_64-3.6/fortranobject.o /tmp/tmp26jvwu04/algebraf90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./algebraf90.cpython-36m-x86_64-linux-gnu.so
+Removing build directory /tmp/tmp26jvwu04

@@ -1,15 +1,16 @@
 # routines to call a function in parallel
 from __future__ import print_function
 import scipy.linalg as lg
+from . import algebra
 try:
   from multiprocess import Pool
-#  raise
 except:
     print("Multiprocess not working")
     def Pool(n=1): # workaround
             class mpool():
                 def map(self,f,xs):
                   return [f(x) for x in xs]
+                def terminate(self): return None # dummy function
             return mpool()
 
 cores = 1 # call in a single by default
@@ -35,7 +36,7 @@ def multieigh(ms):
   """Diagonalize a bunch of Hamiltonians at once"""
 #  mainpool = initialize()
   if mainpool is not None: mainpool.map(lg.eigh,ms)
-  else: return [lg.eigh(m) for m in ms]
+  else: return [algebra.eigh(m) for m in ms]
 
 
 
@@ -55,6 +56,7 @@ def pcall_mp(fun,args,cores=cores):
     mainpool = Pool(cores) # create pool
 #    print("Using",cores,"cores")
     out = mainpool.map(fun,args) # return list
+    mainpool.terminate()
     del mainpool # delete pool
     return out
 #except:

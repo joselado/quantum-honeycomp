@@ -144,7 +144,7 @@ def write_surface_3d(h,energies=None,klist=None,delta=0.01):
 
 
 
-def kdos_bands(h,use_kpm=True,kpath=None,scale=10.0,
+def kdos_bands(h,use_kpm=True,kpath=None,scale=10.0,frand=None,
                  ewindow=4.0,ne=1000,delta=0.01,ntries=10):
   """Calculate the KDOS bands using the KPM"""
   if not use_kpm: raise # nope
@@ -157,7 +157,7 @@ def kdos_bands(h,use_kpm=True,kpath=None,scale=10.0,
     tr.remaining(ik,len(kpath))
     hk = hkgen(k) # get Hamiltonian
     npol = int(scale/delta) # number of polynomials
-    (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,
+    (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,frand=frand,
                    ewindow=ewindow,ntries=ntries) # compute
     for (ix,iy) in zip(x,y): # loop
       fo.write(str(ik/len(kpath))+"   ")

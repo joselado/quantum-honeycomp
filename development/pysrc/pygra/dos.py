@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import scipy.linalg as lg
-from .bandstructure import smalleig # arpack diagonalization
+from .algebra import smalleig # arpack diagonalization
 import time
 from . import timing
 from . import kpm
@@ -127,14 +127,17 @@ def write_dos(es,ds,output_file="DOS.OUT"):
 
 
 def dos1d(h,use_kpm=False,scale=10.,nk=100,npol=100,ntries=2,
-          ndos=1000,delta=0.01,ewindow=None,frand=None):
+          ndos=1000,delta=0.01,ewindow=None,frand=None,
+          energies=None):
   """ Calculate density of states of a 1d system"""
   if h.dimensionality!=1: raise # only for 1d
   ks = np.linspace(0.,1.,nk,endpoint=False) # number of kpoints
   if not use_kpm: # conventional method
     hkgen = h.get_hk_gen() # get generator
 #    delta = 16./(nk*h.intra.shape[0]) # smoothing
-    calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta) # conventiona algorithm
+    calculate_dos_hkgen(hkgen,ks,
+            delta=delta,energies=energies) # conventiona algorithm
+    return np.genfromtxt("DOS.OUT").transpose()
   else:
     h.turn_sparse() # turn the hamiltonian sparse
     hkgen = h.get_hk_gen() # get generator
@@ -149,7 +152,6 @@ def dos1d(h,use_kpm=False,scale=10.,nk=100,npol=100,ntries=2,
       ts.remaining(i,nk)
     yt /= nk # normalize
     write_dos(xs,yt) # write in file
-    print()
     return xs,yt
 
 
@@ -179,13 +181,14 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   """Calculate density of states using the ks given on input"""
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
   tr = timing.Testimator("DOS",maxite=len(ks))
+  if delta is None: delta = 5./len(ks) # automatic delta
   from . import parallel
   def fun(k): # function to execute
     if parallel.cores==1: tr.iterate() # print the info
     hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      return smalleig(hk,numw=numw).tolist() # eigenvalues
+      return smalleig(hk,numw=numw,tol=delta/1e3).tolist() # eigenvalues
     else: # dense Hamiltonian
       return lg.eigvalsh(hk).tolist() # get eigenvalues
 #  for ik in range(len(ks)):  
@@ -196,7 +199,6 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 #  es = es.reshape(len(es)*len(es[0])) # 1d array
   es = np.array(es) # convert to array
   nk = len(ks) # number of kpoints
-  if delta is None: delta = 5./nk # automatic delta
   if energies is not None: # energies given on input
     xs = energies
   else:
@@ -205,7 +207,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     else:
       xs = np.linspace(-window,window,ndos) # create x
   ys = calculate_dos(es,xs,delta) # use the Fortran routine
-  ys /= nk # normalize 
+  ys /= nk # normalize by the number of k-points
   write_dos(xs,ys) # write in file
   print("\nDOS finished")
   return (xs,ys) # return result
@@ -221,7 +223,8 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 
 
 def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
-          ndos=500,numw=20,random=True,kpm_window=1.0,window=None):
+          ndos=500,numw=20,random=True,kpm_window=1.0,
+          window=None,energies=None):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=2: raise # only for 2d
   ks = []
@@ -235,27 +238,37 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     if delta is None: delta = 6./nk
 # conventiona algorithm
     return calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
-                          is_sparse=h.is_sparse,numw=numw,window=window) 
+                          is_sparse=h.is_sparse,numw=numw,window=window,
+                          energies=energies) 
   else: # use the kpm
-    npol = ndos//10
+    if delta is not None: npol = int(20*scale/delta)
+    else: npol = ndos//10
     h.turn_sparse() # turn the hamiltonian sparse
     hkgen = h.get_hk_gen() # get generator
     mus = np.array([0.0j for i in range(2*npol)]) # initialize polynomials
     tr = timing.Testimator("DOS")
     ik = 0
-    for k in ks: # loop over kpoints
-#      print("KPM DOS at k-point",k)
-      ik += 1
-      tr.remaining(ik,len(ks))      
-      if random: 
-        kr = np.random.random(2)
-        print("Random sampling in DOS")
-        hk = hkgen(kr) # hamiltonian
-      else: hk = hkgen(k) # hamiltonian
-      mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
+    from . import parallel
+    if parallel.cores==1: # serial run
+      for k in ks: # loop over kpoints
+        ik += 1
+        tr.remaining(ik,len(ks))      
+        if random: 
+          kr = np.random.random(2)
+          print("Random sampling in DOS")
+          hk = hkgen(kr) # hamiltonian
+        else: hk = hkgen(k) # hamiltonian
+        mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
+    else:
+        ff = lambda k: kpm.random_trace(hkgen(k)/scale,ntries=ntries,n=npol)
+        mus = parallel.pcall(kk,ks) # parallel call
+        mus = np.array(mus).sum(axis=0) # sum all the contributions
     mus /= len(ks) # normalize by the number of kpoints
-    xs = np.linspace(-0.9,0.9,ndos)*kpm_window # x points
+    if energies is None:
+      xs = np.linspace(-0.9,0.9,ndos)*kpm_window # x points
+    else:  xs = energies/scale
     ys = kpm.generate_profile(mus,xs) # generate the profile
+    ys /= scale # rescale
     write_dos(xs*scale,ys) # write in file
     return (xs,ys)
 
@@ -381,60 +394,72 @@ def convolve(x,y,delta=None):
 
 
 
-def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100):
+def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,
+        delta=0.01,ntries=10,nk=100,operator=None):
   """Calculate the KDOS bands using the KPM"""
   hkgen = h.get_hk_gen() # get generator
   numk = nk**h.dimensionality
   tr = timing.Testimator("DOS",maxite=numk) # generate object
   ytot = np.zeros(ne) # initialize
+  npol = 5*int(scale/delta) # number of polynomials
   for ik in range(numk): # loop over kpoints
     tr.iterate()
-    hk = hkgen(np.random.random(3)) # get Hamiltonian
-    npol = int(scale/delta) # number of polynomials
-    (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,
+    k = np.random.random(3)
+    hk = hkgen(k) # get Hamiltonian
+    if callable(operator): op = operator(k) # call the function if necessary
+    else: op = operator # take the same operator
+    (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,operator=op,
                    ewindow=ewindow,ntries=ntries) # compute
     ytot += y # add contribution
   ytot /= nk # normalize
   np.savetxt("DOS.OUT",np.matrix([x,ytot]).T) # save in file
+  return (x,y)
 
 
 
 def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
             use_kpm=False,scale=10.,ntries=10,mode="ED",
-            random=True):
+            random=True,operator=None,**kwargs):
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
-    dos_kpm(h,scale=scale,ewindow=ewindow,ne=len(energies),delta=delta,
-                   ntries=ntries,nk=nk)
+    return dos_kpm(h,scale=scale,ewindow=ewindow,ne=len(energies),delta=delta,
+                   ntries=ntries,nk=nk,operator=operator)
   else: # conventional methods
-    if mode=="ED": # exact diagonalization
-      if h.dimensionality==0:
-        return dos0d(h,es=energies,delta=delta)
-      elif h.dimensionality==1:
-        return dos1d(h,ndos=len(energies),delta=delta,nk=nk)
-      elif h.dimensionality==2:
-        return dos2d(h,use_kpm=False,nk=100,ntries=1,delta=delta,
-            ndos=len(energies),random=random,window=np.max(np.abs(energies)))
-      elif h.dimensionality==3:
-        return dos3d(h,nk=nk,delta=delta,energies=energies)
+    if operator is None: # no operator given
+      if mode=="ED": # exact diagonalization
+        if h.dimensionality==0:
+          return dos0d(h,es=energies,delta=delta)
+        elif h.dimensionality==1:
+          return dos1d(h,energies=energies,delta=delta,nk=nk)
+        elif h.dimensionality==2:
+          return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
+              ndos=len(energies),random=random,window=np.max(np.abs(energies)),
+              energies=energies,**kwargs)
+        elif h.dimensionality==3:
+          return dos3d(h,nk=nk,delta=delta,energies=energies)
+        else: raise
+      elif mode=="Green": # Green function formalism
+        if h.dimensionality==0:
+          return dos0d(h,es=energies,delta=delta) # same as before
+        elif h.dimensionality>0: # Bigger dimensionality
+          from .green import bloch_selfenergy
+          tr = timing.Testimator("KDOS") # generate object
+          ie = 0
+          out = [] # storage
+          for e in energies: # loop
+            tr.remaining(ie,len(energies)) # print status
+            ie += 1 # increase
+            g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
+            out.append(-g.trace()[0,0].imag) # store dos
+          np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
+          return energies,np.array(out) # return
       else: raise
-    elif mode=="Green": # Green function formalism
-      if h.dimensionality==0:
-        return dos0d(h,es=energies,delta=delta) # same as before
-      elif h.dimensionality>0: # Bigger dimensionality
-        from .green import bloch_selfenergy
-        tr = timing.Testimator("KDOS") # generate object
-        ie = 0
-        out = [] # storage
-        for e in energies: # loop
-          tr.remaining(ie,len(energies)) # print status
-          ie += 1 # increase
-          g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
-          out.append(-g.trace()[0,0].imag) # store dos
-        np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
-        return energies,np.array(out) # return
-    else: raise
+    else: # operator given on input
+        ds = [green.green_operator(h,operator,e=e,delta=delta,nk=nk) 
+                for e in energies]
+        np.savetxt("DOS.OUT",np.matrix([energies,ds]).T) # write in a file
+        return (energies,ds)
 
 
 def autodos(h,auto=True,**kwargs):

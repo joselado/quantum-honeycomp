@@ -681,3 +681,21 @@ def green_generator(h,nk=20):
 
 
 
+def green_operator(h,operator,e=0.0,delta=1e-3,nk=10):
+    """Return the integration of an operator times the Green function"""
+    hkgen = h.get_hk_gen() # get generator
+    iden = np.identity(h.intra.shape[0],dtype=np.complex)
+    from . import klist
+    ks = klist.kmesh(h.dimensionality,nk=nk) # klist
+    out = 0.0 # output
+    for k in ks: # loop over kpoints
+        hk = hkgen(k) # Hamiltonian
+        o0 = lg.inv(iden*(e+1j*delta) - hk) # Green's function
+        if callable(operator): o1 = operator(k)
+        else: o1 = operator
+        out += -(o0@o1).trace().imag # Add contribution
+    out /= len(ks) # normalize
+    return out
+
+
+
