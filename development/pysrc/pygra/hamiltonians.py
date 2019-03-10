@@ -15,6 +15,7 @@ from . import extract
 from . import multicell
 from . import spectrum
 from . import kekule
+from . import algebra
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -111,7 +112,7 @@ class hamiltonian():
     return diagonalize(self,nkpoints=nkpoints)
   def get_dos(self,**kwargs):
       from . import dos
-      dos.dos(self,**kwargs)
+      return dos.dos(self,**kwargs)
   def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
     return get_bands_nd(self,**kwargs)
@@ -122,11 +123,11 @@ class hamiltonian():
     """ Adds a sublattice imbalance """
     if self.geometry.has_sublattice and self.geometry.sublattice_number==2:
       add_sublattice_imbalance(self,mass)
-  def add_antiferromagnetism(self,mass,axis=[0.,0.,1.]):
+  def add_antiferromagnetism(self,mass):
     """ Adds antiferromagnetic imbalanc """
     if self.geometry.has_sublattice:
       if self.geometry.sublattice_number==2:
-        magnetism.add_antiferromagnetism(self,mass,axis=axis)
+        magnetism.add_antiferromagnetism(self,mass)
       elif self.geometry.sublattice_number>2:
         magnetism.add_frustrated_antiferromagnetism(self,mass)
       else: raise
@@ -173,7 +174,9 @@ class hamiltonian():
     inout.save(self,output_file) # write in a file
   write = save # just in case
   def read(self,output_file="hamiltonian.pkl"):
+    """ Read the Hamiltonian"""
     return load(output_file) # read Hamiltonian
+  def load(self,**kwargs): self.read(**kwargs)
   def total_energy(self,nkpoints=30,nbands=None,random=False,kp=None):
     """ Get total energy of the system"""
     return total_energy(self,nk=nkpoints,nbands=nbands,random=random,kp=kp)
@@ -191,7 +194,7 @@ class hamiltonian():
     """Turn the hamiltonian spinful""" 
     if self.is_sparse: # sparse Hamiltonian
       self.turn_dense() # dense Hamiltonian
-      self.turn_spinful() # spinful
+      self.turn_spinful(enforce_tr=enforce_tr) # spinful
       self.turn_sparse()
     else: # dense Hamiltonian
       if self.has_spin: return # already spinful
@@ -202,7 +205,8 @@ class hamiltonian():
         from .increase_hilbert import spinful
         from .superconductivity import time_reversal
         def fun(m):
-          return spinful(m)
+            if enforce_tr: return spinful(m,np.conjugate(m))
+            else: return spinful(m)
         if not self.has_spin:
           self.has_spin = True
           self.intra = fun(self.intra) 
@@ -340,31 +344,8 @@ class hamiltonian():
 
   def add_rashba(self,c):
     """Adds Rashba coupling"""
-    if not self.has_spin: raise
-    g = self.geometry
-    is_sparse = self.is_sparse # saprse Hamiltonian
-    self.intra = self.intra + rashba(g.r,c=c,is_sparse=is_sparse)
-    if self.dimensionality==0: return
-    if self.is_multicell: # multicell hamiltonians
-      for i in range(len(self.hopping)): # loop over hoppings
-        d = self.hopping[i].dir # direction
-        Rd = g.a1*d[0] + g.a2*d[1] + g.a3*d[2]
-        r2 = [ir + Rd for ir in g.r] # new coordinates
-        self.hopping[i].m = self.hopping[i].m + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-    else: # conventional Hamiltonians
-      if g.dimensionality==1:  # one dimensional
-        r2 = [ir + g.a1 for ir in g.r]
-        self.inter = self.inter + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-      elif g.dimensionality==2:  # two dimensional
-        r2 = [ir + g.a1 for ir in g.r]
-        self.tx = self.tx + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-        r2 = [ir + g.a2 for ir in g.r]
-        self.ty = self.ty + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-        r2 = [ir + g.a1+g.a2 for ir in g.r]
-        self.txy = self.txy + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-        r2 = [ir + g.a1-g.a2 for ir in g.r]
-        self.txmy = self.txmy + rashba(g.r,r2=r2,c=c,is_sparse=is_sparse)
-      else: raise
+    from . import rashba
+    rashba.add_rashba(self,c)
   def add_kane_mele(self,t):
     """ Adds a Kane-Mele SOC term"""  
     kanemele.add_kane_mele(self,t) # return kane-mele SOC
@@ -456,8 +437,12 @@ class hamiltonian():
         self.txmy = tmprot(self.txmy,[1.,-1.,0.])
       else: raise
   def get_magnetization(self,nkp=10):
-    from .magnetism import get_magnetization
-    get_magnetization(self,nkp=nkp)
+    mx = self.extract(name="mx")
+    my = self.extract(name="my")
+    mz = self.extract(name="mz")
+    return np.array([mx,my,mz]).T # return array
+#    from .magnetism import get_magnetization
+#    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
     """Return a 1d Hamiltonian"""
     if self.is_multicell: raise # not implemented
@@ -550,10 +535,12 @@ class hamiltonian():
         g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
         g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
         g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
-#        np.savetxt("MX.OUT",np.matrix([g.x,g.y,g.z,mx]).T)
-#        np.savetxt("MY.OUT",np.matrix([g.x,g.y,g.z,my]).T)
-#        np.savetxt("MZ.OUT",np.matrix([g.x,g.y,g.z,mz]).T)
-        np.savetxt("MAGNETISM.OUT",np.array([g.x,g.y,g.z,mx,my,mz]).T)
+        # this is just a workaround
+        m = np.genfromtxt("MX.OUT").transpose()
+        (x,y,z,mx) = m[0],m[1],m[2],m[3]
+        my = np.genfromtxt("MY.OUT").transpose()[3]
+        mz = np.genfromtxt("MZ.OUT").transpose()[3]
+        np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
         return np.array([mx,my,mz])
 #    return np.array([mx,my,mz]).transpose()
   def get_ipr(self,**kwargs):
@@ -562,44 +549,6 @@ class hamiltonian():
       if self.dimensionality==0:
           return ipr.ipr(self.intra,**kwargs) 
       else: raise # not implemented
-
-
-
-
-
-
-
-
-
-
-
-
-def rashba(r1,r2=None,c=0.,d=[0.,0.,1.],is_sparse=False):
-  """Add Rashba coupling, returns a spin polarized matrix"""
-  zero = coo_matrix([[0.,0.],[0.,0.]])
-  if r2 is None:
-    r2 = r1
-  nat = len(r1) # number of atoms
-  m = [[None for i in range(nat)] for j in range(nat)] # cretae amtrix
-  for i in range(nat): m[i][i] = zero.copy()
-  for i in range(nat): # loop over first atoms
-    for j in range(nat):  # loop over second atoms
-      rij = r2[j] - r1[i]   # x component
-      dx,dy,dz = rij[0],rij[1],rij[2]  # different components
-      rxs = [dy*sz-dz*sy,dz*sx-dx*sz,dx*sy-dy*sx]  # cross product
-      ms = 1j*(d[0]*rxs[0] + d[1]*rxs[1] + d[2]*rxs[2]) # E dot r times s
-      s = 0.0*ms
-      if 0.9<(rij.dot(rij))<1.1: # if nearest neighbor
-        if callable(c): s = ms*c((r1[i]+r2[j])/2.) # function
-        else:s = ms*c # multiply
-      m[i][j] = s # rashba term
-  if not is_sparse: m = bmat(m).todense()  # to normal matrix
-  else: m = bmat(m) # sparse matrix
-  return m
-
-
-
-
 
 
 
@@ -724,7 +673,7 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
   from scipy.sparse import csc_matrix as csc
   shape = h.intra.shape
   if h.dimensionality==0:
-    vv = lg.eigh(h.intra)
+    vv = algebra.eigh(h.intra)
     vecs = [v for v in vv[1].transpose()]
     if kpoints: return vv[0],vecs,[[0.,0.,0.] for e in vv[0]]
     else: return vv[0],vecs
@@ -743,8 +692,8 @@ def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
       from . import parallel
       if parallel.cores>1: # in parallel
 #        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
-        vvs = parallel.pcall(lambda k: lg.eigh(f(k)),kp)
-      else: vvs = [lg.eigh(f(k)) for k in kp] # 
+        vvs = parallel.pcall(lambda k: algebra.eigh(f(k)),kp)
+      else: vvs = [algebra.eigh(f(k)) for k in kp] # 
     nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
     eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors
     eigvals = np.zeros(nume) # eigenvalues

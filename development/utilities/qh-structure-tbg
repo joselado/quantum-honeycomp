@@ -2,11 +2,15 @@
 
 from __future__ import print_function
 import numpy as np
+import os
 
 try:
   from mayavi import mlab
 except:
   print("Mayavi is not working")
+  path = os.path.realpath(__file__) 
+  import sys
+  os.system("python "+path)
   exit()
 
 

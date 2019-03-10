@@ -56,7 +56,7 @@ class SpinModel(): # class for a spin Hamiltonian
   def write(self,label=""):
     """Write in file"""
     self.geometry.write() # write the geometry
-    write_magnetization(self) # write maagnetization
+    write_magnetization(self) # write magnetization
   def add_tensor(self,fun):
     """Add a tensor interaction"""
     pairs,js = add_tensor(self,fun)

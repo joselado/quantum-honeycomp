@@ -220,7 +220,7 @@ def add_haldane_like(self,t,spinless_generator,
       rs = [] # all the cells
       for i in range(-ncells,ncells+1): # loop over neighbouring cells
         rtmp = [ri + i*g.a1 for ri in g.r] # new positions
-        if close_enough(g.r,rtmp,rcut=2.1): # if this positions are not too far
+        if close_enough(g.r,rtmp,rcut=2.1): # if these positions are not too far
           rs += rtmp
     elif self.dimensionality==2:  # three dimensional
       rs = [] # all the cells
@@ -235,7 +235,7 @@ def add_haldane_like(self,t,spinless_generator,
         for j in range(-ncells,ncells+1):
           for k in range(-ncells,ncells+1):
             rtmp = [ri + i*g.a1 +j*g.a2 + k*g.a3 for ri in g.r] # new positions
-            if close_enough(g.r,rtmp,rcut=2.1): # if this positions are not too far
+            if close_enough(g.r,rtmp,rcut=2.1): # if not too far
               rs += rtmp
     else: raise
 

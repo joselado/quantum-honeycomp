@@ -16,6 +16,8 @@ def m2spin(matin,matin2=[]):
   return matout
 
 
+
+
 def spinful(m,m2=None):
   """ Return a spinful hamiltonian"""
   if type(m)==type(np.matrix): return m2spin(m,matin2=m2)

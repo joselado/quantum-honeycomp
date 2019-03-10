@@ -1,6 +1,5 @@
 import numpy as np
-
-from scipy.sparse import coo_matrix,csc_matrix
+from scipy.sparse import coo_matrix,csc_matrix,issparse
 
 
 def add_phase(m1,r1,r2,phasefun,has_spin=False):
@@ -11,13 +10,12 @@ def add_phase(m1,r1,r2,phasefun,has_spin=False):
   for k in range(len(m.data)): # loop over non vanishing elements
     i = m.row[k]
     j = m.col[k]
-    if has_spin: i,j = i/2,j/2 # if spinful
+    if has_spin: i,j = i//2,j//2 # if spinful
     # peierls phase
     p = phasefun(r1[i],r2[j]) # function yielding the phase
     data[k] *= p # add phase
   out = csc_matrix((data,(row,col)),shape=m1.shape) # convert to csc
-  if type(m1) is type(np.matrix): out = out.todense() # dense matrix
-  out = out.todense()
+  if not issparse(m1): out = out.todense() # dense matrix
   return out
 
 

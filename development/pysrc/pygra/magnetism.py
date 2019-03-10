@@ -5,6 +5,9 @@ import numpy as np
 from . import checkclass
 from . import geometry
 
+def float2array(z):
+    if checkclass.is_iterable(z): return z # iterable, input is an array
+    else: return [0.,0.,z] # input is a number
 
 def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
   """ Add Zeeman to the hamiltonian """
@@ -41,7 +44,7 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
 
 
 
-def add_antiferromagnetism(h,m,axis):
+def add_antiferromagnetism(h,m):
   """ Adds to the intracell matrix an antiferromagnetic imbalance """
   intra = h.intra # intracell hopping
   if h.geometry.has_sublattice: pass  # if has sublattice
@@ -53,6 +56,7 @@ def add_antiferromagnetism(h,m,axis):
     out = [[None for j in range(natoms)] for i in range(natoms)] # output matrix
     # create the array
     if checkclass.is_iterable(m): # iterable, input is an array
+      if len(m)!=len(h.geometry.r): raise
       mass = m # use the input array
     elif callable(m): # input is a function
       mass = [m(h.geometry.r[i]) for i in range(natoms)] # call the function
@@ -60,11 +64,9 @@ def add_antiferromagnetism(h,m,axis):
       mass = [m for i in range(natoms)] # create list
     for i in range(natoms): # loop over atoms
       mi = mass[i] # select the element
-      if callable(axis): ax = np.array(axis(h.geometry.r[i])) # call the function
-      else: ax = np.array(axis) # convert to array
-      ax = ax/np.sqrt(ax.dot(ax)) # normalize the direction
       # add contribution to the Hamiltonian
-      out[i][i] = mi*(sx*ax[0] + sy*ax[1] + sz*ax[2])*h.geometry.sublattice[i]
+      mi = float2array(mi) # convert to array
+      out[i][i] = (sx*mi[0] + sy*mi[1] + sz*mi[2])*h.geometry.sublattice[i]
     out = bmat(out) # turn into a matrix
     h.intra = h.intra + h.spinful2full(out) # Add matrix 
   else:

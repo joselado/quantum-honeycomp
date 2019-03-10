@@ -12,6 +12,7 @@ from . import klist
 from . import topology
 from . import operators
 from .algebra import braket_wAw
+from . import algebra
 
 from .limits import densedimension as maxdim
 arpack_tol = 1e-8
@@ -46,7 +47,7 @@ def current_bands(h,klist=None):
   for k in klist: # loop over kpoints
     hk = hkgen(k) # get k-hamiltonian
     jk = fj(k) # get current operator
-    evals,evecs = lg.eigh(hk) # eigenvectors and eigenvalues
+    evals,evecs = algebra.eigh(hk) # eigenvectors and eigenvalues
     evecs = np.transpose(evecs) # transpose eigenvectors
     for (e,w) in zip(evals,evecs): # do the loop
         waw = braket_wAw(w,jk).real # product
@@ -83,75 +84,6 @@ def ket_Aw(A,w):
   return wo
 
 
-#def get_bands_0d(h,operator=None):
-#  """ Returns a figure with the bandstructure of the system"""
-#  if h.is_sparse:
-#    energies = lg.eigvalsh(h.intra.todense()) # eigenvalues
-#  else:
-#    if operator is None: energies = lg.eigvalsh(h.intra) # eigenvalues
-#    else: # matrix
-#      energies,ws = lg.eigh(h.intra)
-#      vals = []
-#      ws = np.transpose(ws) # transpose
-#      for w in ws: # loop over waves
-#        if callable(operator):
-#          waw = operator(w)
-#        else:
-#          waw = braket_wAw(w,operator).real # calcualte expectation value
-#        vals.append(waw) # store
-#  klist = np.linspace(0,1,len(energies))
-#  if operator is None: msave = np.matrix([klist,energies]).T
-#  else: msave = np.matrix([klist,energies,vals]).T
-#  np.savetxt("BANDS.OUT",msave) # save all
-#  return np.genfromtxt("BANDS.OUT").transpose() # return data
-
-
-
-
-
-
-
-#def get_bands_1d(h,nkpoints=100,operator=None,num_bands=None,callback=None):
-#  if num_bands is None: # all the bands
-#    if operator is not None: diagf = lg.eigh # all eigenvals and eigenfuncs
-#    else: diagf = lg.eigvalsh # all eigenvals and eigenfuncs
-#  else: # using arpack
-#    h = h.copy()
-#    h.turn_sparse() # sparse Hamiltonian
-#    def diagf(m):
-#      eig,eigvec = slg.eigsh(m,k=num_bands,which="LM",sigma=0.0,
-#                               tol=arpack_tol,maxiter=arpack_maxiter)
-#      if operator is None: return eig
-#      else: return (eig,eigvec)
-#  hkgen = h.get_hk_gen() # generator hamiltonian
-#  ks = np.linspace(0.,1.,nkpoints,endpoint=True)
-#  f = open("BANDS.OUT","w") # open bands file
-#  f.write("# system_dimension = 1\n")
-##  if operator is not None: operator=np.matrix(operator) # convert to matrix
-#  tr = timing.Testimator("BANDSTRUCTURE") # generate object
-#  ik = 0 
-#  for k in ks: # loop over kpoints
-#    ik += 1
-#    tr.remaining(ik,ks.shape[0])
-#    hk = hkgen(k) # get hamiltonian
-##    if h.is_sparse: hk = hk.todense() # turn the matrix dense
-#    if operator is None:
-#      es = diagf(hk)
-#      for e in es:  # loop over energies
-#        f.write(str(k)+"   "+str(e)+"\n") # write in file
-#      if callback is not None: callback(k,es) # call the function
-#    else:
-#      es,ws = diagf(hk)
-#      ws = ws.transpose() # transpose eigenvectors
-#      for (e,w) in zip(es,ws):  # loop over waves
-#        if callable(operator):
-#          waw = operator(w,k=k)
-#        else:
-#          waw = braket_wAw(w,operator).real # calcualte expectation value
-#        f.write(str(k)+"   "+str(e)+"  "+str(waw)+"\n") # write in file
-#      if callback is not None: callback(k,es,ws) # call the function
-#  f.close()
-#  return np.genfromtxt("BANDS.OUT").transpose() # return data
 
 
 
@@ -165,15 +97,15 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     if operator is not None: 
       def diagf(m): # diagonalization routine
         if h.is_sparse and h.intra.shape[0]<maxdim: 
-          return lg.eigh(m.todense()) # all eigenvals and eigenfuncs
+          return algebra.eigh(m.todense()) # all eigenvals and eigenfuncs
         else:
-          return lg.eigh(m) # all eigenvals and eigenfuncs
+          return algebra.eigh(m) # all eigenvals and eigenfuncs
     else: 
       def diagf(m): # diagonalization routine
         if h.is_sparse and h.intra.shape[0]<maxdim: 
-          return lg.eigvalsh(m.todense()) # all eigenvals and eigenfuncs
+          return algebra.eigvalsh(m.todense()) # all eigenvals and eigenfuncs
         else:
-          return lg.eigvalsh(m) # all eigenvals and eigenfuncs
+          return algebra.eigvalsh(m) # all eigenvals and eigenfuncs
   else: # using arpack
     h = h.copy()
     h.turn_sparse() # sparse Hamiltonian

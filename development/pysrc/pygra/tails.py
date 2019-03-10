@@ -4,11 +4,12 @@ import scipy.linalg as lg
 
 # check whether if the fortran routines will be used
 try:
-  import tailsf90
+  from . import tailsf90
   use_fortran = True
 except:
   use_fortran=False
-#  print("WARNING, Fortran functions not working in tails")
+  print("WARNING, Fortran functions not working in tails")
+
 
 
 def matrix_tails(m,discard=None):

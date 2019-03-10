@@ -63,3 +63,46 @@ def multilayer(ti=0.3,dz=3.0):
       return 0.0 # else
     return fhop
 
+
+
+
+
+
+def phase_C3(g,phi=0.0):
+    """Create a fucntion that computes hoppings that alternate
+    between +\phi and -\phi every 60 degrees"""
+    if len(g.r)==1:
+      g = g.supercell(2) # create a supercell
+    ds = g.get_connections()
+    i = 0 # first site
+    j = ds[i][0] # connected site
+    dr = g.r[i] - g.r[j] # distance between sites
+    z = dr[0] + 1j*dr[1] # comple vector
+    z0 = np.exp(1j*np.pi*2./3.) # rotation
+    zs = [z,z*z0,z*z0**2] # the three vectors
+    def fun(r1,r2):
+        """Function to compute hoppings"""
+        dr = r1-r2
+        if 0.99<dr.dot(dr)<1.01: # first neighbors
+            zi = dr[0]+1j*dr[1]
+            for zj in zs: # one of the three directions
+                d = np.abs(zi/zj-1.0)
+                print(d)
+                if d<1e-2: 
+                    return np.exp(1j*phi)
+            else: return np.exp(-1j*phi)
+        return 0.0
+    return fun
+
+
+
+
+
+
+
+
+
+
+
+
+

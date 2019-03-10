@@ -660,11 +660,11 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>AB imbalance</string>
+             <string>Upper AB imbalance</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Fermi energy</string>
@@ -686,23 +686,37 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="mAB">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="fermi">
+           <widget class="QLineEdit" name="mAB_upper">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
+           <widget class="QLineEdit" name="fermi">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
            <widget class="QRadioButton" name="set_half_filling">
             <property name="text">
              <string>Measure with respect to half filling</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="mAB_lower">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_20">
+            <property name="text">
+             <string>Lower AB imbalance</string>
             </property>
            </widget>
           </item>

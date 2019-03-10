@@ -25,10 +25,9 @@ def get_moments(v,m,n=100,use_fortran=use_fortran,test=False):
   if use_fortran:
     from .kpmf90 import get_momentsf90 # fortran routine
     mo = coo_matrix(m) # convert to coo matrix
-    vo = v.todense() # convert to conventional vector
-    vo = np.array([vo[i,0] for i in range(len(vo))])
+    v = algebra.matrix2vector(v)
 # call the fortran routine
-    mus = get_momentsf90(mo.row+1,mo.col+1,mo.data,vo,n) 
+    mus = get_momentsf90(mo.row+1,mo.col+1,mo.data,v,n) 
     return mus # return fortran result
   else:
    if test: return python_kpm_moments_clear(v,m,n=n)
@@ -39,16 +38,20 @@ def python_kpm_moments(v,m,n=100):
   """Python routine to calculate moments"""
   mus = np.array([0.0j for i in range(2*n)]) # empty arrray for the moments
   am = v.copy() # zero vector
-  a = m*v  # vector number 1
-  bk = (np.transpose(np.conjugate(v))*v)[0,0] # scalar product
-  bk1 = (np.transpose(np.conjugate(a))*v)[0,0] # scalar product
+  a = m@v  # vector number 1
+  bk = algebra.braket_ww(v,v)
+#  bk = (np.transpose(np.conjugate(v))*v)[0,0] # scalar product
+  bk1 = algebra.braket_ww(a,v)
+#  bk1 = (np.transpose(np.conjugate(a))*v)[0,0] # scalar product
   
   mus[0] = bk.copy()  # mu0
   mus[1] = bk1.copy() # mu1
   for i in range(1,n): 
-    ap = 2*m*a - am # recursion relation
-    bk = (np.transpose(np.conjugate(a))*a)[0,0] # scalar product
-    bk1 = (np.transpose(np.conjugate(ap))*a)[0,0] # scalar product
+    ap = 2*m@a - am # recursion relation
+    bk = algebra.braket_ww(a,a)
+#    bk = (np.transpose(np.conjugate(a))*a)[0,0] # scalar product
+    bk1 = algebra.braket_ww(ap,a)
+#    bk1 = (np.transpose(np.conjugate(ap))*a)[0,0] # scalar product
     mus[2*i] = 2.*bk
     mus[2*i+1] = 2.*bk1
     am = a.copy() # new variables
@@ -87,15 +90,20 @@ def get_momentsA(v,m,n=100,A=None):
   """ Get the first n moments of a certain vector
   using the Chebychev recursion relations"""
   mus = np.array([0.0j for i in range(n)]) # empty arrray for the moments
-  am = v.copy() # zero vector
-  a = m*v  # vector number 1
-  bk = (np.transpose(np.conjugate(v))*A*v)[0,0] # scalar product
-  bk1 = (np.transpose(np.conjugate(a))*A*v)[0,0] # scalar product
+  am = algebra.matrix2vector(v) # zero vector
+  a = m@v  # vector number 1
+#  print(v.shape,A.shape)
+  bk = algebra.braket_wAw(v,A,v)
+#  bk = (np.transpose(np.conjugate(v))*A*v)[0,0] # scalar product
+  bk1 = algebra.braket_wAw(a,A,v)
+#  bk1 = (np.transpose(np.conjugate(a))*A*v)[0,0] # scalar product
   mus[0] = bk  # mu0
   mus[1] = bk1 # mu1
   for i in range(2,n): 
-    ap = 2.*m*a - am # recursion relation
-    bk = (np.transpose(np.conjugate(ap))*A*v)[0,0] # scalar product
+#    print(A)
+    ap = 2.*m@a - am # recursion relation
+    bk = algebra.braket_wAw(ap,A,v)
+#    bk = (np.transpose(np.conjugate(ap))*A*v)[0,0] # scalar product
     mus[i] = bk
     am = a.copy() # new variables
     a = ap.copy() # new variables
@@ -143,14 +151,17 @@ def get_moments_vivj_python(m0,vi,vj,n=100):
   mus = np.zeros(n,dtype=np.complex) # empty arrray for the moments
   v = vi.copy()
   am = v.copy()
-  a = m*v  # vector number 1
-  bk = (vj.H*v).todense().trace()[0,0] # calculate bk
-  bk1 = (vj.H*a).todense().trace()[0,0] # calculate bk
+  a = m@v  # vector number 1
+  bk = algebra.braket_ww(vj,v)
+#  bk = (vj.H*v).todense().trace()[0,0] # calculate bk
+  bk1 = algebra.braket_ww(vj,a)
+#  bk1 = (vj.H*a).todense().trace()[0,0] # calculate bk
   mus[0] = bk  # mu0
   mus[1] = bk1 # mu1
   for ii in range(2,n): 
-    ap = 2.*m*a - am # recursion relation
-    bk = (vj.H*ap).todense().trace()[0,0]
+    ap = 2.*m@a - am # recursion relation
+    bk = algebra.braket_ww(vj,ap)
+#    bk = (vj.H*ap).todense().trace()[0,0]
     mus[ii] = bk
     am = a.copy() # new variables
     a = ap.copy() # new variables
@@ -216,10 +227,12 @@ ldos = ldos0d
 
 
 def tdos(m_in,scale=10.,npol=None,ne=500,kernel="jackson",
-              ntries=20,ewindow=None,frand=None):
+              ntries=20,ewindow=None,frand=None,
+              operator=None):
   """Return two arrays with energies and local DOS"""
   if npol is None: npol = ne
-  mus = random_trace(m_in/scale,ntries=ntries,n=npol,fun=frand) 
+  mus = random_trace(m_in/scale,ntries=ntries,n=npol,fun=frand,
+          operator=operator) 
   if ewindow is None or abs(ewindow)>scale: # no window provided
     xs = np.linspace(-1.0,1.0,ne,endpoint=True)*0.99 # energies
   else:
@@ -239,25 +252,28 @@ def total_energy(m_in,scale=10.,npol=None,ne=500,ntries=20):
 
 
 
-def random_trace(m_in,ntries=20,n=200,fun=None):
+def random_trace(m_in,ntries=20,n=200,fun=None,operator=None):
   """ Calculates local DOS using the KPM"""
   if fun is not None: # check that dimensions are fine
     v0 = fun()
     if len(v0) != m_in.shape[0]: raise
   if fun is None:
 #    def fun(): return rand.random(nd) -.5 + 1j*rand.random(nd) -.5j
-    def fun(): return (rand.random(nd) - 0.5)*np.exp(1j*np.pi*rand.random(nd))
+    def fun(): return (rand.random(nd) - 0.5)*np.exp(2*1j*np.pi*rand.random(nd))
   m = csc(m_in) # saprse matrix
   nd = m.shape[0] # length of the matrix
-  mus = np.array([0.0j for j in range(2*n)])
   def pfun(x):
     v = fun()
     v = v/np.sqrt(v.dot(np.conjugate(v))) # normalize the vector
-    v = csc(v).transpose()
-    mus = get_moments(v,m,n=n) # get the chebychev moments
+#    v = csc(v).transpose()
+    if operator is None:
+      mus = get_moments(v,m,n=n) # get the chebychev moments
+    else:
+      mus = get_momentsA(v,m,n=2*n,A=operator) # get the chebychev moments
     return mus
   from . import parallel
   out = parallel.pcall(pfun,range(ntries))
+  mus = np.zeros(out[0].shape,dtype=np.complex)
   for o in out: mus = mus + o # add contribution
   return mus/ntries
 

@@ -270,7 +270,8 @@ class Geometry:
     Return the connections of each site
     """
     from . import neighbor
-    if self.dimensionality==0:
+#    if self.dimensionality==0:
+    if True:
       self.connections = neighbor.connections(self.r,self.r)
       return self.connections # return list
     else: raise
@@ -1516,13 +1517,12 @@ def neighbor_cells(num,dim=3):
 def write_profile(g,d,name="PROFILE.OUT",nrep=1,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep =1
-  x,y = g.x,g.y # get the coordinates
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:
-      m = np.matrix([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
+      m = np.array([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
   else:
-      m = np.matrix([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
+      m = np.array([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
   np.savetxt(name,m) # save in file
 
 

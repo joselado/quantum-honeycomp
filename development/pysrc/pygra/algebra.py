@@ -1,6 +1,7 @@
 from scipy.sparse import issparse
 from scipy.sparse import csc_matrix as csc
 import scipy.linalg as dlg
+import scipy.sparse.linalg as slg
 import numpy as np
 
 
@@ -13,6 +14,19 @@ def braket_wAw(w,A,wi=None):
     return (np.conjugate(wi)@A@w) # modern way
   else: # matrices and arrays
     return (np.conjugate(wi)@A@w)[0,0] # modern way
+
+
+
+
+def braket_ww(w,wi):
+  """
+  Compute the braket of two wavefunctions
+  """
+  w = matrix2vector(w) # convert to vector
+  wi = matrix2vector(wi) # convert to vector
+  return (np.conjugate(w)@wi) # modern way
+
+
 
 
 def disentangle_manifold(wfs,A):
@@ -53,4 +67,76 @@ def get_representation(wfs,A):
 
 
 
+## routines for diagonalization ##
+
+error = 1e-7
+
+
+
+accelerate = False
+
+def eigh(m):
+    """Wrapper for linalg"""
+    from . import algebraf90
+    if not accelerate: return dlg.eigh(m)
+    # check if doing slices helps
+    n = m.shape[0] # size of the matrix
+    mo = m[0:n:2,1:n:2] # off diagonal is zero
+#    if False: # assume block diagonal
+    if np.max(np.abs(mo))<error: # assume block diagonal
+        # detected block diagonal
+        (es0,vs0) = eigh(m[0:n:2,0:n:2]) # recall
+        (es1,vs1) = eigh(m[1:n:2,1:n:2]) # recall
+        es = np.concatenate([es0,es1]) # concatenate array
+        vs0 = algebraf90.todouble(vs0.T,0)
+        vs1 = algebraf90.todouble(vs1.T,1)
+        vs = np.concatenate([vs0,vs1])
+        return (es,vs.T) # return the eigenvaleus and eigenvectors
+
+    else:
+      if np.max(np.abs(m.imag))<error: # assume real
+          return dlg.eigh(m.real) # diagonalize real matrix
+      else: return dlg.eigh(m) # diagonalize complex matrix
+
+
+def eigvalsh(m):
+    """Wrapper for linalg"""
+    if not accelerate: return dlg.eigvalsh(m)
+    # check if doing slices helps
+    n = m.shape[0] # size of the matrix
+    mo = m[0:n:2,1:n:2] # off diagonal is zero
+#    if False: # assume block diagonal
+    if np.max(np.abs(mo))<error: # assume block diagonal
+        # detected block diagonal
+        es0 = eigvalsh(m[0:n:2,0:n:2]) # recall
+        es1 = eigvalsh(m[1:n:2,1:n:2]) # recall
+        es = np.concatenate([es0,es1]) # concatenate array
+        return es
+
+    else:
+      if np.max(np.abs(m.imag))<error: # assume real
+          return dlg.eigvalsh(m.real) # diagonalize real matrix
+      else: return dlg.eigvalsh(m) # diagonalize complex matrix
+
+
+
+def matrix2vector(v):
+    """Transform a matrix into a vector"""
+    if issparse(v): # sparse matrix
+      v = v.todense() # convert to conventional matrix
+    v = np.array(v) # convert to array
+    if len(v.shape)==1: return v
+    else: return v.reshape(v.shape[0]*v.shape[1])
+
+
+
+
+def smalleig(m,numw=10,evecs=False,tol=1e-7):
+  """
+  Return the smallest eigenvalues using arpack
+  """
+  eig,eigvec = slg.eigsh(m,k=numw,which="LM",sigma=0.0,
+                                  tol=tol)
+  if evecs:  return eig,eigvec.transpose()  # return eigenvectors
+  else:  return eig  # return eigenvalues
 
