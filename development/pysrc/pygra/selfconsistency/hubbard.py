@@ -51,19 +51,19 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   while True: # infinite loop
     ite += 1 # increase counter
     htmp.intra = h.intra + old_mf # add mean field 
-    t1 = time.clock()
+    t1 = time.time()
 # get eigenvectors
     eigvals,eigvecs,kvectors = htmp.eigenvectors(nkp,kpoints=True)
     eigvecs = np.conjugate(eigvecs)
 # fermi energy
-    t2 = time.clock()
+    t2 = time.time()
     fermi = get_fermi_energy(eigvals,filling,fermi_shift=fermi_shift)
 # occupied states
     eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi)
 # mean field
     mf,edc,charge,mag = magnetic_mean_field(voccs,U,collinear=collinear,
                                 totkp=totkp)
-    t3 = time.clock()
+    t3 = time.time()
     error = np.max(np.abs(old_mf-mf)) # absolute difference
     # total energy
     etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
@@ -215,18 +215,18 @@ def hubbardscf_spinless(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
   while True: # infinite loop
     ite += 1 # increase counter
     htmp.intra = h.intra + old_mf # add mean field 
-    t1 = time.clock()
+    t1 = time.time()
 # get eigenvectors
     eigvals,eigvecs,kvectors = htmp.eigenvectors(nkp,kpoints=True)
     eigvecs = np.conjugate(eigvecs)
 # fermi energy
-    t2 = time.clock()
+    t2 = time.time()
     fermi = get_fermi_energy(eigvals,filling,fermi_shift=fermi_shift)
 # occupied states
     eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi)
 # spinless mean field
     mf,edc,charge = spinless_mean_field(voccs,U,totkp=totkp)
-    t3 = time.clock()
+    t3 = time.time()
     print("Times in diagonalization",t2-t1)
     print("Times in new mean field",t3-t2)
     error = np.max(np.abs(old_mf-mf)) # absolute difference

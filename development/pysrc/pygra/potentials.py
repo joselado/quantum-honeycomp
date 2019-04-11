@@ -46,3 +46,36 @@ def commensurate_potential(g):
     if 0.49<abs(a12)<0.51: # angle is 60 degrees
       angle = np.pi/3.
       return cnpot(n=6,k=2.*np.pi/np.sqrt(g.a1.dot(g.a1)),angle=angle)
+
+
+
+
+
+
+def fibonacci(n,n0=0):
+  """Generate the Fibonacci sequence"""
+  a1 = [0] # first
+  a2 = [0,1] # first
+  while True:
+    a3 = a1 + a2
+    a1 = a2
+    a2 = a3
+    if len(a3)>n+n0: break
+  out = [a3[i] for i in range(n0,n0+n)] # output
+  return np.array(out)
+
+
+
+
+def thue_morse(n,n0=0):
+  """Generate the Thue-Morse sequence"""
+  out = []
+  for i in range(n0,n0+n): # loop over integers
+    ib = bin(i).split("b")[1] # in binary
+    acu = 0 # start
+    for iib in ib: # loop
+      if iib=="1": acu += 1
+    acu = acu%2 # modulus
+    out.append(acu) # output
+  return np.array(out)
+

@@ -6,6 +6,7 @@ from scipy.sparse import csc_matrix as csc
 from . import sculpt
 from .supercell import non_orthogonal_supercell
 from . import checkclass
+import scipy.linalg as lg
 
 try:
   from . import supercellf90
@@ -152,6 +153,11 @@ class Geometry:
       r = np.matrix(k).T # real space vectors
       return np.array((R*r).T)[0]
     return f # return function
+  def reciprocal2natural(self,v):
+      """
+      Return a natural vector in real reciprocal coordinates
+      """
+      return self.get_k2K_generator()(v)
   def get_fractional(self,center=False):
     """Fractional coordinates"""
     get_fractional(self,center=center) # get fractional coordinates
@@ -176,8 +182,9 @@ class Geometry:
     self.y[:] -= r0[1]
     self.z[:] -= r0[2]
     self.xyz2r() # update
-    self.get_fractional(center=True)
-    self.fractional2real()
+    if self.dimensionality>0:
+      self.get_fractional(center=True)
+      self.fractional2real()
   def write_function(self,fun,name="FUNCTION.OUT"):
     """Write a certain function"""
     f = open(name,"w")
@@ -1213,25 +1220,20 @@ def get_fractional(g,center=False):
   if dim==0: return
   else: # has dimension
     g.has_fractional = True # has fractional coordinates
-    if dim==1: R = np.matrix([g.a1]).T # transformation matrix
-    elif dim==2: R = np.matrix([g.a1,g.a2]).T # transformation matrix
-    elif dim==3: R = np.matrix([g.a1,g.a2,g.a3]).T # transformation matrix
-    else: raise
-    L = R.I # inverse matrix
+    R = np.array([g.a1,g.a2,g.a3]).T # transformation matrix
+    L = lg.inv(R) # inverse matrix
     store = [] # empty list
     for r in g.r:
-      rn = L*np.matrix(r).T  # transform
-      rn = np.array([rn.T[0,i] for i in range(dim)]) # convert to array
+      rn = L@np.array(r)  # transform
       store.append(rn) # store
     store = np.array(store) # convert to array
     if center: # center the unit cell
-      for i in range(dim):
-        store[:,i] = store[:,i]%1.
+        store = store%1.
     # if you remove the shift the Berry Green formalism does not work
     if dim>0: g.frac_x = store[:,0]
     if dim>1: g.frac_y = store[:,1]
     if dim>2: g.frac_z = store[:,2]
-    g.frac_r = np.array([store[:,i] for i in range(dim)]).transpose()
+    g.frac_r = store
 
 
 

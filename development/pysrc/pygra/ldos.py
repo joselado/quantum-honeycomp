@@ -153,7 +153,7 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos2d(h,e=0.0,delta=0.001,nrep=3,nk=None,mode="green",
+def ldos2d(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
              random=True,num_wf=20):
   """ Calculate DOS for a 2d system"""
   if mode=="green":

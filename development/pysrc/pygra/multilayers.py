@@ -177,7 +177,7 @@ def build_honeycomb_bilayer(h,t=0.1,mvl = None ):
     ho.txmy = mono2bi(h.txmy)  # increase intracell matrix
   elif h.dimensionality==1: # one dimensional system
     ho.inter = mono2bi(h.inter)  # increase intercell matrix
-    dx = np.array([g.celldis,0.,0.])
+    dx = g.a1
     ho.inter += add_interlayer(t,go.r,go.r+dx) # add interlayer coupling
   else:
     raise
@@ -218,7 +218,7 @@ def build_honeycomb_trilayer(h,t=0.1,mvl=None):
     ho.txmy = mono2tri(h.txmy)  # increase intracell matrix
   elif h.dimensionality==1: # one dimensional system
     ho.inter = mono2tri(h.inter)  # increase intercell matrix
-    dx = np.array([g.celldis,0.,0.])
+    dx = g.a1
     ho.inter += add_interlayer(t,go.r,go.r+dx) # add interlayer coupling
   else:
     raise

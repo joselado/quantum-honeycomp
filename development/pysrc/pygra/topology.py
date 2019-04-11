@@ -557,11 +557,17 @@ def berry_density(h,delta=0.002,es=np.linspace(-3.0,3.0,100),nk=100,
 
 
 
-def berry_green_map(h,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
-                  delta=0.002,nrep=2,integral=True):
+def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
+        ne=100,dk=0.0001,operator=None,
+                  delta=0.002,integral=True,eps=1e-1,
+                  energy=0.0,emax=0.0):
   """Return the Berry curvature map at a certain kpoint"""
   f = h.get_gk_gen(delta=delta,canonical_phase=True) # green function generator
   fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=True) 
+  # No minimum energy provided
+  if emin is None:
+      emin = algebra.eigvalsh(h.get_hk_gen()(k))[0] - 1.0
+      print("Minimum energy",emin)
   def fint(x):  
 #    return fgreen(x).trace()[0,0] # return diagonal
     return np.diag(fgreen(x)) # return diagonal
@@ -572,19 +578,38 @@ def berry_green_map(h,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None,
   if integral: # integrate up to the fermi energy
     def fint2(x):
       """Function to integrate using a complex contour, from 0 to 1"""
-      z0 = emin*np.exp(-1j*x*np.pi)/2.
-      z = z0 + emin/2.
+      de = emax-emin # energy window of the integration
+      ce = de/2. # center of the circle
+      z0 = -ce*np.exp(-1j*x*np.pi) # parametrize the circle
+      z = z0 + (emin+emax)/2. # shift the circle
       print("Evaluating",x)
       return -(fint(z)*z0).imag*np.pi # integral after the change of variables
     from .integration import integrate_matrix
-    out = integrate_matrix(fint2,xlim=[0.,1.],eps=1e-1)
+    out = integrate_matrix(fint2,xlim=[0.,1.],eps=eps)
     out = out.real # turn real
   else: # evaluate at the fermi energy
-    out = fint(0.0).real
-  print("Sum",np.sum(out))
+    out = fint(energy).real
+  return out # return result
+
+
+def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,**kwargs):
+  """
+  Write the Berry curvature of a kpoint in a file
+  """
+  if nk is None: # kpoint given
+    out = berry_green_map_kpoint(h,**kwargs) # get the result
+  else: # kpoint not given
+    from . import klist
+    out = [] # empty list
+    for i in range(nk): # random mesh
+      ik = np.random.random(3) # random kpoint
+      out.append(berry_green_map_kpoint(h,**kwargs))
+    out = np.mean(out,axis=0) # resum
   from . import geometry
   from .ldos import spatial_dos
-  geometry.write_profile(h.geometry,spatial_dos(h,out),name="BERRY_MAP.OUT",nrep=nrep)
+  # write in a file
+  geometry.write_profile(h.geometry,
+          spatial_dos(h,out),name="BERRY_MAP.OUT",nrep=nrep)
   return out
 
 

@@ -4,6 +4,7 @@ import scipy.linalg as lg
 import scipy.sparse.linalg as slg
 import os
 from .operators import operator2list
+from . import parallel
 from . import kpm
 from . import timing
 
@@ -257,29 +258,42 @@ def ev(h,operator=None,nk=30):
 
 
 
-def total_energy(h,nk=10,nbands=None,use_kpm=False,random=True,kp=None):
+def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
+        kp=None,mode="mesh",tol=1e-1):
   """Return the total energy"""
   h.turn_dense()
   if h.is_sparse and not use_kpm: 
     print("Sparse Hamiltonian but no bands given, taking 20")
     nbands=20
-  from .klist import kmesh
-  if kp is None: # no kpoints given
-    kp = kmesh(h.dimensionality,nk=nk)
-    if random==True: # random k-mesh
-      kp = [np.random.random(3) for k in kp]
   f = h.get_hk_gen() # get generator
   etot = 0.0 # initialize
   iv = 0
-  for k in kp: # loop over kpoints
+  def enek(k):
+    """Compute energy in this kpoint"""
     hk = f(k)  # kdependent hamiltonian
     if use_kpm: # Kernel polynomial method
-      etot += kpm.total_energy(hk,scale=10.,ntries=20,npol=100) # using KPM
+      return kpm.total_energy(hk,scale=10.,ntries=20,npol=100) # using KPM
     else: # conventional diagonalization
       if nbands is None: vv = lg.eigvalsh(hk) # diagonalize k hamiltonian
       else: vv,aa = slg.eigsh(hk,k=nbands,which="LM",sigma=0.0) 
-      etot += np.sum(vv[vv<0.0]) # sum energies below fermi energy
-  etot = etot/len(kp) # normalize
+      return np.sum(vv[vv<0.0]) # sum energies below fermi energy
+  # compute energy using different modes
+  if mode=="mesh":
+    from .klist import kmesh
+    kp = kmesh(h.dimensionality,nk=nk)
+    etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
+  elif mode=="random":
+    kp = [np.random.random(3) for i in range(nk)] # random points
+    etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
+  elif mode=="integrate":
+    from scipy import integrate
+    if h.dimensionality==1: # one dimensional
+        etot = integrate.quad(enek,-1.,1.,epsabs=tol,epsrel=tol)[0]
+    elif h.dimensionality==2: # two dimensional
+        etot = integrate.dblquad(lambda x,y: enek([x,y]),-1.,1.,-1.,1.,
+                epsabs=tol,epsrel=tol)[0]
+    else: raise
+  else: raise
   return etot
 
 

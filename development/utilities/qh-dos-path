@@ -12,6 +12,7 @@ matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
 
 fig = plt.figure()
+plt.subplots_adjust(left=0.25, bottom=0.25)
 
 fig.set_facecolor("white") # white
 

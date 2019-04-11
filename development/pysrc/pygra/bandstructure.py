@@ -127,6 +127,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     hk = hkgen(kpath[k]) # get hamiltonian
     if operator is None:
       es = diagf(hk)
+      es = np.sort(es) # sort energies
       for e in es:  # loop over energies
         f.write(str(k)+"   "+str(e)+"\n") # write in file
       if callback is not None: callback(k,es) # call the function

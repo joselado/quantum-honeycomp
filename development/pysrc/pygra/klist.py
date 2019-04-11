@@ -8,7 +8,7 @@ def default(g,nk=400):
   """ Input is geometry"""
   if g.dimensionality==0: return [0.] # return gamma point
   elif g.dimensionality==1: 
-    return np.linspace(0,1,nk) # normal path
+    return [np.array([k,0,0]) for k in np.linspace(0,1,nk)] # normal path
   elif g.dimensionality > 1:
     b1 = np.array([1.,0.,0.])
     b2 = np.array([0.,1.,0.])

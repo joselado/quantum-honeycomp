@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget_2">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -215,7 +215,7 @@
        <item row="1" column="0">
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -388,7 +388,7 @@
        <string/>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -452,7 +452,7 @@
           <item row="1" column="1">
            <widget class="QLineEdit" name="LDOS_polynomials">
             <property name="text">
-             <string>600</string>
+             <string>1000</string>
             </property>
            </widget>
           </item>
@@ -466,7 +466,7 @@
           <item row="3" column="1">
            <widget class="QLineEdit" name="num_ene_ldos">
             <property name="text">
-             <string>300</string>
+             <string>2000</string>
             </property>
            </widget>
           </item>
@@ -522,14 +522,14 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="DOS_polynomials">
             <property name="text">
-             <string>600</string>
+             <string>1000</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="DOS_iterations">
             <property name="text">
-             <string>20</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
@@ -543,7 +543,7 @@
           <item row="3" column="1">
            <widget class="QLineEdit" name="num_ene_dos">
             <property name="text">
-             <string>300</string>
+             <string>6000</string>
             </property>
            </widget>
           </item>
@@ -710,7 +710,7 @@
               <x>70</x>
               <y>40</y>
               <width>201</width>
-              <height>104</height>
+              <height>113</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
@@ -825,7 +825,7 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="num_ene_path">
             <property name="text">
-             <string>200</string>
+             <string>2000</string>
             </property>
            </widget>
           </item>
@@ -888,6 +888,41 @@
          <widget class="QPushButton" name="show_path">
           <property name="text">
            <string>Show path</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_12">
+       <attribute name="title">
+        <string>Eigenvalues</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_26">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_25">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_37">
+            <property name="text">
+             <string># of eigenvalues</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="num_eigenvalues">
+            <property name="toolTip">
+             <string>Minimum number of eigenvalues to compute (for small systems all of them will be computed)</string>
+            </property>
+            <property name="text">
+             <string>40</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="show_eigenvalues">
+          <property name="text">
+           <string>Show eigenvalues</string>
           </property>
          </widget>
         </item>

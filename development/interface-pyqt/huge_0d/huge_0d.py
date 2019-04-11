@@ -230,9 +230,9 @@ def show_dos():
   points = int(get("DOS_polynomials")) # number of polynomials
   x = np.linspace(-.9,.9,int(get("num_ene_dos"))) # energies
   h.intra = h.intra/6.0 # normalize
-  ntries = get("DOS_iterations")
+  ntries = int(get("DOS_iterations"))
   t0 = time.clock() # initial time
-  mus = kpm.random_trace(h.intra,n=points,ntries=100) # calculate moments
+  mus = kpm.random_trace(h.intra,n=points,ntries=ntries) # calculate moments
   y = kpm.generate_profile(mus,x) # calculate DOS 
   x,y = x*6.,y/6. # renormalize
   y = dos.convolve(x,y,delta=get("smearing_dos")) # add broadening
@@ -356,6 +356,19 @@ def show_path():
   execute_script("qh-path  ")
 
 
+def show_eigenvalues():
+    """
+    Show the eigenvalues
+    """
+    h = load_hamiltonian() # get the Hamiltonian
+    if h.intra.shape[0]<2000:
+        h.get_bands() # get the bandstructure
+    else:
+        ne = int(get("num_eigenvalues")) # number of eigenvalues
+        h.get_bands(num_bands=ne) # get the bandstructure
+    execute_script("qh-bands0d")
+
+
 
 
 def calculate_path_dos():
@@ -434,6 +447,7 @@ signals["show_spatial_dos"] = show_spatial_dos  # show DOS
 signals["show_lattice"] = show_lattice  # show magnetism
 #signals["show_full_spectrum"] = show_full_spectrum  # show all the eigenvalues
 signals["show_path"] = show_path  # show the path
+signals["show_eigenvalues"] = show_eigenvalues  # show the path
 signals["show_path_dos"] = show_path_dos  # show the path
 signals["show_potential"] = show_potential  # show the potential added
 signals["save_results"] = save_results  # save the results

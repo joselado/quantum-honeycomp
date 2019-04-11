@@ -124,7 +124,7 @@ def generate_parametric_hopping(h,f=None,mgenerator=None,
   h.intra = mgenerator(rs,rs)
   if h.dimensionality == 0: pass
   elif h.dimensionality == 1:
-    dr = np.array([g.celldis,0.,0.])
+    dr = g.a1
     h.inter = mgenerator(rs,rs+dr)
   elif h.dimensionality == 2:
     h.tx = mgenerator(rs,rs+g.a1)

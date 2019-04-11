@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from __future__ import print_function
 import numpy as np
@@ -9,34 +9,64 @@ import sys
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 
+###########################################
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider, Button, RadioButtons
+
 fig = plt.figure()
+ax = fig.add_subplot(111) # axis for the LDOS
+plt.subplots_adjust(left=0.1, bottom=0.25)
+t = np.arange(0.0, 1.0, 0.001)
+a0 = 5
+f0 = 3
+#s = a0*np.sin(2*np.pi*f0*t)
+#l, = plt.plot(t, s, lw=2, color='red')
+plt.axis([0, 1, -10, 10])
 
-fig.set_facecolor("white") # white
+axcolor = 'lightgoldenrodyellow'
+try:
+  axenergy = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
+except:
+  print("axcolor not possible to set")
+  axenergy = plt.axes([0.25, 0.1, 0.65, 0.03])
 
-name = sys.argv[1] # name of the file
 
-m = np.genfromtxt(name).transpose() # read file
+smax = 100
+senergy = Slider(axenergy, 'Saturation', 0., smax, valinit=smax)
+senergy.valtext.set_visible(False)
+
+
+
+
+####################################################
+
+m = np.genfromtxt(sys.argv[1]).transpose() # read file
 x = m[0] # x position
 y = m[1] # y position
-z = m[2]**3 # z position
-
-print("Maximum value is ",np.max(np.abs(z)))
-
-scale = np.abs(z)/np.max(np.abs(z))*100
-zsign = np.sign(z) # sign
+z = m[2] # z position
 
 
-
-
-plt.title(str(len(x))+" atoms")
-plt.scatter(x,y,color="black",s=1)
-try:
-  plt.scatter(x,y,s=scale,c=scale,edgecolor="none",cmap=plt.get_cmap("inferno"))
-except:
-  plt.scatter(x,y,s=scale,c=scale,edgecolor="none")
-plt.xticks([])
-plt.yticks([])
-plt.colorbar() # colorbar
+def update(val):
+  global ax
+  ax.clear() # clear LDOS
+  ax.axis("equal")
+  ax.set_xticks([])
+  ax.set_yticks([])
+  val = int(round(val))
+  scale = np.abs(z)/np.max(np.abs(z)) # scale to 0,1 interval
+  sat = smax/val # saturation percentage
+  scale = np.tanh(scale*sat)
+  scale = scale/np.max(scale)*np.sqrt(len(scale))*5 # rescale
+  ax.scatter(x,y,color="black",s=1)
+  try:
+    ax.scatter(x,y,s=scale,c=scale,edgecolor="none",cmap=plt.get_cmap("inferno"))
+  except:
+    ax.scatter(x,y,s=scale,c=scale,edgecolor="none")
 
 plt.axis("equal")
+
+
+update(smax)
+
+senergy.on_changed(update)
 plt.show()

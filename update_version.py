@@ -2,6 +2,20 @@
 from __future__ import print_function
 import os
 import numpy as np
+import sys
+
+
+if len(sys.argv)>1: # if input provided
+  if "update" in sys.argv[1]:
+    l = np.genfromtxt("VERSION.TXT") # read the version
+    n = l[2] # get the version number
+    a,b,c = str(int(l[0])),str(int(l[1])),str(int(n)) # create the three numbers
+    c= str(int(n + 1)) # increase number
+    open("VERSION.TXT","w").write(a+" "+b+" "+c)
+else:
+  print("Version number not updated, current is",a,b,c)
+
+
 
 l = np.genfromtxt("VERSION.TXT") # read the version
 n = l[2] # get the version number
@@ -23,14 +37,7 @@ os.system("cp "+name+".tar quantum-honeycomp-latest.tar") # create new tar file
 
 #exit()
 
-import sys
 
-if len(sys.argv)>1: # if input provided
-  if "update" in sys.argv[1]:
-    c= str(int(n + 1)) # increase number
-    open("VERSION.TXT","w").write(a+" "+b+" "+c)
-else:
-  print("Version number not updated, current is",a,b,c)
 
 # update the version number
 #open("VERSION.TXT","w").write(a+"  "+b+"  "+c)

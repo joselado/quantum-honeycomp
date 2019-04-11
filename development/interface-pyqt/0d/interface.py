@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -148,25 +148,19 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addWidget(self.ne_ldos, 0, 1, 1, 1)
         self.delta_ldos = QtWidgets.QLineEdit(self.tab_7)
         self.delta_ldos.setObjectName("delta_ldos")
-        self.gridLayout_6.addWidget(self.delta_ldos, 3, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.delta_ldos, 2, 1, 1, 1)
         self.label_20 = QtWidgets.QLabel(self.tab_7)
         self.label_20.setObjectName("label_20")
-        self.gridLayout_6.addWidget(self.label_20, 3, 0, 1, 1)
-        self.nk_ldos = QtWidgets.QLineEdit(self.tab_7)
-        self.nk_ldos.setObjectName("nk_ldos")
-        self.gridLayout_6.addWidget(self.nk_ldos, 1, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.label_20, 2, 0, 1, 1)
         self.label_17 = QtWidgets.QLabel(self.tab_7)
         self.label_17.setObjectName("label_17")
         self.gridLayout_6.addWidget(self.label_17, 0, 0, 1, 1)
-        self.label_18 = QtWidgets.QLabel(self.tab_7)
-        self.label_18.setObjectName("label_18")
-        self.gridLayout_6.addWidget(self.label_18, 1, 0, 1, 1)
         self.label_19 = QtWidgets.QLabel(self.tab_7)
         self.label_19.setObjectName("label_19")
-        self.gridLayout_6.addWidget(self.label_19, 2, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.label_19, 1, 0, 1, 1)
         self.window_ldos = QtWidgets.QLineEdit(self.tab_7)
         self.window_ldos.setObjectName("window_ldos")
-        self.gridLayout_6.addWidget(self.window_ldos, 2, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.window_ldos, 1, 1, 1, 1)
         self.gridLayout_11.addLayout(self.gridLayout_6, 0, 0, 1, 1)
         self.show_interactive_ldos = QtWidgets.QPushButton(self.tab_7)
         self.show_interactive_ldos.setObjectName("show_interactive_ldos")
@@ -308,7 +302,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addWidget(self.tabWidget, 1, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 28))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 878, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -365,9 +359,7 @@ class Ui_MainWindow(object):
         self.ne_ldos.setText(_translate("MainWindow", "300"))
         self.delta_ldos.setText(_translate("MainWindow", "0.03"))
         self.label_20.setText(_translate("MainWindow", "Smearing"))
-        self.nk_ldos.setText(_translate("MainWindow", "20"))
         self.label_17.setText(_translate("MainWindow", "# of energies"))
-        self.label_18.setText(_translate("MainWindow", "# of kpoints"))
         self.label_19.setText(_translate("MainWindow", "Energy window"))
         self.window_ldos.setText(_translate("MainWindow", "0.5"))
         self.show_interactive_ldos.setText(_translate("MainWindow", "Show LDOS"))
