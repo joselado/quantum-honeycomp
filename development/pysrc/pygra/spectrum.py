@@ -23,7 +23,6 @@ def fermi_surface(h,write=True,output_file="FERMI_MAP.OUT",
   kxs = np.linspace(-nsuper,nsuper,nk)  # generate kx
   kys = np.linspace(-nsuper,nsuper,nk)  # generate ky
   iden = np.identity(h.intra.shape[0],dtype=np.complex)
-  kdos = [] # empty list
   kxout = []
   kyout = []
   if reciprocal: R = h.geometry.get_k2K() # get matrix
@@ -53,16 +52,26 @@ def fermi_surface(h,write=True,output_file="FERMI_MAP.OUT",
 
   ts = timing.Testimator()
   # setup the operator
+  rs = [] # empty list
   for x in kxs:
     for y in kxs:
-      if info: print("Doing",x,y)
-      r = np.matrix([x,y,0.]).T # real space vectors
-      k = np.array((R*r).T)[0] # change of basis
+      rs.append([x,y,0.]) # store
+  def getf(r): # function to compute FS
+      rm = np.matrix(r).T
+      k = np.array((R*rm).T)[0] # change of basis
       hk = hk_gen(k) # get hamiltonian
-      kdos.append(get_weight(hk)) # add to the list
-#      kdos.append(np.sum([tdos[i,i]*(-1)**i for i in range(tdos.shape[0])])) # add to the list
-      kxout.append(x)
-      kyout.append(y)
+      return get_weight(hk)
+  rs = np.array(rs) # transform into array
+  from . import parallel
+  kxout = rs[:,0] # x coordinate
+  kyout = rs[:,1] # y coordinate
+  if parallel.cores==1: # serial execution
+      kdos = [] # empty list
+      for r in rs: # loop
+        if info: print("Doing",r)
+        kdos.append(getf(r)) # add to the list
+  else: # parallel execution
+      kdos = parallel.pcall(getf,rs) # compute all
   if write:  # optionally, write in file
     f = open(output_file,"w") 
     for (x,y,d) in zip(kxout,kyout,kdos):

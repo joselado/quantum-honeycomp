@@ -14,12 +14,12 @@ sys.path.append(qhroot+"/pysrc/") # python libraries
 import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
 is_checked = qtwrap.is_checked  # get the value of a certain variable
-getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
 
 from qh_interface import * # import all the libraries needed
 
+from pygra import parallel
 
 from interfacetk import interfacetk
 modify_geometry = lambda x: interfacetk.modify_geometry(x,qtwrap)
@@ -43,6 +43,8 @@ def initialize():
   has_spin = False
   h = g.get_hamiltonian(is_sparse=True,has_spin=has_spin,is_multicell=True,
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))
+  # workaround to put Fermi energy in zero approx
+  h.shift_fermi(-get("tinter")/16.) 
   mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
   h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
   h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
@@ -86,15 +88,22 @@ def show_bands(self):
       h.turn_dense()
       num_bands = None
   else: num_bands = max(20,int(get("nbands")))
-  opname = getbox("bands_operator")
+  opname = qtwrap.getbox("bands_operator")
   kpath = klist.default(h.geometry,nk=int(get("nk_bands")))  # write klist
   if opname=="None": op = None # no operators
   elif opname=="Valley": op = h.get_operator("valley_upper") # no operators
+  check_parallel()  # check if there is parallelization
   h.get_bands(kpath=kpath,num_bands=num_bands,operator=op) 
   comp.kill()
   execute_script("qh-bands2d ")
   
   
+
+def check_parallel():
+  """Check if there is parallelization"""
+  if qtwrap.getbox("use_parallelization") =="Yes":
+      parallel.cores = parallel.maxcpu
+  else: parallel.cores = 1 # single core
 
 
 
@@ -110,10 +119,17 @@ def show_dos(self):
   ndos = npol*10
   delta = get("delta_dos")
   scale = 10.0 # scale for KPM
-  ewindow = get("ewindow_dos")/scale
-  dos.dos2d(h,use_kpm=True,nk=nk,ntries=1,delta=delta,random=True,
-              ndos=ndos,kpm_window=ewindow,scale=scale)
-  execute_script("tb90-dos  ")
+  check_parallel() # check if there is parallelization
+  name = qtwrap.getbox("mode_dos") # mode of the DOS
+  if name=="KPM":
+    dos.dos(h,use_kpm=True,nk=nk,ntries=1,scale=scale,delta=5*delta,
+          ne=int(10000/delta))
+  elif name=="Lowest":
+    numw = int(get("numw_dos")) # number of waves
+    energies = None
+    dos.dos2d(h,nk=nk,delta=delta,numw=numw)
+  else: raise
+  execute_script("qh-dos DOS.OUT ")
   comp.kill()
   return
 
@@ -123,6 +139,7 @@ def show_dos(self):
 def show_fermi_surface(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
   ndos = int(get("ne_dos"))
+  check_parallel() # check if there is parallelization
   if h.dimensionality==2:
     spectrum.fermi_surface(h,e=get("energy_fs"),nk=int(get("nk_fs")),
             nsuper = 2,reciprocal=True,delta=get("delta_fs"),

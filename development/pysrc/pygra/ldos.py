@@ -109,28 +109,33 @@ def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,nk=40):
 
 
 
-def slabldos(h,energies=np.linspace(-1.0,1.0,40),delta=None,nk=40):
+def spatial_energy_profile(h,energies=np.linspace(-1.0,1.0,40),
+        delta=None,nk=40):
   """Computes the DOS for each site of an slab, only for 2d"""
-  if h.dimensionality!=2: raise # nope
+  if h.dimensionality==0:
+      pos = h.geometry.x
+      nk = 1
+  elif h.dimensionality==1: pos = h.geometry.y
+  elif h.dimensionality==2: pos = h.geometry.z
+  else: raise
   ds = ldosmap(h,energies=energies,delta=delta,nk=nk)
-  if len(ds[0])!=len(h.geometry.z): 
-    print("Wrong dimensions",len(ds[0]),len(h.geometry.z))
+  if len(ds[0])!=len(pos): 
+    print("Wrong dimensions",len(ds[0]),len(pos))
     raise
   f = open("DOSMAP.OUT","w")
-  f.write("# energy, index, DOS, zposition\n")
+  f.write("# energy, index, DOS, position\n")
   for ie in range(len(energies)):
-    for iz in range(len(h.geometry.z)):
+    for ip in range(len(pos)):
       f.write(str(energies[ie])+"  ")
-      f.write(str(iz)+"  ")
-      f.write(str(ds[ie,iz])+"   ")
-      f.write(str(h.geometry.z[iz])+"\n")
+      f.write(str(ip)+"  ")
+      f.write(str(ds[ie,ip])+"   ")
+      f.write(str(pos[ip])+"\n")
   f.close()
   return energies,np.transpose(ds) # retunr LDOS 
 
 
 
-
-
+slabldos = spatial_energy_profile # redefine
 
 
 

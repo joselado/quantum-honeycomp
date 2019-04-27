@@ -223,8 +223,8 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
 
 
 def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
-          ndos=500,numw=20,random=True,kpm_window=1.0,
-          window=None,energies=None):
+          ndos=2000,random=True,kpm_window=1.0,
+          window=None,energies=None,**kwargs):
   """ Calculate density of states of a 2d system"""
   if h.dimensionality!=2: raise # only for 2d
   ks = []
@@ -237,9 +237,11 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
     hkgen = h.get_hk_gen() # get generator
     if delta is None: delta = 6./nk
 # conventiona algorithm
-    return calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
-                          is_sparse=h.is_sparse,numw=numw,window=window,
-                          energies=energies) 
+    (xs,ys) = calculate_dos_hkgen(hkgen,ks,ndos=ndos,delta=delta,
+                          is_sparse=h.is_sparse,window=window,
+                          energies=energies,**kwargs) 
+    write_dos(xs,ys) # write in file
+    return (xs,ys)
   else: # use the kpm
     if delta is not None: npol = int(20*scale/delta)
     else: npol = ndos//10
@@ -261,7 +263,7 @@ def dos2d(h,use_kpm=False,scale=10.,nk=100,ntries=1,delta=None,
         mus += kpm.random_trace(hk/scale,ntries=ntries,n=npol)
     else:
         ff = lambda k: kpm.random_trace(hkgen(k)/scale,ntries=ntries,n=npol)
-        mus = parallel.pcall(kk,ks) # parallel call
+        mus = parallel.pcall(ff,ks) # parallel call
         mus = np.array(mus).sum(axis=0) # sum all the contributions
     mus /= len(ks) # normalize by the number of kpoints
     if energies is None:
@@ -394,26 +396,36 @@ def convolve(x,y,delta=None):
 
 
 
-def dos_kpm(h,scale=10.0,ewindow=4.0,ne=1000,
+def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
         delta=0.01,ntries=10,nk=100,operator=None):
   """Calculate the KDOS bands using the KPM"""
   hkgen = h.get_hk_gen() # get generator
   numk = nk**h.dimensionality
-  tr = timing.Testimator("DOS",maxite=numk) # generate object
   ytot = np.zeros(ne) # initialize
   npol = 5*int(scale/delta) # number of polynomials
-  for ik in range(numk): # loop over kpoints
-    tr.iterate()
-    k = np.random.random(3)
+  def f(k):
     hk = hkgen(k) # get Hamiltonian
     if callable(operator): op = operator(k) # call the function if necessary
     else: op = operator # take the same operator
     (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,operator=op,
                    ewindow=ewindow,ntries=ntries) # compute
-    ytot += y # add contribution
-  ytot /= nk # normalize
+    return (x,y)
+  from . import parallel
+  if parallel.cores==1:
+    tr = timing.Testimator("DOS",maxite=numk) # generate object
+    for ik in range(numk): # loop over kpoints
+      tr.iterate()
+      k = np.random.random(3)
+      (x,y) = f(k) # compute
+      ytot += y # add contribution
+    ytot /= nk # normalize
+  else: # parallel calculation
+    ks = [np.random.random(3) for i in range(numk)] # different kpoints
+    out = parallel.pcall(f,ks) # compute all
+    ytot = np.mean([out[i][1] for i in range(numk)],axis=0) # average DOS
+    x = out[0][0] # energies
   np.savetxt("DOS.OUT",np.matrix([x,ytot]).T) # save in file
-  return (x,y)
+  return (x,ytot)
 
 
 
@@ -423,7 +435,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
-    return dos_kpm(h,scale=scale,ewindow=ewindow,ne=len(energies),delta=delta,
+    return dos_kpm(h,scale=scale,ewindow=ewindow,delta=delta,
                    ntries=ntries,nk=nk,operator=operator)
   else: # conventional methods
     if operator is None: # no operator given

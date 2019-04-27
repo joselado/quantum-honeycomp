@@ -61,7 +61,7 @@ class Geometry:
 #    except: pass # continue with normal way
     if self.dimensionality==1:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
-      s = supercell3d(self,n1=nsuper)
+      s = supercell1d(self,nsuper)
     elif self.dimensionality==2:
       try: # two number given
         nsuper1 = nsuper[0]
@@ -1218,22 +1218,29 @@ def get_fractional(g,center=False):
 #  if g.dimensionality<2: raise # stop 
   dim = g.dimensionality # dimensionality
   if dim==0: return
-  else: # has dimension
-    g.has_fractional = True # has fractional coordinates
+  elif dim==1: # one dimensional
+    R = np.array([g.a1,[0.,1.,0.],[0.,0.,1.]]).T # transformation matrix
+    if np.max(np.abs(g.a1[1:2]))>1e-6: raise
+  elif dim==2: # two dimensional
+    R = np.array([g.a1,g.a2,[0.,0.,1.]]).T # transformation matrix
+    if np.abs(g.a1[2])>1e-6 or np.abs(g.a2[2])>1e-6: raise
+  elif dim==3:
     R = np.array([g.a1,g.a2,g.a3]).T # transformation matrix
-    L = lg.inv(R) # inverse matrix
-    store = [] # empty list
-    for r in g.r:
-      rn = L@np.array(r)  # transform
-      store.append(rn) # store
-    store = np.array(store) # convert to array
-    if center: # center the unit cell
-        store = store%1.
-    # if you remove the shift the Berry Green formalism does not work
-    if dim>0: g.frac_x = store[:,0]
-    if dim>1: g.frac_y = store[:,1]
-    if dim>2: g.frac_z = store[:,2]
-    g.frac_r = store
+  else: raise
+  g.has_fractional = True # has fractional coordinates
+  L = lg.inv(R) # inverse matrix
+  store = [] # empty list
+  for r in g.r:
+    rn = L@np.array(r)  # transform
+    store.append(rn) # store
+  store = np.array(store) # convert to array
+  if center: # center the unit cell
+      store = store%1.
+  # if you remove the shift the Berry Green formalism does not work
+  if dim>0: g.frac_x = store[:,0]
+  if dim>1: g.frac_y = store[:,1]
+  if dim>2: g.frac_z = store[:,2]
+  g.frac_r = store
 
 
 
@@ -1575,15 +1582,6 @@ def hyperhoneycomb_lattice():
 
 
 
-
-def pyrochlore_lattice():
-  """Return a pyrochlore lattice"""
-  rs = [np.array([0.,0.,0.])]
-  rs += [np.array([-.25,.25,0.])]
-  rs += [np.array([0.,.25,.25])]
-  rs += [np.array([-.25,0.,.25])]
-  fac = np.sqrt(rs[1].dot(rs[1])) # distance to FN
-  rs = [np.array(r)/fac for r in rs] # positions
 
 
 

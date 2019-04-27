@@ -22,7 +22,7 @@ def geometry_film(g,nz=1):
   go = g.supercell([1,1,nz]) # create the supercell
   go.dimensionality = 2 # reduce dimensionality
   go = sculpt.set_xy_plane(go) # put in the xy plane
-  go.real2fractional()
+  go.get_fractional(center=True)
   go.fractional2real()
   return go
 

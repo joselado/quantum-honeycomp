@@ -245,12 +245,8 @@ class hamiltonian():
   def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
-    if self.dimensionality == 0:
-      first_neighbors0d(self)
-    elif self.dimensionality == 1:
-      first_neighbors1d(self)
-    elif self.dimensionality == 2:
-      first_neighbors2d(self)
+    if 0<=self.dimensionality<3:
+      first_neighborsnd(self)
     elif self.dimensionality == 3:
       from .multicell import first_neighbors as fnm
       fnm(self)
@@ -408,6 +404,20 @@ class hamiltonian():
       my = self.extract(name="my")
       mz = self.extract(name="mz")
       return np.array([mx,my,mz]).T # return array
+  def compute_vev(self,name="sz",**kwargs):
+      """
+      Compute a VEV of a spatially resolved operator
+      """
+      n = len(self.geometry.r) # number of sites
+      ops = [operators.index(self,n=[i]) for i in range(n)]
+      if name=="sx": op = operators.get_sx(self)
+      elif name=="sy": op = operators.get_sy(self)
+      elif name=="sz": op = operators.get_sz(self)
+      elif name=="density": op = operators.index(self,n=range(n))
+      else: raise
+      ops = [o@op for o in ops] # define operators
+      return spectrum.ev(self,operator=ops,**kwargs).real
+      
 #    from .magnetism import get_magnetization
 #    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
@@ -869,7 +879,7 @@ def is_hermitic(m):
 
 
 
-def first_neighbors2d(h):
+def first_neighborsnd(h):
   """ Gets a first neighbor hamiltonian"""
   r = h.geometry.r    # x coordinate 
   g = h.geometry
@@ -877,61 +887,27 @@ def first_neighbors2d(h):
   a1, a2 = g.a1, g.a2
   def gett(r1,r2):
     """Return hopping given two sets of positions"""
-    if not h.is_sparse: return create_fn_hopping(r1,r2)
-    else: 
-      from . import neighbor
-      pairs = neighbor.find_first_neighbor(r1,r2)
-      if len(pairs)==0: rows,cols = [],[]
-      else: rows,cols = np.array(pairs).T # transpose
-      data = np.array([1. for c in cols])
-      n = len(r1)
-      return csc_matrix((data,(rows,cols)),shape=(n,n),dtype=np.complex)
-
-  h.intra = gett(r,r)
-  h.tx = gett(r,r+a1)
-  h.ty = gett(r,r+a2)
-  h.txy = gett(r,r+a1+a2)
-  h.txmy = gett(r,r+a1-a2)
-  if h.has_spin: # add spin degree of freedom 
-    h.has_spin = False
-    h.turn_spinful() # if it has spin degree of freedom
-  
-
-
-
-def first_neighbors1d(h):
-  """ Gets a first neighbor hamiltonian"""
-  r = h.geometry.r    # x coordinate 
-  a1 = h.geometry.a1 # get a1
-# first neighbors hopping, all the matrices
-  h.intra = create_fn_hopping(r,r)
-  h.inter = create_fn_hopping(r,r+a1)
-  if h.has_spin: # if it has spin degree of freedom
-    from .increase_hilbert import m2spin
-    h.intra = m2spin(h.intra,h.intra) # intracell term 
-    h.inter = m2spin(h.inter,h.inter) # hopping
-
-
-def first_neighbors0d(h):
-  """ Gets a first neighbor hamiltonian"""
-  r = h.geometry.r    # x coordinate 
-  from . import neighbor
-  pairs = neighbor.find_first_neighbor(r,r)
-  rows,cols = np.array(pairs).T # transpose
-  data = np.array([1. for c in cols])
-  n = len(r)
-  if h.has_spin: # spinful calculation
-    data = np.concatenate([data,data])
-    rows = np.array(rows)
-    rows = np.concatenate([2*rows,2*rows+1])
-    cols = np.array(cols)
-    cols = np.concatenate([2*cols,2*cols+1])
-    n = n*2
-  h.intra = csc_matrix((data,(rows,cols)),shape=(n,n),dtype=np.complex)
-  if h.is_sparse: pass # for sparse matrix
-  else: h.intra = h.intra.todense()  # intracell
-
-
+    from . import neighbor
+    pairs = neighbor.find_first_neighbor(r1,r2)
+    if len(pairs)==0: rows,cols = [],[]
+    else: rows,cols = np.array(pairs).T # transpose
+    data = np.array([1. for c in cols])
+    n = len(r1)
+    m = csc_matrix((data,(rows,cols)),shape=(n,n),dtype=np.complex)
+    m = h.spinless2full(m) # add spin degree of freedom if necessary
+    if h.is_sparse: return m
+    else: return m.todense()
+  if h.dimensionality==0:
+    h.intra = gett(r,r)
+  elif h.dimensionality==1:
+    h.intra = gett(r,r)
+    h.inter = gett(r,r+a1)
+  elif h.dimensionality==2:
+    h.intra = gett(r,r)
+    h.tx = gett(r,r+a1)
+    h.ty = gett(r,r+a2)
+    h.txy = gett(r,r+a1+a2)
+    h.txmy = gett(r,r+a1-a2)
 
 
 

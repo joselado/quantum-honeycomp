@@ -115,21 +115,20 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
       if operator is None: return eig
       else: return (eig,eigvec)
   # open file and get generator
-  f = open("BANDS.OUT","w") # open bands file
   hkgen = h.get_hk_gen() # generator hamiltonian
   if kpath is None:
     from . import klist
     kpath = klist.default(h.geometry,nk=nk) # generate default klist
-  tr = timing.Testimator("BANDSTRUCTURE") # generate object
-  for k in range(len(kpath)): # loop over kpoints
 #    print("Bands in kpoint",k,"of",len(kpath),end="\r")
-    tr.remaining(k,len(kpath))
+  def getek(k):
+    """Compute this k-point"""
+    out = "" # output string
     hk = hkgen(kpath[k]) # get hamiltonian
     if operator is None:
       es = diagf(hk)
       es = np.sort(es) # sort energies
       for e in es:  # loop over energies
-        f.write(str(k)+"   "+str(e)+"\n") # write in file
+        out += str(k)+"   "+str(e)+"\n" # write in file
       if callback is not None: callback(k,es) # call the function
     else:
       es,ws = diagf(hk)
@@ -146,12 +145,24 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
         if isinstance(operator, (list,)): # input is a list
             waws = [evaluate(w,k,A) for A in operator]
         else: waws = [evaluate(w,k,operator)]
-        f.write(str(k)+"   "+str(e)+"  ") # write in file
-        for waw in waws:  f.write(str(waw)+"  ") # write in file
-        f.write("\n") # next line
+        out += str(k)+"   "+str(e)+"  " # write in file
+        for waw in waws:  out += str(waw)+"  " # write in file
+        out += "\n" # next line
       # callback function in each iteration
       if callback is not None: callback(k,es,ws) # call the function
-    f.flush()
+    return out # return string
+  ### Now evaluate the function
+  from . import parallel
+  f = open("BANDS.OUT","w") # open bands file
+  if parallel.cores==1: ### single thread ###
+    tr = timing.Testimator("BANDSTRUCTURE") # generate object
+    for k in range(len(kpath)): # loop over kpoints
+      tr.remaining(k,len(kpath)) # estimate of the time
+      f.write(getek(k)) # write this kpoint
+      f.flush() # flush in file
+  else: # parallel run
+      esk = parallel.pcall(getek,range(len(kpath))) # compute all
+      for e in esk: f.write(e)
   f.close()
   print("\nBANDS finished")
   return np.genfromtxt("BANDS.OUT").transpose() # return data

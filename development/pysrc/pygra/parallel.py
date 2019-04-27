@@ -4,6 +4,8 @@ import scipy.linalg as lg
 from . import algebra
 try:
   from multiprocess import Pool
+  import multiprocess
+  maxcpu = multiprocess.cpu_count()
 except:
     print("Multiprocess not working")
     def Pool(n=1): # workaround
