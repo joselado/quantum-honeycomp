@@ -13,6 +13,9 @@ if len(sys.argv)>1: # if input provided
     c= str(int(n + 1)) # increase number
     open("VERSION.TXT","w").write(a+" "+b+" "+c)
 else:
+  l = np.genfromtxt("VERSION.TXT") # read the version
+  n = l[2] # get the version number
+  a,b,c = str(int(l[0])),str(int(l[1])),str(int(n)) # create the three numbers
   print("Version number not updated, current is",a,b,c)
 
 

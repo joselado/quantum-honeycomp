@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(980, 659)
+        MainWindow.resize(980, 698)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_6 = QtWidgets.QGridLayout(self.centralwidget)
@@ -380,7 +380,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7 = QtWidgets.QGridLayout()
         self.gridLayout_7.setObjectName("gridLayout_7")
         self.show_chern = QtWidgets.QPushButton(self.tab_10)
-        self.show_chern.setEnabled(False)
+        self.show_chern.setEnabled(True)
         self.show_chern.setObjectName("show_chern")
         self.gridLayout_7.addWidget(self.show_chern, 3, 0, 1, 1)
         self.show_z2 = QtWidgets.QPushButton(self.tab_10)
@@ -584,7 +584,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "2D systems"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Multilayer graphene"))
         self.label_14.setText(_translate("MainWindow", "Magnetic field"))
         self.swave.setText(_translate("MainWindow", "0.0"))
         self.Bz.setText(_translate("MainWindow", "0.0"))

@@ -154,6 +154,18 @@ def pickup_hamiltonian():
 
 
 
+def show_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  nk = int(np.sqrt(get("nk_topology")))
+  opname = getbox("operator_topology")
+  if opname=="None": op=None
+  elif opname=="Valley": op = operators.get_valley(h,projector=True)
+  else: raise
+  topology.chern(h,nk=nk,operator=op)
+  execute_script("qh-chern BERRY_CURVATURE.OUT")
+
+
+
 
 
 
@@ -338,6 +350,7 @@ signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
+signals["show_chern"] = show_chern  # show Chern number
 signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["compute_sweep"] = sweep_parameter  
 signals["show_structure_3d"] = show_structure_3d
