@@ -377,7 +377,7 @@ class Ui_MainWindow(object):
         self.gridLayout_7 = QtWidgets.QGridLayout()
         self.gridLayout_7.setObjectName("gridLayout_7")
         self.show_chern = QtWidgets.QPushButton(self.tab_10)
-        self.show_chern.setEnabled(False)
+        self.show_chern.setEnabled(True)
         self.show_chern.setObjectName("show_chern")
         self.gridLayout_7.addWidget(self.show_chern, 3, 0, 1, 1)
         self.show_z2 = QtWidgets.QPushButton(self.tab_10)
@@ -541,7 +541,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget_2.setCurrentIndex(0)
-        self.tabWidget_3.setCurrentIndex(0)
+        self.tabWidget_3.setCurrentIndex(1)
         self.bands_color.setCurrentIndex(0)
         self.tabWidget_4.setCurrentIndex(1)
         self.tabWidget.setCurrentIndex(0)

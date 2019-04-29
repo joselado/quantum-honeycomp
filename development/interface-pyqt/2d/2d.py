@@ -186,6 +186,22 @@ def show_berry2d():
   topology.berry_map(h,nk=nk,operator=op)
   execute_script("qh-berry2d BERRY_MAP.OUT")
 
+
+def show_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  nk = int(np.sqrt(get("nk_topology")))
+  opname = getbox("operator_topology")
+  if opname=="None": op=None
+  elif opname=="Valley": op = operators.get_valley(h,projector=True)
+  else: raise 
+  topology.chern(h,nk=nk,operator=op)
+  execute_script("qh-chern BERRY_CURVATURE.OUT")
+
+  
+
+
+
+
   
 
 
@@ -348,6 +364,7 @@ signals["show_bands"] = show_bands  # show bandstructure
 signals["show_structure"] = show_structure  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
 signals["show_berry2d"] = show_berry2d  # show DOS
+signals["show_chern"] = show_chern  # show the chern number
 signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
