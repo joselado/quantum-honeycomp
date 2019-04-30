@@ -19,7 +19,6 @@ try:
       nn = fn.number_neighborsf90(r1t,r2t)
       if nn==0: return []  # if no neighbors found
       pairs = np.array(fn.first_neighborsf90(r1t,r2t,nn))
-      print(pairs.T,nn,len(r1))
       return pairs.T # return the pairs
 
 

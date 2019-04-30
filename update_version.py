@@ -46,7 +46,7 @@ os.system("cp "+name+".tar quantum-honeycomp-latest.tar") # create new tar file
 #open("VERSION.TXT","w").write(a+"  "+b+"  "+c)
 
 os.system("git add .")
-os.system("git commit -m 'New version'")
+os.system("git commit -m 'Update'")
 os.system("git push")
 
 
