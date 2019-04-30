@@ -33,7 +33,7 @@ def get_anaconda_command(name="python"):
   for l in lines: print(l)
   for l in lines: # loop over pythons
     l = l.split(" ")[-1] # get last line 
-    if "anaconda" in l:
+    if "anaconda3" in l:
       print("\nFound Anaconda ",name,"in",l)
       return l
   print("Anaconda",name,"not found")

@@ -6,16 +6,37 @@ from scipy.sparse import csc_matrix,bmat
 minimum_hopping = 1e-3
 
 
-def find_first_neighbor(r1,r2):
-   """Calls the fortran routine"""
-   from . import first_neighborsf90 as fn
-   r1t = np.matrix(r1).T
-   r2t = np.matrix(r2).T
-   nn = fn.number_neighborsf90(r1t,r2t)
-#   print nn
-   if nn==0: return []  # if no neighbors found
-   pairs = np.array(fn.first_neighborsf90(r1t,r2t,nn))
-   return pairs.T # return the pairs
+
+
+
+try: 
+  from . import first_neighborsf90
+  def find_first_neighbor(r1,r2):
+      """Calls the fortran routine"""
+      from . import first_neighborsf90 as fn
+      r1t = np.matrix(r1).T
+      r2t = np.matrix(r2).T
+      nn = fn.number_neighborsf90(r1t,r2t)
+      if nn==0: return []  # if no neighbors found
+      pairs = np.array(fn.first_neighborsf90(r1t,r2t,nn))
+      print(pairs.T,nn,len(r1))
+      return pairs.T # return the pairs
+
+
+except:
+  print("ERROR, neighbor fortran routine is not well compiled")
+  def find_first_neighbor(r1,r2):
+     """Calls the fortran routine"""
+     print("Using ultraslow function!!!!!!!!!!")
+     pairs = []
+     for i in range(len(r1)):
+       for j in range(len(r2)):
+         ri = r1[i]
+         rj = r2[j]
+         dr = ri-rj
+         dr = dr.dot(dr)
+         if 0.8<dr<1.2: pairs.append([i,j])
+     return np.array(pairs)
 
 
 
@@ -28,26 +49,6 @@ def connections(r1,r2):
   return out # return list
 
 
-
-
-
-
-try: 
-  from . import first_neighborsf90
-except:
-  print("ERROR, neighbor fortran routine is not well compiled")
-  def find_first_neighbor(r1,r2):
-     """Calls the fortran routine"""
-     print("Using ultraslow function!!!!!!!!!!")
-     pairs = []
-     for i in range(len(r1)):
-       for j in range(len(r1)):
-         ri = r1[i]
-         rj = r2[j]
-         dr = ri-rj
-         dr = dr.dot(dr)
-         if 0.8<dr<1.2: pairs.append([i,j])
-     return np.array(pairs)
 
 
 

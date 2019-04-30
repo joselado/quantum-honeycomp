@@ -50,6 +50,7 @@ integer, intent(out) :: pairs(2,np)
 integer :: i,j,ip ! counter
 real (kind=8) :: dr,dx,dy,dz
 
+pairs = 0
 
 ip = 1 ! start counter
 

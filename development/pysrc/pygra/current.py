@@ -10,20 +10,22 @@ def current_operator(h0):
   """Get the current operator"""
   h = h0.copy()
   h = h0.get_multicell() # multicell Hamiltonian
-  if h.dimensionality != 1: raise # only for 1d
-  if not h.is_multicell: # no multicell
-    def fj(k):
-      phik = np.exp(1j*2.*np.pi*k) # complex phase
-      jk = 1j*(h.inter*phik - h.inter.H*np.conjugate(phik)) 
-      return jk
-  else: # multicell Hamiltonian
-    def fj(k):
-      jk = h.intra*0. # initialize
-      for t in h.hopping:
-        phik = np.exp(1j*2.*np.pi*k*t.dir[0]) # complex phase
-        jk = jk + 1j*t.m*phik*t.dir[0]
-      return jk
-  return fj
+  if h.dimensionality == 0: return None
+  elif h.dimensionality == 1:
+    if not h.is_multicell: # no multicell
+      def fj(k):
+        phik = np.exp(1j*2.*np.pi*k) # complex phase
+        jk = 1j*(h.inter*phik - h.inter.H*np.conjugate(phik)) 
+        return jk
+    else: # multicell Hamiltonian
+      def fj(k):
+        jk = h.intra*0. # initialize
+        for t in h.hopping:
+          phik = np.exp(1j*2.*np.pi*k*t.dir[0]) # complex phase
+          jk = jk + 1j*t.m*phik*t.dir[0]
+        return jk
+    return fj
+  else: raise
 
 
 

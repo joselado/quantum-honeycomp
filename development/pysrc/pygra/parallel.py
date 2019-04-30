@@ -72,6 +72,10 @@ def pcall_mp(fun,args,cores=cores):
 
 def pcall(fun,args): # define the function
   global cores
-  if cores==1: return pcall_serial(fun,args) # one core, simply iterate
-  else: return pcall_mp(fun,args,cores=cores) # call in parallel
+  from multiprocessing import current_process
+  if current_process().name == 'MainProcess': # main process
+    if cores==1: return pcall_serial(fun,args) # one core, simply iterate
+    else: return pcall_mp(fun,args,cores=cores) # call in parallel
+  # child process
+  else: return pcall_serial(fun,args) # one core, simply iterate
 

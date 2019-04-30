@@ -62,6 +62,7 @@ class hamiltonian():
     fill = filling + extrae/self.intra.shape[0] # filling
     self.shift_fermi(-get_fermi_energy(es,fill)) # shift the fermi energy
   def __init__(self,geometry=None):
+    self.data = dict() # empty dictionary with various data
     self.has_spin = True # has spin degree of freedom
     self.prefix = "" # a string used a prefix for different files
     self.path = "" # a path used for different files

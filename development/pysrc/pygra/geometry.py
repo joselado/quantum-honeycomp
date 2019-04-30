@@ -18,6 +18,7 @@ except:
 class Geometry:
   """ Class for a geometry in a system """
   def __init__(self):
+    self.data = dict() # empty dictionary with different data
     self.has_sublattice = False # has sublattice index
     self.sublattice_number = 2 # two sublattices
     self.has_fractional = False

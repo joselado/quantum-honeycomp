@@ -20,6 +20,7 @@ def twisted_bilayer(m0=3,rotate=True,shift=[0.,0.],center="AB/BA",
   theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
   print("Theta",theta*180.0/np.pi)
   g.angle = theta # terrible workaround
+  g.data["angle"] = theta # store the angle of the geometry
   nsuper = [[m0,m0+r,0],[-m0-r,2*m0+r,0],[0,0,1]]
   g = geometry.non_orthogonal_supercell(g,m=nsuper,
            reducef=lambda x: 3*np.sqrt(x))
