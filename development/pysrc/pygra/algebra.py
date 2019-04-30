@@ -77,8 +77,8 @@ accelerate = False
 
 def eigh(m):
     """Wrapper for linalg"""
-    from . import algebraf90
     if not accelerate: return dlg.eigh(m)
+    from . import algebraf90
     # check if doing slices helps
     n = m.shape[0] # size of the matrix
     mo = m[0:n:2,1:n:2] # off diagonal is zero
