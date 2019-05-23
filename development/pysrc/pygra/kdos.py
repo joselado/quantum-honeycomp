@@ -221,7 +221,9 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
   if delta is None:
       delta = 1*(max(energies) - min(energies))/len(energies)
   if kpath is None: 
-    if h1.dimensionality==3:
+    if h1.dimensionality==1:
+      kpath = [[0.,0.,0.]]
+    elif h1.dimensionality==3:
       g2d = h1.geometry.copy() # copy Hamiltonian
       g2d = sculpt.set_xy_plane(g2d)
       kpath = klist.default(g2d,nk=nk)

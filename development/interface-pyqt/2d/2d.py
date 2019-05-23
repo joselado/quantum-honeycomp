@@ -116,6 +116,10 @@ def special_pairing(h):
         h.add_pairing(delta,mode="swaveA")
     elif deltatype=="sigma_z": # only in one sublattice
         h.add_pairing(delta,mode="swavez")
+    elif deltatype=="Haldane": # only in one sublattice
+        h.add_pairing(delta,mode="haldane")
+    elif deltatype=="AntiHaldane": # only in one sublattice
+        h.add_pairing(delta,mode="antihaldane")
     else: raise # not implemented
 
 

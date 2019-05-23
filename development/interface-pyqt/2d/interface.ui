@@ -239,6 +239,16 @@
               <string>sigma_z</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Haldane</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>AntiHaldane</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

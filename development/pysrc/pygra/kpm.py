@@ -215,7 +215,7 @@ def local_dos(m_in,i=0,n=200,use_fortran=use_fortran):
 def ldos0d(m_in,i=0,scale=10.,npol=None,ne=500,kernel="jackson"):
   """Return two arrays with energies and local DOS"""
   if npol is None: npol = ne
-  mus = local_dos(m_in/scale,i=i,n=npol) # get coefficients
+  mus = local_dos(csc_matrix(m_in)/scale,i=i,n=npol) # get coefficients
   xs = np.linspace(-1.0,1.0,ne,endpoint=True)*0.99 # energies
   ys = generate_profile(mus,xs,kernel=kernel)
   return (scale*xs,ys/scale)

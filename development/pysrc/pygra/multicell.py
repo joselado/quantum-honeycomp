@@ -523,7 +523,11 @@ def kchain(h,k=[0.,0.,0.]):
 #  h = turn_multicell(h0) # multicell form
   if not h.is_multicell: h = h.get_multicell()
   dim = h.dimensionality # dimensionality
-  if dim>1: # 2D or 3D
+  if dim==1: # 1D
+      for t in h.hopping:
+          if t.dir[0]==1: return h.intra,t.m
+      raise
+  elif dim>1: # 2D or 3D
     intra = np.zeros(h.intra.shape) # zero amtrix
     inter = np.zeros(h.intra.shape) # zero amtrix
     intra = h.intra # initialize

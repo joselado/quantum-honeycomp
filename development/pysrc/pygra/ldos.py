@@ -10,7 +10,7 @@ from . import klist
 from . import operators
 from . import timing
 
-def ldos0d(h,e=0.0,delta=0.01):
+def ldos0d(h,e=0.0,delta=0.01,write=True):
   """Calculates the local density of states of a hamiltonian and
      writes it in file"""
   if h.dimensionality==0:  # only for 0d
@@ -20,8 +20,51 @@ def ldos0d(h,e=0.0,delta=0.01):
   d = [ -(g[i,i]).imag/np.pi for i in range(len(g))] # get imaginary part
   d = spatial_dos(h,d) # convert to spatial resolved DOS
   g = h.geometry  # store geometry
-  write_ldos(g.x,g.y,d,z=g.z) # write in file
+  if write: write_ldos(g.x,g.y,d,z=g.z) # write in file
   return d
+
+
+
+def ldoskpm(h,m,energies=np.linspace(-1.,1.,100),
+        delta=0.01,scale = 10.0,i=0):
+    """Compute a local DOS using the KPM"""
+    npol = 1*int(scale/delta) # number of polynomials
+    from . import kpm
+    def get(j):
+      es,ds = kpm.ldos(m,i=j,scale=scale,npol=npol,ne=npol*5)
+      return es,ds # return
+    from scipy.interpolate import interp1d
+    if h.has_spin and h.has_eh: # spin with electron-hole
+        (es,ds1) = get(4*i)
+        (es,ds2) = get(4*i+1)
+        (es,ds3) = get(4*i+2)
+        (es,ds4) = get(4*i+3)
+        ds = ds1+ds2+ds3+ds4
+    elif h.has_spin and not h.has_eh: # spinful
+        (es,ds1) = get(2*i)
+        (es,ds2) = get(2*i+1)
+    elif not h.has_spin and not h.has_eh: # spinless
+        (es,ds) = get(i)
+    else: raise
+    f = interp1d(es,ds.real,bounds_error=False,fill_value=0.0)
+    return energies,f(energies)
+
+
+
+
+
+def dos_site(h,i=0,mode="ED",energies=np.linspace(-1.,1.,100),**kwargs):
+    """DOS in a particular site for different energies"""
+    if h.dimensionality!=0: raise # only for 0d
+    if mode=="ED":
+      out = []
+      for e in energies:
+          d = ldos0d(h,e=e,write=False,**kwargs)
+          out.append(d[i]) # store
+      return (energies,np.array(out)) # return result
+    elif mode=="KPM":
+        return ldoskpm(h,h.intra,energies=energies,i=i,**kwargs)
+
 
 
 
