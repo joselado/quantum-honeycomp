@@ -10,6 +10,7 @@ import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 
 fig = plt.figure()
+plt.gcf().canvas.set_window_title('Structure')
 
 fig.set_facecolor("white") # white
 

@@ -5,10 +5,12 @@ import pylab as py
 import sys
 import numpy as np
 import matplotlib
+import matplotlib.pyplot as plt
 matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
 fig = py.figure()
 fig.subplots_adjust(0.1,0.2)
+plt.gcf().canvas.set_window_title('Momentum resolved DOS')
 
 
 

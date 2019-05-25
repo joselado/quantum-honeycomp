@@ -26,6 +26,11 @@ https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.161414
 ![Alt text](screenshots/qah.png?raw=true "QAH state")
 
 
+## Confined modes in 0D systems
+Spectra and spatially resolved density of states of a triangular graphene island, showing the emergence of confined modes
+![Alt text](screenshots/island.png?raw=true "Confined modes in a graphene island")
+
+
 
 # Capabilities #
 - Tight binding models in different lattices (triangular, square, honeycomb, Kagome, Lieb, diamond, pyrochlore)
