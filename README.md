@@ -35,6 +35,10 @@ Spectra and spatially resolved density of states of a triangular graphene island
 Electronic spectra of a massive honeycomb lattice in the presence of an off-plane magnetic field, giving rise to Landau levels and chiral edge states
 ![Alt text](screenshots/zzqh.png?raw=true "Landau levels in a massive zigzag honeycomb ribbon")
 
+## Twisted bilayer graphene
+Bandstructure and local density of states of twisted bilayer graphene at the magic angle, showing the emergence of a flat band, which an associated triangular density of states
+https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.121407
+![Alt text](screenshots/tbg.png?raw=true "Magic angle twisted bilayer graphene")
 
 # Capabilities #
 - Tight binding models in different lattices (triangular, square, honeycomb, Kagome, Lieb, diamond, pyrochlore)

@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 fig = plt.figure()
+plt.gcf().canvas.set_window_title('Local DOS')
 ax = fig.add_subplot(111) # axis for the LDOS
 plt.subplots_adjust(left=0.1, bottom=0.25)
 t = np.arange(0.0, 1.0, 0.001)
@@ -56,7 +57,7 @@ def update(val):
   scale = np.abs(z)/np.max(np.abs(z)) # scale to 0,1 interval
   sat = smax/val # saturation percentage
   scale = np.tanh(scale*sat)
-  scale = scale/np.max(scale)*np.sqrt(len(scale))*5 # rescale
+  scale = scale/np.max(scale)*np.sqrt(len(scale))/2 # rescale
   ax.scatter(x,y,color="black",s=1)
   try:
     ax.scatter(x,y,s=scale,c=scale,edgecolor="none",cmap=plt.get_cmap("inferno"))
