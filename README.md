@@ -31,6 +31,10 @@ Spectra and spatially resolved density of states of a triangular graphene island
 ![Alt text](screenshots/island.png?raw=true "Confined modes in a graphene island")
 
 
+## Landau levels
+Electronic spectra of a massive honeycomb lattice in the presence of an off-plane magnetic field, giving rise to Landau levels and chiral edge states
+![Alt text](screenshots/zzqh.png?raw=true "Landau levels in a massive zigzag honeycomb ribbon")
+
 
 # Capabilities #
 - Tight binding models in different lattices (triangular, square, honeycomb, Kagome, Lieb, diamond, pyrochlore)
