@@ -16,7 +16,9 @@ window = qtwrap.main() # this is the main interface
 
 
 
-from qh_interface import * # import all the libraries needed
+from interfacetk.qh_interface import * # import all the libraries needed
+from interfacetk import common # common routines for all the geometries
+
 
 
 
@@ -90,18 +92,7 @@ def initialize():
 
 def show_bands(self=0):
   h = pickup_hamiltonian() # get hamiltonian
-  opname = getbox("bands_color")
-  if opname=="None": op = None # no operators
-  elif opname=="Sx": op = h.get_operator("sx") # off plane case
-  elif opname=="Sy": op = h.get_operator("sy")# off plane case
-  elif opname=="Sz": op = h.get_operator("sz")# off plane case
-  elif opname=="Valley": op = h.get_operator("valley")
-  elif opname=="z-position": op = h.get_operator("zposition")
-  elif opname=="Interface" and not h.has_eh: 
-      op = h.get_operator("interface")
-  else: op = None
-  h.get_bands(operator=op)
-  execute_script("qh-bands1d  ")
+  common.get_bands(h,qtwrap) # wrapper
 
 
 def show_ldos():

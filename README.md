@@ -7,17 +7,24 @@ This program allows to perform tight binding calculations with a user friendly i
 
 # How to install #
 
-The program has been developed to run in Linux machines. Execute the script "install" to compile all the necesary libraries,
-which will also add to your PATH the folder ../bin, where the script quantum-honeycomp is present. 
+The program runs in Linux and Mac machines. 
 
-Alternatively, you can download the file "quantum-honeycomp-latest.tar", uncompress it and execute the script "install"
+Download the file "quantum-honeycomp-latest.tar", uncompress it, and execute the script "install". Afterwards, you can execute the program by writting in a terminal "quantum-honeycomp"
 
-This program uses several python libraries. For Debian/Ubuntu machines, a script called "autoinstall" will install all the
-necessary libraries. This program partially runs on Mac OSX, the user interface
-shows which modes can be executed in a mac machine.
+This program uses several Python libraries. The simplest way of getting all the dependencies is by installing Python Anaconda from https://www.anaconda.com/distribution/#download-section 
 
 For using this program in Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
 a version of ubuntu in that virtual machine, and following the previous instructions.
+
+
+# Examples
+This program allows to study a variety of electronic states by means of tight binding models, in particular
+
+## Quantum anomalous Hall state
+Honeycomb lattice with Rashba spin-orbit coupling and exchange field, giving rise to a net Chern number and chiral edge states
+https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.161414
+![Alt text](screenshots/qah.png?raw=true "QAH state")
+
 
 
 # Capabilities #

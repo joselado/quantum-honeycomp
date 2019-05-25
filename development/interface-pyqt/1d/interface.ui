@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>770</width>
+    <width>1017</width>
     <height>626</height>
    </rect>
   </property>
@@ -279,6 +279,13 @@
         </item>
         <item row="1" column="0">
          <layout class="QGridLayout" name="gridLayout_2">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string># kpoints</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
@@ -321,19 +328,27 @@
               <string>Valley</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>IPR</string>
+             </property>
+            </item>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_9">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="nk_bands">
             <property name="text">
-             <string># kpoints</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="nk_bands">
+           <widget class="QComboBox" name="bands_colormap"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_38">
             <property name="text">
-             <string>100</string>
+             <string>Colormap</string>
             </property>
            </widget>
           </item>
@@ -892,7 +907,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>770</width>
+     <width>1017</width>
      <height>25</height>
     </rect>
    </property>

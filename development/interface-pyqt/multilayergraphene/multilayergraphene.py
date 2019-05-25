@@ -107,7 +107,7 @@ def show_bands(self=0):
   else: op =None
   kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
   h.get_bands(operator=op,kpath=kpath)
-  execute_script("qh-bands2d  ")
+  execute_script("qh-bands --dim 2  ")
   comp.kill()
 
 

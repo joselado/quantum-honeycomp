@@ -15,8 +15,8 @@ getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
 
-
-from qh_interface import * # import all the libraries needed
+from interfacetk.qh_interface import * # import all the libraries needed
+from interfacetk import common # common routines for all the geometries
 
 
 
@@ -96,29 +96,47 @@ def initialize():
   if check("rashba"): h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
   h.shift_fermi(get("fermi")) # shift fermi energy
-  if check("kanemele"):  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-  if check("haldane"):  h.add_haldane(get("haldane")) # intrinsic SOC
-  if check("antihaldane"):  h.add_antihaldane(get("antihaldane")) 
-  if check("swave"):  h.add_swave(get("swave")) 
+  if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
+  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
+  if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
+  if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
+  if abs(get("swave"))>0.0: 
+      h = h.get_multicell()
+      special_pairing(h)
   return h
+
+
+
+
+
+def special_pairing(h):
+    """Create a special pairing function"""
+    delta = get("swave") # value
+    deltatype = getbox("pairing_type") # type of pairing
+    if deltatype=="Uniform":
+        h.add_pairing(delta,mode="swave")
+    elif deltatype=="One sublattice": # only in one sublattice
+        h.add_pairing(delta,mode="swaveA")
+    elif deltatype=="sigma_z": # only in one sublattice
+        h.add_pairing(delta,mode="swavez")
+    elif deltatype=="Haldane": # only in one sublattice
+        h.add_pairing(delta,mode="haldane")
+    elif deltatype=="AntiHaldane": # only in one sublattice
+        h.add_pairing(delta,mode="antihaldane")
+    else: raise # not implemented
+
+
+
+
+
+
+
 
 
 def show_bands(self=0):
   h = pickup_hamiltonian() # get hamiltonian
-  opname = getbox("bands_color")
-  if opname=="None": op = None # no operators
-  elif opname=="Sx": op = h.get_operator("sx") # off plane case
-  elif opname=="Sy": op = h.get_operator("sy")# off plane case
-  elif opname=="Sz": op = h.get_operator("sz")# off plane case
-  elif opname=="Valley": op = h.get_operator("valley")
-  elif opname=="z-position": op = h.get_operator("zposition")
-  elif opname=="Interface" and not h.has_eh: 
-      op = h.get_operator("interface")
-  else: op = None
-  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
-  h.get_bands(operator=op,kpath=kpath)
-  execute_script("qh-bands2d  ")
+  common.get_bands(h,qtwrap) # wrapper
 
 
 def show_ldos():

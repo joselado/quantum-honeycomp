@@ -9,18 +9,17 @@ qhroot = os.environ["QHROOT"] # root path
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
-import qtwrap # import the library with simple wrappaers to qt4
+from interfacetk import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
 
 
-from qh_interface import * # import all the libraries needed
+from interfacetk.qh_interface import * # import all the libraries needed
+from interfacetk import common # common routines for all the geometries
 
-
-
-
+common.initialize(qtwrap) # do several common initializations
 
 
 
@@ -100,8 +99,6 @@ def initialize():
   if abs(get("swave"))>0.0: 
       h = h.get_multicell()
       special_pairing(h)
-#  h.add_peierls(get("peierls")) # shift fermi energy
-
   return h
 
 
@@ -130,16 +127,7 @@ def special_pairing(h):
 def show_bands(self=0):
   comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
-  opname = getbox("bands_color")
-  if opname=="None": op = None # no operators
-  elif opname=="Sx": op = h.get_operator("sx") # off plane case
-  elif opname=="Sy": op = h.get_operator("sy")# off plane case
-  elif opname=="Sz": op = h.get_operator("sz")# off plane case
-  elif opname=="Valley": op = h.get_operator("valley")
-  else: op =None
-  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
-  h.get_bands(operator=op,kpath=kpath)
-  execute_script("qh-bands2d  ")
+  common.get_bands(h,qtwrap) # get the band structure
   comp.kill()
 
 

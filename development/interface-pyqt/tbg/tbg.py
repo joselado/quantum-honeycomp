@@ -11,13 +11,15 @@ qhroot = os.environ["QHROOT"] # root path
 
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
-import qtwrap # import the library with simple wrappaers to qt4
+from interfacetk import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
 is_checked = qtwrap.is_checked  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
 
-from qh_interface import * # import all the libraries needed
+from interfacetk.qh_interface import * # import all the libraries needed
+from interfacetk import common # common routines for all the geometries
+common.initialize(qtwrap) # do several common initializations
 
 from pygra import parallel
 
@@ -77,25 +79,8 @@ def initialize():
 
 
 def show_bands(self):
-  comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
-  if h.intra.shape[0]<4000:
-    num_bands = int(get("nbands"))
-    if num_bands> h.intra.shape[0]-3: 
-      h.turn_dense()
-      num_bands = None
-    if num_bands<0: 
-      h.turn_dense()
-      num_bands = None
-  else: num_bands = max(20,int(get("nbands")))
-  opname = qtwrap.getbox("bands_operator")
-  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))  # write klist
-  if opname=="None": op = None # no operators
-  elif opname=="Valley": op = h.get_operator("valley_upper") # no operators
-  check_parallel()  # check if there is parallelization
-  h.get_bands(kpath=kpath,num_bands=num_bands,operator=op) 
-  comp.kill()
-  execute_script("qh-bands2d ")
+  common.get_bands(h,qtwrap) # wrapper
   
   
 

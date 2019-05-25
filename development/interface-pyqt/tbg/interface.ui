@@ -113,14 +113,28 @@
     <item row="0" column="1" rowspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
         <string>Structure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="0" column="0">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="show_structure">
+          <property name="text">
+           <string>Show structure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="show_structure_3d">
+          <property name="text">
+           <string>Show structure 3D</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="1">
            <widget class="QLineEdit" name="nsuper_struct">
@@ -138,20 +152,6 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="show_structure">
-          <property name="text">
-           <string>Show structure</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="show_structure_3d">
-          <property name="text">
-           <string>Show structure 3D</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab">
@@ -161,28 +161,28 @@
        <layout class="QGridLayout" name="gridLayout_9">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>nbands</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>nkpoints</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="nbands">
             <property name="text">
              <string>20</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="nk_bands">
             <property name="text">
              <string>100</string>
@@ -197,7 +197,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="bands_operator">
+           <widget class="QComboBox" name="bands_color">
             <item>
              <property name="text">
               <string>None</string>
@@ -208,6 +208,26 @@
               <string>Valley</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>IPR</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Layer</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="bands_colormap"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Colormap</string>
+            </property>
            </widget>
           </item>
          </layout>

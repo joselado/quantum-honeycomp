@@ -18,8 +18,12 @@ parser.add_argument("--input",default="BANDS.OUT",
         help='Input file with the bands')
 parser.add_argument("--dim",default=0,
         help='Dimension of the system')
+parser.add_argument("--cblabel",default="",
+        help='Colorbar label')
 parser.add_argument("--show",default="True",
         help='Show the bandstructure')
+parser.add_argument("--cmap",default="RGB",
+        help='Color map')
 
 args = parser.parse_args() # get the arguments
 
@@ -32,7 +36,7 @@ def plot_bands():
   import numpy as np
   cdict={'red': ((0., 0, 0),(0.6,0.0,0.0),(1, 1.0, 1.0)), 'green': ((0., 0.0, 0.0),(0.4,1.0,1.0),(0.6,1.0,1.0),(1, 0.0, 0.0)), 'blue': ((0., 1.0, 1.0),(0.4,0.0,0.0), (1, 0.0, 0.0))}
   import matplotlib
-  my_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
+  rgb_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
   
   
   m = np.genfromtxt(args.input).transpose()
@@ -48,9 +52,10 @@ def plot_bands():
     print("Total color below Ef", tc)
   
   
-  
+   
   k = m[0] # default x axis
-  k = (k - np.min(k))/(np.max(k) -np.min(k))
+  if args.dim=="0": k = range(len(m[0])) # indexes
+  else: k = (k - np.min(k))/(np.max(k) -np.min(k))
   e = m[1] # default x axis
   xlabel = "K-path" # default
   # plot a rectangle in the ocupied levels
@@ -62,12 +67,15 @@ def plot_bands():
     fig.subplots_adjust(0.3,0.3)
   if draw_color: # plot with color
     fig.subplots_adjust(0.3,0.1)
-    col = plt.scatter(k,e,c=color,cmap=my_cmap, edgecolors='none')
+    if args.cmap=="RGB": cmap = rgb_cmap # red-green-blue colormap
+    else: cmap = plt.get_cmap(args.cmap) # get the colormap
+    col = plt.scatter(k,e,c=color,cmap=cmap, edgecolors='none')
     from matplotlib import ticker
     cb = plt.colorbar(orientation="horizontal")
     tick_locator = ticker.MaxNLocator(nbins=5)
     cb.locator = tick_locator
     cb.update_ticks()
+    cb.set_label(args.cblabel) # set the label
   plt.xlim([min(k),max(k)])   # x axis range
   plt.ylim([min(e),max(e)])   # y axis range
   
@@ -81,7 +89,11 @@ def plot_bands():
   bandstructure = plt.gcf()
   bandstructure.canvas.set_window_title('Bandstructure')
 # add the lines in the bandstructure
-  if True: # two dimensional
+  if args.dim=="0": # zero dimensional
+      plt.xlabel("State index")
+  elif args.dim=="1": # zero dimensional
+      plt.xticks([0.,0.5,1.],["$\Gamma$","$X$","$\Gamma$"])
+  elif args.dim=="2": # two dimensional
     try: ll = open("BANDLINES.OUT","r").readlines()
     except:
         print("BANDLINES.OUT not found")

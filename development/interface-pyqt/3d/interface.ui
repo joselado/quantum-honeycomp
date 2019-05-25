@@ -294,16 +294,6 @@
             </item>
             <item>
              <property name="text">
-              <string>Interface</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>z-position</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
               <string>Sx</string>
              </property>
             </item>
