@@ -18,7 +18,7 @@ a version of ubuntu in that virtual machine, and following the previous instruct
 
 
 # Examples
-This program allows to study a variety of electronic states by means of tight binding models, in particular
+This program allows to study a variety of electronic states by means of tight binding models as shown below.
 
 ## Quantum anomalous Hall state
 Honeycomb lattice with Rashba spin-orbit coupling and exchange field, giving rise to a net Chern number and chiral edge states
