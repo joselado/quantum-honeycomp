@@ -50,6 +50,11 @@ Electronic spectra of a massive honeycomb lattice in the presence of an off-plan
 ![Alt text](screenshots/zzqh.png?raw=true "Landau levels in a massive zigzag honeycomb ribbon")
 
 
+## Artificial topological superconductors
+Bogoliuvov de Gennes band structructure of a two-dimensional gas in a square lattice with Rashba spin-orbit coupling, off-plane exchange field and s-wave superconducting proximity effect. When superconductivity is turned on, a gap opens up in the spectra hasting a non-trivial Chern number, giving rise to propagating Majorana modes in the system
+![Alt text](screenshots/topologicalSC.png?raw=true "Artificial topological superconductor in a square lattice")
+
+
 ## Quantum Valley Hall effect
 Band structure of Bernal stacked bilayer graphene, showing the emergence of a gap when an interlayer bias is applied. The previous gap hosts a non-trivial valley Chern number, giving rise to the emergence of pseudo-helical states in the edge of the system
 ![Alt text](screenshots/qvh.png?raw=true "Quantum valley Hall state in biased bilayer AB graphene")
