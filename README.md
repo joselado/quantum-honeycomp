@@ -30,6 +30,10 @@ https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.161414
 Honeycomb lattice with Kane-Mele spin-orbit coupling and Rashba spin-orbit coupling, giving rise to a gapped spectra with a non-trivial Z2 invariant and helical edge states https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.95.226801
 ![Alt text](screenshots/qsh.png?raw=true "QSH state")
 
+## Magnetism in graphene zigzag nanoribbons
+Self-consistent mean field calculation of a zigzag graphene ribbon, with electronic interactions included as a mean field Hubbard model. Interactions give rise to an edge magnetization in the ribbon, with an antiferromagnetic alignment between edges
+![Alt text](screenshots/zzscf.png?raw=true "Magnetism in zigzag nanoribbons")
+
 
 ## Confined modes in 0D systems
 Spectra and spatially resolved density of states of a triangular graphene island, showing the emergence of confined modes

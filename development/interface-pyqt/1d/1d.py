@@ -171,8 +171,7 @@ def pickup_hamiltonian():
 def show_magnetism():
   """Show the magnetism of the system"""
   h = pickup_hamiltonian() # get the Hamiltonian
-  h.write_magnetization() # write the magnetism
-  execute_script("qh-moments",mayavi=True)
+  common.show_exchange(h,qtwrap)
 
 
 

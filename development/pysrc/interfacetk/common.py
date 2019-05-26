@@ -47,6 +47,27 @@ def get_kdos(h,window):
 
 
 
+def show_exchange(h,window):
+    """Show the exchange field"""
+    nrep = max([int(window.get("magnetization_nrep")),1]) # replicas
+    h.write_magnetization(nrep=nrep) # write the magnetism
+    execute_script("qh-moments",mayavi=True)
+
+
+def show_dos(h,window):
+  nk = int(window.get("dos_nk"))
+  delta = window.get("dos_delta")
+  if h.dimensionality==0:
+    dos.dos0d(h,es=np.linspace(-3.1,3.1,500),delta=delta)
+  elif h.dimensionality==1:
+    dos.dos1d(h,ndos=400)
+  elif h.dimensionality==2:
+    dos.dos2d(h,ndos=500,delta=delta,nk=nk)
+  else: raise
+  execute_script("qh-dos  DOS.OUT")
+
+
+
 
 
 
@@ -61,10 +82,9 @@ def check_parallel(qtwrap):
 
 def set_colormaps(form,name,cs=[]):
     """Add the different colormaps to a combox"""
-    cb = getattr(form,name)
     try: cb = getattr(form,name)
     except:
-        print("Combox",name,"not found")
+        print("Combobox",name,"not found")
         return
     cb.clear() # clear the items
     cb.addItems(cs)

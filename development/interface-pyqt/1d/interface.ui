@@ -469,9 +469,23 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="DOS_smearing">
+           <widget class="QLineEdit" name="dos_delta">
             <property name="text">
              <string>0.01</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>Number of k-points</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="dos_nk">
+            <property name="text">
+             <string>100</string>
             </property>
            </widget>
           </item>
@@ -751,6 +765,20 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_17">
         <item row="0" column="0">
+         <widget class="QLabel" name="label_39">
+          <property name="text">
+           <string>Number of unit cells</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="magnetization_nrep">
+          <property name="text">
+           <string>5</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
          <widget class="QPushButton" name="show_magnetism">
           <property name="text">
            <string>Show magnetism</string>
