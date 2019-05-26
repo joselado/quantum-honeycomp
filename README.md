@@ -35,8 +35,8 @@ Self-consistent mean field calculation of a zigzag graphene ribbon, with electro
 ![Alt text](screenshots/zzscf.png?raw=true "Magnetism in zigzag nanoribbons")
 
 
-## Nodal line semimetal
-band structure of a slab of a 3D nodal line semimetal in a diamond lattice, showing the emergence of topological zero energy drumhead states in the surface of the slab https://link.springer.com/article/10.1007%2Fs10909-017-1846-3
+## Nodal line semimetals
+Band structure of a slab of a 3D nodal line semimetal in a diamond lattice, showing the emergence of topological zero energy drumhead states in the surface of the slab https://link.springer.com/article/10.1007%2Fs10909-017-1846-3
 ![Alt text](screenshots/nodalline.png?raw=true "Magnetism in zigzag nanoribbons")
 
 
@@ -45,13 +45,19 @@ Spectra and spatially resolved density of states of a triangular graphene island
 ![Alt text](screenshots/island.png?raw=true "Confined modes in a graphene island")
 
 
+## Colossal graphene quantum dots
+Density of states and spatially resolved density of states of a bg graphene quantum dot. The huge islands module uses special techniques to efficiently solve systems with hundreds of thousands of atoms.
+![Alt text](screenshots/giant_island.png?raw=true "Big graphene island")
+
+
+
 ## Landau levels
 Electronic spectra of a massive honeycomb lattice in the presence of an off-plane magnetic field, giving rise to Landau levels and chiral edge states
 ![Alt text](screenshots/zzqh.png?raw=true "Landau levels in a massive zigzag honeycomb ribbon")
 
 
 ## Artificial topological superconductors
-Bogoliuvov de Gennes band structructure of a two-dimensional gas in a square lattice with Rashba spin-orbit coupling, off-plane exchange field and s-wave superconducting proximity effect. When superconductivity is turned on, a gap opens up in the spectra hasting a non-trivial Chern number, giving rise to propagating Majorana modes in the system
+Bogoliuvov de Gennes band structructure of a two-dimensional gas in a square lattice with Rashba spin-orbit coupling, off-plane exchange field and s-wave superconducting proximity effect. When superconductivity is turned on, a gap opens up in the spectra hosting a non-trivial Chern number, giving rise to propagating Majorana modes in the system
 ![Alt text](screenshots/topologicalSC.png?raw=true "Artificial topological superconductor in a square lattice")
 
 

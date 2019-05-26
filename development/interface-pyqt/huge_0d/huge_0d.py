@@ -311,7 +311,7 @@ def show_lattice():
   g.write()
   print("Structure has been created")
 #  if getactive("show3d"): execute_script("qh-pick ")
-  execute_script("qh-fast-pick  ")
+  execute_script("qh-fast-structure  ")
 
 
 def show_path_dos():
