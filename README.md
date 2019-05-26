@@ -35,6 +35,11 @@ Self-consistent mean field calculation of a zigzag graphene ribbon, with electro
 ![Alt text](screenshots/zzscf.png?raw=true "Magnetism in zigzag nanoribbons")
 
 
+## Nodal line semimetal
+band structure of a slab of a 3D nodal line semimetal in a diamond lattice, showing the emergence of topological zero energy drumhead states in the surface of the slab https://link.springer.com/article/10.1007%2Fs10909-017-1846-3
+![Alt text](screenshots/nodalline.png?raw=true "Magnetism in zigzag nanoribbons")
+
+
 ## Confined modes in 0D systems
 Spectra and spatially resolved density of states of a triangular graphene island, showing the emergence of confined modes
 ![Alt text](screenshots/island.png?raw=true "Confined modes in a graphene island")
