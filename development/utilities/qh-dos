@@ -2,6 +2,7 @@
 
 import numpy as np
 import pylab as pl
+import matplotlib.pyplot as plt
 
 ### script for ploting DOS.OUT of tb90 ###
 
@@ -11,13 +12,23 @@ import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
 
+
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input",default="DOS.OUT",
+        help='Input file with the dos')
+args = parser.parse_args() # get the arguments
+
+
 # cretae figure and adjust subplot
 fig = pl.figure(1)
 fig.subplots_adjust(0.2,0.2)
+currentfig = plt.gcf()
+currentfig.canvas.set_window_title('Density of states')
 
 import sys
-if len(sys.argv[1])>1: name = sys.argv[1]
-else: name = "DOS.OUT"
+name = args.input
 m = np.genfromtxt(name).transpose()
 num_dos = len(m) - 1
 e = m[0]

@@ -185,19 +185,9 @@ def pickup_hamiltonian():
 
 
 
-
-
-
-
-
-
-
-
 def show_berry2d():
   h = pickup_hamiltonian() # get hamiltonian
-  nk = int(get("nk_topology"))
-  topology.berry_map(h,nk=nk)
-  execute_script("qh-berry2d BERRY_MAP.OUT")
+  common.get_berry2d(h,qtwrap)
 
   
 
@@ -243,16 +233,19 @@ def show_kdos(self):
 
 def show_berry1d(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  topology.write_berry(h,ks)
-  execute_script("qh-berry1d  label  ")
+  common.get_berry1d(h,qtwrap)
 
 
 def show_z2(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nk_topology")
-  topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
-  execute_script("qh-wannier-center  ") # plot the result
+  common.get_z2(h,qtwrap)
+
+
+def show_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_chern(h,qtwrap)
+
+
 
 
 
@@ -292,6 +285,7 @@ signals["show_structure"] = show_structure  # show bandstructure
 signals["show_structure_3d"] = show_structure_3d  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
 signals["show_berry2d"] = show_berry2d  # show DOS
+signals["show_chern"] = show_chern  
 signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS

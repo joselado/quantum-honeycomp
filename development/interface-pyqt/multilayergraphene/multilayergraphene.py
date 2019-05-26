@@ -9,15 +9,16 @@ qhroot = os.environ["QHROOT"] # root path
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
-import qtwrap # import the library with simple wrappaers to qt4
+from interfacetk import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
 
 
 
-from qh_interface import * # import all the libraries needed
-
+from interfacetk.qh_interface import * # import all the libraries needed
+from interfacetk import common 
+common.initialize(qtwrap) # initilizations
 
 
 
@@ -96,20 +97,8 @@ def initialize():
 
 
 def show_bands(self=0):
-  comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
-  opname = getbox("bands_color")
-  if opname=="None": op = None # no operators
-  elif opname=="Sx": op = h.get_operator("sx") # off plane case
-  elif opname=="Sy": op = h.get_operator("sy")# off plane case
-  elif opname=="Sz": op = h.get_operator("sz")# off plane case
-  elif opname=="Valley": op = h.get_operator("valley")
-  else: op =None
-  kpath = klist.default(h.geometry,nk=int(get("nk_bands")))
-  h.get_bands(operator=op,kpath=kpath)
-  execute_script("qh-bands --dim 2  ")
-  comp.kill()
-
+  common.get_bands(h,qtwrap)
 
 
 def show_dosbands(self=0):
@@ -137,12 +126,7 @@ def show_fermi_surface(silent=False):
 
 def show_dos(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
-  ndos = int(get("ne_dos"))
-  if h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("delta_dos"),nk=int(get("nk_dos")),
-            window=get("window_dos"))
-  else: raise
-  if not silent: execute_script("qh-dos DOS.OUT") # show the result
+  common.get_dos(h,qtwrap)
 
 
 def pickup_hamiltonian():
@@ -154,37 +138,10 @@ def pickup_hamiltonian():
 
 
 
-def show_chern():
-  h = pickup_hamiltonian() # get hamiltonian
-  nk = int(np.sqrt(get("nk_topology")))
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise
-  topology.chern(h,nk=nk,operator=op)
-  execute_script("qh-chern BERRY_CURVATURE.OUT")
 
 
 
 
-
-
-
-
-
-
-
-def show_berry2d():
-  h = pickup_hamiltonian() # get hamiltonian
-  nk = int(np.sqrt(get("nk_topology")))
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise 
-  topology.berry_map(h,nk=nk,operator=op)
-  execute_script("qh-berry2d BERRY_MAP.OUT")
-
-  
 
 
 def show_structure(self):
@@ -212,20 +169,23 @@ def show_kdos(self):
 
 def show_berry1d(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise 
-  topology.write_berry(h,ks,operator=op)
-  execute_script("qh-berry1d  label  ")
+  common.get_berry1d(h,qtwrap) # compute Berry 1D
 
 
 def show_z2(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nk_topology")
-  topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
-  execute_script("qh-wannier-center  ") # plot the result
+  common.get_z2(h,qtwrap) # compute Berry 1D
+
+
+def show_berry2d():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_berry2d(h,qtwrap)
+
+
+def show_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_chern(h,qtwrap)
+
 
 
 
@@ -313,7 +273,7 @@ def sweep_parameter():
             g = h.get_gap() # compute Gap
             out.append([p,g]) # store result
         elif cname=="Chern number": # compute the gap
-            c = topology.chern(h,nk=int(np.sqrt(get("nk_topology"))))
+            c = topology.chern(h,nk=int(np.sqrt(get("topology_nk"))))
             out.append([p,c]) # store result
         elif cname=="Eigenvalues": # compute the gap
             kpath = [np.random.random(3) for i in range(int(get("nk_bands")))]

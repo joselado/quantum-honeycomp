@@ -143,12 +143,7 @@ def show_dosbands(self=0):
 
 def show_dos(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
-  ndos = int(get("ne_dos"))
-  if h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("delta_dos"),nk=int(get("nk_dos")),
-            window=get("window_dos"))
-  else: raise
-  if not silent: execute_script("qh-dos DOS.OUT") # show the result
+  common.get_dos(h,qtwrap,silent=silent)
 
 
 def pickup_hamiltonian():
@@ -158,36 +153,6 @@ def pickup_hamiltonian():
     return initialize()
 
 
-
-
-
-
-
-
-
-
-
-
-def show_berry2d():
-  h = pickup_hamiltonian() # get hamiltonian
-  nk = int(np.sqrt(get("nk_topology")))
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise 
-  topology.berry_map(h,nk=nk,operator=op)
-  execute_script("qh-berry2d BERRY_MAP.OUT")
-
-
-def show_chern():
-  h = pickup_hamiltonian() # get hamiltonian
-  nk = int(np.sqrt(get("nk_topology")))
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise 
-  topology.chern(h,nk=nk,operator=op)
-  execute_script("qh-chern BERRY_CURVATURE.OUT")
 
   
 
@@ -215,22 +180,27 @@ def show_kdos(self):
 
 
 
+
 def show_berry1d(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  opname = getbox("operator_topology")
-  if opname=="None": op=None
-  elif opname=="Valley": op = operators.get_valley(h,projector=True)
-  else: raise 
-  topology.write_berry(h,ks,operator=op)
-  execute_script("qh-berry1d  label  ")
+  common.get_berry1d(h,qtwrap) # compute Berry 1D
 
 
 def show_z2(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  nk = np.sqrt(get("nk_topology"))
-  topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
-  execute_script("qh-wannier-center  ") # plot the result
+  common.get_z2(h,qtwrap) # compute Berry 1D
+
+
+def show_berry2d():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_berry2d(h,qtwrap)
+
+
+def show_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_chern(h,qtwrap)
+
+
 
 
 

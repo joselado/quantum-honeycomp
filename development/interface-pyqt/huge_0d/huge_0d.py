@@ -237,7 +237,7 @@ def show_dos():
   x,y = x*6.,y/6. # renormalize
   y = dos.convolve(x,y,delta=get("smearing_dos")) # add broadening
   dos.write_dos(x,y) # write dos in file
-  execute_script("qh-dos DOS.OUT")
+  execute_script("qh-dos")
   print("Time spent in Kernel PM DOS calculation =",time.clock() - t0)
 
 

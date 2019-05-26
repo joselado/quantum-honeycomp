@@ -88,7 +88,6 @@ def haldane(r1,r2,rm,fun=0.0,sublattice=None):
 def get_haldane_function(g,stagger=False):
     """Return a function that computes the Haldane coupling"""
     rm = g.multireplicas(3)
-    from .kanemele import haldane
     def f(r1,r2):
       m = haldane([r1],[r2],rm,fun=1.0).todense()[0,0]
       if not stagger: return m # conventional Haldane

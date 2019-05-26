@@ -59,22 +59,24 @@ def dos_surface(h,output_file="DOS.OUT",
 
 
 
-def dos0d(h,es=None,delta=0.01,i=None):
+def dos0d(h,energies=np.linspace(-4,4,500),delta=0.01):
   """Calculate density of states of a 0d system"""
-  if es is None: es = np.linspace(-4,4,500)
-  ds = [] # empty list
-  if h.dimensionality==0:  # only for 0d
-    iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity
-    for e in es: # loop over energies
-      g = ( (e+1j*delta)*iden -h.intra ).I # calculate green function
-      if i is None: d = -g.trace()[0,0].imag
-      elif checkclass.is_iterable(i): # iterable list 
-          d = sum([-g[ii,ii].imag for ii in i])
-      else: d = -g[i,i].imag # assume an integer
-      ds.append(d)  # add this dos
-  else: raise # not implemented...
-  write_dos(es,ds)
-  return ds
+  hkgen = h.get_hk_gen() # get generator
+  calculate_dos_hkgen(hkgen,[0],
+            delta=delta,energies=energies) # conventiona algorithm
+#  ds = [] # empty list
+#  if h.dimensionality==0:  # only for 0d
+#    iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity
+#    for e in es: # loop over energies
+#      g = ( (e+1j*delta)*iden -h.intra ).I # calculate green function
+#      if i is None: d = -g.trace()[0,0].imag
+#      elif checkclass.is_iterable(i): # iterable list 
+#          d = sum([-g[ii,ii].imag for ii in i])
+#      else: d = -g[i,i].imag # assume an integer
+#      ds.append(d)  # add this dos
+#  else: raise # not implemented...
+#  write_dos(es,ds)
+#  return ds
 
 
 
@@ -441,7 +443,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
     if operator is None: # no operator given
       if mode=="ED": # exact diagonalization
         if h.dimensionality==0:
-          return dos0d(h,es=energies,delta=delta)
+          return dos0d(h,energies=energies,delta=delta)
         elif h.dimensionality==1:
           return dos1d(h,energies=energies,delta=delta,nk=nk)
         elif h.dimensionality==2:
@@ -452,9 +454,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
           return dos3d(h,nk=nk,delta=delta,energies=energies)
         else: raise
       elif mode=="Green": # Green function formalism
-        if h.dimensionality==0:
-          return dos0d(h,es=energies,delta=delta) # same as before
-        elif h.dimensionality>0: # Bigger dimensionality
+        if True: # Bigger dimensionality
           from .green import bloch_selfenergy
           tr = timing.Testimator("KDOS") # generate object
           ie = 0
