@@ -3,6 +3,7 @@
 # Aim #
 
 This program allows to perform tight binding calculations with a user friendly interface
+![Alt text](screenshots/quantum_honeycomp.png?raw=true "Quantum Honeycomp System selection")
 
 
 # How to install #

@@ -6,11 +6,12 @@ import platform
 
   
 # Add path of the interface
-sys.path.append(os.environ["QHROOT"]+"/interface-pyqt/system_selection") 
+qhroot = os.environ["QHROOT"] # root path
+sys.path.append(qhroot+"/interface-pyqt/system_selection") 
 # Add path of the wrapper
-sys.path.append(os.environ["QHROOT"]+"/interface-pyqt/qtwrap") 
+sys.path.append(qhroot+"/pysrc/") # python libraries
 
-import qtwrap # import the library with simple wrappers to pyqt
+from interfacetk import qtwrap # import the library with simple wrappers to pyqt
 window = qtwrap.main() # this is the main interface
 
 
@@ -98,7 +99,7 @@ signals["update_qh"] = update_qh # update Quantum Honeycomp
 
 
 # set the quantum honeycomp logo
-qtwrap.set_logo("qhlogo","quantum-honeycomp.png")
+qtwrap.set_logo("qhlogo","quantum_honeycomp.png")
 
 # Set the version number
 version = open(os.environ["QHROOT"]+"/VERSION.TXT").read().replace("\n","")

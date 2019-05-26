@@ -96,14 +96,11 @@ def set_image(name,path):
 def set_logo(name,image):
   """Set a certain logo"""
   qhroot = os.environ["QHROOT"] # root path
-  path = qhroot+"/systems/logos/"+image
+  path = qhroot+"/interface-pyqt/logos/"+image
   set_image(name,path)
   
 
 
-#def save_interface(window,path):
-#    from .saveload import guisave
-#    guisave(window)
 
 
 
