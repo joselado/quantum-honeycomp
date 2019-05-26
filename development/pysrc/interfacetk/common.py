@@ -1,5 +1,7 @@
 from .qh_interface import execute_script
+import numpy as np
 from pygra import klist
+from qh_interface import *
 from pygra import parallel
 
 def get_bands(h,window):
@@ -30,6 +32,25 @@ def get_bands(h,window):
 
 
 
+
+def get_kdos(h,window):
+    """Show the KDOS"""
+    ew = window.get("kdos_ewindow")
+    new = int(window.get("kdos_mesh")) # scale as kpoints
+    energies = np.linspace(-ew,ew,new) # number of ene
+    kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+    kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
+    command = "qh-kdos-both --input KDOS.OUT"
+    try: command += " --cmap "+ window.getbox("kdos_colormap")
+    except: pass
+    execute_script(command) # execute the script
+
+
+
+
+
+
+
 def check_parallel(qtwrap):
   """Check if there is parallelization"""
   if qtwrap.getbox("use_parallelization") =="Yes":
@@ -38,7 +59,7 @@ def check_parallel(qtwrap):
 
 
 
-def set_colormaps(form,name):
+def set_colormaps(form,name,cs=[]):
     """Add the different colormaps to a combox"""
     cb = getattr(form,name)
     try: cb = getattr(form,name)
@@ -46,13 +67,16 @@ def set_colormaps(form,name):
         print("Combox",name,"not found")
         return
     cb.clear() # clear the items
-    cs = ["RGB","hot","inferno","plasma","bwr","rainbow","gnuplot"]
     cb.addItems(cs)
+
 
 
 def initialize(window):
     """Do various initializations"""
-    set_colormaps(window.form,"bands_colormap")
+    cs = ["RGB","hot","inferno","plasma","bwr","rainbow","gnuplot"]
+    set_colormaps(window.form,"bands_colormap",cs=cs) # set the bands
+    cs = ["hot","inferno","plasma","rainbow","gnuplot","cool"]
+    set_colormaps(window.form,"kdos_colormap",cs=cs) # set the bands
 
 
 

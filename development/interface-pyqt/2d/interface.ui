@@ -863,7 +863,7 @@
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="0" column="1">
-           <widget class="QLineEdit" name="ewindow_kdos">
+           <widget class="QLineEdit" name="kdos_ewindow">
             <property name="text">
              <string>0.5</string>
             </property>
@@ -877,7 +877,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="mesh_kdos">
+           <widget class="QLineEdit" name="kdos_mesh">
             <property name="text">
              <string>100</string>
             </property>
@@ -889,6 +889,16 @@
              <string># of points</string>
             </property>
            </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>Colormap</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="kdos_colormap"/>
           </item>
          </layout>
         </item>

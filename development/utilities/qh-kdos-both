@@ -1,31 +1,41 @@
-#!/usr/bin/python2
+#!/usr/bin/plt.hon2
 
-
-import pylab as py
+import matplotlib.pyplot as plt
 import sys
 import numpy as np
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
-fig = py.figure()
-fig.subplots_adjust(0.25,0.25)
+fig = plt.figure()
+fig.subplots_adjust(0.2,0.2,0.8,0.9)
+currentfig = plt.gcf()
+currentfig.canvas.set_window_title('k-resolved DOS')
 
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input",default="KDOS.OUT",
+        help='Input file with the kdos')
+
+parser.add_argument("--cmap",default="hot",
+        help='Colormap for the plot')
+
+args = parser.parse_args() # get the arguments
 
 
 fig.set_facecolor("white")
 
-name = sys.argv[1]  # name of the file
+name = args.input # input file
 
 
 for i in range(2):
-  m = py.genfromtxt(name).transpose()
+  m = np.genfromtxt(name).transpose()
   x = m[0]
   y = m[1]
   ze = m[2]
   zb = m[3]
   zs = [ze,zb] # list with zs
-  py.subplot(1,2,i+1)
+  plt.subplot(1,2,i+1)
   z = zs[i]
   
   # get dimensions assuming uniform grid
@@ -66,22 +76,26 @@ for i in range(2):
   
   vmax = np.percentile(z_inter,95)
   
-  #py.subplot(1,2,1)
-  #py.contour(x,y,z_inter,300,cmap = py.get_cmap("hot"))
+  #plt.subplot(1,2,1)
+  #plt.contour(x,y,z_inter,300,cmap = plt.get_cmap("hot"))
   minx = np.min(x)
   maxx = np.max(x)
   miny = np.min(m[1])
   maxy = np.max(m[1])
-  py.imshow(z_inter, aspect='auto', origin='lower',cmap = py.get_cmap("hot"), extent = ( minx, maxx, miny, maxy),interpolation='nearest',vmax=vmax)
-  #py.xticks([])
-  #py.yticks([])
+  plt.imshow(z_inter, aspect='auto', origin='lower',cmap = plt.get_cmap(args.cmap), extent = ( minx, maxx, miny, maxy),interpolation='nearest',vmax=vmax,vmin=0.0)
+  plt.xticks([0.,1.])
+  #plt.yticks([])
   
-  py.xlabel("K-path [2$\pi$]")
+  plt.xlabel("K-path [2$\pi$]")
   if i==0: # first one
-    py.ylabel("Energy [t]")
+    plt.ylabel("Energy [t]")
   if i==0:
-    py.title("Surface")
+    plt.title("Surface")
   elif i==1:
-    py.title("Bulk")
+    plt.title("Bulk")
+    from matplotlib import ticker
+    cb = plt.colorbar(ticks=[0.,vmax])
+    cb.ax.set_yticklabels([0, 'Max'])
+    cb.set_label("DOS")
   
-py.show()
+plt.show()

@@ -26,6 +26,11 @@ https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.161414
 ![Alt text](screenshots/qah.png?raw=true "QAH state")
 
 
+## Quantum Spin Hall state
+Honeycomb lattice with Kane-Mele spin-orbit coupling and Rashba spin-orbit coupling, giving rise to a gapped spectra with a non-trivial Z2 invariant and helical edge states https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.95.226801
+![Alt text](screenshots/qsh.png?raw=true "QSH state")
+
+
 ## Confined modes in 0D systems
 Spectra and spatially resolved density of states of a triangular graphene island, showing the emergence of confined modes
 ![Alt text](screenshots/island.png?raw=true "Confined modes in a graphene island")
