@@ -158,13 +158,7 @@ def show_structure(self):
 
 def show_kdos(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  ew = get("ewindow_kdos")
-  new = int(get("mesh_kdos")) # scale as kpoints
-  energies = np.linspace(-ew,ew,new) # number of ene
-  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
-  kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
-  execute_script("qh-kdos-both KDOS.OUT  ")
-
+  common.get_kdos(h,qtwrap)
 
 
 def show_berry1d(self):

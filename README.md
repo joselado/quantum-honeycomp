@@ -49,6 +49,12 @@ Spectra and spatially resolved density of states of a triangular graphene island
 Electronic spectra of a massive honeycomb lattice in the presence of an off-plane magnetic field, giving rise to Landau levels and chiral edge states
 ![Alt text](screenshots/zzqh.png?raw=true "Landau levels in a massive zigzag honeycomb ribbon")
 
+
+## Quantum Valley Hall effect
+Band structure of Bernal stacked bilayer graphene, showing the emergence of a gap when an interlayer bias is applied. The previous gap hosts a non-trivial valley Chern number, giving rise to the emergence of pseudo-helical states in the edge of the system
+![Alt text](screenshots/hv.png?raw=true "Quantum valley Hall state in biased bilayer AB graphene")
+
+
 ## Twisted bilayer graphene
 Bandstructure and local density of states of twisted bilayer graphene at the magic angle, showing the emergence of a flat band, with an associated triangular density of states
 https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.121407
