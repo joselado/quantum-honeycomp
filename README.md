@@ -52,7 +52,7 @@ Electronic spectra of a massive honeycomb lattice in the presence of an off-plan
 
 ## Quantum Valley Hall effect
 Band structure of Bernal stacked bilayer graphene, showing the emergence of a gap when an interlayer bias is applied. The previous gap hosts a non-trivial valley Chern number, giving rise to the emergence of pseudo-helical states in the edge of the system
-![Alt text](screenshots/hv.png?raw=true "Quantum valley Hall state in biased bilayer AB graphene")
+![Alt text](screenshots/qvh.png?raw=true "Quantum valley Hall state in biased bilayer AB graphene")
 
 
 ## Twisted bilayer graphene
