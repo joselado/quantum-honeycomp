@@ -4,70 +4,66 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 
 # change the font size
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 
+path = os.path.dirname(os.path.realpath(__file__)) # current path
+path += "/../pysrc"
+sys.path.append(path) # add library
+from interfacetk import plotpyqt
+
 ###########################################
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
-fig = plt.figure()
-plt.gcf().canvas.set_window_title('Local DOS')
-ax = fig.add_subplot(111) # axis for the LDOS
-plt.subplots_adjust(left=0.1, bottom=0.25)
-t = np.arange(0.0, 1.0, 0.001)
-a0 = 5
-f0 = 3
-#s = a0*np.sin(2*np.pi*f0*t)
-#l, = plt.plot(t, s, lw=2, color='red')
-plt.axis([0, 1, -10, 10])
-
-axcolor = 'lightgoldenrodyellow'
-try:
-  axenergy = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
-except:
-  print("axcolor not possible to set")
-  axenergy = plt.axes([0.25, 0.1, 0.65, 0.03])
-
-
-smax = 100
-senergy = Slider(axenergy, 'Saturation', 0., smax, valinit=smax)
-senergy.valtext.set_visible(False)
 
 
 
-
-####################################################
-
-m = np.genfromtxt(sys.argv[1]).transpose() # read file
-x = m[0] # x position
-y = m[1] # y position
-z = m[2] # z position
-
-
-def update(val):
-  global ax
+def plot():
+  size = main.get_slider("Size")
+  fig = plt.figure(0)
+  plt.gcf().canvas.set_window_title('Local DOS')
+  ax = fig.add_subplot(111) # axis for the LDOS
+  plt.subplots_adjust(left=0.1, bottom=0.25)
+  t = np.arange(0.0, 1.0, 0.001)
+  a0 = 5
+  f0 = 3
+  plt.axis([0, 1, -10, 10])
+  axcolor = 'lightgoldenrodyellow'
+  smax = 100
+  ####################################################
+  m = np.genfromtxt(sys.argv[1]).transpose() # read file
+  x = m[0] # x position
+  y = m[1] # y position
+  z = m[2] # z position
   ax.clear() # clear LDOS
   ax.axis("equal")
   ax.set_xticks([])
   ax.set_yticks([])
-  val = int(round(val))
+  ax.scatter(x,y,color="black",s=size)
+  sat = main.get_slider("Saturation")/50 # saturation
+  sat = np.power(sat,4) # exponential scale
   scale = np.abs(z)/np.max(np.abs(z)) # scale to 0,1 interval
-  sat = smax/val # saturation percentage
   scale = np.tanh(scale*sat)
-  scale = scale/np.max(scale)*np.sqrt(len(scale))/2 # rescale
   ax.scatter(x,y,color="black",s=1)
+  ss = scale*main.get_slider("DOSSize")
   try:
-    ax.scatter(x,y,s=scale,c=scale,edgecolor="none",cmap=plt.get_cmap("inferno"))
+    ax.scatter(x,y,s=ss,c=scale,edgecolor="none",cmap=plt.get_cmap("inferno"))
   except:
     ax.scatter(x,y,s=scale,c=scale,edgecolor="none")
+  
+  plt.axis("equal")
+  return fig
 
-plt.axis("equal")
 
+app,main = plotpyqt.get_interface(plot)
+main.add_slider("Lattice size",label="Size") # Slider for the dots
+main.add_slider("DOS size",label="DOSSize",v0=20) # Slider for the dots
+main.add_slider("Saturation",v0=50) # Saturation
 
-update(smax)
-
-senergy.on_changed(update)
-plt.show()
+main.plot()
+main.show()
+sys.exit(app.exec_())
