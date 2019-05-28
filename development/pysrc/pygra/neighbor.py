@@ -36,10 +36,10 @@ except:
          dr = dr.dot(dr)
          if 0.8<dr<1.2: pairs.append([i,j])
      return np.array(pairs)
-  try:
-      import numba 
-      from .numbaneighbor import find_first_neighbor
-  except: pass
+#  try:
+#      import numba 
+#      from .numbaneighbor import find_first_neighbor
+#  except: pass
 
 
 
