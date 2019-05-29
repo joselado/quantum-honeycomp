@@ -271,6 +271,11 @@ def show_magnetism():
   h.write_magnetization() # write the magnetism
   execute_script("qh-moments",mayavi=True)
 
+def show_fermi_surface():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_fermi_surface(h,qtwrap)
+
+
 
 
 
@@ -294,6 +299,8 @@ signals["show_ldos"] = show_ldos  # show DOS
 signals["show_magnetism"] = show_magnetism
 signals["solve_scf"] = solve_scf 
 signals["select_atoms_removal"] = select_atoms_removal
+signals["show_fermi_surface"] = show_fermi_surface
+
 #signals["show_magnetism"] = show_magnetism  # show magnetism
 #signals["show_lattice"] = show_lattice  # show magnetism
 #signals["save_results"] = save_results  # save the results

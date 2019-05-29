@@ -111,15 +111,8 @@ def show_dosbands(self=0):
 
 def show_fermi_surface(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
-  ndos = int(get("ne_dos"))
-  if h.dimensionality==2:
-    spectrum.fermi_surface(h,e=get("energy_fs"),nk=int(get("nk_fs")),
-            nsuper = 2,reciprocal=True,delta=get("delta_fs"))
-#    dos.dos2d(h,ndos=500,delta=get("delta_dos"),nk=int(get("nk_dos")),
-#            window=get("window_dos"))
-  else: raise
-  if not silent: 
-      execute_script("qh-fermi-surface FERMI_MAP.OUT") # show the result
+  common.get_fermi_surface(h,qtwrap)
+
 
 
 
