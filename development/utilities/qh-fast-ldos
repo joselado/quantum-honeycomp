@@ -22,7 +22,7 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 
 
 
-def plot():
+def plot(main):
   size = main.get_slider("Size")
   fig = plt.figure(0)
   plt.gcf().canvas.set_window_title('Local DOS')

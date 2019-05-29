@@ -39,7 +39,8 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 
 md = np.genfromtxt(folder+"DOS.OUT").transpose()
 
-def plot():
+def plot(main):
+  """Plotting function"""
   fig = plt.figure()
   plt.gcf().canvas.set_window_title('Spatially resolved DOS')
   ax = fig.add_subplot(121) # axis for the LDOS

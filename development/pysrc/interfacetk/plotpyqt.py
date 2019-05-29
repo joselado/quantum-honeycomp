@@ -44,10 +44,12 @@ def get_interface(plot_figure):
             self.layout = layout
             self.setLayout(layout)
         def plot(self):
-            ''' plot some random stuff '''
+            '''Plot the figure'''
             # instead of ax.hold(False)
+            import matplotlib.pyplot as plt
+            plt.close() # close figure
             self.layout.removeWidget(self.canvas)
-            self.figure = plot_figure() # get that figure
+            self.figure = plot_figure(self) # get that figure
             self.canvas = FigureCanvas(self.figure)
             self.toolbar = NavigationToolbar(self.canvas, self)
             # refresh canvas
@@ -74,10 +76,13 @@ def get_interface(plot_figure):
             """Get the value of a combobox"""
             obj = self.findChild(QtWidgets.QComboBox,name)
             return obj.currentText()
-        def add_slider(self,name,label=None,vmin=0.0,vmax=100,v0=None):
+        def add_slider(self,name,label=None,vs=range(100),v0=0):
             """Add a slider"""
+            vmin = 0
+            vmax = len(vs)-1
             if label is None: label = name
             slider = QSlider(Qt.Horizontal,objectName=label)
+            slider.vs = vs # store
             slider.setMinimum(vmin)
             slider.setMaximum(vmax)
             slider.setTickPosition(QSlider.TicksBelow)
@@ -95,13 +100,27 @@ def get_interface(plot_figure):
             """Get the value of a slider"""
             slider = self.findChild(QSlider,name)
             out = slider.value()
-            return out
+            return slider.vs[int(out)]
 
     app = QApplication(sys.argv)
     main = Window()
     return app,main
 
 if __name__ == '__main__':
-    app,main = get_interface(plt.figure)
+    def funfig(obj): # dummy function
+        xs = np.linspace(0.,10.,300) # xgrid
+        # get the value of the slider
+        ys = np.cos(xs*obj.get_slider("k") + obj.get_slider("phi")) 
+        fig = plt.figure(0) # initialize figure
+        plt.plot(xs,ys,c=obj.get_combobox("c")) # plot data
+        return fig # return figure
+    app,main = get_interface(funfig) # get the interface
+    ks = np.linspace(1.0,3.0,50) # wavevectors
+    ps = np.linspace(0.0,2.0,50)*np.pi # phases
+    main.add_slider("Wavevector",label="k",vs=ks) # initialize the slider
+    main.add_slider("Phase",label="phi",vs=ps) # initialize the slider
+    # initialize the combobox
+    main.add_combobox(["red","blue","black"],name="Color",label="c") 
+    main.plot()
     main.show()
     sys.exit(app.exec_())
