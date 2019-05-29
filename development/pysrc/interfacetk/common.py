@@ -103,6 +103,18 @@ def get_chern(h,window):
     topology.chern(h,nk=nk,operator=op)
     execute_script("qh-chern BERRY_CURVATURE.OUT")
 
+def get_fermi_surface(h,window):
+    e = window.get("fs_ewindow")
+    energies = np.linspace(-e,e,100)
+    nk = window.get("fs_nk")
+    delta = window.get("fs_delta")
+    spectrum.multi_fermi_surface(h,nk=60,energies=energies,
+        delta=delta,nsuper=1)
+    execute_script("qh-multifermisurface")
+
+
+
+
 
 def get_z2(h,window):
     nk = int(np.sqrt(window.get("topology_nk")))

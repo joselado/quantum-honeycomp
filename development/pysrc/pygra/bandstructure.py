@@ -92,6 +92,8 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
   """
   Get an n-dimensional bandstructure
   """
+  if num_bands is not None:
+    if num_bands>(h.intra.shape[0]-1): num_bands=None
   if type(operator)==str: operator = h.get_operator(operator)
   if num_bands is None: # all the bands
     if operator is not None: 

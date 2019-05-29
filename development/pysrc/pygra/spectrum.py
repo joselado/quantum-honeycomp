@@ -8,6 +8,8 @@ from . import parallel
 from . import kpm
 from . import timing
 
+from .fermisurface import multi_fermi_surface
+
 arpack_tol = 1e-5
 arpack_maxiter = 10000
 

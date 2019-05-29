@@ -98,12 +98,12 @@ def plot(main):
 
 
 app,main = plotpyqt.get_interface(plot)
-main.add_slider("Energy") # Slider for the dots
-main.add_slider("Size",v0=50) # Slider for the dots
-main.add_slider("Saturation",v0=50) # Saturation
+main.add_slider(label="Energy") # Slider for the dots
+main.add_slider(label="Size",v0=50) # Slider for the dots
+main.add_slider(label="Saturation",v0=50) # Saturation
 cs = ["inferno","plasma","magma","rainbow","jet"]
-main.add_combobox(cs,name="Color Map",label="colormap") # Slider for the dots
-main.add_combobox(["white","black"],name="Background") # Slider for the dots
+main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
+main.add_combobox(["white","black"],label="Background") # Slider for the dots
 
 
 main.plot()

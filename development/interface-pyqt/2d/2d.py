@@ -200,6 +200,9 @@ def show_chern():
   h = pickup_hamiltonian() # get hamiltonian
   common.get_chern(h,qtwrap)
 
+def show_fermi_surface():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_fermi_surface(h,qtwrap)
 
 
 
@@ -311,6 +314,7 @@ def sweep_parameter():
 
 
 
+
 save_results = lambda x: save_outputs(inipath,tmppath) # function to save
 
 
@@ -324,6 +328,7 @@ signals["show_berry2d"] = show_berry2d  # show DOS
 signals["show_chern"] = show_chern  # show the chern number
 signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
+signals["show_fermi_surface"] = show_fermi_surface
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism

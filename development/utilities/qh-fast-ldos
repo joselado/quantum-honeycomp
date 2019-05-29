@@ -60,9 +60,9 @@ def plot(main):
 
 
 app,main = plotpyqt.get_interface(plot)
-main.add_slider("Lattice size",label="Size") # Slider for the dots
-main.add_slider("DOS size",label="DOSSize",v0=20) # Slider for the dots
-main.add_slider("Saturation",v0=50) # Saturation
+main.add_slider(label="Lattice size",key="Size") # Slider for the dots
+main.add_slider(label="DOS size",key="DOSSize",v0=20) # Slider for the dots
+main.add_slider(label="Saturation",v0=50) # Saturation
 
 main.plot()
 main.show()
