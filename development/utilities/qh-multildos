@@ -41,7 +41,7 @@ md = np.genfromtxt(folder+"DOS.OUT").transpose()
 
 def plot(main):
   """Plotting function"""
-  fig = plt.figure()
+  fig = plt.gcf()
   plt.gcf().canvas.set_window_title('Spatially resolved DOS')
   ax = fig.add_subplot(121) # axis for the LDOS
   axd = fig.add_subplot(122) # axis for the DOS

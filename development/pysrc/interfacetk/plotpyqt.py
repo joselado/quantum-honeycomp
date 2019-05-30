@@ -18,45 +18,44 @@ import matplotlib.pyplot as plt
 
 import random
 
-def get_interface(plot_figure):
+def get_interface(plot_figure,i=0):
     """Return an object that plots stuff"""
     class Window(QDialog):
         def __init__(self, parent=None):
             super(Window, self).__init__(parent)
-    
-            self.figure = plt.figure(0)
-    
+            self.figure = plt.figure(i)
             # this is the Canvas Widget that displays the `figure`
             # it takes the `figure` instance as a parameter to __init__
             self.canvas = FigureCanvas(self.figure)
-    
-            # this is the Navigation widget
-    
-            # Just some button connected to `plot` method
-            self.button = QPushButton('Plot')
+#            self.button = QPushButton('Plot')
 #            self.button.clicked.connect(self.plot)
-    
             # set the layout
-#            layout = QVBoxLayout()
             layout = QGridLayout()
-#            layout.addWidget(self.button)
             self.row = 1
             self.layout = layout
+            self._dynamic_ax = self.canvas.figure.subplots()
+            self.layout.addWidget(self.canvas, 1,0,1,0)
             self.setLayout(layout)
         def plot(self):
             '''Plot the figure'''
             # instead of ax.hold(False)
-            self.layout.removeWidget(self.canvas)
-            self.figure = plot_figure(self) # get that figure
-            self.canvas = FigureCanvas(self.figure)
+            self._dynamic_ax.clear()
+            self.figure.clear()
+#            self.layout.removeWidget(self.canvas)
+            fig = plot_figure(self) # get that figure
+            if fig.number!=self.figure.number: 
+                print("You must plot in the same figure as the one initialized for the interface, use fig = plt.figure(obj.figure.number) in your function, where obj is the input of your function")
+                exit()
+            self._dynamic_ax.figure.canvas.draw()
+#            self.canvas = FigureCanvas(self.figure)
 #            self.toolbar = NavigationToolbar(self.canvas, self)
             # refresh canvas
-            self.canvas = FigureCanvas(self.figure)
+#            self.canvas = FigureCanvas(self.figure)
             # add the new canvas at the position of the old one
 #            self.layout.addWidget(self.toolbar,0,0,1,0)
-            self.layout.addWidget(self.canvas, 1,0,1,0)
-            self.setLayout(self.layout)
-            self.canvas.draw()
+#            self.layout.addWidget(self.canvas, 1,0,1,0)
+#            self.setLayout(self.layout)
+#            self.canvas.draw()
         def add_combobox(self,cs,label=None,key=None):
             """Add a combo box"""
             if key is None: 
@@ -134,7 +133,7 @@ if __name__ == '__main__':
         # get the value of the slider
         ys = np.cos(xs*obj.get_slider("k") + obj.get_slider("phi")) 
         ys = ys + float(obj.get_text("dy")) # shift the values
-        fig = plt.figure(0) # initialize figure
+        fig = plt.figure(obj.figure.number) # initialize figure
         fig.clear()
         plt.plot(xs,ys,c=obj.get_combobox("c")) # plot data
         plt.ylim([-2,2])
