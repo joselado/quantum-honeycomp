@@ -7,6 +7,7 @@ from . import timing
 from . import kpm
 from . import checkclass
 from . import green
+from . import algebra
 
 try:
 #  raise
@@ -181,6 +182,11 @@ def dos1d_sites(h,sites=[0],scale=10.,nk=100,npol=100,info=False,ewindow=None):
 def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
          is_sparse=False,numw=10,window=None,energies=None):
   """Calculate density of states using the ks given on input"""
+  if not is_sparse: # if not is sparse
+      m = hkgen([0,0,0]) # get the matrix
+      if algebra.issparse(m): 
+          print("Hamiltonian is sparse, selecting sparse mode in DOS")
+          is_sparse = True
   es = np.zeros((len(ks),hkgen(ks[0]).shape[0])) # empty list
   tr = timing.Testimator("DOS",maxite=len(ks))
   if delta is None: delta = 5./len(ks) # automatic delta
@@ -190,13 +196,14 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      return smalleig(hk,numw=numw,tol=delta/1e3).tolist() # eigenvalues
+      return algebra.smalleig(hk,numw=numw,tol=delta/1e3) # eigenvalues
     else: # dense Hamiltonian
-      return lg.eigvalsh(hk).tolist() # get eigenvalues
+      return algebra.eigvalsh(hk) # get eigenvalues
 #  for ik in range(len(ks)):  
   out = parallel.pcall(fun,ks) # launch all the processes
   es = [] # empty list
-  for o in out: es += o # concatenate
+  for o in out: 
+      es = np.concatenate([es,o]) # concatenate
 #    tr.remaining(ik,len(ks))
 #  es = es.reshape(len(es)*len(es[0])) # 1d array
   es = np.array(es) # convert to array

@@ -7,6 +7,7 @@ from .operators import operator2list
 from . import parallel
 from . import kpm
 from . import timing
+from . import algebra
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
@@ -14,14 +15,14 @@ arpack_maxiter = 10000
 def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
                     energies=[0.0],nk=50,nsuper=1,reciprocal=True,
                     delta=None,refine_delta=1.0,operator=None,
-                    mode='full',num_waves=2,info=True):
+                    numw=20,info=True):
   """Calculates the Fermi surface of a 2d system"""
   energies = np.array(energies) # convert to array
   if operator is not None: raise
   if h.dimensionality!=2: raise  # continue if two dimensional
   hk_gen = h.get_hk_gen() # gets the function to generate h(k)
-  kxs = np.linspace(-nsuper,nsuper,nk)  # generate kx
-  kys = np.linspace(-nsuper,nsuper,nk)  # generate ky
+  kxs = np.linspace(-nsuper,nsuper,nk,endpoint=True)  # generate kx
+  kys = np.linspace(-nsuper,nsuper,nk,endpoint=True)  # generate ky
   iden = np.identity(h.intra.shape[0],dtype=np.complex)
   kxout = []
   kyout = []
@@ -29,18 +30,19 @@ def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
   else:  fR = lambda x: x # get identity
   # setup a reasonable value for delta
   #### function to calculate the weight ###
-  if mode=='full': # use full inversion
-    def get_weight(hk):
-      es = lg.eigvalsh(hk) # get eigenvalues
+  if h.is_sparse: mode = "sparse"
+  else: mode = "full"
+  def get_weight(hk):
+      if mode=='full': es = algebra.eigvalsh(hk) # get eigenvalues
+      elif mode=='sparse': es = algebra.smalleig(hk,numw=numw)
       ws = [np.sum(delta/((e-es)**2+delta**2)) for e in energies] # weights
       return np.array(ws) # return weights
-  else: raise
 ##############################################
   ts = timing.Testimator()
   # setup the operator
   rs = [] # empty list
   for x in kxs:
-    for y in kxs:
+    for y in kys:
       rs.append([x,y,0.]) # store
   def getf(r): # function to compute FS
       k = fR(r) # get the reciprocal space vector
@@ -66,7 +68,7 @@ def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
       name = output_folder+"/"+filename
       np.savetxt(name,np.array([rs[:,0],rs[:,1],kdos[:,i]]).T)
       fo.write(filename+"\n")
-  h.get_dos(nk=nk,delta=delta,energies=energies)
+  h.get_dos(nk=nk,delta=delta,energies=energies,random=False)
   fo.close()
 
 

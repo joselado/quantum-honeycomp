@@ -119,24 +119,9 @@ def show_dosbands(self=0):
 
 
 
-def show_interactive_ldos():
-  comp = computing() # create the computing window
+def show_multildos():
   h = pickup_hamiltonian()  # get the hamiltonian
-  ewin = get("window_ldos")
-  nrep = int(get("nsuper_ldos"))
-  nk = int(get("nk_ldos"))
-  ne = int(get("ne_ldos"))
-  delta = get("delta_ldos")
-  opname = getbox("operator_ldos") # get the operator
-  if opname=="None": op = None
-  elif opname=="Current": op = operators.get_current(h)
-  elif opname=="Spin current": op = operators.get_spin_current(h)
-  else: raise
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,
-          delta=delta,nrep=nrep,op=op)
-  comp.kill()
-  if op is None: execute_script("qh-multildos ")
-  else: execute_script("qh-multildos-signed ")
+  common.get_multildos(h,qtwrap)
 
 
 
@@ -222,7 +207,7 @@ signals["show_bands"] = show_bands  # show bandstructure
 signals["show_structure"] = show_structure  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
-signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
+signals["show_multildos"] = show_multildos  # show DOS
 signals["show_structure_3d"] = show_structure_3d
 signals["show_magnetism"] = show_magnetism 
 signals["solve_scf"] = solve_scf

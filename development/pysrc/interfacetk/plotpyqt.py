@@ -32,6 +32,7 @@ def get_interface(plot_figure,i=0):
             # set the layout
             layout = QGridLayout()
             self.row = 1
+            self.column = 0
             self.layout = layout
             self._dynamic_ax = self.canvas.figure.subplots()
             self.layout.addWidget(self.canvas, 1,0,1,0)
@@ -69,14 +70,19 @@ def get_interface(plot_figure,i=0):
               lb = QtWidgets.QLabel(label)
               self.layout.addWidget(lb,self.row,0)
               self.layout.addWidget(combo,self.row,1)
+              self.column += 2 # increase counter
             else:
               self.layout.addWidget(combo,self.row,1,1,0)
+              self.column += 1 # increase counter
         def get_combobox(self,name):
             """Get the value of a combobox"""
             obj = self.findChild(QtWidgets.QComboBox,name)
             return obj.currentText()
-        def add_slider(self,key=None,label=None,vs=range(100),v0=0):
+        def add_slider(self,key=None,
+                label=None,vs=range(100),v0=0,
+                next_row=True):
             """Add a slider"""
+            vs = np.array(vs) # set as array
             vmin = 0
             vmax = len(vs)-1
             if key is None: 
@@ -92,13 +98,17 @@ def get_interface(plot_figure,i=0):
             else: slider.setValue(vmin)
 #            slider.sliderMoved.connect(self.plot)
             slider.valueChanged.connect(self.plot)
-            self.row += 1 # increase counter
+            if next_row: 
+                self.column = 0 # start a new column
+                self.row += 1 # increase counter
             if label is not None:
               lb = QtWidgets.QLabel(label) # label object
-              self.layout.addWidget(lb,self.row,0)
-              self.layout.addWidget(slider,self.row,1)
+              self.layout.addWidget(lb,self.row,self.column)
+              self.layout.addWidget(slider,self.row,self.column+1)
+              self.column += 2 # increase counter
             else:
               self.layout.addWidget(slider,self.row,0,1,0)
+              self.column += 1 # increase counter
             self.setLayout(self.layout)
         def get_slider(self,name):
             """Get the value of a slider"""
@@ -115,8 +125,10 @@ def get_interface(plot_figure,i=0):
               lb = QtWidgets.QLabel(label)
               self.layout.addWidget(lb,self.row,0)
               self.layout.addWidget(le,self.row,1)
+              self.column += 2 # increase counter
             else:
               self.layout.addWidget(le,self.row,-1)
+              self.column += 1 # increase counter
             self.setLayout(self.layout)
         def get_text(self,name):
             le = self.findChild(QtWidgets.QLineEdit,name)

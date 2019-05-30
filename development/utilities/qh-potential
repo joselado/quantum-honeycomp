@@ -4,35 +4,54 @@ from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
 
 # change the font size
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
-
-fig = plt.figure()
-
-fig.set_facecolor("white") # white
-
 name = sys.argv[1] # name of the file
 
-m = np.genfromtxt(name).transpose() # read file
-x = m[0] # x position
-y = m[1] # y position
-z = m[2] # z position
+def getfig(main):
+  fig = plt.gcf()
+  fig.set_facecolor("white") # white
+  m = np.genfromtxt(name).transpose() # read file
+  x = m[0] # x position
+  y = m[1] # y position
+  z = m[2] # z position
+  print("Maximum value is ",np.max(np.abs(z)))
+  size = np.power(main.get_slider("Size"),4)
+  scale = np.abs(z)/np.max(np.abs(z))*100*size
+  zsign = np.sign(z) # sign
+  plt.title(str(len(x))+" atoms")
+  plt.scatter(x,y,color="black",s=1)
+  color = zsign*scale
+  cplot = plt.scatter(x,y,s=scale,c=color,
+          edgecolor="none",cmap=plt.get_cmap("bwr"))
+  cb = fig.colorbar(cplot,ticks=[min(color),max(color)])
+  cb.ax.set_yticklabels(["Min",'Max'])
+  plt.xticks([])
+  plt.yticks([])
+  plt.axis("equal")
+  zoom = main.get_slider("Zoom")
+  plt.xlim([np.min(x)*zoom,np.max(x)*zoom])
+  plt.ylim([np.min(y)*zoom,np.max(y)*zoom])
+  return fig
 
-print("Maximum value is ",np.max(np.abs(z)))
-
-scale = np.abs(z)/np.max(np.abs(z))*100
-zsign = np.sign(z) # sign
 
 
 
+# Do the PyQt wrapper
+path = os.path.dirname(os.path.realpath(__file__)) # current path
+path += "/../pysrc"
+sys.path.append(path) # add library
+from interfacetk import plotpyqt
 
-plt.title(str(len(x))+" atoms")
-plt.scatter(x,y,color="black",s=1)
-plt.scatter(x,y,s=scale,c=zsign*scale,edgecolor="none",cmap=plt.get_cmap("bwr"))
-plt.xticks([])
-plt.yticks([])
 
-plt.axis("equal")
-plt.show()
+app,main = plotpyqt.get_interface(getfig)
+main.add_slider(label="Size",vs=np.linspace(0.,2,100),v0=50)
+main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,100),v0=0)
+
+# execute the interface
+main.plot()
+main.show()
+sys.exit(app.exec_())

@@ -104,12 +104,14 @@ def get_chern(h,window):
     execute_script("qh-chern BERRY_CURVATURE.OUT")
 
 def get_fermi_surface(h,window):
+    check_parallel(window) # check if use parallelization
     e = window.get("fs_ewindow")
     energies = np.linspace(-e,e,100)
-    nk = window.get("fs_nk")
+    nk = int(window.get("fs_nk")) # number of kpoints
+    numw = int(window.get("fs_numw")) # number of waves for sparse
     delta = window.get("fs_delta")
-    spectrum.multi_fermi_surface(h,nk=60,energies=energies,
-        delta=delta,nsuper=1)
+    spectrum.multi_fermi_surface(h,nk=nk,energies=energies,
+        delta=delta,nsuper=1,numw=numw)
     execute_script("qh-multifermisurface")
 
 
@@ -120,6 +122,24 @@ def get_z2(h,window):
     nk = int(np.sqrt(window.get("topology_nk")))
     topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
     execute_script("qh-wannier-center  ") # plot the result
+
+
+
+def get_multildos(h,window):
+    check_parallel(window) # check if use parallelization
+    ewin = window.get("multildos_ewindow")
+    nrep = int(max([1,window.get("multildos_nrep")]))
+    nk = int(max([1,window.get("multildos_nk")]))
+    numw = int(window.get("multildos_numw"))
+    ne = 100 # 100 points
+    delta = window.get("multildos_delta")
+    ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),
+            nk=nk,delta=delta,nrep=nrep,numw=numw)
+    execute_script("qh-multildos ")
+
+
+
+
 
 
 

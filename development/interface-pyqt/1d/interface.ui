@@ -511,113 +511,85 @@
        <attribute name="title">
         <string>LDOS</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_15">
+       <layout class="QGridLayout" name="gridLayout_6">
         <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="ne_ldos">
-            <property name="text">
-             <string>300</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QGridLayout" name="gridLayout_22">
           <item row="3" column="1">
-           <widget class="QLineEdit" name="delta_ldos">
+           <widget class="QLineEdit" name="multildos_delta">
+            <property name="toolTip">
+             <string>Energy smearing</string>
+            </property>
             <property name="text">
-             <string>0.05</string>
+             <string>0.03</string>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_20">
+           <widget class="QLabel" name="label_36">
             <property name="text">
              <string>Smearing</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="nk_ldos">
-            <property name="text">
-             <string>100</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_17">
-            <property name="text">
-             <string># of energies</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string># of kpoints</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_19">
+           <widget class="QLabel" name="label_42">
             <property name="text">
              <string>Energy window</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="window_ldos">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="multildos_nk">
+            <property name="toolTip">
+             <string>Number of kpoints used</string>
+            </property>
+            <property name="text">
+             <string>50</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QPushButton" name="show_multildos">
+            <property name="text">
+             <string>Show LDOS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="multildos_ewindow">
+            <property name="toolTip">
+             <string>Energy window</string>
+            </property>
             <property name="text">
              <string>1.5</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="nsuper_ldos">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_43">
             <property name="text">
-             <string>10</string>
+             <string>Number of kpoints</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_21">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_44">
             <property name="text">
-             <string>Supercell</string>
+             <string>Number of unit cells</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_36">
-            <property name="text">
-             <string>Operator</string>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="multildos_nrep">
+            <property name="toolTip">
+             <string>Number of replicas of the unit cell to plot</string>
             </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QComboBox" name="operator_ldos">
-            <item>
-             <property name="text">
-              <string>None</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Current</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Spin current</string>
-             </property>
-            </item>
+            <property name="text">
+             <string>15</string>
+            </property>
            </widget>
           </item>
          </layout>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="show_interactive_ldos">
-          <property name="text">
-           <string>Show LDOS</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>

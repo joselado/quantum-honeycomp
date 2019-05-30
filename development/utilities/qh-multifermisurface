@@ -79,7 +79,7 @@ def plot(main):
   ax.set_yticks([])
   ax.set_xlabel("$k_x$")
   ax.set_ylabel("$k_y$")
-  ax.set_title("E="+str(round(float(energy),3)))
+  ax.set_title("Fermi surface E="+str(round(float(energy),3)))
   ax.set_xlim([0,nx])
   ax.set_ylim([0,ny])
 #  try:
@@ -95,6 +95,7 @@ def plot(main):
   axd.set_xlim([min(md[0]),max(md[0])]) # xlim
   axd.set_xticks(np.linspace(min(md[0]),max(md[0]),5,endpoint=True)) # xlim
   axd.set_ylabel("DOS")
+  axd.set_title("Density of states")
   axd.set_xlabel("Energy")
   axd.set_yticks([])
   return fig

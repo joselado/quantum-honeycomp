@@ -74,11 +74,15 @@ def plot(main):
   color = np.tanh(color*sat)
   color = color/np.abs(max(color))
   cplot = ax.scatter(x,y,s=scale*size,c=color,edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
-  fig.colorbar(cplot)
+  cb = fig.colorbar(cplot,ticks=[0,1])
+  cb.ax.set_yticklabels([0,'Max'])
   ax.axis("equal")
+  zoom = main.get_slider("Zoom")
   ax.set_xticks([])
   ax.set_yticks([])
-  ax.set_title("E="+str(round(float(energy),3)))
+  ax.set_xlim([np.min(x)*zoom,np.max(x)*zoom])
+  ax.set_ylim([np.min(y)*zoom,np.max(y)*zoom])
+  ax.set_title("LDOS E="+str(round(float(energy),3)))
   try:
     ax.set_facecolor(main.get_combobox("Background"))
   except: pass
@@ -93,6 +97,7 @@ def plot(main):
   axd.set_xticks(np.linspace(min(md[0]),max(md[0]),5,endpoint=True)) # xlim
   axd.set_ylabel("DOS")
   axd.set_xlabel("Energy")
+  axd.set_title("Density of states")
   axd.set_yticks([])
   return fig
 
@@ -101,9 +106,10 @@ app,main = plotpyqt.get_interface(plot)
 main.add_slider(label="Energy") # Slider for the dots
 main.add_slider(label="Size",v0=50) # Slider for the dots
 main.add_slider(label="Saturation",v0=50) # Saturation
+main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,40)) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
-main.add_combobox(["white","black"],label="Background") # Slider for the dots
+main.add_combobox(["black","white"],label="Background") # Slider for the dots
 
 
 main.plot()

@@ -244,18 +244,9 @@ def show_structure_3d(self):
 
 
 
-def show_interactive_ldos():
-  comp = computing() # create the computing window
+def show_multildos():
   h = pickup_hamiltonian()  # get the hamiltonian
-  ewin = get("window_ldos")
-  nrep = int(get("nsuper_ldos"))
-  nk = int(get("nk_ldos"))
-  ne = int(get("ne_ldos"))
-  delta = get("delta_ldos")
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,
-          nrep=nrep)
-  comp.kill()
-  execute_script("qh-multildos ")
+  common.get_multildos(h,qtwrap)
 
 
 
@@ -335,7 +326,7 @@ signals["show_magnetism"] = show_magnetism  # show magnetism
 signals["compute_sweep"] = sweep_parameter  
 signals["show_structure_3d"] = show_structure_3d
 signals["select_atoms_removal"] = select_atoms_removal
-signals["show_interactive_ldos"] = show_interactive_ldos
+signals["show_multildos"] = show_multildos
 
 
 

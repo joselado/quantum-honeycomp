@@ -139,7 +139,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="nsuper_struct">
             <property name="text">
-             <string>3</string>
+             <string>6</string>
             </property>
            </widget>
           </item>
@@ -319,87 +319,102 @@
        <attribute name="title">
         <string>LDOS</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <layout class="QGridLayout" name="gridLayout_35">
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="ne_ldos">
+       <layout class="QGridLayout" name="gridLayout_19">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_18">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="multildos_nk">
+            <property name="toolTip">
+             <string>Number of kpoints used</string>
+            </property>
             <property name="text">
-             <string>300</string>
+             <string>10</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="delta_ldos">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="multildos_delta">
+            <property name="toolTip">
+             <string>Energy smearing</string>
+            </property>
             <property name="text">
-             <string>0.01</string>
+             <string>0.003</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_43">
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_23">
             <property name="text">
              <string>Smearing</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="nk_ldos">
-            <property name="text">
-             <string>16</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_44">
-            <property name="text">
-             <string># of energies</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_45">
-            <property name="text">
-             <string># of kpoints</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_46">
+           <widget class="QLabel" name="label_24">
             <property name="text">
              <string>Energy window</string>
             </property>
            </widget>
           </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="QPushButton" name="show_multildos">
+            <property name="text">
+             <string>Show LDOS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="multildos_ewindow">
+            <property name="toolTip">
+             <string>Energy window</string>
+            </property>
+            <property name="text">
+             <string>0.3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_25">
+            <property name="text">
+             <string>Number of kpoints</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_26">
+            <property name="text">
+             <string>Number of unit cells</string>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="window_ldos">
+           <widget class="QLineEdit" name="multildos_nrep">
+            <property name="toolTip">
+             <string>Number of replicas of the unit cell to plot</string>
+            </property>
             <property name="text">
-             <string>0.4</string>
+             <string>6</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="nsuper_ldos">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="multildos_numw">
+            <property name="toolTip">
+             <string>Number of wavefunctions computed around E=0 to calculate the LDOS</string>
+            </property>
             <property name="text">
-             <string>3</string>
+             <string>20</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_47">
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_32">
             <property name="text">
-             <string>Supercell</string>
+             <string>Number of waves</string>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="show_interactive_ldos">
-          <property name="text">
-           <string>Show LDOS</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -495,57 +510,71 @@
       </widget>
       <widget class="QWidget" name="tab_6">
        <attribute name="title">
-        <string>Fermi surface</string>
+        <string>FS</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QPushButton" name="show_fermi_surface">
-          <property name="text">
-           <string>Fermi surface</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_37">
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_52">
-            <property name="text">
-             <string># of kpoints</string>
-            </property>
-           </widget>
-          </item>
+       <layout class="QGridLayout" name="gridLayout_16">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_15">
           <item row="2" column="1">
-           <widget class="QLineEdit" name="delta_fs">
+           <widget class="QLineEdit" name="fs_nk">
             <property name="text">
-             <string>0.01</string>
+             <string>60</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="energy_fs">
+           <widget class="QLineEdit" name="fs_ewindow">
             <property name="text">
-             <string>0.0</string>
+             <string>-0.05</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_54">
+           <widget class="QLabel" name="label_52">
+            <property name="text">
+             <string>Number of kpoints</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QPushButton" name="show_fermi_surface">
+            <property name="text">
+             <string>Show Fermi surface</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_49">
             <property name="text">
              <string>Smearing</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="nk_fs">
+           <widget class="QLineEdit" name="fs_delta">
             <property name="text">
-             <string>30</string>
+             <string>0.0005</string>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_40">
+           <widget class="QLabel" name="label_42">
             <property name="text">
-             <string>Energy</string>
+             <string>Energy window</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>NUmber of waves</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="fs_numw">
+            <property name="text">
+             <string>8</string>
             </property>
            </widget>
           </item>

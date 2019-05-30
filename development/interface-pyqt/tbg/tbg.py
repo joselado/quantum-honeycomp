@@ -123,15 +123,7 @@ def show_dos(self):
 
 def show_fermi_surface(silent=False):
   h = pickup_hamiltonian() # get hamiltonian
-  ndos = int(get("ne_dos"))
-  check_parallel() # check if there is parallelization
-  if h.dimensionality==2:
-    spectrum.fermi_surface(h,e=get("energy_fs"),nk=int(get("nk_fs")),
-            nsuper = 2,reciprocal=True,delta=get("delta_fs"),
-            mode="lowest",num_waves=10)
-  else: raise
-  if not silent:
-      execute_script("qh-fermi-surface FERMI_MAP.OUT") # show the result
+  common.get_fermi_surface(h,qtwrap)
 
 
 def show_structure():
@@ -235,19 +227,9 @@ def show_structure_3d(self):
 
 
 
-def show_interactive_ldos():
-  comp = computing() # create the computing window
+def show_multildos():
   h = pickup_hamiltonian()  # get the hamiltonian
-  h.turn_dense()
-  ewin = get("window_ldos")
-  nrep = int(get("nsuper_ldos"))
-  nk = int(np.sqrt(get("nk_ldos")))
-  ne = int(get("ne_ldos"))
-  delta = get("delta_ldos")
-  ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),nk=nk,delta=delta,
-          nrep=nrep)
-  comp.kill()
-  execute_script("qh-multildos ")
+  common.get_multildos(h,qtwrap)
 
 
 def select_atoms_removal(self):
@@ -273,7 +255,7 @@ signals["show_structure"] = show_structure  # show magnetism
 signals["show_structure_3d"] = show_structure_3d
 signals["show_dosbands"] = show_dosbands  # show magnetism
 signals["show_fermi_surface"] = show_fermi_surface  # show magnetism
-signals["show_interactive_ldos"] = show_interactive_ldos  # show magnetism
+signals["show_multildos"] = show_multildos 
 signals["select_atoms_removal"] = select_atoms_removal
 #signals["show_2dband"] = show_2dband  # show magnetism
 #signals["show_kdos"] = show_kdos  # show kdos
