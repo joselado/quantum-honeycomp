@@ -65,12 +65,13 @@ def plot(main):
   color = scale/np.max(scale) # between 0 and 1
   size = 1
   sat = main.get_slider("Saturation")/50 # saturation
-  sat = 4*np.power(sat,4) # exponential scale
+  sat = 15*np.power(sat,4) # exponential scale
   color = np.tanh(color*sat)
   color = color/np.abs(max(color))
 #  cplot = ax.scatter(x,y,s=size*600/nx,c=color,edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
-  cplot = ax.imshow(color.reshape((nx,ny)),cmap=cmap,vmin=0,
-          vmax=1,interpolation=main.get_combobox("interpolation"))
+  cplot = ax.imshow(color.reshape((nx,ny)),cmap=cmap,vmin=0,aspect='auto',
+          vmax=1,interpolation=main.get_combobox("interpolation"),
+          extent = (0,ny,0,nx))
   cb = fig.colorbar(cplot,ticks=[0,1])
   cb.ax.set_yticklabels([0,'Max'])
 
@@ -79,7 +80,8 @@ def plot(main):
   ax.set_yticks([])
   ax.set_xlabel("$k_x$")
   ax.set_ylabel("$k_y$")
-  ax.set_title("Fermi surface E="+str(round(float(energy),3)))
+  #ax.set_title("Fermi surface E="+str(round(float(energy),3)))
+  ax.set_title("Fermi surface")
   ax.set_xlim([0,nx])
   ax.set_ylim([0,ny])
 #  try:
@@ -95,7 +97,7 @@ def plot(main):
   axd.set_xlim([min(md[0]),max(md[0])]) # xlim
   axd.set_xticks(np.linspace(min(md[0]),max(md[0]),5,endpoint=True)) # xlim
   axd.set_ylabel("DOS")
-  axd.set_title("Density of states")
+  axd.set_title("DOS")
   axd.set_xlabel("Energy")
   axd.set_yticks([])
   return fig
@@ -109,6 +111,7 @@ main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
 ts = ["bicubic","nearest","none"]
 main.add_combobox(ts,label="Interpolation",key="interpolation") 
 #main.add_combobox(["white","black"],label="Background") # Slider for the dots
+main.setWindowTitle("Fermi surface")
 
 
 main.plot()

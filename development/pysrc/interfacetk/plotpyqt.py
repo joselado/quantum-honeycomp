@@ -44,6 +44,7 @@ def get_interface(plot_figure,i=0):
             self.figure.clear()
 #            self.layout.removeWidget(self.canvas)
             fig = plot_figure(self) # get that figure
+            plt.tight_layout(h_pad=0.1,w_pad=0.1) # adjust axis
             if fig.number!=self.figure.number: 
                 print("You must plot in the same figure as the one initialized for the interface, use fig = plt.figure(obj.figure.number) in your function, where obj is the input of your function")
                 exit()
@@ -104,7 +105,7 @@ def get_interface(plot_figure,i=0):
             if label is not None:
               lb = QtWidgets.QLabel(label) # label object
               self.layout.addWidget(lb,self.row,self.column)
-              self.layout.addWidget(slider,self.row,self.column+1)
+              self.layout.addWidget(slider,self.row,self.column+1,1,1)
               self.column += 2 # increase counter
             else:
               self.layout.addWidget(slider,self.row,0,1,0)

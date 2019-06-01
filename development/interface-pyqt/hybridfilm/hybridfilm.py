@@ -127,7 +127,7 @@ def show_ldos():
   energies = np.linspace(-ewin,ewin,int(get("ne_ldos")))
   delta = get("delta_ldos")
   ldos.slabldos(h,energies=energies,delta=delta,nk=int(get("nk_ldos")))
-  execute_script("qh-ldos-slab DOSMAP.OUT  ")
+  execute_script('qh-map2d --input DOSMAP.OUT --xlabel Energy --ylabel "z-position" --zlabel DOS --title "Local DOS"')
 
 
 

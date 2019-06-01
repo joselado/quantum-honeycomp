@@ -26,11 +26,42 @@ from pygra import parallel
 from interfacetk import interfacetk
 modify_geometry = lambda x: interfacetk.modify_geometry(x,qtwrap)
 
+qtwrap.set_combobox("multilayer_type",
+        cs=["Twisted bilayer",
+            "Aligned bilayer AA",
+            "Aligned bilayer AB",
+            "Aligned trilayer ABC",
+            "Twisted trilayer 010",
+            "Twisted trilayer 001"
+            ,"Twisted bi-bilayer AB"
+            ,"Twisted bi-trilayer ABC"
+            ])
 
 def get_geometry(modify=True):
   """ Create a 2d honeycomb lattice"""
-  n = int(get("cell_size")) # size of the unit cell
-  g = specialgeometry.twisted_bilayer(n)
+  n = int(qtwrap.get("cell_size")) # size of the unit cell
+  name = qtwrap.getbox("multilayer_type")
+  if name=="Twisted bilayer":
+    g = specialgeometry.twisted_bilayer(n)
+  elif name=="Aligned bilayer AA":
+    g = specialgeometry.twisted_multilayer(n,rot=[0,0])
+  elif name=="Aligned bilayer AB":
+    gb = specialgeometry.multilayer_graphene(l=[0,1])
+    g = specialgeometry.twisted_multilayer(n,rot=[0],g=gb,dz=6.0)
+  elif name=="Aligned trilayer ABC":
+    gb = specialgeometry.multilayer_graphene(l=[0,1,2])
+    g = specialgeometry.twisted_multilayer(n,rot=[0],g=gb,dz=6.0)
+  elif name=="Twisted trilayer 010":
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1,0])
+  elif name=="Twisted trilayer 001":
+    g = specialgeometry.twisted_multilayer(n,rot=[0,0,1])
+  elif name=="Twisted bi-bilayer AB":
+    gb = specialgeometry.multilayer_graphene(l=[0,1])
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=6.0)
+  elif name=="Twisted bi-trilayer ABC":
+    gb = specialgeometry.multilayer_graphene(l=[0,1,2])
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=6.0)
+  else: raise
 #  g = geometry.honeycomb_lattice()
 #  g = g.supercell(n)
   if modify: g = modify_geometry(g) # remove atoms if necessary
@@ -47,9 +78,9 @@ def initialize():
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))
   # workaround to put Fermi energy in zero approx
   h.shift_fermi(-get("tinter")/16.) 
-  mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
-  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
-  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
+#  mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
+#  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
+#  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
   efield = get("interlayer_bias")
   def bias(r):
     if r[2]<0.0: return efield
@@ -131,7 +162,7 @@ def show_structure():
   nsuper = int(get("nsuper_struct")) 
   g = g.supercell(nsuper) # build a supercell
   g.write()
-  execute_script("qh-potential POSITIONS.OUT ")
+  execute_script("qh-potential --input POSITIONS.OUT --colorbar false --cmap rainbow --zoom 70 --size 30")
 
 
 

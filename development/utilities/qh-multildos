@@ -110,7 +110,7 @@ main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,40)) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
 main.add_combobox(["black","white"],label="Background") # Slider for the dots
-
+main.setWindowTitle("Local DOS")
 
 main.plot()
 main.show()

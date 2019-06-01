@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Twisted bilayer graphene</string>
+   <string>Twisted multilayer graphene</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_17">
@@ -42,13 +42,6 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Upper AB imbalance</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Fermi energy</string>
@@ -70,37 +63,16 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="mAB_upper">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
            <widget class="QLineEdit" name="fermi">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="3" column="1">
            <widget class="QRadioButton" name="set_half_filling">
             <property name="text">
              <string>Measure with respect to half filling</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="mAB_lower">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_20">
-            <property name="text">
-             <string>Lower AB imbalance</string>
             </property>
            </widget>
           </item>
@@ -567,7 +539,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_22">
             <property name="text">
-             <string>NUmber of waves</string>
+             <string>Number of waves</string>
             </property>
            </widget>
           </item>
@@ -715,6 +687,16 @@
            <widget class="QLineEdit" name="cell_size">
             <property name="text">
              <string>7</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="multilayer_type"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>Multilayer type</string>
             </property>
            </widget>
           </item>
