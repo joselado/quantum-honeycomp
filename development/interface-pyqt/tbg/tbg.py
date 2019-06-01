@@ -60,7 +60,7 @@ def get_geometry(modify=True):
     g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=6.0)
   elif name=="Twisted bi-trilayer ABC":
     gb = specialgeometry.multilayer_graphene(l=[0,1,2])
-    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=6.0)
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=9.0)
   else: raise
 #  g = geometry.honeycomb_lattice()
 #  g = g.supercell(n)
