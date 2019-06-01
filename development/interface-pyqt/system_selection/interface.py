@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         self.hybridribbon_pyqt.setText(_translate("MainWindow", "Hybrid ribbons"))
         self.sheets.setText(_translate("MainWindow", "Sheets"))
         self.multilayergraphene.setText(_translate("MainWindow", "Multilayer graphene"))
-        self.twisted_bilayer.setText(_translate("MainWindow", "Twisted bilayer graphene"))
+        self.twisted_bilayer.setText(_translate("MainWindow", "Twisted multilayer graphene"))
         self.update_qh.setToolTip(_translate("MainWindow", "This command will download the latest version fo Quantum Honeycomp from github"))
         self.update_qh.setText(_translate("MainWindow", "Update Quantum Honeycomp"))
 

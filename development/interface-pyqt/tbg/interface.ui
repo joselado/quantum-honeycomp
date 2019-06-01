@@ -497,7 +497,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="fs_ewindow">
             <property name="text">
-             <string>-0.05</string>
+             <string>0.05</string>
             </property>
            </widget>
           </item>
