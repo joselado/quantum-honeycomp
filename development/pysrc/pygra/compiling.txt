@@ -7,8 +7,8 @@ running build_src
 build_src
 building extension "algebraf90" sources
 f2py options: []
-f2py:> /tmp/tmpz5un7k_g/src.linux-x86_64-3.6/algebraf90module.c
-creating /tmp/tmpz5un7k_g/src.linux-x86_64-3.6
+f2py:> /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.c
+creating /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6
 Reading fortran codes...
 	Reading file 'algebraf90.f90' (format:free)
 Post-processing...
@@ -19,11 +19,11 @@ Building modules...
 	Building module "algebraf90"...
 		Constructing wrapper function "todouble"...
 		  vout = todouble(vin,shift,[n])
-	Wrote C/API module "algebraf90" to file "/tmp/tmpz5un7k_g/src.linux-x86_64-3.6/algebraf90module.c"
-  adding '/tmp/tmpz5un7k_g/src.linux-x86_64-3.6/fortranobject.c' to sources.
-  adding '/tmp/tmpz5un7k_g/src.linux-x86_64-3.6' to include_dirs.
-copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpz5un7k_g/src.linux-x86_64-3.6
-copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpz5un7k_g/src.linux-x86_64-3.6
+	Wrote C/API module "algebraf90" to file "/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.c"
+  adding '/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.c' to sources.
+  adding '/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6' to include_dirs.
+copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6
+copying /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6
 build_src: building npy-pkg config files
 running build_ext
 customize UnixCCompiler
@@ -37,17 +37,40 @@ building 'algebraf90' extension
 compiling C sources
 C compiler: gcc -pthread -B /home/jose/apps/anaconda3/compiler_compat -Wl,--sysroot=/ -Wsign-compare -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC
 
-creating /tmp/tmpz5un7k_g/tmp
-creating /tmp/tmpz5un7k_g/tmp/tmpz5un7k_g
-creating /tmp/tmpz5un7k_g/tmp/tmpz5un7k_g/src.linux-x86_64-3.6
-compile options: '-I/tmp/tmpz5un7k_g/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
-gcc: /tmp/tmpz5un7k_g/src.linux-x86_64-3.6/algebraf90module.c
-gcc: /tmp/tmpz5un7k_g/src.linux-x86_64-3.6/fortranobject.c
+creating /tmp/tmpxnqc9vrj/tmp
+creating /tmp/tmpxnqc9vrj/tmp/tmpxnqc9vrj
+creating /tmp/tmpxnqc9vrj/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6
+compile options: '-I/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+gcc: /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.c
+In file included from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1818:0,
+                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.c:16:
+/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it by " \
+  ^~~~~~~
+/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.c:109:12: warning: ‘f2py_size’ defined but not used [-Wunused-function]
+ static int f2py_size(PyArrayObject* var, ...)
+            ^~~~~~~~~
+gcc: /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.c
+In file included from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarraytypes.h:1818:0,
+                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.h:13,
+                 from /tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.c:2:
+/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION" [-Wcpp]
+ #warning "Using deprecated NumPy API, disable it by " \
+  ^~~~~~~
+/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.c: In function ‘format_def’:
+/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.c:138:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if (size < sizeof(notalloc)) {
+                  ^
 compiling Fortran sources
 Fortran f77 compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran f90 compiler: /usr/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
 Fortran fix compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O3 -funroll-loops
-compile options: '-I/tmp/tmpz5un7k_g/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
+compile options: '-I/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6 -I/home/jose/apps/anaconda3/lib/python3.6/site-packages/numpy/core/include -I/home/jose/apps/anaconda3/include/python3.6m -c'
 gfortran:f90: algebraf90.f90
-/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpz5un7k_g/tmp/tmpz5un7k_g/src.linux-x86_64-3.6/algebraf90module.o /tmp/tmpz5un7k_g/tmp/tmpz5un7k_g/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpz5un7k_g/algebraf90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./algebraf90.cpython-36m-x86_64-linux-gnu.so
-Removing build directory /tmp/tmpz5un7k_g
+/usr/bin/gfortran -Wall -g -Wall -g -shared /tmp/tmpxnqc9vrj/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/algebraf90module.o /tmp/tmpxnqc9vrj/tmp/tmpxnqc9vrj/src.linux-x86_64-3.6/fortranobject.o /tmp/tmpxnqc9vrj/algebraf90.o -L/usr/lib/gcc/x86_64-linux-gnu/7 -L/usr/lib/gcc/x86_64-linux-gnu/7 -lgfortran -o ./algebraf90.cpython-36m-x86_64-linux-gnu.so
+Removing build directory /tmp/tmpxnqc9vrj

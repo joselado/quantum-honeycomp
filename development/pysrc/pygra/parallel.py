@@ -14,6 +14,7 @@ except:
                   return [f(x) for x in xs]
                 def terminate(self): return None # dummy function
             return mpool()
+    maxcpu = 1
 
 cores = 1 # call in a single by default
 
