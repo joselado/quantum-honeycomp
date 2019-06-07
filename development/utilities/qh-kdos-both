@@ -26,74 +26,85 @@ fig.set_facecolor("white")
 name = args.input # input file
 
 
-for i in range(2):
-  m = np.genfromtxt(name).transpose()
-  x = m[0]
-  y = m[1]
-  ze = m[2]
-  zb = m[3]
-  zs = [ze,zb] # list with zs
-  plt.subplot(1,2,i+1)
-  z = zs[i]
-  
-  # get dimensions assuming uniform grid
-  
+
+
+def getplot(obj):
+  fig = plt.figure(obj.figure.number)
+  for i in range(2):
+    m = np.genfromtxt(name).transpose()
+    x = m[0]
+    y = m[1]
+    ze = m[2]
+    zb = m[3]
+    zs = [ze,zb] # list with zs
+    plt.subplot(1,2,i+1)
+    z = zs[i]
     
-  ny = (y.max()-y.min())/abs(y[1]-y[0])
-  ny = int(round(ny)) + 1
-  nx = len(z)/ny
+    # get dimensions assuming uniform grid
+    
+      
+    ny = (y.max()-y.min())/abs(y[1]-y[0])
+    ny = int(round(ny)) + 1
+    nx = len(z)/ny
+    
+    nx = int(nx)
+    ny = int(ny)
+    
+    #nx = 20
+    #ny = len(z)//nx
+    
+    
+    
+    print("Detected",nx,ny,"grid")
+    
+    Z = np.abs(z).reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
+    Z = z.reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
+    T = Z.T              # transposes the matrix (Zx,Zy)
+    
+    # now interpolate to get a smooth mesh
+    from scipy.interpolate import interp2d
+    x = np.linspace(0.,1.,nx)
+    y = np.linspace(0.,1.,ny)
+    xx, yy = np.meshgrid(x, y)
+    f = interp2d(x, y, T, kind='linear')
+    
+    # 
+    x = np.linspace(0.,1.,1000)
+    y = np.linspace(0.,1.,1000)
+    
+    z_inter = f(x,y)
+    
+    # now plot the data
+    
+    vmax = np.percentile(z_inter,95)
+    
+    #plt.subplot(1,2,1)
+    #plt.contour(x,y,z_inter,300,cmap = plt.get_cmap("hot"))
+    minx = np.min(x)
+    maxx = np.max(x)
+    miny = np.min(m[1])
+    maxy = np.max(m[1])
+    plt.imshow(z_inter, aspect='auto', origin='lower',cmap = plt.get_cmap(args.cmap), extent = ( minx, maxx, miny, maxy),interpolation='nearest',vmax=vmax,vmin=0.0)
+    plt.xticks([0.,1.])
+    #plt.yticks([])
+    
+    plt.xlabel("K-path [2$\pi$]")
+    if i==0: # first one
+      plt.ylabel("Energy [t]")
+    if i==0:
+      plt.title("Surface")
+    elif i==1:
+      plt.title("Bulk")
+      from matplotlib import ticker
+      cb = plt.colorbar(ticks=[0.,vmax])
+      cb.ax.set_yticklabels([0, 'Max'])
+      cb.set_label("DOS")
+  return fig
   
-  nx = int(nx)
-  ny = int(ny)
-  
-  #nx = 20
-  #ny = len(z)//nx
-  
-  
-  
-  print("Detected",nx,ny,"grid")
-  
-  Z = np.abs(z).reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
-  Z = z.reshape(nx,ny) # makes a (Zy,Zx) matrix out of z
-  T = Z.T              # transposes the matrix (Zx,Zy)
-  
-  # now interpolate to get a smooth mesh
-  from scipy.interpolate import interp2d
-  x = np.linspace(0.,1.,nx)
-  y = np.linspace(0.,1.,ny)
-  xx, yy = np.meshgrid(x, y)
-  f = interp2d(x, y, T, kind='linear')
-  
-  # 
-  x = np.linspace(0.,1.,1000)
-  y = np.linspace(0.,1.,1000)
-  
-  z_inter = f(x,y)
-  
-  # now plot the data
-  
-  vmax = np.percentile(z_inter,95)
-  
-  #plt.subplot(1,2,1)
-  #plt.contour(x,y,z_inter,300,cmap = plt.get_cmap("hot"))
-  minx = np.min(x)
-  maxx = np.max(x)
-  miny = np.min(m[1])
-  maxy = np.max(m[1])
-  plt.imshow(z_inter, aspect='auto', origin='lower',cmap = plt.get_cmap(args.cmap), extent = ( minx, maxx, miny, maxy),interpolation='nearest',vmax=vmax,vmin=0.0)
-  plt.xticks([0.,1.])
-  #plt.yticks([])
-  
-  plt.xlabel("K-path [2$\pi$]")
-  if i==0: # first one
-    plt.ylabel("Energy [t]")
-  if i==0:
-    plt.title("Surface")
-  elif i==1:
-    plt.title("Bulk")
-    from matplotlib import ticker
-    cb = plt.colorbar(ticks=[0.,vmax])
-    cb.ax.set_yticklabels([0, 'Max'])
-    cb.set_label("DOS")
-  
-plt.show()
+
+app,main = plotpyqt.get_interface(plot)
+
+main.plot()
+main.show()
+sys.exit(app.exec_())
+
