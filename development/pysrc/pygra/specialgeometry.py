@@ -124,11 +124,15 @@ def twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
   return g
 
 
+
+
+
+
+
+
+
 def twisted_trilayer(m0=3):
   return twisted_multilayer(m0=m0,shift=[-1.,0.,1.])
-
-
-
 
 
 def generalized_twisted_multilayer(m0=3,rotate=True,shift=[0.,0.],
@@ -219,6 +223,72 @@ def mismatched_lattice(n1=5,n2=4,g=None):
     gn.r2xyz() # update
     gn.get_fractional() # update fractional coordinates
     return gn # get geometry
+
+
+
+def twisted_multimultilayer(m0=3,
+  r=1,rot=[1,0],
+  g=None,dz=3.0):
+  """Return the geometry for twisted multimultilayer graphene"""
+  if g is None: # nothing provided, assume twisted bilayer
+    g = [] # empty list
+    for i in rot:
+      gi = geometry.honeycomb_lattice() # default is honeycomb
+      g.append(gi) # store geometry
+  g0 = [] # empt list
+  for gi in g:
+      gi = geometry.non_orthogonal_supercell(gi,m=[[-1,0,0],[0,1,0],[0,0,1]])
+      g0.append(gi) # store
+  g = g0 # overwrite
+  # define the rotation angle
+  theta = np.arccos((3.*m0**2+3*m0*r+r**2/2.)/(3.*m0**2+3*m0*r+r**2))
+  print("Theta",theta*180.0/np.pi)
+  # supercell used
+  nsuper = [[m0,m0+r,0],[-m0-r,2*m0+r,0],[0,0,1]]
+  gs = [] # empty list
+  if len(rot)!=len(g): raise # inconsistency
+  zshift= 0.0 # initial shift
+  for (irot,gi) in zip(rot,g): # loop
+    dzi = np.max(gi.z)-np.min(gi.z) # width of this layer
+    gi = geometry.non_orthogonal_supercell(gi,m=nsuper,
+           reducef=lambda x: 3*np.sqrt(x))
+    gi.r[:,2] -= np.min(gi.r[:,2]) # lowest layer in zero
+    gi.r2xyz() # update
+    if irot!=0 and irot!=1: raise # nope
+    gs.append(rotate_layer(gi,irot*theta,dr=[0.,0.,zshift]))
+    zshift = zshift + dzi + dz
+  # now create the final geometry object
+  del g # remove that list
+  g = gs[0].copy() # overwrite g
+  g.r = np.concatenate([gi.r for gi in gs]).copy() # all the positions
+  g.r2xyz() # update
+  g.real2fractional() # update fractional coordinates 
+  g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # rotate
+  g.get_fractional() # get fractional coordinates 
+  return g
+
+
+
+def parse_twisted_multimultilayer(name,n=3):
+    """Given a name for a multilayer, return the geometry"""
+    # name is two element list
+    # second element is the list with aligned stacking
+    # thirs element determines whether if they are rotated
+    gs = [] # empty list
+    for ni in name[0]: # loop over names of the layers
+            if ni=="": gi = multilayer_graphene([0]) # normal honeycomb
+            elif ni=="AA": gi = multilayer_graphene([0,0]) 
+            elif ni=="AB": gi = multilayer_graphene([0,1]) 
+            elif ni=="BA": gi = multilayer_graphene([1,0]) 
+            elif ni=="ABC": gi = multilayer_graphene([0,1,2]) 
+            elif ni=="ABAB": gi = multilayer_graphene([0,1,0,1]) 
+            elif ni=="ABBA": gi = multilayer_graphene([0,1,1,0]) 
+            else: raise
+            gs.append(gi) # store
+    rot = name[1] # rotations
+    return twisted_multimultilayer(rot=rot,g=gs,m0=n)
+
+
 
 
 

@@ -217,6 +217,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
       xs = np.linspace(-window,window,ndos) # create x
   ys = calculate_dos(es,xs,delta) # use the Fortran routine
   ys /= nk # normalize by the number of k-points
+  ys *= 1./np.pi # normalization of the Lorentzian
   write_dos(xs,ys) # write in file
   print("\nDOS finished")
   return (xs,ys) # return result

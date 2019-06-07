@@ -33,7 +33,8 @@ qtwrap.set_combobox("multilayer_type",
             "Aligned trilayer ABC",
             "Twisted trilayer 010",
             "Twisted trilayer 001"
-            ,"Twisted bi-bilayer AB"
+            ,"Twisted bi-bilayer AB AB"
+            ,"Twisted bi-bilayer AB BA"
             ,"Twisted bi-trilayer ABC"
             ])
 
@@ -55,12 +56,15 @@ def get_geometry(modify=True):
     g = specialgeometry.twisted_multilayer(n,rot=[0,1,0])
   elif name=="Twisted trilayer 001":
     g = specialgeometry.twisted_multilayer(n,rot=[0,0,1])
-  elif name=="Twisted bi-bilayer AB":
-    gb = specialgeometry.multilayer_graphene(l=[0,1])
-    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=6.0)
+  elif name=="Twisted bi-bilayer AB AB":
+    ps = [["AB","AB"],[0,1]]
+    g = specialgeometry.parse_twisted_multimultilayer(ps,n=n)
+  elif name=="Twisted bi-bilayer AB BA":
+    ps = [["AB","BA"],[0,1]]
+    g = specialgeometry.parse_twisted_multimultilayer(ps,n=n)
   elif name=="Twisted bi-trilayer ABC":
-    gb = specialgeometry.multilayer_graphene(l=[0,1,2])
-    g = specialgeometry.twisted_multilayer(n,rot=[0,1],g=gb,dz=9.0)
+    ps = [["ABC","ABC"],[0,1]]
+    g = specialgeometry.parse_twisted_multimultilayer(ps,n=n)
   else: raise
 #  g = geometry.honeycomb_lattice()
 #  g = g.supercell(n)

@@ -19,7 +19,7 @@ window = qtwrap.main() # this is the main interface
 from interfacetk.qh_interface import * # import all the libraries needed
 from interfacetk import common # common routines for all the geometries
 
-
+common.initialize(qtwrap) # do several common initializations
 
 
 def get_geometry():
@@ -110,11 +110,7 @@ def show_dosbands(self=0):
 
 def show_dos(self):
   h = pickup_hamiltonian() # get hamiltonian
-  nk = get("nk_dos")
-  delta = get("smearing_dos")
-  ne = get("ne_dos")
-  dos.dos3d(h,ndos=int(ne),delta=delta,nk=int(nk))
-  execute_script("qh-dos  DOS.OUT")
+  common.get_dos(h,qtwrap)
 
 
 
@@ -171,12 +167,7 @@ def show_structure_3d(self):
 
 def show_kdos(self):
   h = pickup_hamiltonian()  # get the hamiltonian
-  ew = get("ewindow_kdos")
-  new = int(get("mesh_kdos")) # scale as kpoints
-  energies = np.linspace(-ew,ew,new) # number of ene
-  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
-  kdos.surface(h,energies=energies,delta=ew/new,kpath=None)
-  execute_script("qh-kdos-both KDOS.OUT  ")
+  common.get_kdos(h,qtwrap) # get the KDOS
 
 
 

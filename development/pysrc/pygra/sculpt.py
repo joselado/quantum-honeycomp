@@ -37,22 +37,11 @@ def intersec(g,f):
   """ Intersec coordinates with a certain function which yields True or False,
   output is resultant geometry """
   gout = g.copy() # copy the geometry
-  x = [] # out x
-  y = [] # out y
-  z = [] # out y
-  iis = []
-  for (ii,ix,iy,iz) in zip(range(len(g.x)),g.x,g.y,g.z): # loop over positions
-    if f([ix,iy,iz]): # if the function yields true
-      x.append(ix)
-      y.append(iy)
-      z.append(iz)
-      iis.append(ii)
-  gout.x = np.array(x)  # copy x
-  gout.y = np.array(y)  # copy y
-  gout.z = np.array(z)  # copy y
-  gout.xyz2r() # update r
+  store = np.array([f(ir) for ir in g.r],dtype=int) # store
+  gout.r = g.r[store==1]
+  gout.r2xyz() # update r
   if gout.has_sublattice: # if has sublattice, keep the indexes
-    gout.sublattice = [g.sublattice[i] for i in iis]
+    gout.sublattice = g.sublattice[store==1]
   return gout
 
 
@@ -104,15 +93,9 @@ def rotate(g,angle):
   phi = angle
   go = g.copy()
   # modify x and y, z is the same
-  x,y,z = [],[],[]  # initialize lists
   c,s = np.cos(phi), np.sin(phi)  # sin and cos of the anggle
-  for (ix,iy,iz) in zip(g.x,g.y,g.z):
-    x.append(c*ix + s*iy)    # x coordinate 
-    y.append(-s*ix + c*iy)    # y coordinate
-    z.append(iz)
-  go.x = np.array(x)
-  go.y = np.array(y)
-  go.z = np.array(z)
+  go.x = c*g.x + s*g.y    # x coordinate 
+  go.y = -s*g.x + c*g.y    # y coordinate
   go.xyz2r() # update r
   if go.dimensionality==2:  # two dimensional
     x,y,z = go.a1

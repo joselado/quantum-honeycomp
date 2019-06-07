@@ -66,7 +66,10 @@ def get_dos(h,window,silent=False):
   delta = window.get("dos_delta")
   ewindow = abs(window.get("dos_ewindow"))
   energies = np.linspace(-ewindow,ewindow,ewindow/delta*5) # get the energies
-  dos.dos(h,delta=delta,nk=nk,energies=energies) # compute DOS
+  if window.getbox("dos_mode")=="Green":
+    dos.dos(h,delta=delta,nk=nk,energies=energies,mode="Green") # compute DOS
+  else:
+    dos.dos(h,delta=delta,nk=nk,energies=energies,random=False) # compute DOS
   if not silent: execute_script("qh-dos --input DOS.OUT")
 
 
