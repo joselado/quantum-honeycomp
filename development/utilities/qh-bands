@@ -51,15 +51,9 @@ def getplot(obj):
   
   # check if plot the color
   draw_color = False
-  if len(m.T[0]) > 2:
+  if len(m) > 2:
     draw_color = True
     color = m[2]
-    tc = 0.0
-    for i in range(len(m[1])):
-      if m[1][i]<0.0: tc += m[2][i]
-    print("Total color below Ef", tc)
-  
-  
    
   k = m[0] # default x axis
   if args.dim=="0": k = range(len(m[0])) # indexes
@@ -123,7 +117,8 @@ def getplot(obj):
 
 app,main = plotpyqt.get_interface(getplot)
 main.setWindowTitle("Band structure")
-main.add_combobox(["RGB","rainbow","plasma","inferno"],
+if len(m)>2: # has color
+  main.add_combobox(["RGB","rainbow","plasma","inferno"],
         label="Colormap",key="cmap")
 main.add_slider(label="Energy window",key="ewin",
         vs=np.linspace(0.,1.,100)) # Energy window
