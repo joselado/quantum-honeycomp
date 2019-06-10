@@ -27,6 +27,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input",default="DOS.OUT",
         help='Input file with the dos')
 args = parser.parse_args() # get the arguments
+name = args.input
+m = np.genfromtxt(name).transpose()
 
 
 from scipy.signal import savgol_filter
@@ -40,8 +42,6 @@ def getplot(obj):
   currentfig.canvas.set_window_title('Density of states')
   
   import sys
-  name = args.input
-  m = np.genfromtxt(name).transpose()
   num_dos = len(m) - 1
   e = m[0]
   d = m[1]
@@ -55,7 +55,7 @@ def getplot(obj):
       conv = delta/(e**2+delta**2)/np.pi # convolution
       d = np.convolve(d,conv,mode="same")*de/len(e)
   # first subplot
-  splot = plt.subplot(1,2,1)
+  splot = plt.subplot(2,1,1)
   splot.set_title("DOS")
   splot.plot(e,d,color="black")
   splot.set_xlim([min(e),max(e)])
@@ -73,7 +73,7 @@ def getplot(obj):
   splot.set_xlim([-ewin,ewin])  
   plt.locator_params(nbins=4)
   # now the integral of the DOS
-  iplot = plt.subplot(1,2,2)
+  iplot = plt.subplot(2,1,2)
   iplot.set_title("Integrated DOS")
   from scipy.integrate import cumtrapz
   di = cumtrapz(d,e)
@@ -93,6 +93,7 @@ def getplot(obj):
 
 # create the interface
 app,main = plotpyqt.get_interface(getplot)
+main.setWindowTitle("Density of states")
 main.add_slider(label="Smoothness",vs=np.linspace(0.,1.,100)) # Saturation
 main.add_slider(label="Energy window",key="ewin",vs=np.linspace(0.,1.,100)) 
 main.plot()

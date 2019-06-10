@@ -3,7 +3,7 @@ from scipy.sparse import csc_matrix as csc
 import scipy.linalg as dlg
 import scipy.sparse.linalg as slg
 import numpy as np
-
+from .algebratk import sparsetensor
 
 def braket_wAw(w,A,wi=None):
   """

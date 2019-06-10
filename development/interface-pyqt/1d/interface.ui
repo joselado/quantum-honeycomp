@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1017</width>
-    <height>626</height>
+    <height>659</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,35 +27,42 @@
        <layout class="QGridLayout" name="gridLayout_19">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout">
-          <item row="4" column="1">
+          <item row="13" column="1">
+           <widget class="QLineEdit" name="swave">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
            <widget class="QLineEdit" name="Bz">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="Bx">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
+          <item row="5" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
              <string>Zeeman Jz</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="1">
+          <item row="11" column="1">
            <widget class="QLineEdit" name="mAB">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QLineEdit" name="By">
             <property name="text">
              <string>0.0</string>
@@ -69,7 +76,7 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="peierls">
             <property name="enabled">
              <bool>true</bool>
@@ -79,28 +86,28 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="7" column="1">
            <widget class="QLineEdit" name="kanemele">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
+          <item row="9" column="0">
            <widget class="QLabel" name="label_24">
             <property name="text">
              <string>Haldane</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="1">
+          <item row="10" column="1">
            <widget class="QLineEdit" name="antihaldane">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
              <string>swave pairing</string>
@@ -117,101 +124,108 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
+          <item row="6" column="1">
            <widget class="QLineEdit" name="rashba">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="8" column="1">
+          <item row="9" column="1">
            <widget class="QLineEdit" name="haldane">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="11" column="1">
+          <item row="12" column="1">
            <widget class="QLineEdit" name="mAF">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="6" column="0">
            <widget class="QLabel" name="label_10">
             <property name="text">
              <string>Rashba</string>
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="7" column="0">
            <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Kane-Mele</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Zeeman Jx</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_4">
             <property name="text">
              <string>Zeeman Jy</string>
             </property>
            </widget>
           </item>
-          <item row="10" column="0">
+          <item row="11" column="0">
            <widget class="QLabel" name="label_12">
             <property name="text">
              <string>Sublattice imbalance</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_14">
             <property name="text">
              <string>Magnetic field</string>
             </property>
            </widget>
           </item>
-          <item row="12" column="1">
-           <widget class="QLineEdit" name="swave">
-            <property name="text">
-             <string>0.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
+          <item row="12" column="0">
            <widget class="QLabel" name="label_13">
             <property name="text">
              <string>Antiferromagnetism</string>
             </property>
            </widget>
           </item>
-          <item row="9" column="0">
+          <item row="10" column="0">
            <widget class="QLabel" name="label_25">
             <property name="text">
              <string>Anti-Haldane</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="1">
+          <item row="8" column="1">
            <widget class="QLineEdit" name="antikanemele">
             <property name="text">
              <string>0.0</string>
             </property>
            </widget>
           </item>
-          <item row="7" column="0">
+          <item row="8" column="0">
            <widget class="QLabel" name="label_37">
             <property name="text">
              <string>Anti Kane-Mele</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="crystalfield">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Crystal field</string>
             </property>
            </widget>
           </item>
@@ -231,7 +245,21 @@
         <string>Structure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_9">
-        <item row="0" column="0">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="show_structure">
+          <property name="text">
+           <string>Show structure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="show_structure_3d">
+          <property name="text">
+           <string>Show structure 3D</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="1">
            <widget class="QLineEdit" name="nsuper_struct">
@@ -249,20 +277,6 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="show_structure">
-          <property name="text">
-           <string>Show structure</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="show_structure_3d">
-          <property name="text">
-           <string>Show structure 3D</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_5">
@@ -279,7 +293,7 @@
         </item>
         <item row="1" column="0">
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
              <string># kpoints</string>
@@ -335,20 +349,10 @@
             </item>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QLineEdit" name="nk_bands">
             <property name="text">
              <string>100</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="bands_colormap"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_38">
-            <property name="text">
-             <string>Colormap</string>
             </property>
            </widget>
           </item>

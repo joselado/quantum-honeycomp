@@ -1603,3 +1603,40 @@ def multireplicas(self,n):
         for d in dl:  out += self.replicas(d) # add this direction
     return out
 
+
+
+def write_vasp(g0):
+    """Turn a geometry into vasp geometry"""
+    g = g0.copy() # copy geometry
+    s = 1.42
+    if g.dimensionality==3: pass
+    elif g.dimensionality==2:
+        g.r[:,2] -= np.min(g.r[:,2])
+        z = np.max(g.r[:,2]) - np.min(g.r[:,2])
+        a3 = np.array([0.,0.,z+9.0])
+        g.a3 = a3 # set the lattice vector
+        g.dimensionality = 3
+        g.get_fractional() # get fractional coordinates
+    else: raise # not implemented
+    f = open("vasp.vasp","w") # input file
+    f.write("Structure\n 1.0\n")
+    for i in range(3): f.write(str(s*g.a1[i])+"  ")
+    f.write("\n")
+    for i in range(3): f.write(str(s*g.a2[i])+"  ")
+    f.write("\n")
+    for i in range(3): f.write(str(s*g.a3[i])+"  ")
+    f.write("\n C\n "+str(len(g.r))+"\n Direct\n")
+    for ir in g.frac_r:
+        for i in range(3): f.write(str(ir[i])+"  ")
+        f.write("\n")
+
+
+
+
+
+
+
+
+
+
+

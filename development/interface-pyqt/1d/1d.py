@@ -91,6 +91,7 @@ def initialize():
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   if abs(get("rashba")) > 0.0: h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
+  h.add_crystal_field(qtwrap.get("crystalfield")) 
   h.shift_fermi(get("fermi")) # shift fermi energy
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC

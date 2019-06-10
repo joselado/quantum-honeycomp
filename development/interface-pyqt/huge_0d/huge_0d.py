@@ -166,6 +166,7 @@ def initialize():
     h.first_neighbors()  # first neighbor hopping
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   h.add_peierls(get("peierls")) # add magnetic field
+  h.add_crystal_field(qtwrap.get("crystalfield")) # add magnetic field
   if get("haldane")!=0.0:
     h.add_haldane(get("haldane")) # add Haldane coupling
   if get("edge_potential")!=0.0: # if there is edge potential

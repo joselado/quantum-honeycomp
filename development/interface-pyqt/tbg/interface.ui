@@ -69,10 +69,27 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QRadioButton" name="set_half_filling">
             <property name="text">
              <string>Measure with respect to half filling</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Crystal field</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="crystalfield">
+            <property name="toolTip">
+             <string>Crystal field Hartree term, makes the edge atoms inequivalent</string>
+            </property>
+            <property name="text">
+             <string>0.0</string>
             </property>
            </widget>
           </item>
@@ -133,28 +150,28 @@
        <layout class="QGridLayout" name="gridLayout_9">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="3" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_7">
             <property name="text">
              <string>nbands</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
              <string>nkpoints</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="nbands">
             <property name="text">
              <string>20</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="1" column="1">
            <widget class="QLineEdit" name="nk_bands">
             <property name="text">
              <string>100</string>
@@ -190,16 +207,6 @@
               <string>Layer</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="bands_colormap"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_18">
-            <property name="text">
-             <string>Colormap</string>
-            </property>
            </widget>
           </item>
          </layout>

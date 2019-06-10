@@ -26,6 +26,8 @@ def element(i,n,p,d=2,j=None):
 class interaction(): 
   def __init__(self):
     self.contribution = "AB" # assume that both operators contribute
+    self.dir = [0,0,0] # unit cell to which to hop
+    self.dhop = [0,0,0] # matrix that is affected
 
 def hubbard_density(i,n,g=1.0):
   """Return pair of operators for a Hubbard mean field"""
@@ -166,6 +168,7 @@ def v_ij_spinless(i,j,n,g=1.0,d=[0,0,0]):
   v.a = csc_matrix(([1.0],[[i],[j]]),shape=(n,n),dtype=np.complex) # cc
   v.b = csc_matrix(([1.0],[[j],[i]]),shape=(n,n),dtype=np.complex) # cdc
   v.dir = d # direction of the interaction 
+  v.dhop = d # direction of the interaction 
   v.g = -g # this minus comes from commutation relations
   v.contribution = "A"
   v.i = i
@@ -174,8 +177,18 @@ def v_ij_spinless(i,j,n,g=1.0,d=[0,0,0]):
 
 
 
-
-
+def v_ij_density_spinless(i,j,n,g=1.0,d=[0,0,0]):
+  """Return pair of operators for a V mean field"""
+  v = interaction()
+  v.a = csc_matrix(([1.0],[[i],[i]]),shape=(n,n),dtype=np.complex) # cc
+  v.b = csc_matrix(([1.0],[[j],[j]]),shape=(n,n),dtype=np.complex) # cdc
+  v.dir = d # direction of the neighbor
+  v.dhop = [0,0,0] # hopping that is affected
+  v.g = g 
+  v.contribution = "AB"
+  v.i = i
+  v.j = j
+  return v
 
 
 
@@ -190,6 +203,8 @@ def guess(h,mode="ferro",fun=0.01):
     h0.add_zeeman(fun)
   elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
+  elif mode=="potential":
+    h0.add_onsite(fun)
   elif mode=="antiferro":
     h0.add_antiferromagnetism(fun)
   elif mode=="imbalance":
@@ -206,7 +221,7 @@ def guess(h,mode="ferro",fun=0.01):
   else: raise
   return h0.intra # return matrix
 
-from .bandstructure import braket_wAw
+from .algebra import braket_wAw
 #from numba import jit
 
 #@jit
@@ -270,6 +285,18 @@ def broyden_solver(scf):
 
 
 
+def coulomb_interaction(g,**kwargs):
+    """Return a list with the Coulomb interaction terms"""
+    from .selfconsistency.coulomb import coulomb_density_matrix
+    m = coulomb_density_matrix(g,**kwargs)
+    interactions = [] # empty list
+    nat = len(g.r)
+    for i in range(nat):
+      for j in range(nat):
+        if abs(m[i,j])>1e-5:
+          interactions.append(v_ij_density_spinless(i,j,nat,
+            g=m[i,j],d=[0,0,0]))
+    return interactions
 
 
 

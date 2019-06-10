@@ -2,15 +2,26 @@ from . import specialhopping
 from . import specialgeometry
 
 
-def tbg(n=7,ti=0.4,lambi=7.0,is_sparse=True,has_spin=False):
+def tbg(n=7,ti=0.4,lambi=7.0,is_sparse=True,
+        has_spin=False,dl=3.0):
     """
     Return the Hamiltonian of twisted bilayer graphene
     """
-    g = specialgeometry.twisted_bilayer(n)
-    mgenerator = specialhopping.twisted_matrix(ti=ti,lambi=lambi)
+    g = specialgeometry.twisted_bilayer(n,dz=dl/2.0)
+    mgenerator = specialhopping.twisted_matrix(ti=ti,
+            lambi=lambi,dl=dl)
     h = g.get_hamiltonian(is_sparse=is_sparse,has_spin=has_spin,
             is_multicell=True,mgenerator=mgenerator)
     return h
+
+
+def multilayer_graphene(l=[0],ti=0.3):
+  """Return the hamiltonian of multilayer graphene"""
+  g = specialgeometry.multilayer_graphene(l=l)
+  h = g.get_hamiltonian(has_spin=False,
+          fun=specialhopping.multilayer(ti=ti))
+  return h
+
 
 
 

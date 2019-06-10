@@ -82,6 +82,7 @@ def initialize():
      mgenerator=twisted_matrix(ti=get("tinter"),lambi=7.0))
   # workaround to put Fermi energy in zero approx
   h.shift_fermi(-get("tinter")/16.) 
+  h.add_crystal_field(qtwrap.get("crystalfield")) 
 #  mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
 #  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
 #  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
@@ -149,7 +150,7 @@ def show_dos(self):
     energies = None
     dos.dos2d(h,nk=nk,delta=delta,numw=numw)
   else: raise
-  execute_script("qh-dos DOS.OUT ")
+  execute_script("qh-dos --input DOS.OUT ")
   comp.kill()
   return
 

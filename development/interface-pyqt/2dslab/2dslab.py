@@ -95,12 +95,15 @@ def initialize():
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   if check("rashba"): h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
+  h.add_crystal_field(qtwrap.get("crystalfield")) 
   h.shift_fermi(get("fermi")) # shift fermi energy
   if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
   if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
   if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
+  if abs(get("inplaneb"))>0.0:
+      h.add_inplane_bfield(b=get("inplaneb"),phi=get("inplaneb_phi"))
   if abs(get("swave"))>0.0: 
       h = h.get_multicell()
       special_pairing(h)
@@ -164,16 +167,8 @@ def show_dosbands(self=0):
 
 def show_dos(self):
   h = pickup_hamiltonian() # get hamiltonian
-#  mode = getbox("mode_dos") # mode for the DOS
-  if h.dimensionality==0:
-    dos.dos0d(h,es=np.linspace(-3.1,3.1,500),delta=get("DOS_smearing"))
-  elif h.dimensionality==1:
-#    dos.dos1d(h,ndos=400,delta=get("DOS_smearing"))
-    dos.dos1d(h,ndos=400)
-  elif h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
-  else: raise
-  execute_script("tb90-dos  ")
+  common.get_dos(h,qtwrap)
+
 
 
 

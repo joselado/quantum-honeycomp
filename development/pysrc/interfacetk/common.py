@@ -33,8 +33,8 @@ def get_bands(h,window):
     h.get_bands(operator=op,kpath=kpath,num_bands=num_bands)
     command = "qh-bands --dim "+str(h.dimensionality) 
     if op is not None: command += " --cblabel "+opname
-    if window.getbox("bands_colormap") is not None: 
-        command += " --cmap "+window.getbox("bands_colormap")
+#    if window.getbox("bands_colormap") is not None: 
+#        command += " --cmap "+window.getbox("bands_colormap")
     execute_script(command) # execute the command
 
 
@@ -48,8 +48,6 @@ def get_kdos(h,window):
     kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
     kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
     command = "qh-kdos-both --input KDOS.OUT"
-    try: command += " --cmap "+ window.getbox("kdos_colormap")
-    except: pass
     execute_script(command) # execute the script
 
 
@@ -169,8 +167,6 @@ def initialize(window):
     """Do various initializations"""
     cs = ["RGB","hot","inferno","plasma","bwr","rainbow","gnuplot"]
     set_colormaps(window.form,"bands_colormap",cs=cs) # set the bands
-    cs = ["hot","inferno","plasma","rainbow","gnuplot","cool"]
-    set_colormaps(window.form,"kdos_colormap",cs=cs) # set the bands
 
 
 

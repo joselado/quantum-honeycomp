@@ -8,6 +8,7 @@ import os
 import scipy.optimize as optimize
 from . import klist
 from . import inout
+from . import algebra
 from . import meanfield
 from . import groundstate
 
@@ -125,12 +126,15 @@ class scfclass():
     self.hamiltonian = self.hamiltonian0.copy() # copy original
     self.hamiltonian.intra += self.mf[(0,0,0)] # add mean field
     if self.hamiltonian.dimensionality>0:
-      for i in range(len(self.hamiltonian.hopping)):
-        d = self.hamiltonian.hopping[i].dir
-        if tuple(d) in self.mf:
-          self.hamiltonian.hopping[i].m += self.mf[tuple(d)]
-    
-  def setup_interaction(self,mode="Hubbard",g=1.0):
+      from . import multicell
+      hopping = self.hamiltonian.hopping # empty list
+      for key in self.mf: # loop over the mean field
+        if key==(0,0,0): continue
+        m = multicell.get_tij(self.hamiltonian0,
+                rij=key,zero=True) + self.mf[key] # get this hopping
+        hopping.append(multicell.Hopping(d=key,m=m))
+      self.hamiltonian.hopping = multicell.collect_hopping(self.hamiltonian)
+  def setup_interaction(self,mode="Hubbard",g=1.0,**kwargs):
     """Create the operators that will determine the interactions"""
     if timing: t0 = time.clock()
     interactions = [] # empty list
@@ -178,6 +182,14 @@ class scfclass():
         for i in range(nat): 
           interactions.append(meanfield.hubbard_density(i,nat,g=g)) 
   # store this interaction
+      elif mode=="Coulomb": # Coulomb interaction
+        self.bloch_multicorrelator = True
+#        self.correlator_mode = "1by1" # mode to calculate the correlators
+        if self.hamiltonian.has_spin: raise
+        else: 
+            interactions = meanfield.coulomb_interaction(
+                    self.hamiltonian.geometry,
+                    vc=g,**kwargs)
       elif mode=="V": # V interaction
 #        self.correlator_mode = "1by1" # mode to calculate the correlators
         self.bloch_multicorrelator = True
@@ -221,14 +233,19 @@ class scfclass():
         lamb.append(d) # store data
         dv.append(-np.array(v.dir)) # store direction, be aware of the sign!!!
       k += 1 # increase counter
-    self.ijk = np.array(ijk,dtype=np.int) # first array
-    self.lamb = np.array(lamb,dtype=np.complex) # data array
+    ijk = np.array(ijk,dtype=np.int)
+    lamb = np.array(lamb,dtype=np.complex) # data array
+    self.ijk = ijk # first array
+    self.lamb = lamb # data array
     self.dir = np.array(dv,dtype=np.int) # data array
+    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
+            ijk[:,1],ijk[:,2],lamb,
+            shape=(v.a.shape[0],v.a.shape[0],k))
   def update_expectation_values(self):
     """Calculate the expectation values of the different operators"""
     # this conjugate comes from being inconsistent
     # in the routines to calculate exectation values
-    voccs = np.conjugate(self.wavefunctions) # get wavefunctions
+    voccs = np.array(np.conjugate(self.wavefunctions)) # get wavefunctions
     ks = self.kvectors # kpoints
     mode = self.correlator_mode # 
 #    mode = "1by1"
@@ -273,6 +290,7 @@ class scfclass():
     """Calculate the expectation values of the different operators"""
     mfnew = dict() # new mean field
     accu = 0.0 # accumulator
+    from . import check
     for key in self.mf: mfnew[key] = self.hamiltonian.intra*0.  # initialize 
     if self.correlator_mode == "multicorrelator":
       np.savetxt("VS_SCF.OUT",np.matrix([range(len(self.cij)),np.abs(self.cij)]).T)
@@ -294,7 +312,11 @@ class scfclass():
         fvs.write(str(v.i)+"   ")
         fvs.write(str(v.j)+"   ")
         fvs.write(str(np.abs(v.vav)+np.abs(v.vbv))+"\n")
-      mfnew[tuple(v.dir)] = mfnew[tuple(v.dir)] + tmp  # store
+      # store in the dictionary
+      if not tuple(v.dir) in mfnew:
+          mfnew[tuple(v.dir)] = tmp  # store
+          print("WARNING, tuple",tuple(v.dir)," not present in mf")
+      else: mfnew[tuple(v.dir)] = mfnew[tuple(v.dir)] + tmp  # store
     if self.write_vabv: fvs.close() # close file
     accu /= len(self.interactions)*2
     if not self.silent: print("Average value of expectation values",accu)
@@ -306,6 +328,8 @@ class scfclass():
       print("################################")
       self.mf = meanfield.enforce_eh(self.hamiltonian,self.mf)
     if not self.silent: print("ERROR",self.error)
+    check.check_dict(self.mf)
+#    exit()
   def get_total_energy(self):
     """Return the total energy"""
     eout = np.sum(self.energies)/self.kfac 
@@ -322,7 +346,10 @@ class scfclass():
     if not self.silent: print("## Iteration number ",self.iteration)
     mixing = self.mixing 
     self.update_hamiltonian() # update the Hamiltonian
-    self.hamiltonian.check() # check that nothing weird happened
+    try: self.hamiltonian.check() # check that nothing weird happened
+    except: 
+        print("WARNING, hamiltonian is non hermitian in mean field")
+        raise
     t1 = time.clock()
     self.update_occupied_states(fermi_shift=self.fermi_shift)
     t2 = time.clock()
@@ -371,8 +398,11 @@ def error_meanfield(mf1,mf2):
 def mix_meanfield(mf1,mf2,mixing=0.9):
   """Mix the two mean fields"""
   out = dict() # create dictionary
-  for key in mf1:
-    out[key] = mf1[key]*(1-mixing)+mf2[key]*mixing # sum error
+  for key in mf2:
+    if key in mf1: # if present in the old one
+      out[key] = mf1[key]*(1-mixing)+mf2[key]*mixing # sum error
+    else:
+      out[key] = mf2[key] # sum error
   return out
 
 
@@ -401,7 +431,7 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
         voccs.append(v) # store
         eoccs.append(e) # store
         koccs.append(k) # store
-    voccs = np.matrix(np.array(voccs))  # as array
+    voccs = np.array(voccs)  # as array
     eoccs = np.array(eoccs)  # as array
     koccs = np.array(koccs)  # as array
   else:
@@ -439,6 +469,7 @@ def get_gap(es,fermi):
 
 
 from .selfconsistency.hubbard import hubbardscf
+from .selfconsistency.coulomb import coulombscf
 
 
 def get_super_correlator(voccs,weight=None,totkp=1):
@@ -520,9 +551,11 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   htmp.turn_dense() # turn to dense Hamiltonian
   # generalate the necessary list of correlators
   if mf is None: # generate initial mean field
-    if mag is None: mag = np.random.random((nat,3)) 
-# get mean field matrix
-    old_mf = selective_U_matrix(U,directional_mean_field(mag)) 
+    if mag is None: 
+      old_mf = np.random.random(h.intra.shape)
+      old_mf += old_mf.T
+    else:
+      old_mf = selective_U_matrix(U,directional_mean_field(mag)) 
   else: old_mf = mf # use guess
   # get the pairs for the correlators
   ndim = h.intra.shape[0] # dimension

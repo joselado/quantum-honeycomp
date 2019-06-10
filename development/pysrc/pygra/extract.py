@@ -62,7 +62,7 @@ def my(m):
 
 
 def onsite(m,has_spin=True):
-  """Extract the z component of the magnetism, assume spin degree of freedom"""
+  """Extract the onsite energy"""
   if has_spin: # has spin degree of freedom
     n = m.shape[0]//2 # number of sites
     ds = np.zeros(n).real # pairing

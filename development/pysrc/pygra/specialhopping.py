@@ -2,7 +2,8 @@ import numpy as np
 from scipy.sparse import csc_matrix
 
 
-def twisted(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
+def twisted(cutoff=5.0,ti=0.3,lambi=8.0,
+        lamb=12.0,dl=3.0,lambz=10.0):
   """Hopping for twisted bilayer graphene"""
   cutoff2 = cutoff**2 # cutoff in distance
   def fun(r1,r2):
@@ -18,13 +19,13 @@ def twisted(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
     if (r-1.0)<-0.1: 
       print(r)
       raise
-    out = -(dx*dx + dy*dy)/rr*np.exp(-lamb*(r-1.0))
-    out += -ti*(dz*dz)/rr*np.exp(-lambi*(r-3.0))
+    out = -(dx*dx + dy*dy)/rr*np.exp(-lamb*(r-1.0))*np.exp(-lambz*dz*dz)
+    out += -ti*(dz*dz)/rr*np.exp(-lambi*(r-dl))
     return out
   return fun
 
 
-def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
+def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0,dl=3.0,lambz=10.0):
   """Function capable of returning the hopping matrix
   for twisted bilayer graphene"""
   try: # use fortran routine
@@ -34,7 +35,7 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
       nr = len(r1) # 
       nmax = len(r1)*100 # maximum number of hoppings
       (ii,jj,ts,nout) = specialhoppingf90.twistedhopping(r1,r2,nmax,
-                                  cutoff,ti,lamb,lambi,1e-3)
+                                  cutoff,ti,lamb,lambi,lambz,1e-3,dl)
       ts = -ts[0:nout]
       ii = ii[0:nout]
       jj = jj[0:nout]
@@ -43,7 +44,7 @@ def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0):
   except:
     print("FORTRAN not working in specialhopping")
     def funhop(r1,r2):
-      fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb)
+      fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb,dl=dl)
       m = np.matrix([[fh(r1i,r2j) for r1i in r1] for r2j in r2])
       return csc_matrix(m,dtype=np.complex)
 #      raise

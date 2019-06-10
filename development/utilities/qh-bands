@@ -5,11 +5,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+# plotpyqt
+import os
+path = os.path.dirname(os.path.realpath(__file__)) # current path
+path += "/../pysrc"
+sys.path.append(path) # add library
+from interfacetk import plotpyqt
+###
+
+
+
 # change the font size
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 matplotlib.rcParams['font.family'] = "Bitstream Vera Serif"
-fig = plt.figure()
 
 
 import argparse
@@ -29,17 +38,16 @@ args = parser.parse_args() # get the arguments
 
 from os import system as sh
 
+m = np.genfromtxt(args.input).transpose()
 
-def plot_bands():
+def getplot(obj):
   """ Plots the bandstructure from BANDS.OUT"""
+  fig = plt.figure(obj.figure.number)
   # the color map
   import numpy as np
   cdict={'red': ((0., 0, 0),(0.6,0.0,0.0),(1, 1.0, 1.0)), 'green': ((0., 0.0, 0.0),(0.4,1.0,1.0),(0.6,1.0,1.0),(1, 0.0, 0.0)), 'blue': ((0., 1.0, 1.0),(0.4,0.0,0.0), (1, 0.0, 0.0))}
   import matplotlib
   rgb_cmap = matplotlib.colors.LinearSegmentedColormap('my_colormap',cdict,256)
-  
-  
-  m = np.genfromtxt(args.input).transpose()
   
   # check if plot the color
   draw_color = False
@@ -63,13 +71,15 @@ def plot_bands():
   plt.fill_between(sorted(k),min(e)-3.0,0,color="yellow")
   
   if not draw_color:  # plot without color
-    col = plt.scatter(k,e, color ="black")
+    col = plt.scatter(k,e, color ="black",s=obj.get_slider("size"))
     fig.subplots_adjust(0.3,0.3)
   if draw_color: # plot with color
     fig.subplots_adjust(0.3,0.1)
+    args.cmap = obj.get_combobox("cmap") # get the colormap
     if args.cmap=="RGB": cmap = rgb_cmap # red-green-blue colormap
     else: cmap = plt.get_cmap(args.cmap) # get the colormap
-    col = plt.scatter(k,e,c=color,cmap=cmap, edgecolors='none')
+    col = plt.scatter(k,e,c=color,cmap=cmap, edgecolors='none',
+            s=obj.get_slider("size"))
     from matplotlib import ticker
     cb = plt.colorbar(orientation="horizontal")
     tick_locator = ticker.MaxNLocator(nbins=5)
@@ -77,7 +87,8 @@ def plot_bands():
     cb.update_ticks()
     cb.set_label(args.cblabel) # set the label
   plt.xlim([min(k),max(k)])   # x axis range
-  plt.ylim([min(e),max(e)])   # y axis range
+  ewin = 1.01 - obj.get_slider("ewin") # energy window
+  plt.ylim([ewin*min(e),ewin*max(e)])   # y axis range
   
   # axis
   xlab = plt.xlabel("")
@@ -110,7 +121,17 @@ def plot_bands():
   return fig
 
 
-if __name__=="__main__":
-  fig = plot_bands()  
-  if args.show=="True":
-    plt.show()
+app,main = plotpyqt.get_interface(getplot)
+main.setWindowTitle("Band structure")
+main.add_combobox(["RGB","rainbow","plasma","inferno"],
+        label="Colormap",key="cmap")
+main.add_slider(label="Energy window",key="ewin",
+        vs=np.linspace(0.,1.,100)) # Energy window
+main.add_slider(label="Size",key="size",
+        vs=range(10,100),v0=40) # Energy window
+main.plot()
+main.show()
+sys.exit(app.exec_())
+
+
+

@@ -1,11 +1,11 @@
 subroutine twistedhopping(r1,r2,n,iout,jout,tout,nmax,nout, &
-               cutoff,tinter,lamb,lambi,mint)
+               cutoff,tinter,lamb,lambi,lambz,mint,dl)
 implicit none
 integer, intent(in) :: n ! number of sites
 integer, intent(in) :: nmax ! maximum number of hoppings
 real (kind=8), intent(in) :: r1(n,3),r2(n,3) ! positions
 real (kind=8), intent(in) :: tinter ! interlayer hopping
-real (kind=8), intent(in) :: cutoff,lambi,lamb,mint ! parameters
+real (kind=8), intent(in) :: cutoff,lambi,lamb,lambz,mint,dl ! parameters
 real (kind=8), intent(out) :: tout(nmax) ! hoppings
 integer, intent(out) :: iout(nmax),jout(nmax),nout ! indexes
 integer :: i,j,k ! counter
@@ -32,8 +32,9 @@ do i=1,n ! loop over sites
     if (rij2.gt.cutoff2) cycle ! too far, skip iteration
     if (rij2.lt.1.d-02) cycle ! same atom, skip iteration
     rij = sqrt(rij2) ! distance
-    t = exp(-lamb*(rij - 1.d00))*(dx*dx+dy*dy)/rij2 ! intralayer hopping
-    t = t + tinter*exp(-lambi*(rij-3.d00))*dz*dz/rij2 ! interlayer hopping
+    ! intralayer hopping
+    t = exp(-lamb*(rij - 1.d00))*(dx*dx+dy*dy)/rij2*exp(-lambz*dz*dz)
+    t = t + tinter*exp(-lambi*(rij-dl))*dz*dz/rij2 ! interlayer hopping
     if (abs(t).lt.mint) cycle ! too small hopping
     if (k.gt.nmax) then
       write(*,*) "Not large enough array",nmax,k,mint,t
