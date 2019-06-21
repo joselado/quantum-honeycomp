@@ -26,14 +26,14 @@ common.initialize(qtwrap) # several initilizations
 def get_geometry(modify=True):
   """ Create a 0d island"""
   lattice_name = getbox("lattice") # get the option
-  n = int(get("width")) # thickness of the system
+  n = float(get("width")) # thickness of the system
 #  lattice_name = builder.get_object("lattice").get_active_text()
   if lattice_name=="Chain":
     g = geometry.chain()
   if lattice_name=="Honeycomb":
     g = geometry.honeycomb_lattice()
   elif lattice_name=="Square":
-    g = geometry.square_lattice()
+    g = geometry.single_square_lattice()
   elif lattice_name=="Kagome":
     g = geometry.kagome_lattice()
   elif lattice_name=="Lieb":

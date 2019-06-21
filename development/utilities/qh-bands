@@ -123,7 +123,7 @@ if len(m)>2: # has color
 main.add_slider(label="Energy window",key="ewin",
         vs=np.linspace(0.,1.,100)) # Energy window
 main.add_slider(label="Size",key="size",
-        vs=range(10,100),v0=40) # Energy window
+        vs=range(1,100),v0=40) # Energy window
 main.plot()
 main.show()
 sys.exit(app.exec_())
