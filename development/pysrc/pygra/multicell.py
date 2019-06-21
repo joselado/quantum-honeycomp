@@ -385,15 +385,20 @@ def parametric_matrix(h,cutoff=5,fm=None):
   dirs = h.geometry.neighbor_directions() # directions of the hoppings
   # generate hoppings
   h.hopping = [] # empty list
-  for d in dirs: # loop over directions
+  def gett(d):
         i1,i2,i3 = d[0],d[1],d[2] # extract indexes
-        if i1==0 and i2==0 and i3==0: continue
+        if i1==0 and i2==0 and i3==0: return None
         t = Hopping() # hopping class
         da = a1*i1+a2*i2+a3*i3 # direction
         r2 = [ri + da for ri in r]
         t.m = h.spinless2full(fm(r,r2))
         t.dir = [i1,i2,i3] # store direction
-        if np.sum(np.abs(t.m))>0.00001: h.hopping.append(t) # append 
+        if np.sum(np.abs(t.m))>0.00001: return t
+        else: return None
+  from . import parallel
+  ts = parallel.pcall(gett,dirs) # get hoppings
+  ts = [x for x in ts if x is not None] # remove Nones
+  h.hopping = ts # store
   return h
 
 

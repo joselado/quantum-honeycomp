@@ -32,6 +32,8 @@ def restricted_density(intra,n=20,e=0.0,window=0.1,mode="arpack",
       if -window<(ie-e)<0.0: d = d + np.abs(iw)*np.abs(iw) # add
     elif window_mode=="above":
       if 0.0<(ie-e)<window: d = d + np.abs(iw)*np.abs(iw) # add
+    elif window_mode=="filled":
+      if ie<e: d = d + np.abs(iw)*np.abs(iw) # add
     else: raise
   return d # return contribution
 
@@ -42,7 +44,7 @@ def restricted_density(intra,n=20,e=0.0,window=0.1,mode="arpack",
 
 
 def density(h,e=0.0,nk=20,mode="arpack",random=True,num_wf=20,
-                window=0.1,nrep=3,name="DENSITY_UP.OUT",
+                window=0.1,nrep=3,name="DENSITY.OUT",
                 window_mode="around",kpoints=None):
   """ Calculate the electronic density"""
   if h.intra.shape[0]<100: mode="full"
@@ -50,9 +52,11 @@ def density(h,e=0.0,nk=20,mode="arpack",random=True,num_wf=20,
   hkgen = h.get_hk_gen() # get generator
   d = np.zeros(h.intra.shape[0]) # initialize
   tr = timing.Testimator("DENSITY")
-  if kpoints is None: 
-    kpoints = [np.random.random(3) for ik in range(nk)]
-  else: nk = len(kpoints) # given at input
+  from . import klist
+  kpoints = klist.kmesh(h.dimensionality,nk=nk)
+#  if kpoints is None: 
+#    kpoints = [np.random.random(3) for ik in range(nk)]
+  nk = len(kpoints) # given at input
   for ik in range(len(kpoints)):
     tr.remaining(ik,nk)
     k = kpoints[ik] # random k-point

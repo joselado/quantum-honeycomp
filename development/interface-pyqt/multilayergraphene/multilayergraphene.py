@@ -23,7 +23,10 @@ common.initialize(qtwrap) # initilizations
 
 
 
+# set the different possible multilayers
 
+cs = specialgeometry.multilayer_codes(n=4)
+qtwrap.set_combobox("lattice",cs=cs)
 
 
 def get_geometry(modify=True):
@@ -35,7 +38,6 @@ def get_geometry(modify=True):
       elif il=="B": ns += [0]
       elif il=="C": ns += [1]
       else: print("Error",il)
-  print(ns)
   g = specialgeometry.multilayer_graphene(l=ns)
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)

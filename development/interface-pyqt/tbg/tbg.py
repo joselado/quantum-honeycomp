@@ -83,6 +83,8 @@ def initialize():
   # workaround to put Fermi energy in zero approx
   h.shift_fermi(-get("tinter")/16.) 
   h.add_crystal_field(qtwrap.get("crystalfield")) 
+  if abs(get("inplaneb"))>0.0:
+      h.add_inplane_bfield(b=get("inplaneb"),phi=get("inplaneb_phi"))
 #  mu,ml = get("mAB_upper"),get("mAB_lower") # get the masses
 #  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
 #  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
@@ -144,7 +146,7 @@ def show_dos(self):
   name = qtwrap.getbox("mode_dos") # mode of the DOS
   if name=="KPM":
     dos.dos(h,use_kpm=True,nk=nk,ntries=1,scale=scale,delta=5*delta,
-          ne=int(10000/delta))
+            energies=np.linspace(-5.0,5.0,int(20./delta)))
   elif name=="Lowest":
     numw = int(get("numw_dos")) # number of waves
     energies = None

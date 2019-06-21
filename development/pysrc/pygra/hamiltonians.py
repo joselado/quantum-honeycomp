@@ -372,35 +372,38 @@ class hamiltonian():
       self.add_kekule(fun)
 
   def add_modified_haldane(self,t):
-    """
-    Adds a Haldane term
-    """  
-    kanemele.add_modified_haldane(self,t) # return Haldane SOC
+      """
+      Adds a Haldane term
+      """  
+      kanemele.add_modified_haldane(self,t) # return Haldane SOC
   def add_anti_kane_mele(self,t):
-    """
-    Adds an anti Kane-Mele term
-    """  
-    kanemele.add_anti_kane_mele(self,t) # return anti kane mele SOC
-  def add_antihaldane(self,t): self.add_modified_haldane(t) # second name
+      """
+      Adds an anti Kane-Mele term
+      """  
+      kanemele.add_anti_kane_mele(self,t) # return anti kane mele SOC
+  def add_antihaldane(self,t): 
+      """Add an anti-Haldane term"""
+      self.add_modified_haldane(t) # second name
   def add_crystal_field(self,v):
+      """Add a crystal field term to the Hamiltonian"""
       from . import crystalfield
-      crystalfield.hartree(self,v=v) # store
+      crystalfield.hartree(self,v=v) 
   def add_peierls(self,mag_field,new=False):
-    """
-    Add magnetic field
-    """
-    from .peierls import add_peierls
-    add_peierls(self,mag_field=mag_field,new=new)
+      """
+      Add magnetic field
+      """
+      from .peierls import add_peierls
+      add_peierls(self,mag_field=mag_field,new=new)
   def add_inplane_bfield(self,**kwargs):
       """Add in-plane magnetic field"""
       from .peierls import add_inplane_bfield
       add_inplane_bfield(self,**kwargs)
   def align_magnetism(self,vectors):
-    """ Rotate the Hamiltonian to have magnetism in the z direction"""
-    if self.has_eh: raise
-    from .rotate_spin import align_magnetism as align
-    self.intra = align(self.intra,vectors)
-    self.inter = align(self.inter,vectors)
+      """ Rotate the Hamiltonian to have magnetism in the z direction"""
+      if self.has_eh: raise
+      from .rotate_spin import align_magnetism as align
+      self.intra = align(self.intra,vectors)
+      self.inter = align(self.inter,vectors)
   def global_spin_rotation(self,**kwargs):
       """ Perform a global spin rotation """
       return rotate_spin.hamiltonian_spin_rotation(self,**kwargs)
@@ -441,80 +444,81 @@ class hamiltonian():
       hout.geometry.dimensionality = 1 # one dimensional
       return hout
   def get_multicell(self):
-    """Return a multicell Hamiltonian"""
-    return multicell.turn_multicell(self)
+      """Return a multicell Hamiltonian"""
+      return multicell.turn_multicell(self)
   def turn_multicell(self):
-    """Conver to multicell Hamiltonian"""
-    h = multicell.turn_multicell(self)
-    self.is_multicell = True
-    self.hopping = h.hopping # assign hopping
+      """Conver to multicell Hamiltonian"""
+      h = multicell.turn_multicell(self)
+      self.is_multicell = True
+      self.hopping = h.hopping # assign hopping
   def get_no_multicell(self):
-    """Return a multicell Hamiltonian"""
-    return multicell.turn_no_multicell(self)
+      """Return a multicell Hamiltonian"""
+      return multicell.turn_no_multicell(self)
   def clean(self):
-    """Clean a Hamiltonian"""
-    from .clean import clean_hamiltonian
-    clean_hamiltonian(self)
+      """Clean a Hamiltonian"""
+      from .clean import clean_hamiltonian
+      clean_hamiltonian(self)
   def get_operator(self,name,projector=False):
-    """Return a certain operator"""
-    if name=="sx": return operators.get_sx(self)
-    elif name=="sy": return operators.get_sy(self)
-    elif name=="sz": return operators.get_sz(self)
-    elif name=="current": 
-        if self.dimensionality==1: return operators.get_current(self)
-        else: raise
-    elif name=="sublattice": return operators.get_sublattice(self,mode="both")
-    elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")
-    elif name=="sublatticeB": return operators.get_sublattice(self,mode="B")
-    elif name=="interface": return operators.get_interface(self)
-    elif name=="spair": return operators.get_pairing(self,ptype="s")
-    elif name=="deltax": return operators.get_pairing(self,ptype="deltax")
-    elif name=="deltay": return operators.get_pairing(self,ptype="deltay")
-    elif name=="deltaz": return operators.get_pairing(self,ptype="deltaz")
-    elif name=="electron": return operators.get_electron(self)
-    elif name=="hole": return operators.get_hole(self)
-    elif name=="zposition": return operators.get_zposition(self)
-    elif name=="yposition": return operators.get_yposition(self)
-    elif name=="xposition": return operators.get_xposition(self)
-    elif name=="velocity": return operators.get_velocity(self)
-    # total magnetizations
-    elif name=="mx": 
-      return self.get_operator("sx")*self.get_operator("electron")
-    elif name=="my": 
-      return self.get_operator("sy")*self.get_operator("electron")
-    elif name=="mz": 
-      return self.get_operator("sz")*self.get_operator("electron")
-    elif name=="valley": return operators.get_valley(self,projector=projector)
-    elif name=="inplane_valley": return operators.get_inplane_valley(self)
-    elif name=="valley_upper": 
-      print("This operator only makes sense for TBG")
-      ht = self.copy()
-      ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-      return operators.get_valley(ht)
-    elif name=="inplane_valley_upper": 
-      print("This operator only makes sense for TBG")
-      ht = self.copy()
-      ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-      return operators.get_inplane_valley(ht)
-    elif name=="valley_lower": 
-      print("This operator only makes sense for TBG")
-      ht = self.copy()
-      ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
-      return operators.get_valley(ht)
-    elif name=="ipr": return operators.ipr 
-    else: raise
+      """Return a certain operator"""
+      if name=="sx": return operators.get_sx(self)
+      elif name=="sy": return operators.get_sy(self)
+      elif name=="sz": return operators.get_sz(self)
+      elif name=="current": 
+          if self.dimensionality==1: return operators.get_current(self)
+          else: raise
+      elif name=="sublattice": return operators.get_sublattice(self,mode="both")
+      elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")
+      elif name=="sublatticeB": return operators.get_sublattice(self,mode="B")
+      elif name=="interface": return operators.get_interface(self)
+      elif name=="spair": return operators.get_pairing(self,ptype="s")
+      elif name=="deltax": return operators.get_pairing(self,ptype="deltax")
+      elif name=="deltay": return operators.get_pairing(self,ptype="deltay")
+      elif name=="deltaz": return operators.get_pairing(self,ptype="deltaz")
+      elif name=="electron": return operators.get_electron(self)
+      elif name=="hole": return operators.get_hole(self)
+      elif name=="zposition": return operators.get_zposition(self)
+      elif name=="surface": return operators.get_surface(self)
+      elif name=="yposition": return operators.get_yposition(self)
+      elif name=="xposition": return operators.get_xposition(self)
+      elif name=="velocity": return operators.get_velocity(self)
+      # total magnetizations
+      elif name=="mx": 
+        return self.get_operator("sx")*self.get_operator("electron")
+      elif name=="my": 
+        return self.get_operator("sy")*self.get_operator("electron")
+      elif name=="mz": 
+        return self.get_operator("sz")*self.get_operator("electron")
+      elif name=="valley": return operators.get_valley(self,projector=projector)
+      elif name=="inplane_valley": return operators.get_inplane_valley(self)
+      elif name=="valley_upper": 
+        print("This operator only makes sense for TBG")
+        ht = self.copy()
+        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
+        return operators.get_valley(ht)
+      elif name=="inplane_valley_upper": 
+        print("This operator only makes sense for TBG")
+        ht = self.copy()
+        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
+        return operators.get_inplane_valley(ht)
+      elif name=="valley_lower": 
+        print("This operator only makes sense for TBG")
+        ht = self.copy()
+        ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
+        return operators.get_valley(ht)
+      elif name=="ipr": return operators.ipr 
+      else: raise
   def extract(self,name="mz"): 
-    """Extract somethign from the Hamiltonian"""
-    if self.has_eh: raise # not implemented
-    if name=="density":
-      return extract.onsite(self.intra,has_spin=self.has_spin)
-    elif name=="mx" and self.has_spin:
-      return extract.mx(self.intra)
-    elif name=="my" and self.has_spin:
-      return extract.my(self.intra)
-    elif name=="mz" and self.has_spin:
-      return extract.mz(self.intra)
-    else: raise
+      """Extract somethign from the Hamiltonian"""
+      if self.has_eh: raise # not implemented
+      if name=="density":
+        return extract.onsite(self.intra,has_spin=self.has_spin)
+      elif name=="mx" and self.has_spin:
+        return extract.mx(self.intra)
+      elif name=="my" and self.has_spin:
+        return extract.my(self.intra)
+      elif name=="mz" and self.has_spin:
+        return extract.mz(self.intra)
+      else: raise
   def write_magnetization(self,nrep=5):
     """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole

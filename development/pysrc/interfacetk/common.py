@@ -16,6 +16,7 @@ def get_operator(h,opname,projector=False):
     elif opname=="x-position": op = h.get_operator("xposition")
     elif opname=="z-position": op = h.get_operator("zposition")
     elif opname=="Interface": op = h.get_operator("interface")
+    elif opname=="Surface": op = h.get_operator("surface")
     elif opname=="Layer": op = h.get_operator("zposition")
     else: op = None
     return op

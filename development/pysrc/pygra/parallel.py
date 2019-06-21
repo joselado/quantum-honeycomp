@@ -2,6 +2,10 @@
 from __future__ import print_function
 import scipy.linalg as lg
 from . import algebra
+
+
+is_child = False # check if you are running a child
+
 try:
   from multiprocess import Pool
   import multiprocess
@@ -15,6 +19,7 @@ except:
                 def terminate(self): return None # dummy function
             return mpool()
     maxcpu = 1
+
 
 cores = 1 # call in a single by default
 
@@ -72,11 +77,15 @@ def pcall_mp(fun,args,cores=cores):
 
 
 def pcall(fun,args): # define the function
-  global cores
+  global cores,is_child
   from multiprocessing import current_process
-  if current_process().name == 'MainProcess': # main process
-    if cores==1: return pcall_serial(fun,args) # one core, simply iterate
-    else: return pcall_mp(fun,args,cores=cores) # call in parallel
+  if not is_child: # if main process
+#  if current_process().name == 'MainProcess': # main process
+    is_child = True # child from now on
+    if cores==1: out = pcall_serial(fun,args) # one core, simply iterate
+    else: out = pcall_mp(fun,args,cores=cores) # call in parallel
+    is_child = False # main from now on
+    return out
   # child process
   else: return pcall_serial(fun,args) # one core, simply iterate
 

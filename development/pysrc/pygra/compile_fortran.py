@@ -21,43 +21,28 @@ names += [("tails","tailsf90.f90","tailsf90")]
 names += [("algebra","algebraf90.f90","algebraf90")] 
 
 
+import sys
+python = sys.executable
+ls = python.split("/")
+del ls[-1] # remove last one
+del ls[0] # remove first one
+compiler = ""
+for l in ls: compiler += "/"+l
+compiler += "/f2py"
+import os
+if not os.path.isfile(compiler):
+    print(compiler,"does not exist")
+    print("You may want to use another Python")
+    exit()
 
-def get_anaconda_command(name="python"):
-  """Return the path for Anaconda Python, which has pyqt by default"""
-  os.system("rm -f /tmp/qh_commands.txt") # remove
-  os.system("which -a "+name+"  > /tmp/qh_commands.txt") # run the command
-  lines = open("/tmp/qh_commands.txt").read() # read the lines
-  lines = lines.split("\n") # split the lines
-  del lines[-1] # remove the last one
-  print("Found ",len(lines),"python paths\n")
-  for l in lines: print(l)
-  for l in lines: # loop over pythons
-    l = l.split(" ")[-1] # get last line 
-    if "anaconda3" in l:
-      print("\nFound Anaconda ",name,"in",l)
-      return l
-  print("Anaconda",name,"not found")
-  raise
-
-
-
-
-import platform
-if platform.system()=="Linux":
-  compiler = "/usr/bin/f2py3" # name of the compiler
-else: 
-  compiler = get_anaconda_command("f2py") # name of the compiler
-
-compiler = get_anaconda_command("f2py") # name of the compiler
-print("Using compiler ",compiler)
+print("Using compiler",compiler)
 
 for name in names:
   folder,f90,so = name[0],name[1],name[2] # different names
   os.chdir("fortran/"+folder) # go to the folder
   os.system("rm -f *.so") # remove old libraries
   print("Compiling",name[1])
-  os.system(compiler+" -c -m "+so+"  "+f90+"> ../../compiling.txt") # compile
-#  os.system(compiler+" -c -m "+so+"  "+f90)#+"> ../../compiling.txt") # compile
+  os.system(compiler+" -c -m "+so+"  "+f90+"> /dev/null 2>&1") # compile
   os.system("cp *.so ../../"+so+".so") # copy library
   os.chdir("../..") # return to parent
 

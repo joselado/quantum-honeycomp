@@ -407,7 +407,8 @@ def convolve(x,y,delta=None):
 
 
 def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
-        delta=0.01,ntries=10,nk=100,operator=None):
+        delta=0.01,ntries=10,nk=100,operator=None,
+        **kwargs):
   """Calculate the KDOS bands using the KPM"""
   hkgen = h.get_hk_gen() # get generator
   numk = nk**h.dimensionality
@@ -418,7 +419,7 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
     if callable(operator): op = operator(k) # call the function if necessary
     else: op = operator # take the same operator
     (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,operator=op,
-                   ewindow=ewindow,ntries=ntries) # compute
+                   ewindow=ewindow,ntries=ntries,**kwargs) # compute
     return (x,y)
   from . import parallel
   if parallel.cores==1:
@@ -446,7 +447,8 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
     return dos_kpm(h,scale=scale,ewindow=ewindow,delta=delta,
-                   ntries=ntries,nk=nk,operator=operator)
+                   ntries=ntries,nk=nk,operator=operator,
+                   ne=len(energies),**kwargs)
   else: # conventional methods
     if operator is None: # no operator given
       if mode=="ED": # exact diagonalization

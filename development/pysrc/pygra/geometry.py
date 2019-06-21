@@ -42,6 +42,9 @@ class Geometry:
     self.ncells = 2 # number of neighboring cells returned
   def get_index(self,r,**kwargs):
     return get_index(self,r,**kwargs)
+  def __add__(self,g1):
+      """Sum two geometries"""
+      return sum_geometries(self,g1)
   def plot_geometry(self):
     """Plots the system"""
     return plot_geometry(self)
@@ -1636,6 +1639,19 @@ def write_vasp(g0):
 
 
 
+
+
+
+def sum_geometries(g1,g2):
+    """Sum two geometries"""
+    if g1.dimensionality!=0: raise
+    if g2.dimensionality!=0: raise
+    g = g1.copy()
+    g.r = np.concatenate([g1.r,g2.r])
+    g.r2xyz()
+    if g.has_sublattice:
+        g.sublattice = np.concatenate([g1.sublattice,g2.sublattice])
+    return g
 
 
 

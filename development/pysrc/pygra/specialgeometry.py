@@ -290,5 +290,18 @@ def parse_twisted_multimultilayer(name,n=3):
 
 
 
+def multilayer_codes(n=3):
+    """Return all the codes for aligned multilayers
+    up to n layers"""
+    out = []
+    import itertools 
+    for i in range(n): # loop over layer numbers
+        o = list(itertools.product('ABC', repeat=i))
+        o = ["A"+"".join(io) for io in o]
+        out += o
+    return out
+
+
+
 
 

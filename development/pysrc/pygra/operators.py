@@ -36,17 +36,15 @@ def operator2list(operator):
 
 
 
-def surface(h,cut = 2.,which="both"):
+def get_surface(h,cut = 0.5,which="both"):
   """Return an operator which is non-zero in the upper surface"""
-  zmax = np.max(h.geometry.z) # maximum z
-  zmin = np.min(h.geometry.z) # maximum z
+  zmax = np.max(h.geometry.r[:,2]) # maximum z
+  zmin = np.min(h.geometry.r[:,2]) # maximum z
   dind = 1 # index to which divide the positions
-  if h.has_spin:  dind *= 2 # duplicate for spin
-  if h.has_eh:  dind *= 2  # duplicate for eh
-  n = h.intra.shape[0] # number of elments of the hamiltonian
+  n = len(h.geometry.r) # number of elments of the hamiltonian
   data = [] # epmty list
   for i in range(n): # loop over elements
-    z = h.geometry.z[i//dind]
+    z = h.geometry.z[i]
     if which=="upper": # only the upper surface
       if np.abs(z-zmax) < cut:  data.append(1.)
       else: data.append(0.)
@@ -55,11 +53,12 @@ def surface(h,cut = 2.,which="both"):
       else: data.append(0.)
     elif which=="both": # only the upper surface
       if np.abs(z-zmax) < cut:  data.append(1.)
-      elif np.abs(z-zmin) < cut:  data.append(-1.)
+      elif np.abs(z-zmin) < cut:  data.append(1.)
       else: data.append(0.)
     else: raise
   row, col = range(n),range(n)
   m = csc((data,(row,col)),shape=(n,n),dtype=np.complex)
+  m = h.spinless2full(m)
   return m # return the operator
 
 
