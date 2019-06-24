@@ -56,6 +56,35 @@ def select_atoms_removal(self):
   execute_script("qh-remove-atoms-geometry") # remove the file
 
 
+
+def select_atom_time_evolution():
+  """Select a single atom"""
+  g = get_geometry() # get the unmodified geometry
+  g.write()
+  execute_script("qh-pick-single-atom") # pick a single atom
+
+
+def show_time_evolution():
+  h = pickup_hamiltonian() # get hamiltonian
+  try: i = open("SELECTED_SINGLE_ATOM.INFO").read()
+  except: i = 0
+  if i=="": i=0
+  else: i = int(i)
+  if h.has_spin: 
+      i = i*2
+      if qtwrap.getbox("channel_time_evolution")=="Down": i += 1
+#  print(i) ; return
+  if h.has_eh: i = i*4
+  tmax = qtwrap.get("tmax_time_evolution") # maximum time
+  timeevolution.evolve_local_state(h,i=i,ts=np.linspace(0.,tmax,100),
+        mode="green")
+  execute_script("qh-multitimeevolution") # plot the result
+
+
+
+
+
+
 def modify_geometry(g):
   """Modify the geometry according to the interface"""
   if qtwrap.is_checked("remove_selected"): # remove some atoms
@@ -116,26 +145,6 @@ def show_dosbands(self=0):
 def show_interactive_ldos():
   h = pickup_hamiltonian()  # get the hamiltonian
   common.get_multildos(h,qtwrap) # compute
-
-
-
-
-
-
-def show_dos(self):
-  h = pickup_hamiltonian() # get hamiltonian
-#  mode = getbox("mode_dos") # mode for the DOS
-  if h.dimensionality==0:
-    dos.dos0d(h,es=np.linspace(-3.1,3.1,500),delta=get("DOS_smearing"))
-  elif h.dimensionality==1:
-#    dos.dos1d(h,ndos=400,delta=get("DOS_smearing"))
-    dos.dos1d(h,ndos=400)
-  elif h.dimensionality==2:
-    dos.dos2d(h,ndos=500,delta=get("DOS_smearing"))
-  else: raise
-  execute_script("qh-dos  ")
-
-
 
 
 
@@ -223,6 +232,8 @@ signals["show_structure_3d"] = show_structure_3d
 signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 signals["show_magnetism"] = show_magnetism
 signals["select_atoms_removal"] = select_atoms_removal
+signals["select_atom_time_evolution"] = select_atom_time_evolution
+signals["show_time_evolution"] = show_time_evolution
 
 
 

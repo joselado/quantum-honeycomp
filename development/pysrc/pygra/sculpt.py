@@ -136,7 +136,7 @@ def remove_unibonded(g,d=1.0,tol=0.01,use_fortran=use_fortran,iterative=False):
       for direc in g.neighbor_directions(): # loop over directions
         for r2 in g.replicas(d=direc): # loop over replicas
           dr = r1-r2
-          if d-tol < dr.dot(dr) < d+tol: # if sirdt neighbor
+          if d-tol < dr.dot(dr) < d+tol: # if first neighbor
             nb += 1 # increase counter
       if nb<2:
         sb.append(i+0) # add to the list

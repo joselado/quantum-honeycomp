@@ -9,6 +9,7 @@ import numpy as np
 from . import klist
 from . import operators
 from . import timing
+from . import parallel
 
 def ldos0d(h,e=0.0,delta=0.01,write=True):
   """Calculates the local density of states of a hamiltonian and
@@ -289,14 +290,19 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   fo = open("MULTILDOS/MULTILDOS.TXT","w") # files with the names
-  for e in es: # loop over energies
-    print("MULTILDOS for energy",e)
+  def getldosi(e):
+    """Get this iteration"""
     out = np.array([0.0 for i in range(h.intra.shape[0])]) # initialize
     for (d,p,ie) in zip(ds,ps,evals): # loop over wavefunctions
       fac = delta/((e-ie)**2 + delta**2) # factor to create a delta
       out += fac*d*p # add contribution
     out /= np.pi # normalize
-    out = spatial_dos(h,out) # resum if necessary
+    return spatial_dos(h,out) # resum if necessary
+  outs = parallel.pcall(getldosi,es) # get energies
+  ie = 0
+  for e in es: # loop over energies
+    print("MULTILDOS for energy",e)
+    out = outs[ie] ; ie += 1 # get and increase
     name0 = "LDOS_"+str(e)+"_.OUT" # name of the output
     name = "MULTILDOS/" + name0
     write_ldos(go.x,go.y,out.tolist()*(nrep**h.dimensionality),
