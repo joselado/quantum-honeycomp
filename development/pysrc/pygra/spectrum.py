@@ -251,10 +251,10 @@ def ev2d(h,nk=50,nsuper=1,reciprocal=False,
 
 
 
-def ev(h,operator=None,nk=30):
+def ev(h,operator=None,nk=30,**kwargs):
   """Calculate the expectation value of a certain number of operators"""
   from .densitymatrix import full_dm
-  dm = full_dm(h,nk=nk,use_fortran=True)
+  dm = full_dm(h,nk=nk,use_fortran=True,**kwargs)
   if operator is None: # no operator given on input
     operator = [] # empty list
   elif not isinstance(operator,list): # if it is not a list

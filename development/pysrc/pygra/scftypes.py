@@ -130,9 +130,8 @@ class scfclass():
       hopping = self.hamiltonian.hopping # empty list
       for key in self.mf: # loop over the mean field
         if key==(0,0,0): continue
-        m = multicell.get_tij(self.hamiltonian0,
-                rij=key,zero=True) + self.mf[key] # get this hopping
-        hopping.append(multicell.Hopping(d=key,m=m))
+        m = self.mf[key] # get this hopping
+        hopping.append(multicell.Hopping(d=key,m=m)) # add this one
       self.hamiltonian.hopping = multicell.collect_hopping(self.hamiltonian)
   def setup_interaction(self,mode="Hubbard",g=1.0,**kwargs):
     """Create the operators that will determine the interactions"""

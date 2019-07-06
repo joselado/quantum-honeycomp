@@ -65,7 +65,7 @@ def global_spin_rotation(m,vector = np.array([0.,0.,1.]),angle = 0.0,
   for i in range(n): # loop over sites
     u = np.array(vector) # rotation direction
     u = u/np.sqrt(u.dot(u)) # normalize rotation direction
-    rot = u[0]*sx + u[1]*sy + u[2]*sz 
+    rot = (u[0]*sx + u[1]*sy + u[2]*sz)/2. # rotation
     # a factor 2 is taken out due to 1/2 of S
     # a factor 2 is added to have BZ in the interval 0,1
     rot = lg.expm(2.*np.pi*1j*rot*angle/2.0)

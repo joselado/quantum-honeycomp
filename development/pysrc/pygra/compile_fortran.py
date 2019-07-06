@@ -20,7 +20,6 @@ names += [("chi","chif90.f90","chif90")]
 names += [("tails","tailsf90.f90","tailsf90")] 
 names += [("algebra","algebraf90.f90","algebraf90")] 
 
-
 import sys
 python = sys.executable
 ls = python.split("/")

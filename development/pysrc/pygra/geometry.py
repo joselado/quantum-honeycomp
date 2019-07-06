@@ -1162,7 +1162,7 @@ def remove_duplicated(g):
   rs = remove_duplicated_positions(g.r)
   go.r = np.array(rs)
   go.r2xyz() # update the other coordinates
-  go.atoms_names = names
+#  go.atoms_names = names
   return go
 
 
@@ -1464,16 +1464,17 @@ def get_sublattice(rs):
   """Return indexes of the sublattice, assuming that there is sublattice"""
   n = len(rs) # loop over positions
   sublattice = [0 for i in range(n)] # list for the sublattice
-  sublattice[0] = -1 # start with this atom
+  ii = np.random.randint(n)
+  sublattice[ii] = -1 # start with this atom
   print("Looking for a sublattice")
   while True: # infinite loop
-    for i in range(1,n): # look for a neighbor for site i
+    for i in range(n): # look for a neighbor for site i
+      if sublattice[i]!=0: continue
       for j in range(n): # loop over the rest of the atoms
         if sublattice[j]==0: continue # next one
         dr = rs[i] - rs[j] # distance to site i
         if 0.9<dr.dot(dr)<1.01: # if NN and sublattice 
           sublattice[i] = -sublattice[j] + 0 # opposite
-          print("Found ",i,sublattice,end="\r")
           continue # next one
     if np.min(np.abs(sublattice))!=0: break
   return sublattice
@@ -1628,10 +1629,30 @@ def write_vasp(g0):
     for i in range(3): f.write(str(s*g.a2[i])+"  ")
     f.write("\n")
     for i in range(3): f.write(str(s*g.a3[i])+"  ")
-    f.write("\n C\n "+str(len(g.r))+"\n Direct\n")
-    for ir in g.frac_r:
-        for i in range(3): f.write(str(ir[i])+"  ")
-        f.write("\n")
+    # write the atoms
+    if not g.atoms_have_names: # no name provided
+      f.write("\n C\n "+str(len(g.r))+"\n Direct\n")
+      # write all the atoms in fractional coordinates
+      for ir in g.frac_r:
+          for i in range(3): f.write(str(ir[i])+"  ")
+          f.write("\n")
+    else: # atoms have labels
+        namedict = dict() # dictionary
+        for (key,n) in zip(g.atoms_names,range(len(g.r))):
+            if not key in namedict: 
+                namedict[key] = [n] # store
+            else: namedict[key].append(n) # store
+        f.write("\n") # next line
+        for key in namedict: f.write(str(key)+"   ")
+        f.write("\n") # next line
+        for key in namedict: f.write(str(len(namedict[key]))+"   ")
+        f.write("\n Direct \n") # next line
+        for key in namedict: # loop over types
+            ns = namedict[key] # list with atoms
+            for ii in ns: # loop over atoms
+              for i in range(3): f.write(str(g.frac_r[ii][i])+"  ")
+              f.write("\n")
+    f.close()
 
 
 
@@ -1644,13 +1665,15 @@ def write_vasp(g0):
 
 def sum_geometries(g1,g2):
     """Sum two geometries"""
-    if g1.dimensionality!=0: raise
-    if g2.dimensionality!=0: raise
+#    if g1.dimensionality!=0: raise
+#    if g2.dimensionality!=0: raise
     g = g1.copy()
     g.r = np.concatenate([g1.r,g2.r])
     g.r2xyz()
     if g.has_sublattice:
         g.sublattice = np.concatenate([g1.sublattice,g2.sublattice])
+    if g.atoms_have_names:
+        g.atoms_names = np.concatenate([g1.atoms_names,g2.atoms_names])
     return g
 
 

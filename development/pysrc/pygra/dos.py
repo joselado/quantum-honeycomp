@@ -8,6 +8,7 @@ from . import kpm
 from . import checkclass
 from . import green
 from . import algebra
+from . import parallel
 
 try:
 #  raise
@@ -196,9 +197,12 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
     hk = hkgen(k) # Hamiltonian
     t0 = time.clock() # time
     if is_sparse: # sparse Hamiltonian 
-      return algebra.smalleig(hk,numw=numw,tol=delta/1e3) # eigenvalues
+      es = algebra.smalleig(hk,numw=numw,tol=delta/1e3) # eigenvalues
+      ws = np.zeros(es.shape[0])+1.0 # weight
     else: # dense Hamiltonian
-      return algebra.eigvalsh(hk) # get eigenvalues
+      es = algebra.eigvalsh(hk) # get eigenvalues
+      ws = np.zeros(es.shape[0])+1.0 # weight
+    return es # return energies
 #  for ik in range(len(ks)):  
   out = parallel.pcall(fun,ks) # launch all the processes
   es = [] # empty list
@@ -223,6 +227,20 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   return (xs,ys) # return result
 
 
+
+def dos_kmesh(h,nk=10,delta=1e-3,energies=np.linspace(-1,1,200),**kwargs):
+    """Compute the DOS in a k-mesh by using the bandstructure function"""
+    from .klist import kmesh
+    ks = kmesh(h.dimensionality,nk=nk)
+    # compute band structure
+    out = h.get_bands(kpath=ks,output_file="DOS.OUT",**kwargs) 
+    if len(out)==2: w = None
+    else: w = out[2]
+    ys = calculate_dos(out[1],energies,delta,w=w)/len(ks)
+    ys *= 1./np.pi # normalization of the Lorentzian
+    write_dos(energies,ys) # write in file
+    print("\nDOS finished")
+    return (energies,ys) # return result
 
 
 
@@ -440,46 +458,44 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
 
 
 
-def dos(h,energies=np.linspace(-4.0,4.0,400),delta=0.01,nk=10,
-            use_kpm=False,scale=10.,ntries=10,mode="ED",
-            random=True,operator=None,**kwargs):
+def dos(h,energies=np.linspace(-4.0,4.0,400),
+            use_kpm=False,mode="ED",**kwargs):
   """Calculate the density of states"""
   if use_kpm: # KPM
     ewindow = max([abs(min(energies)),abs(min(energies))]) # window
-    return dos_kpm(h,scale=scale,ewindow=ewindow,delta=delta,
-                   ntries=ntries,nk=nk,operator=operator,
-                   ne=len(energies),**kwargs)
+    return dos_kpm(h,ewindow=ewindow,ne=len(energies),**kwargs)
   else: # conventional methods
-    if operator is None: # no operator given
       if mode=="ED": # exact diagonalization
-        if h.dimensionality==0:
-          return dos0d(h,energies=energies,delta=delta)
-        elif h.dimensionality==1:
-          return dos1d(h,energies=energies,delta=delta,nk=nk)
-        elif h.dimensionality==2:
-          return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
-              ndos=len(energies),random=random,window=np.max(np.abs(energies)),
-              energies=energies,**kwargs)
-        elif h.dimensionality==3:
-          return dos3d(h,nk=nk,delta=delta,energies=energies)
-        else: raise
+        return dos_kmesh(h,energies=energies,**kwargs)
+ #   if operator is None: # no operator given
+#        if h.dimensionality==0:
+#          return dos0d(h,energies=energies,delta=delta)
+#        elif h.dimensionality==1:
+#          return dos1d(h,energies=energies,delta=delta,nk=nk)
+#        elif h.dimensionality==2:
+#          return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
+#              ndos=len(energies),random=random,window=np.max(np.abs(energies)),
+#              energies=energies,**kwargs)
+#        elif h.dimensionality==3:
+#          return dos3d(h,nk=nk,delta=delta,energies=energies)
+#        else: raise
       elif mode=="Green": # Green function formalism
-        if True: # Bigger dimensionality
-          from .green import bloch_selfenergy
-          tr = timing.Testimator("KDOS") # generate object
-          ie = 0
-          out = [] # storage
-          for e in energies: # loop
-            tr.remaining(ie,len(energies)) # print status
-            ie += 1 # increase
-            g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
-            out.append(-g.trace()[0,0].imag) # store dos
-          np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
-          return energies,np.array(out) # return
-      else: raise
-    else: # operator given on input
-        ds = [green.green_operator(h,operator,e=e,delta=delta,nk=nk) 
-                for e in energies]
+#          from .green import bloch_selfenergy
+#          tr = timing.Testimator("KDOS") # generate object
+#          ie = 0
+#          out = [] # storage
+#          for e in energies: # loop
+#            tr.remaining(ie,len(energies)) # print status
+#            ie += 1 # increase
+#            g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
+#            out.append(-g.trace()[0,0].imag) # store dos
+#          np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
+#          return energies,np.array(out) # return
+#      else: raise
+#    else: # operator given on input
+        def fun(e):
+            return green.green_operator(h,operator,e=e,**kwargs) 
+        ds = parallel.pcall(fun,energies) # compute DOS with an operator
         np.savetxt("DOS.OUT",np.matrix([energies,ds]).T) # write in a file
         return (energies,ds)
 

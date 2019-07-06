@@ -13,7 +13,7 @@ def braket_wAw(w,A,wi=None):
   if issparse(A): # sparse matrices
     return (np.conjugate(wi)@A@w) # modern way
   else: # matrices and arrays
-    return (np.conjugate(wi)@A@w)[0,0] # modern way
+    return (np.conjugate(wi)@np.array(A)@w) # modern way
 
 
 

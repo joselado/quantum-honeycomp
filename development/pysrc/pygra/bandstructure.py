@@ -88,7 +88,8 @@ def ket_Aw(A,w):
 
 
 def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
-                    callback=None,central_energy=0.0,nk=400):
+                    callback=None,central_energy=0.0,nk=400,
+                    output_file="BANDS.OUT"):
   """
   Get an n-dimensional bandstructure
   """
@@ -155,7 +156,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     return out # return string
   ### Now evaluate the function
   from . import parallel
-  f = open("BANDS.OUT","w") # open bands file
+  f = open(output_file,"w") # open bands file
   if parallel.cores==1: ### single thread ###
     tr = timing.Testimator("BANDSTRUCTURE") # generate object
     for k in range(len(kpath)): # loop over kpoints
@@ -167,7 +168,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
       for e in esk: f.write(e)
   f.close()
   print("\nBANDS finished")
-  return np.genfromtxt("BANDS.OUT").transpose() # return data
+  return np.genfromtxt(output_file).transpose() # return data
 
 
 

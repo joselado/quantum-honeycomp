@@ -10,6 +10,7 @@ from . import operators
 from . import inout
 from . import timing
 from . import algebra
+from . import parallel
 
 
 arpack_tol = 1e-5
@@ -20,23 +21,27 @@ def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
       mode="Wilson",delta=0.001,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
-  fo = open("BERRY_CURVATURE.OUT","w") # open file
   tr = timing.Testimator("BERRY CURVATURE")
   ik = 0
   if operator is not None: mode="Green" # Green function mode
-  for k in kpath:
-    tr.remaining(ik,len(kpath))
+  def getb(k):
     if reciprocal:  k = h.geometry.get_k2K_generator()(k) # convert
-    ik += 1
     if mode=="Wilson":
       b = berry_curvature(h,k,dk=dk,window=window,max_waves=max_waves)
     if mode=="Green":
       f = h.get_gk_gen(delta=delta) # get generator
       b = berry_green(f,k=k,operator=operator) 
-    fo.write(str(k[0])+"   ")
-    fo.write(str(k[1])+"   ")
-    fo.write(str(b)+"\n")
-    fo.flush()
+    return str(k[0])+"   "+str(k[1])+"   "+str(b)+"\n"
+  fo = open("BERRY_CURVATURE.OUT","w") # open file
+  if parallel.cores==1: # serial execution
+    for k in kpath:
+      tr.remaining(ik,len(kpath))
+      ik += 1
+      fo.write(getb(k)) # write result
+      fo.flush()
+  else: # parallel execution
+      out = parallel.pcall(getb,kpath)
+      for o in out: fo.write(o) # write
   fo.close() # close file
   m = np.genfromtxt("BERRY_CURVATURE.OUT").transpose()
   return range(len(m[0])),m[2]
@@ -209,7 +214,6 @@ def mesh_chern(h,dk=-1,nk=10,delta=0.0001,mode="Wilson",operator=None):
       ks.append([x,y]) # create kpoints
 #  tr = timing.Testimator("CHERN NUMBER")
   ik = 0
-  from . import parallel
   bs = parallel.pcall(fberry,ks) # compute all the Berry curvatures
 #  for k in ks: # loop
 #    tr.remaining(ik,len(ks))
@@ -592,18 +596,21 @@ def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
   return out # return result
 
 
-def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,**kwargs):
+def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,operator=None,**kwargs):
   """
   Write the Berry curvature of a kpoint in a file
   """
+  if operator is not None:
+      if operator=="valley": 
+          operator = h.get_operator("valley",projector=True) 
   if nk is None: # kpoint given
-    out = berry_green_map_kpoint(h,**kwargs) # get the result
+    out = berry_green_map_kpoint(h,operator=operator,**kwargs) # get the result
   else: # kpoint not given
     from . import klist
     out = [] # empty list
     for i in range(nk): # random mesh
       ik = np.random.random(3) # random kpoint
-      out.append(berry_green_map_kpoint(h,**kwargs))
+      out.append(berry_green_map_kpoint(h,operator=operator,**kwargs))
     out = np.mean(out,axis=0) # resum
   from . import geometry
   from .ldos import spatial_dos
@@ -631,7 +638,6 @@ def berry_density_map(h,nk=40,reciprocal=True,nsuper=1,
   nt = nk*nk # total number of points
   ik = 0
   ks = [] # list with kpoints
-  from . import parallel
   for x in np.linspace(-nsuper,nsuper,nk,endpoint=False):
     for y in np.linspace(-nsuper,nsuper,nk,endpoint=False):
         ks.append([x,y,0.])

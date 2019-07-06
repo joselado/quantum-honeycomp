@@ -9,7 +9,7 @@ except:
   print("Fortran routines not working in densitymatrix.py")
  
 
-def full_dm(h,use_fortran=True,nk=10):
+def full_dm(h,use_fortran=True,nk=10,delta=1e-2):
   if h.dimensionality == 0: fac = 1.
   elif h.dimensionality == 1: fac = 1./nk
   elif h.dimensionality == 2: fac = 1./nk**2
@@ -17,7 +17,7 @@ def full_dm(h,use_fortran=True,nk=10):
   else: raise
   es,vs = h.eigenvectors() # get eigenvectors
   if use_fortran:
-    dm = density_matrixf90.density_matrix(np.array(es),np.array(vs))
+    dm = density_matrixf90.density_matrix(np.array(es),np.array(vs),delta)
     return dm*fac
   else:
     return np.matrix(full_dm_python(h.intra.shape[0],es,np.array(vs)))*fac # call hte function

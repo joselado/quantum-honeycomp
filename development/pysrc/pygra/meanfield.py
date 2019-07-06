@@ -203,6 +203,8 @@ def guess(h,mode="ferro",fun=0.01):
     h0.add_zeeman(fun)
   elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
+  elif mode=="CDW":
+    h0.add_onsite(h.geometry.sublattice)
   elif mode=="potential":
     h0.add_onsite(fun)
   elif mode=="antiferro":
@@ -285,17 +287,31 @@ def broyden_solver(scf):
 
 
 
-def coulomb_interaction(g,**kwargs):
+def coulomb_interaction(g,vc=0.0,rcut=20,**kwargs):
     """Return a list with the Coulomb interaction terms"""
-    from .selfconsistency.coulomb import coulomb_density_matrix
-    m = coulomb_density_matrix(g,**kwargs)
+#    from .selfconsistency.coulomb import coulomb_density_matrix
+#    m = coulomb_density_matrix(g,**kwargs)
+#    print(m[0]) ; exit()
     interactions = [] # empty list
-    nat = len(g.r)
-    for i in range(nat):
-      for j in range(nat):
-        if abs(m[i,j])>1e-5:
-          interactions.append(v_ij_density_spinless(i,j,nat,
-            g=m[i,j],d=[0,0,0]))
+    nat = len(g.r) # number of atoms
+    lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
+    g.ncells = int(2*rcut/lat)+1 # number of unit cells to consider
+    ri = g.r # positions
+    for d in g.neighbor_directions(): # loop
+      rj = np.array(g.replicas(d)) # positions
+      for i in range(nat):
+        for j in range(nat):
+          dx = rj[j,0] - ri[i,0]
+          dy = rj[j,1] - ri[i,1]
+          dz = rj[j,2] - ri[i,2]
+          dr = dx*dx + dy*dy + dz*dz
+          dr = np.sqrt(dr) # square root
+          if dr<1e-4: v = 0.0
+          elif dr>rcut: v = 0.0
+          else: v = 1./dr*np.exp(-dr/rcut) # quench interaction
+          if v>1e-3:
+            interactions.append(v_ij_density_spinless(i,j,nat,
+            g=v,d=[0,0,0]))
     return interactions
 
 

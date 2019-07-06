@@ -8,6 +8,7 @@ from . import timing
 from . import multicell
 from . import kpm
 from . import sculpt
+from . import parallel
 
 def write_kdos(k=0.,es=[],ds=[],new=True):
   """ Write KDOS in a file"""
@@ -230,20 +231,19 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
     elif h1.dimensionality==2:
       kpath = [[k,0.,0.] for k in np.linspace(0.,1.,nk)]
     else: raise
-  fo = open("KDOS_INTERFACE.OUT","w")
-  fo.write("# k, E, Bulk1, Surf1, Bulk2, Surf2, interface\n")
-  tr = timing.Testimator("KDOS") # generate object
+#  tr = timing.Testimator("KDOS") # generate object
+#  tr.remaining(ik,len(kpath)) # generate object
   ik = 0
   h1 = h1.get_multicell() # multicell Hamiltonian
   h2 = h2.get_multicell() # multicell Hamiltonian
-  for k in kpath:
-    tr.remaining(ik,len(kpath)) # generate object
-    ik += 1
+  def computek(ik):
+    k = kpath[ik] # get this one
 #    for energy in energies:
 #  (b1,s1,b2,s2,b12) = green.interface(h1,h2,k=k,energy=energy,delta=delta)
 #      out = green.interface(h1,h2,k=k,energy=energy,delta=delta)
     outs = green.interface_multienergy(h1,h2,k=k,energies=energies,
             delta=delta,dh1=dh1,dh2=dh2)
+    outstr = ""
     for (energy,out) in zip(energies,outs):
       if operator is None: 
         op = np.identity(h1.intra.shape[0]*2) # normal cell
@@ -253,14 +253,21 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
         op = operator # normal cell 
         ops = bmat([[csc_matrix(operator),None],[None,csc_matrix(operator)]])
       # write everything
-      fo.write(str(ik)+"   "+str(energy)+"   ")
+      outstr += str(ik)+"   "+str(energy)+"   "
       for g in out: # loop
-        if g.shape[0]==op.shape[0]: d = -(g*op).trace()[0,0].imag # bulk
-        else: d = -(g*ops).trace()[0,0].imag # interface
-        fo.write(str(d)+"   ")
-      fo.write("\n")
-      fo.flush() # flush
+        if g.shape[0]==op.shape[0]: d = -(g@op).trace()[0,0].imag # bulk
+        else: d = -(g@ops).trace()[0,0].imag # interface
+        outstr += str(d)+"   "
+      outstr += "\n"
+    return outstr
+  out = parallel.pcall(computek,range(len(kpath))) # compute all
+  fo = open("KDOS_INTERFACE.OUT","w")
+  fo.write("# k, E, Bulk1, Surf1, Bulk2, Surf2, interface\n")
+  for o in out: fo.write(o)
   fo.close()
+
+#      fo.flush() # flush
+#  fo.close()
 
 
 

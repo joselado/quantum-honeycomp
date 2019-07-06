@@ -108,8 +108,8 @@ def initialize():
         raise
   if False:
     custom_scf(h) # create the tb90.in
-  else:
-    h.write("hamiltonian.in")
+#  else:
+#    h.write("hamiltonian.in")
   klist.default(g,nk=int(get("nkpoints")))  # write klist
 #  klist.tr_path(nk=int(get("nkpoints")))  # write klist
   return h

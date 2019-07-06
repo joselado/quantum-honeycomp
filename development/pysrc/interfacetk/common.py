@@ -68,7 +68,7 @@ def get_dos(h,window,silent=False):
   if window.getbox("dos_mode")=="Green":
     dos.dos(h,delta=delta,nk=nk,energies=energies,mode="Green") # compute DOS
   else:
-    dos.dos(h,delta=delta,nk=nk,energies=energies,random=False) # compute DOS
+    dos.dos(h,delta=delta,nk=nk,energies=energies) # compute DOS
   if not silent: execute_script("qh-dos --input DOS.OUT")
 
 

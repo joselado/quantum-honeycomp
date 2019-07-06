@@ -10,25 +10,37 @@ import os
 import matplotlib
 matplotlib.rcParams.update({'font.size': 18})
 
+
 def getfig(main):
   fig = plt.gcf()
   fig.set_facecolor("white") # white
-  m = np.genfromtxt(args.input).transpose() # read file
+  m = minput
   x = m[0] # x position
   y = m[1] # y position
   z = m[2] # z position
-  print("Maximum value is ",np.max(np.abs(z)))
+#  print("Maximum value is ",np.max(np.abs(z)))
   size = np.power(main.get_slider("Size"),4)
   scale = 100*size
   zsign = np.sign(z) # sign
   plt.title(str(len(x))+" atoms")
   plt.scatter(x,y,color="black",s=1)
-  color = zsign*scale
+  color = z
+  if main.get_combobox("Range")=="Default":
+        minc = min(color)
+        maxc = max(color)
+  elif main.get_combobox("Range")=="Symmetric":
+        maxc = np.max(np.abs(color))
+        minc = -maxc
+  elif main.get_combobox("Range")=="Sign":
+        maxc = np.max(np.abs(color))
+        minc = -maxc
+        color = np.sign(color)
   cplot = plt.scatter(x,y,s=scale,c=color,
-          edgecolor="none",cmap=args.cmap)
+          edgecolor="none",cmap=args.cmap,
+          vmin=minc,vmax=maxc)
   if args.colorbar=="true":
-    cb = fig.colorbar(cplot,ticks=[min(color),max(color)])
-    cb.ax.set_yticklabels(["Min",'Max'])
+    cb = fig.colorbar(cplot,ticks=[minc,maxc])
+#    cb.ax.set_yticklabels(["Min",'Max'])
   plt.xticks([])
   plt.yticks([])
   plt.axis("equal")
@@ -57,12 +69,14 @@ parser.add_argument("--zoom",default="0",help='Initial zoom')
 parser.add_argument("--size",default="30",help='Initial zoom')
 args = parser.parse_args() # get the arguments
 
+minput = np.genfromtxt(args.input).transpose() # read file
 
 app,main = plotpyqt.get_interface(getfig)
 main.add_slider(label="Size",vs=np.linspace(0.,2,100),
         v0=int(args.size))
 main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,100),
         v0=int(args.zoom))
+main.add_combobox(["Default","Symmetric","Sign"],label="Range")
 
 # execute the interface
 main.plot()

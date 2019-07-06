@@ -16,8 +16,8 @@ def rkky_atom(hin,delta=0.001,i=None,filling=0.5):
     den0 += evecs[i]*np.conjugate(evecs[i]) # density
   def denshift(delta2):
     nfill = int(round(no*filling)) # filling
-    def fermi(x,y,z):
-      dr = r0 - np.array([x,y,z])
+    def fermi(r):
+      dr = r0 - np.array(r)
       dr = dr.dot(dr)
       if dr<0.1: return delta2
   #    if x<0.0 and y>0.0: return delta
@@ -66,8 +66,8 @@ def rkky_atom_v1(hin,delta=0.001,i=None,filling=0.5):
   else: r0 = hin.geometry.r[i]
   no = hin.intra.shape[0]
   def denshift(delta2):
-    def fermi(x,y,z):
-      dr = r0 - np.array([x,y,z])
+    def fermi(r):
+      dr = r0 - np.array(r)
       dr = dr.dot(dr)
       if dr<0.1: return delta2
   #    if x<0.0 and y>0.0: return delta

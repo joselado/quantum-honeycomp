@@ -6,6 +6,7 @@ from ..scftypes import get_occupied_states
 import time
 from .. import limits
 from .. import inout
+from scipy.sparse import csc_matrix
 
 
 
@@ -16,10 +17,10 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
                   smearing=None,fermi_shift=0.0,
                   maxite=1000,save=False,**kwargs):
   """ Solve a selfconsistent Hubbard mean field"""
-  vc = coulomb_density_matrix(h.geometry,vc=2*g) # get the matrix
+  vc = coulomb_density_matrix(h.geometry,vc=2*g,**kwargs) # get the matrix
   mix = 1. - mix
   U = g # redefine
-  if h.has_spin: raise # not implemented
+#  if h.has_spin: raise # not implemented
   os.system("rm -f STOP") # remove stop file
   from scipy.linalg import eigh
   nat = h.intra.shape[0] # number of atoms
@@ -54,13 +55,15 @@ def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
 # occupied states
     eoccs,voccs,koccs = get_occupied_states(eigvals,eigvecs,kvectors,fermi)
 # mean field
-    mf,edc = charge_mean_field(voccs,vc) # get the new mean field
+    # get the new mean field
+    if h.has_spin: mf,edc = charge_mean_field_spinful(voccs,vc) 
+    else: mf,edc = charge_mean_field(voccs,vc) # get the new mean field
     mf = mf/totkp # normalize
     edc = edc/totkp # normalize
     t3 = time.time()
     error = np.max(np.abs(old_mf-mf)) # absolute difference
     # total energy
-    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
+    etot = (np.sum(eoccs)/totkp + edc).real  # eigenvalues and double counting
     file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
     file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file
     file_etot.flush()
@@ -112,13 +115,68 @@ def charge_mean_field(voccs,vc):
 
 
 
-def coulomb_density_matrix(g,**kwargs):
-    """Return a list with the Coulomb interaction terms"""
-    from ..crystalfield import hartree_onsite
-    m = hartree_onsite(g,**kwargs) # get array
-    m = m - np.mean(m) # remove average
+def charge_mean_field_spinful(voccs,vc):
+    """Return the charge mean field, for a spinful Hamiltonian
+       Vc is the spinless matrix"""
+    n = vc.shape[0] # number of sites
+    charge = np.zeros(2*n) # initialize
+    mfup = np.zeros(n) # initialize
+    mfdn = np.zeros(n) # initialize
+    mf = np.zeros(2*n) # initialize
+    for w in voccs:
+        charge += np.abs(w)**2 # add contribution
+    chargeup = np.array([charge[2*i] for i in range(n)]) # up charge
+    chargedn = np.array([charge[2*i+1] for i in range(n)]) # down charge
+    for i in range(n): # loop over rows of the matrix
+        mfdn[i] = chargeup.dot(vc[i]) # get contribution
+        mfup[i] = chargedn.dot(vc[i]) # get contribution
+    # This formula is only ok if there is a single pair per ij
+    edc = -mfup@(vc@mfdn)
+    for i in range(n):
+        mf[2*i] = mfup[i]
+        mf[2*i+1] = mfdn[i]
+    return np.diag(mf),edc # return diagonal matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def coulomb_density_matrix(g,rcut=30.0,vc=0.0):
+    """Return an array with the Hartree terms"""
+    g = g.copy() # copy geometry
+    interactions = [] # empty list
     nat = len(g.r) # number of atoms
-    ind = range(nat) # indexes
-    mat = csc_matrix((m,(ind,ind)),shape=(nat,nat),dtype=np.complex)
-    return mat # return
+    mout = np.zeros((nat,nat)) # initialize matrix
+    lat = np.sqrt(g.a1.dot(g.a1)) # size of the unit cell
+    g.ncells = int(2*rcut/lat)+1 # number of unit cells to consider
+    ri = g.r # positions
+    for d in g.neighbor_directions(): # loop
+        rj = np.array(g.replicas(d)) # positions
+        for i in range(nat):
+          for j in range(nat):
+            dx = rj[j,0] - ri[i,0]
+            dy = rj[j,1] - ri[i,1]
+            dz = rj[j,2] - ri[i,2]
+            dr = dx*dx + dy*dy + dz*dz
+            dr = np.sqrt(dr) # square root
+            if dr<1e-4: v = 0.0
+            elif dr>rcut: v = 0.0
+            else: v = 1./dr*np.exp(-dr/rcut) # quench interaction
+            mout[i,j] += v # store contribution
+    mout /= 2*np.max(mout) # normalize
+    return vc*mout # return
+
+
+
 

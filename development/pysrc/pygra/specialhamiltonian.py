@@ -15,7 +15,7 @@ def tbg(n=7,ti=0.12,lambi=3.0,lamb=3.0,is_sparse=True,
     return h
 
 
-def multilayer_graphene(l=[0],real=False):
+def multilayer_graphene(l=[0],real=False,**kwargs):
   """Return the hamiltonian of multilayer graphene"""
   g = specialgeometry.multilayer_graphene(l=l)
   g.center()

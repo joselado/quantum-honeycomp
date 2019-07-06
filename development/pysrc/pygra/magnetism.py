@@ -86,7 +86,6 @@ def add_magnetism(h,m):
     # create the array
     out = [[None for j in range(natoms)] for i in range(natoms)] # output matrix
     if checkclass.is_iterable(m):
-      print(natoms)
       if checkclass.is_iterable(m[0]) and len(m)==natoms: # input is an array
         mass = m # use as arrays
       elif len(m)==3: # single exchange provided

@@ -64,7 +64,7 @@ def pcall_mp(fun,args,cores=cores):
     mainpool = Pool(cores) # create pool
 #    print("Using",cores,"cores")
     out = mainpool.map(fun,args) # return list
-    mainpool.terminate()
+    mainpool.terminate() # clear the pool
     del mainpool # delete pool
     return out
 #except:
@@ -83,7 +83,11 @@ def pcall(fun,args): # define the function
 #  if current_process().name == 'MainProcess': # main process
     is_child = True # child from now on
     if cores==1: out = pcall_serial(fun,args) # one core, simply iterate
-    else: out = pcall_mp(fun,args,cores=cores) # call in parallel
+    else: 
+        try: out = pcall_mp(fun,args,cores=cores) # call in parallel
+        except:
+            print("Something wrong happened in the parallel execution")
+            out = pcall_serial(fun,args) # serial execution
     is_child = False # main from now on
     return out
   # child process
