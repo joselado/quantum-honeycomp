@@ -396,8 +396,8 @@ def parametric_matrix(h,cutoff=5,fm=None):
         if np.sum(np.abs(t.m))>0.00001: return t
         else: return None
 #  from . import parallel
-#  ts = parallel.pcall(gett,dirs) # get hoppings
-  ts = [gett(d) for d in dirs] # get hoppings in serie
+  ts = parallel.pcall(gett,dirs) # get hoppings
+#  ts = [gett(d) for d in dirs] # get hoppings in serie
   ts = [x for x in ts if x is not None] # remove Nones
   h.hopping = ts # store
   return h
