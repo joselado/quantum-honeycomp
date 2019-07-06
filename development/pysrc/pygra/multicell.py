@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import csc_matrix,bmat,coo_matrix
+from . import parallel
 
 
 def collect_hopping(h):
