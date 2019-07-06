@@ -204,6 +204,11 @@ class Geometry:
     """Return directions linking to neighbors"""
     if n is None: n = self.ncells
     return neighbor_directions(self,n)
+  def get_ncells(self):
+      if self.dimensionality==0: return 0
+      else:
+          n = int(10/np.sqrt(self.a1.dot(self.a1)))
+          return max([1,n])
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
       write_profile(self,d,**kwargs)

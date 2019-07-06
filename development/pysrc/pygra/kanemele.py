@@ -2,6 +2,7 @@ from __future__ import print_function
 from scipy.sparse import csc_matrix,bmat
 from .rotate_spin import sx,sy,sz
 import numpy as np
+from pygra import parallel
 
 try:
   from . import kanemelef90
@@ -240,36 +241,44 @@ def add_haldane_like(self,t,spinless_generator,
 #     else: return m # spinless
   from .multicell import close_enough # check if two rs are close
   if self.is_multicell:   # multicell Hamiltonians
-    ncells = 4 # number of neighboring cells to check
-    if self.dimensionality==1:  # three dimensional
-      rs = [] # all the cells
-      for i in range(-ncells,ncells+1): # loop over neighbouring cells
-        rtmp = [ri + i*g.a1 for ri in g.r] # new positions
-        if close_enough(g.r,rtmp,rcut=2.1): # if these positions are not too far
-          rs += rtmp
-    elif self.dimensionality==2:  # three dimensional
-      rs = [] # all the cells
-      for i in range(-ncells,ncells+1): # loop over neighbouring cells
-        for j in range(-ncells,ncells+1):
-          rtmp = [ri + i*g.a1 +j*g.a2 for ri in g.r] # new positions
-          if close_enough(g.r,rtmp,rcut=2.1): # if this positions are not too far
+    if self.dimensionality==0:  rs = g.r
+    else: # higher dimensional
+      ncells = self.geometry.get_ncells() # number of unit cells
+      if self.dimensionality==1:  # three dimensional
+        rs = [] # all the cells
+        for i in range(-ncells,ncells+1): # loop over neighbouring cells
+          rtmp = self.geometry.replicas(d=[i,0,0]) 
+          if close_enough(g.r,rtmp,rcut=2.1): # if these positions are not too far
             rs += rtmp
-    elif self.dimensionality==3:  # three dimensional
-      rs = [] # all the cells
-      for i in range(-ncells,ncells+1): # loop over neighbouring cells
-        for j in range(-ncells,ncells+1):
-          for k in range(-ncells,ncells+1):
-            rtmp = [ri + i*g.a1 +j*g.a2 + k*g.a3 for ri in g.r] # new positions
-            if close_enough(g.r,rtmp,rcut=2.1): # if not too far
+      elif self.dimensionality==2:  # three dimensional
+        rs = [] # all the cells
+        for i in range(-ncells,ncells+1): # loop over neighbouring cells
+          for j in range(-ncells,ncells+1):
+            rtmp = self.geometry.replicas(d=[i,j,0]) 
+            if close_enough(g.r,rtmp,rcut=2.1): # if this positions are not too far
               rs += rtmp
-    else: raise
+      elif self.dimensionality==3:  # three dimensional
+        rs = [] # all the cells
+        for i in range(-ncells,ncells+1): # loop over neighbouring cells
+          for j in range(-ncells,ncells+1):
+            for k in range(-ncells,ncells+1):
+              rtmp = self.geometry.replicas(d=[i,j,k]) 
+              if close_enough(g.r,rtmp,rcut=2.1): # if not too far
+                rs += rtmp
+      else: raise
 
-    self.intra += generator(g.r,g.r,rs,fun=t,sublattice=sublattice) # coupling
-    for i in range(len(self.hopping)): # loop over hoppings
-      d = self.hopping[i].dir
+#    self.intra += generator(g.r,g.r,rs,fun=t,sublattice=sublattice) # coupling
+    dirs = [[0,0,0]] + [t.dir for t in self.hopping] # directions
+    def pfun(d): # function to parallelize
+#    for i in range(len(self.hopping)): # loop over hoppings
       print("Adding Kane Mele in hopping",d)
-      r2 = [ri + d[0]*g.a1 + d[1]*g.a2 +d[2]*g.a3 for ri in g.r] # second vectors
-      self.hopping[i].m += generator(g.r,r2,rs,fun=t,sublattice=sublattice) # kane mele coupling
+      r2 = self.geometry.replicas(d)
+      return generator(g.r,r2,rs,fun=t,sublattice=sublattice) 
+    ms = parallel.pcall(pfun,dirs) # get matrices
+    self.intra = self.intra + ms[0] # intracell matrix
+    for i in range(len(self.hopping)):
+        self.hopping[i].m += ms[i+1] # store
+
     return
 
   else:  # conventional Hamiltonian

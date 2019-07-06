@@ -297,6 +297,7 @@ def get_valley(h,projector=False,delta=None):
   """Return a callable that calculates the valley expectation value
   using the modified Haldane coupling"""
   ho = h.copy() # copy Hamiltonian
+  ho.turn_multicell()
   ho.clean() # set to zero
   ho.add_modified_haldane(1.0/4.5) # add modified Haldane coupling
   hkgen = ho.get_hk_gen() # get generator for the hk Hamiltonian
