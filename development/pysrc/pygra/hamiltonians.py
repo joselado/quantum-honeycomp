@@ -481,6 +481,7 @@ class hamiltonian():
       elif name=="yposition": return operators.get_yposition(self)
       elif name=="xposition": return operators.get_xposition(self)
       elif name=="velocity": return operators.get_velocity(self)
+      elif name=="electrons": return operators.get_electron(self)
       # total magnetizations
       elif name=="mx": 
         return self.get_operator("sx")*self.get_operator("electron")

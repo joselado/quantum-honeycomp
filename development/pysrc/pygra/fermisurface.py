@@ -68,7 +68,7 @@ def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
       name = output_folder+"/"+filename
       np.savetxt(name,np.array([rs[:,0],rs[:,1],kdos[:,i]]).T)
       fo.write(filename+"\n")
-  h.get_dos(nk=nk,delta=delta,energies=energies,random=False)
+  h.get_dos(nk=nk,delta=delta,energies=energies)
   fo.close()
 
 

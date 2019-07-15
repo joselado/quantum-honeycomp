@@ -5,6 +5,8 @@ import scipy.sparse.linalg as slg
 import numpy as np
 from .algebratk import sparsetensor
 
+maxsize = 10000
+
 def braket_wAw(w,A,wi=None):
   """
   Compute the braket of a wavefunction
@@ -16,6 +18,12 @@ def braket_wAw(w,A,wi=None):
     return (np.conjugate(wi)@np.array(A)@w) # modern way
 
 
+def todense(m):
+    """Turn a matrix dense"""
+    if issparse(m):
+        if m.shape[0]<maxsize: return m.todense()
+        else: raise
+    else: return m
 
 
 def braket_ww(w,wi):
@@ -101,6 +109,7 @@ def eigh(m):
 
 def eigvalsh(m):
     """Wrapper for linalg"""
+    m = todense(m) # turn the matrix dense
     if not accelerate: return dlg.eigvalsh(m)
     # check if doing slices helps
     n = m.shape[0] # size of the matrix
@@ -139,4 +148,21 @@ def smalleig(m,numw=10,evecs=False,tol=1e-7):
                                   tol=tol)
   if evecs:  return eig,eigvec.transpose()  # return eigenvectors
   else:  return eig  # return eigenvalues
+
+
+
+def spectral_gap(m,numw=10,**kwargs):
+    """
+    Compute the spectral gap
+    """
+    es = smalleig(m,numw=10,evecs=False,**kwargs)
+    ev = es[es<0.]
+    ec = es[es>0.]
+    if len(ev)==0 or len(ec)==0:
+        if numw<100: return gap(m,numw=2*numw,**kwargs)
+        else: raise
+    g = np.min(np.abs(ev))+np.min(ec) # gap
+    return g # return gap
+
+
 

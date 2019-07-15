@@ -11,6 +11,7 @@ from . import inout
 from . import algebra
 from . import meanfield
 from . import groundstate
+from . import parallel
 
 
 from .meanfield import guess # function to calculate guesses
@@ -182,13 +183,13 @@ class scfclass():
           interactions.append(meanfield.hubbard_density(i,nat,g=g)) 
   # store this interaction
       elif mode=="Coulomb": # Coulomb interaction
-        self.bloch_multicorrelator = True
-#        self.correlator_mode = "1by1" # mode to calculate the correlators
-        if self.hamiltonian.has_spin: raise
-        else: 
-            interactions = meanfield.coulomb_interaction(
-                    self.hamiltonian.geometry,
-                    vc=g,**kwargs)
+        interactions = meanfield.coulomb_interaction(
+                self.hamiltonian.geometry,has_spin=self.hamiltonian.has_spin,
+                vc=g,**kwargs)
+      elif mode=="fastCoulomb": # Coulomb interaction
+        interactions = meanfield.fast_coulomb_interaction(
+                self.hamiltonian.geometry,has_spin=self.hamiltonian.has_spin,
+                vc=g,**kwargs)
       elif mode=="V": # V interaction
 #        self.correlator_mode = "1by1" # mode to calculate the correlators
         self.bloch_multicorrelator = True
@@ -237,21 +238,22 @@ class scfclass():
     self.ijk = ijk # first array
     self.lamb = lamb # data array
     self.dir = np.array(dv,dtype=np.int) # data array
-    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
-            ijk[:,1],ijk[:,2],lamb,
-            shape=(v.a.shape[0],v.a.shape[0],k))
+#    self.tensormf = algebra.sparsetensor.Tensor3(ijk[:,0],
+#            ijk[:,1],ijk[:,2],lamb,
+#            shape=(v.a.shape[0],v.a.shape[0],k))
   def update_expectation_values(self):
     """Calculate the expectation values of the different operators"""
     # this conjugate comes from being inconsistent
     # in the routines to calculate exectation values
     voccs = np.array(np.conjugate(self.wavefunctions)) # get wavefunctions
     ks = self.kvectors # kpoints
+#    self.correlator_mode = "plain"
     mode = self.correlator_mode # 
-#    mode = "1by1"
     if mode=="plain": # conventional mode
-      for v in self.interactions:
-        v.vav = (voccs*v.a*voccs.H).trace()[0,0]/self.kfac # <vAv>
-        v.vbv = (voccs*v.b*voccs.H).trace()[0,0]/self.kfac # <vBv>
+        plain_expectation_value(self)
+#      for v in self.interactions:
+#        v.vav = np.trace(voccs@v.a@np.conjugate(voccs).T)/self.kfac # <vAv>
+#        v.vbv = np.trace(voccs@v.b@np.conjugate(voccs).T)/self.kfac # <vBv>
     elif mode=="1by1": # conventional mode
       for v in self.interactions:
         phis = [self.hamiltonian.geometry.bloch_phase(v.dir,k*0.) for k in ks]
@@ -542,7 +544,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
-                  broyden=False,callback=None):
+                  broyden=False,callback=None,**kwargs):
   """ Solve a generalized selfcnsistent problem"""
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
@@ -576,9 +578,9 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   if type(mode) is type(dict()): # of mode is a dictionary add several interactions
     print("Adding multiple interactions")
     for key in mode:
-      scf.setup_interaction(g=mode[key],mode=key) # create the interaction matrices
+      scf.setup_interaction(g=mode[key],mode=key,**kwargs) # create the interaction matrices
   else: # conventional way
-    scf.setup_interaction(g=g,mode=mode) # create the interaction matrices
+    scf.setup_interaction(g=g,mode=mode,**kwargs) # create the interaction matrices
   if type(old_mf) is type(dict()): # of mode is a dictionary add several interactions
     scf.mf = old_mf # initial mean field
   else:
@@ -619,6 +621,31 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
   file_gap.close() # close file
   if scf.scfmode=="filling":  scf.hamiltonian.shift_fermi(-scf.fermi)
   return scf # return mean field
+
+
+
+
+def plain_expectation_value(self):
+    """Compute the expectation values using the plain scheme"""
+    voccs = np.array(np.conjugate(self.wavefunctions))
+    if parallel.cores==1: # single core execution
+      for v in self.interactions:
+        v.vav = np.trace(voccs@v.a@np.conjugate(voccs).T)/self.kfac # <vAv>
+        v.vbv = np.trace(voccs@v.b@np.conjugate(voccs).T)/self.kfac # <vBv>
+    else: # multicore execution
+        ma = [v.a for v in self.interactions]
+        mb = [v.b for v in self.interactions]
+        kfac = self.kfac
+        def fun(i):
+            vav = np.trace(voccs@ma[i]@np.conjugate(voccs).T)/kfac
+            vbv = np.trace(voccs@mb[i]@np.conjugate(voccs).T)/kfac
+            return [vav,vbv]
+        # compute expectation values
+        vv = parallel.pcall(fun,range(len(self.interactions)))
+        for i in range(len(self.interactions)):
+            self.interactions[i].vav = vv[i][0]
+            self.interactions[i].vbv = vv[i][1]
+
 
 
 

@@ -354,24 +354,24 @@ def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
     m = add_pairing(df,r1=r,r2=r) # intra cell
     self.intra = self.intra + m + m.H
     if self.dimensionality>0:
-      if self.is_multicell: # for multicell hamiltonians
-        from .multicell import Hopping
-        for d in self.geometry.neighbor_directions(): # loop over directions
-          # this is a workaround to be able to do triplets
-          # do it for +k and -k
-          if d.dot(d)<0.0001: continue # skip onsite
-          r2 = self.geometry.replicas(d) # positions
-          m = add_pairing(df,r1=r,r2=r2) # new matrix
-#          m2 = add_pairing(df,r1=r,r2=r2) # new matrix, the other way
-          m2 = m
-          if np.max(np.abs(m))>0.0001: # non zero
-              self.hopping.append(Hopping(d=d,m=m)) # add pairing
-          if np.max(np.abs(m2))>0.0001: # non zero
-              self.hopping.append(Hopping(d=-np.array(d),m=m2.H)) # add pairing
-        from .multicell import collect_hopping
-        self.hopping = collect_hopping(self)
-      else: # conventional way
-        raise # error
+      if not self.is_multicell: # for multicell hamiltonians
+        self.turn_multicell()
+        print("Converting Hamiltonian to multicell")
+      from .multicell import Hopping
+      for d in self.geometry.neighbor_directions(): # loop over directions
+        # this is a workaround to be able to do triplets
+        # do it for +k and -k
+        if d.dot(d)<0.0001: continue # skip onsite
+        r2 = self.geometry.replicas(d) # positions
+        m = add_pairing(df,r1=r,r2=r2) # new matrix
+#        m2 = add_pairing(df,r1=r,r2=r2) # new matrix, the other way
+        m2 = m
+        if np.max(np.abs(m))>0.0001: # non zero
+            self.hopping.append(Hopping(d=d,m=m)) # add pairing
+        if np.max(np.abs(m2))>0.0001: # non zero
+            self.hopping.append(Hopping(d=-np.array(d),m=m2.H)) # add pairing
+      from .multicell import collect_hopping
+      self.hopping = collect_hopping(self)
 
 
 iden = np.matrix([[1.,0.],[0.,1.]],dtype=np.complex)

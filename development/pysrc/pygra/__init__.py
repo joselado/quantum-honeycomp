@@ -18,7 +18,6 @@
 # from . import current
 # from . import dos
 # from . import sculpt
-# from . import input_tb90
 # from . import kpm
 # from . import supercell
 # from . import skeleton

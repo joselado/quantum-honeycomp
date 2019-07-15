@@ -265,6 +265,7 @@ def twisted_multimultilayer(m0=3,
   g.real2fractional() # update fractional coordinates 
   g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # rotate
   g.get_fractional() # get fractional coordinates 
+  g.data["angle_degrees"] = theta*180.0/np.pi # store the angle of the geometry
   return g
 
 

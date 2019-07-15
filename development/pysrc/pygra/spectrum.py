@@ -286,7 +286,10 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
       return kpm.total_energy(hk,scale=10.,ntries=20,npol=100) # using KPM
     else: # conventional diagonalization
       if nbands is None: vv = lg.eigvalsh(hk) # diagonalize k hamiltonian
-      else: vv,aa = slg.eigsh(hk,k=nbands,which="LM",sigma=0.0) 
+      else: 
+          vv,aa = slg.eigsh(hk,k=4*nbands,which="LM",sigma=0.0) 
+          vv = -np.sort(-(vv[vv<0.0])) # negative eigenvalues
+          vv = vv[0:nbands] # get the negative eigenvlaues closest to EF
       return np.sum(vv[vv<0.0]) # sum energies below fermi energy
   # compute energy using different modes
   if mode=="mesh":

@@ -4,6 +4,7 @@ import scipy.optimize as opt
 import numpy as np
 import scipy.sparse.linalg as lgs
 from scipy.sparse import csc_matrix
+from . import algebra
 
 def minimize_gap(f,tol=0.001,bounds=(0,1.)):
   """Miimizes the gap of the system, the argument is between 0 and 1"""
@@ -59,10 +60,11 @@ def gap2d(h,nk=40,k0=None,rmap=1.0,recursive=False,
     hk_gen = h.get_hk_gen() # generator
     def minfun(k): # function to minimize
       hk = hk_gen(k) # Hamiltonian 
-      if h.is_sparse: es,ew = lgs.eigsh(hk,k=10,which="LM",sigma=0.0,tol=1e-06)
-      else: es = lg.eigvalsh(hk) # get eigenvalues
-      es = es[es>0.]
-      return np.min(es) # retain positive
+      if h.is_sparse: 
+          es = algebra.smalleig(hk,numw=10)
+      else: es = algebra.eigvalsh(hk) # get eigenvalues
+      ggg = np.min(es[es>0.])+np.min(np.abs(es[es<0.])) # gap
+      return ggg # retain positive
     gaps = [minimize(minfun,np.random.random(h.dimensionality),method="Powell").fun  for i in range(iterations)]
 #    print(gaps)
     return np.min(gaps)
@@ -77,11 +79,13 @@ def gap2d(h,nk=40,k0=None,rmap=1.0,recursive=False,
         k = np.array([ix,iy]) # generate kvector
         if recursive: k = k0 + k*rmap # scale vector
         hk = hk_gen(k) # generate hamiltonian
-        if h.is_sparse: es,ew = lgs.eigsh(csc_matrix(hk),k=4,which="LM",sigma=0.0)
-        else: es = lg.eigvalsh(hk) # get eigenvalues
-        es = es[es>0.] # retain positive
-        if min(es)<emin:
-          emin = min(es) # store new minimum 
+        if h.is_sparse: 
+            es = algebra.smalleig(hk,numw=4)
+        else: 
+            es = algebra.eigvalsh(hk) # get eigenvalues
+        ggg = np.min(es[es>0.])+np.min(np.abs(es[es<0.])) # gap
+        if ggg<emin:
+          emin = ggg # store new minimum 
           kbest = k.copy() # store the best k
     if recursive: # if it has been chosen recursive
       if iterations>0: # if still iterations left
@@ -108,8 +112,8 @@ def optimize_gap_single(h,direct=True):
     def fg(k): # minimize the gap
       k1 = np.array([k[2*i] for i in range(dim)])
       k2 = np.array([k[2*i+1] for i in range(dim)])
-      es1 = lg.eigvalsh(hkgen(k1)) # eigenvalues
-      es2 = lg.eigvalsh(hkgen(k2)) # eigenvalues
+      es1 = algebra.eigvalsh(hkgen(k1)) # eigenvalues
+      es2 = algebra.eigvalsh(hkgen(k2)) # eigenvalues
       return np.min(es1[es1>0.])-np.max(es2[es2<0.]) # return gap
     x0 = np.random.random(dim*2) # random point
     bounds = [(0,1.) for i in range(2*dim)] # bounds
@@ -148,18 +152,23 @@ def indirect_gap(h):
   hk_gen = h.get_hk_gen() # generator
   def gete(k): # return the energies
     hk = hk_gen(k) # Hamiltonian 
-    if h.is_sparse: es,ew = lgs.eigsh(hk,k=10,which="LM",sigma=0.0,tol=1e-06)
-    else: es = lg.eigvalsh(hk) # get eigenvalues
+    if h.is_sparse: es = algebra.smalleig(hk,numw=10) # sparse
+    else: es = algebra.eigvalsh(hk) # get eigenvalues
     return es # get the energies
   # We will assume that the chemical potential is at zero
   def func(k): # conduction band eigenvalues
     es = gete(k) # get eigenvalues
     es = es[es>0.] # conduction band
-    return min(es) # minimum energy
+    return np.min(es) # minimum energy
   def funv(k): # valence band eigenvalues
     es = gete(k) # get eigenvalues
     es = -es[es<0.] # valence band
-    return min(es) # maximum energy
+    return np.min(es) # maximum energy
+  def funcv(k): # valence band eigenvalues
+    es = gete(k) # get eigenvalues
+    ec = np.min(es[es>0.0]) # conduction band
+    ev = np.min(-es[es<0.0]) # valence band
+    return ec+ev # energy difference
   def opte(f):
     """Optimize the eigenvalues"""
     from scipy.optimize import differential_evolution

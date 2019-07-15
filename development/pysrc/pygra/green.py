@@ -199,11 +199,26 @@ def write_matrix(f,g):
   fw.close()   # close file
 
 
+# detect non vanishing elements of a matrix
+def nv_el(m):
+  """ get the non vanishing elments of a matrix"""
+  from scipy.sparse import csc_matrix as csc
+  mc = csc(m) # to coo_matrixi
+  mc.eliminate_zeros()
+  mc = mc.tocoo()
+  data = mc.data # get data
+  col = mc.col # get column index
+  row = mc.row # get row index
+  nv = []
+  nt=len(data)
+  for i in range(nt):
+   # save the nonvanishing values
+   nv.append([row[i]+1,col[i]+1,data[i].real,data[i].imag])
+  return nv
 
 
 def write_sparse(f,g):
   """ Write a sparse matrix in a file"""
-  from .input_tb90 import nv_el
   fw = open(f,"w") # open the file
   fw.write("# dimension = "+str(g.shape[0])+"\n")
   nv=nv_el(g)
