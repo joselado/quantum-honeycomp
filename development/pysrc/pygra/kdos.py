@@ -145,21 +145,35 @@ def write_surface_3d(h,energies=None,klist=None,delta=0.01):
 
 
 
-def kdos_bands(h,use_kpm=True,kpath=None,scale=10.0,frand=None,
-                 ewindow=4.0,ne=1000,delta=0.01,ntries=10):
+def kdos_bands(h,use_kpm=False,kpath=None,scale=10.0,frand=None,
+                 ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100,
+                 operator=None,energies=np.linspace(-3.0,3.0,200)):
   """Calculate the KDOS bands using the KPM"""
-  if not use_kpm: raise # nope
-  hkgen = h.get_hk_gen() # get generator
-  if kpath is None: kpath = klist.default(h.geometry) # default
-  fo = open("KDOS_BANDS.OUT","w") # open file
-  ik = 0
-  tr = timing.Testimator("KDOS") # generate object
-  for k in kpath: # loop over kpoints
-    tr.remaining(ik,len(kpath))
-    hk = hkgen(k) # get Hamiltonian
-    npol = int(scale/delta) # number of polynomials
-    (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,frand=frand,
+  if not use_kpm: # conventional method
+    f = h.get_gk_gen(delta=delta) # Green generator
+    def pfun(k): # do it for this k-point
+        def gfun(e):
+            m = f(k=k,e=e) # Green's function
+            m = green.GtimesO(m,operator,k=k)
+            return -np.trace(m).imag # return DOS
+        return energies,np.array([gfun(e) for e in energies])
+  else:
+    if operator is not None: raise # not implemented
+    hkgen = h.get_hk_gen() # get generator
+    def pfun(k): # do it for this k-point
+      hk = hkgen(k) # get Hamiltonian
+      npol = int(scale/delta) # number of polynomials
+      (x,y) = kpm.tdos(hk,scale=scale,npol=npol,ne=ne,frand=frand,
                    ewindow=ewindow,ntries=ntries) # compute
+      return (x,y)
+  if kpath is None: 
+      kpath = klist.default(h.geometry,nk=nk) # default
+  ### Now compute and write in a file
+  ik = 0
+  out = parallel.pcall(pfun,kpath) # compute all
+  fo = open("KDOS_BANDS.OUT","w") # open file
+  for k in kpath: # loop over kpoints
+    (x,y) = out[ik] # get this one
     for (ix,iy) in zip(x,y): # loop
       fo.write(str(ik/len(kpath))+"   ")
       fo.write(str(ix)+"   ")

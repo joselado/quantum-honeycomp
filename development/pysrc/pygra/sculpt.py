@@ -88,7 +88,7 @@ def circle(r=1.0,out=False):
 def rotate(g,angle):
   """ Rotates a geometry"""
   if np.abs(angle)<0.0000001: 
-    print("No rotation performed")
+#    print("No rotation performed")
     return g
   phi = angle
   go = g.copy()

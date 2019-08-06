@@ -130,7 +130,19 @@ def is_number(s):
         return False
 
 
-def add_inplane_bfield(h,b=0.0,phi=0.0):
+
+
+def add_inplane_bfield(h,**kwargs):   add_bfield(h,mode="inplane",**kwargs)
+def add_offplane_bfield(h,**kwargs):   add_bfield(h,mode="offplane",**kwargs)
+
+def add_peierls(h,mag_field,**kwargs):
+    add_offplane_bfield(h,b=mag_field*2)
+
+
+
+
+
+def add_bfield(h,b=0.0,phi=0.0,mode="inplane"):
     """Add an in-plane magnetic field"""
     if h.dimensionality>2: raise # not implemented
     if h.has_spin: gi = lambda i: i//2
@@ -141,15 +153,17 @@ def add_inplane_bfield(h,b=0.0,phi=0.0):
     sphi = np.sin(phi*np.pi)
     g = h.geometry # get geometry
     r = g.r # get positions
+    def get_phase(r,dr):
+        if mode=="inplane": return 2*r[2]*(dr[0]*sphi - dr[1]*cphi)
+        elif mode=="offplane": return r[1]*dr[0]/2.
     def add_phase(m,r1,r2): # add the phase
         mo = coo_matrix(m) # convert to coo matrix
         data = mo.data +0.0j
         k = 0
         for (i,j,d) in zip(mo.row,mo.col,mo.data): # loop
-            z = r1[gi(i)][2] + r2[gi(j)][2]
-            dx = r1[gi(i)][0] - r2[gi(j)][0]
-            dy = r1[gi(i)][1] - r2[gi(j)][1]
-            p = z*(dx*sphi - dy*cphi)
+            r = (r1[gi(i)] + r2[gi(j)])/2.
+            dr = r1[gi(i)] - r2[gi(j)]
+            p = get_phase(r,dr)
             data[k] *= np.exp(1j*b*p)
             k += 1
         out = csc_matrix((data,(mo.row,mo.col)),shape=mo.shape) 

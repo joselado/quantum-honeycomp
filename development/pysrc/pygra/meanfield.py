@@ -230,6 +230,12 @@ def guess(h,mode="ferro",fun=0.01):
   h0.clean() # clean the Hamiltonian
   if mode=="ferro":
     h0.add_zeeman(fun)
+  elif mode=="ferroX":
+    h0.add_zeeman([fun,0.,0.])
+  elif mode=="ferroY":
+    h0.add_zeeman([0.,fun,0.])
+  elif mode=="ferroZ":
+    h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
     h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
   elif mode=="CDW":

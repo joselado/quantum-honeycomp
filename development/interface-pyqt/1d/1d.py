@@ -149,7 +149,16 @@ def show_magnetism():
   common.show_exchange(h,qtwrap)
 
 
-
+def show_ldos():
+  h = pickup_hamiltonian() # get the Hamiltonian
+  ew = abs(qtwrap.get("ldos_ewindow"))
+  energies = np.linspace(-ew,ew,200)
+  delta = qtwrap.get("ldos_delta")
+  nk = int(qtwrap.get("ldos_nk"))
+  name = qtwrap.getbox("ldos_operator")
+  ldos.spatial_energy_profile(h,operator=h.get_operator(name),
+          nk=nk,delta=delta,energies=energies)
+  execute_script('qh-map2d --input DOSMAP.OUT --xlabel Energy --ylabel "y-position" --zlabel DOS --title "Local DOS"')
   
 
 
@@ -209,6 +218,7 @@ signals["show_structure"] = show_structure  # show bandstructure
 signals["show_dos"] = show_dos  # show DOS
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_multildos"] = show_multildos  # show DOS
+signals["show_ldos"] = show_ldos  # show DOS
 signals["show_structure_3d"] = show_structure_3d
 signals["show_magnetism"] = show_magnetism 
 signals["solve_scf"] = solve_scf

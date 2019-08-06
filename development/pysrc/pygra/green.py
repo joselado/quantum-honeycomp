@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 import scipy.linalg as lg
 from . import multicell
+from . import algebra
 
 
 #try:
@@ -717,6 +718,18 @@ def green_operator(h0,operator,e=0.0,delta=1e-3,nk=10):
       g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0] 
       out = -(np.array(g)@operator).trace().imag
     return out
+
+
+
+def GtimesO(g,o,k=[0.,0.,0.]):
+    """Green function times operator"""
+    o = algebra.todense(o) # convert to dense operator if possible
+    if o is None: return g # return Green function
+    elif type(o)==type(g): return g@o # return
+    elif callable(o): return o(g,k=k) # call the operator
+    else:
+        print(type(g),type(o))
+        raise
 
 
 

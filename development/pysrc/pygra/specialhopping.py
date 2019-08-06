@@ -1,9 +1,17 @@
 import numpy as np
 from scipy.sparse import csc_matrix
 
+try:
+    from . import specialhoppingf90
+    use_fortran=True
+except:
+    use_fortran=False
+    print("FORTRAN not working in specialhopping")
+
+
 
 def twisted(cutoff=5.0,ti=0.3,lambi=8.0,
-        lamb=12.0,dl=3.0,lambz=10.0):
+        lamb=12.0,dl=3.0,lambz=10.0,b=0.0,phi=0.0):
   """Hopping for twisted bilayer graphene"""
   cutoff2 = cutoff**2 # cutoff in distance
   def fun(r1,r2):
@@ -21,32 +29,44 @@ def twisted(cutoff=5.0,ti=0.3,lambi=8.0,
       raise
     out = -(dx*dx + dy*dy)/rr*np.exp(-lamb*(r-1.0))*np.exp(-lambz*dz*dz)
     out += -ti*(dz*dz)/rr*np.exp(-lambi*(r-dl))
+    #### fix for magnetic field
+    cphi = np.cos(phi*np.pi)
+    sphi = np.sin(phi*np.pi)
+    r = (r1+r2)/2.
+    dr = r1-r2
+    p = 2*r[2]*(dr[0]*sphi - dr[1]*cphi)
+    out *= np.exp(1j*b*p)
+    #####
     return out
   return fun
 
 
-def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,lamb=12.0,dl=3.0,lambz=10.0):
+def twisted_matrix(cutoff=5.0,ti=0.3,lambi=8.0,
+        lamb=12.0,dl=3.0,lambz=10.0,**kwargs):
   """Function capable of returning the hopping matrix
   for twisted bilayer graphene"""
-  try: # use fortran routine
+  if use_fortran:
     from . import specialhoppingf90
     def funhop(r1,r2):
       """Function that returns a hopping matrix"""
       nr = len(r1) # 
       nmax = len(r1)*100 # maximum number of hoppings
       (ii,jj,ts,nout) = specialhoppingf90.twistedhopping(r1,r2,nmax,
-                                  cutoff,ti,lamb,lambi,lambz,1e-3,dl)
-      ts = -ts[0:nout]
+                                  cutoff,ti,lamb,lambi,lambz,1e-10,dl)
+      if nout>nmax: raise # sanity check
+      ts = ts[0:nout]
       ii = ii[0:nout]
       jj = jj[0:nout]
       out = csc_matrix((ts,(ii-1,jj-1)),shape=(nr,nr),dtype=np.complex) # matrix
       return out
-  except:
-    print("FORTRAN not working in specialhopping")
+  else:
+    print("Using Python function in twisted")
     def funhop(r1,r2):
-      fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb,dl=dl)
-      m = np.matrix([[fh(r1i,r2j) for r1i in r1] for r2j in r2])
-      return csc_matrix(m,dtype=np.complex)
+      fh = twisted(cutoff=cutoff,ti=ti,lambi=lambi,lamb=lamb,dl=dl,**kwargs)
+      m = np.array([[fh(r1i,r2j) for r1i in r1] for r2j in r2],dtype=np.complex)
+      m = csc_matrix(m,dtype=np.complex).T
+      m.eliminate_zeros()
+      return m
 #      raise
   return funhop # function
 

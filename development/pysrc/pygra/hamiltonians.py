@@ -102,7 +102,7 @@ class hamiltonian():
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
       if operator is not None: hk = operator.H@hk@operator # project
-      out = (np.identity(hk.shape[0])*(e+1j*delta) - hk).I 
+      out = lg.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
 #      print(self.geometry.frac_r) 
 #      exit()
       return out
@@ -460,7 +460,8 @@ class hamiltonian():
       clean_hamiltonian(self)
   def get_operator(self,name,projector=False):
       """Return a certain operator"""
-      if name=="sx": return operators.get_sx(self)
+      if name=="None": return None
+      elif name=="sx": return operators.get_sx(self)
       elif name=="sy": return operators.get_sy(self)
       elif name=="sz": return operators.get_sz(self)
       elif name=="current": 

@@ -20,6 +20,7 @@ arpack_maxiter = 10000
 def write_berry(h,kpath=None,dk=0.01,window=None,max_waves=None,
       mode="Wilson",delta=0.001,reciprocal=False,operator=None):
   """Calculate and write in file the Berry curvature"""
+  operator = get_operator(h,operator)
   if kpath is None: kpath = klist.default(h.geometry) # take default kpath
   tr = timing.Testimator("BERRY CURVATURE")
   ik = 0
@@ -538,26 +539,27 @@ def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None):
 #  return np.sum([fint(e) for e in es]) # return
 
 
-
-def berry_density(h,delta=0.002,es=np.linspace(-3.0,3.0,100),nk=100,
-                     dk = 0.02):
-  """Write in a file an energy map of the Berry curvature"""
-  f = h.get_gk_gen(delta=delta)
-  ks = [np.random.random(3) for i in range(nk)] # random kpoints
-  out = [] # empty list
-  from scipy import integrate
-  for e in es:
-    def fint(kx,ky): # function to integrate
-      k = [kx,ky,0.]
-      fint2 = berry_green_generator(f,k=k,dk=dk) # get the function
-      return fint2(e)
-    o = integrate.dblquad(fint, 0, 1, lambda x: 0, lambda x: 1,epsabs=10.0,
-                epsrel=10.0)[0]
-    print(e,o)
-    out.append(o)
-  np.savetxt("BERRY_DENSITY.OUT",np.matrix([es,out]).T) 
-  return (es,outm)
-
+#
+#def berry_frequency_density(h,delta=0.002,
+#        energies=np.linspace(-3.0,3.0,100),nk=10,dk=1e-1,
+#                     **kwargs):
+#  """Write in a file an energy map of the Berry curvature"""
+#  f = h.get_gk_gen(delta=delta)
+#  def pfun(e):
+#    def fint(k): # function to integrate
+#      fint2 = berry_green_generator(f,k=k,dk=dk,**kwargs) # get the function
+#      return fint2(e).real
+##    o = integrate.dblquad(fint, 0, 1, lambda x: 0, lambda x: 1,epsabs=10.0,
+##                epsrel=10.0)[0]
+#    ks=klist.kmesh(h.dimensionality,nk)
+#    o = np.mean([fint(k) for k in ks])
+#    print("Doing",e,o)
+#    return o
+#  out = parallel.pcall(pfun,energies) # parallel calculation
+#  out = np.array(out)
+#  np.savetxt("BERRY_FREQUENCY_DENSITY.OUT",np.matrix([energies,out]).T) 
+#  return (energies,out)
+#
 
 
 
@@ -668,7 +670,7 @@ def chern_density(h,nk=10,operator=None,delta=0.02,dk=0.02,
   def fp(k): # compute berry curvatures
     if parallel.cores==1: tr.iterate()
     else: print(k)
-    k = np.random.random(3)
+#    k = np.random.random(3)
     fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=False) 
     return np.array([fgreen(e).real for e in es])
   out = parallel.pcall(fp,ks) # compute everything
@@ -687,3 +689,20 @@ def chern_density(h,nk=10,operator=None,delta=0.02,dk=0.02,
 
 
 hall_conductivity = chern
+
+
+
+
+def get_operator(h,op):
+    """ Wrapper for operators """
+    if op is None: return None
+    if type(op)==str: # string
+        if op=="valley": return h.get_operator("valley",projector=True) 
+        else: return h.get_operator("valley",projector=True) 
+    if callable(op): return op # function
+    if type(op)==np.array: return op
+
+
+
+
+

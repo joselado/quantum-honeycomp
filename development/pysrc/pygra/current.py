@@ -13,12 +13,14 @@ def current_operator(h0):
   if h.dimensionality == 0: return None
   elif h.dimensionality == 1:
     if not h.is_multicell: # no multicell
-      def fj(k):
+      def fj(k0):
+        k = k0[0]
         phik = np.exp(1j*2.*np.pi*k) # complex phase
         jk = 1j*(h.inter*phik - h.inter.H*np.conjugate(phik)) 
         return jk
     else: # multicell Hamiltonian
-      def fj(k):
+      def fj(k0):
+        k = k0[0]
         jk = h.intra*0. # initialize
         for t in h.hopping:
           phik = np.exp(1j*2.*np.pi*k*t.dir[0]) # complex phase

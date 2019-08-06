@@ -120,8 +120,8 @@ def get_pairing(h,ptype="s"):
 
 def get_electron(h):
   """Operator to project on the electron sector"""
-  if h.has_eh:
-      return csc_matrix(np.identity(h.intra.shape))
+  if not h.has_eh:
+      return np.identity(h.intra.shape[0])
   else: # only for e-h systems
       op = superconductivity.proje
       r = h.geometry.r
@@ -428,9 +428,14 @@ def get_valley_taux(h,projector=False):
     else: return lambda wf,k=None: braket_wAw(wf,hk3(k)) # return number
 
 
-
-
-
+def get_operator(op,k=[0.,0.,0.],h=None):
+    """Get a function that acts as an operator"""
+    if op is None: return None
+    if callable(op): 
+        return lambda v: op(v,k=k) # assume it yields a number
+    if type(op) is np.array: 
+        return lambda v: braket_wAw(v,op) # assume it yields a matrix
+    else: raise
 
 
 
