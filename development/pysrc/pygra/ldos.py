@@ -398,7 +398,7 @@ def ldos_defect(h,v,e=0.0,delta=0.001,n=1):
   rep = 2*n +1
   # calculate pristine green function
   g,selfe = green.supercell_selfenergy(h,e=e,delta=delta,nk=100,nsuper=rep)
-  # now calculate defected green function 
+  # now calculate defective green function 
   ez = e + 1j*delta # complex energy
   emat = np.matrix(np.identity(len(g)))*ez  # E +i\delta 
   from . import supercell

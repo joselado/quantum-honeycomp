@@ -8,6 +8,7 @@ def get_operator(h,opname,projector=False):
     """Return an operator"""
     if opname=="None": op = None # no operators
     elif opname=="Sx": op = h.get_operator("sx") # off plane case
+    elif opname=="Berry": op = h.get_operator("berry") # off plane case
     elif opname=="Sy": op = h.get_operator("sy")# off plane case
     elif opname=="Sz": op = h.get_operator("sz")# off plane case
     elif opname=="Valley": op = h.get_operator("valley",projector=projector)

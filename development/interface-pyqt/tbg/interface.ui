@@ -235,6 +235,11 @@
               <string>Layer</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Berry</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

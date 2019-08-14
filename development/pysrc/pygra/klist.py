@@ -4,6 +4,66 @@ import numpy as np
 import scipy.linalg as lg
 from . import geometry
 
+
+def get_klist(g,ns,nk=100):
+    """Return a klist from a list of names"""
+    # generate dictionary
+    kdict = dict()
+    kdict["G"] = [0.,0.,0.]
+    if np.abs(g.a1.dot(g.a2))<0.001: # square lattice
+      kdict["X"] = [0.5,0.,0.]
+      kdict["Y"] = [0.,0.5,0.]
+      kdict["M"] = [0.5,0.5,0.]
+    else: # triangular lattice
+      angle = py_ang(g.a1,g.a2) # angle between vectors
+      kdict["M1"] = [1./2.,1./2.,0.]
+      kdict["M2"] = [0.,1./2.,0.]
+      kdict["M3"] = [1./2.,0.,0.]
+      if np.abs(angle - np.pi*2./3.)<0.001: # first type
+        kdict["K"] = [1./3.,1./3.,0.]
+        kdict["K'"] = [2./3.,2./3.,0.]
+        kdict["M"] = [1./2.,0.,0.]
+      else: # second type
+        kdict["K"] = [1./3.,-1./3.,0.]
+        kdict["K'"] = [2./3.,-2./3.,0.]
+        kdict["M"] = [1./2.,0.,0.]
+    # create the different vertex
+    kv = np.array([kdict[n] for n in ns]) # get the different ones
+    # create the different k-points
+    ks = [] # empty list
+    kinds = [0] # initial one
+    for i in range(len(ns)-1): # loop over vertex
+        kn = kv[i+1]-kv[i] # vector linking the two
+        k0 = kv[i] # first vector
+        knorm = np.sqrt(kn.dot(kn)) # norm
+        nki = int(nk*knorm) # number of points
+        kinds.append(nki+sum(kinds)) # store
+        dk = np.linspace(0.,1.,nki,endpoint=False) # create increment
+        for ik in dk:
+            ks.append(k0 + ik*kn) # new vector
+    ks.append(kv[len(ns)-1]) # last one
+    fbl = open("BANDLINES.OUT","w")
+    for i in range(len(ns)): 
+        fbl.write(str(kinds[i])+" "+ns[i]+"\n")
+
+    return ks # return vector
+
+
+
+
+
+def py_ang(v1, v2):
+  """ Returns the angle in radians between vectors 'v1' and 'v2'    """
+  cosang = np.dot(v1, v2)
+  sinang = lg.norm(np.cross(v1, v2))
+  return np.arctan2(sinang, cosang)
+
+
+
+
+
+
+
 def default(g,nk=400):
   """ Input is geometry"""
   if g.dimensionality==0: return [0.] # return gamma point

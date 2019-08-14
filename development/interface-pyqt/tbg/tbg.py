@@ -33,6 +33,7 @@ qtwrap.set_combobox("multilayer_type",
             "Aligned trilayer ABC",
             "Twisted trilayer 010",
             "Twisted trilayer 001"
+            ,"Twisted tetralayer 0101"
             ,"Twisted bi-bilayer AB AB"
             ,"Twisted bi-bilayer AB BA"
             ,"Twisted bi-trilayer ABC"
@@ -54,6 +55,8 @@ def get_geometry(modify=True):
     g = specialgeometry.twisted_multilayer(n,rot=[0],g=gb,dz=6.0)
   elif name=="Twisted trilayer 010":
     g = specialgeometry.twisted_multilayer(n,rot=[0,1,0])
+  elif name=="Twisted tetralayer 0101":
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1,0,1])
   elif name=="Twisted trilayer 001":
     g = specialgeometry.twisted_multilayer(n,rot=[0,0,1])
   elif name=="Twisted bi-bilayer AB AB":

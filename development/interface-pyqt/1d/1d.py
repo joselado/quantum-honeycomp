@@ -152,7 +152,7 @@ def show_magnetism():
 def show_ldos():
   h = pickup_hamiltonian() # get the Hamiltonian
   ew = abs(qtwrap.get("ldos_ewindow"))
-  energies = np.linspace(-ew,ew,200)
+  energies = np.linspace(-ew,ew,100)
   delta = qtwrap.get("ldos_delta")
   nk = int(qtwrap.get("ldos_nk"))
   name = qtwrap.getbox("ldos_operator")

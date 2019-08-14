@@ -18,6 +18,7 @@ from . import kekule
 from . import algebra
 from . import groundstate
 from . import rotate_spin
+from . import topology
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -56,12 +57,9 @@ class hamiltonian():
     es = np.array(es)
     esf = es[es<energy]
     return len(esf)/len(es) # return filling
-  def set_filling(self,filling=0.5,nk=10,extrae=0.):
+  def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
-    es = spectrum.eigenvalues(self,nk=nk)
-    from .scftypes import get_fermi_energy
-    fill = filling + extrae/self.intra.shape[0] # filling
-    self.shift_fermi(-get_fermi_energy(es,fill)) # shift the fermi energy
+    spectrum.set_filling(self,filling=filling,**kwargs)
   def __init__(self,geometry=None):
     self.data = dict() # empty dictionary with various data
     self.has_spin = True # has spin degree of freedom
@@ -458,9 +456,10 @@ class hamiltonian():
       """Clean a Hamiltonian"""
       from .clean import clean_hamiltonian
       clean_hamiltonian(self)
-  def get_operator(self,name,projector=False):
+  def get_operator(self,name,projector=False,**kwargs):
       """Return a certain operator"""
       if name=="None": return None
+      elif name=="berry": return topology.berry_operator(self,**kwargs)
       elif name=="sx": return operators.get_sx(self)
       elif name=="sy": return operators.get_sy(self)
       elif name=="sz": return operators.get_sz(self)

@@ -317,6 +317,11 @@
             </item>
             <item>
              <property name="text">
+              <string>Berry</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Sx</string>
              </property>
             </item>

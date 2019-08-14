@@ -89,7 +89,7 @@ def ket_Aw(A,w):
 
 def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
                     callback=None,central_energy=0.0,nk=400,
-                    output_file="BANDS.OUT"):
+                    output_file="BANDS.OUT",write=True):
   """
   Get an n-dimensional bandstructure
   """
@@ -156,19 +156,26 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
     return out # return string
   ### Now evaluate the function
   from . import parallel
-  f = open(output_file,"w") # open bands file
+  if write: f = open(output_file,"w") # open bands file
   if parallel.cores==1: ### single thread ###
     tr = timing.Testimator("BANDSTRUCTURE") # generate object
+    esk = "" # empty list
     for k in range(len(kpath)): # loop over kpoints
       tr.remaining(k,len(kpath)) # estimate of the time
-      f.write(getek(k)) # write this kpoint
-      f.flush() # flush in file
+      ek = getek(k)
+      esk += ek # store
+      if write: f.write(ek) # write this kpoint
+      if write: f.flush() # flush in file
   else: # parallel run
       esk = parallel.pcall(getek,range(len(kpath))) # compute all
-      for e in esk: f.write(e)
-  f.close()
+      esk = "".join(esk) # concatenate all
+      if write: f.write(esk)
+  if write: f.close()
   print("\nBANDS finished")
-  return np.genfromtxt(output_file).transpose() # return data
+  esk = esk.split("\n") # split
+  del esk[-1] # remove last one
+  esk = np.array([[float(i) for i in ek.split()] for ek in esk]).T
+  return esk # return data
 
 
 
