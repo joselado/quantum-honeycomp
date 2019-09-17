@@ -33,7 +33,7 @@ def turn_multicell(h):
   hoppings = [] # list of hoppings
   # directions
   dirs = []
-  if h.dimensionality == 0: return ho # two dimensional
+  if h.dimensionality == 0: ts = []
   elif h.dimensionality == 1: # one dimensional
     dirs.append(np.array([1,0,0]))
     ts = [h.inter.copy()]
@@ -95,7 +95,7 @@ def hk_gen(h):
       if np.sum(np.abs(coo_matrix(t.m).data))>1e-7: hopping.append(t) # store this hopping
     else:
       if np.sum(np.abs(t.m))>1e-7: hopping.append(t) # store this hopping
-  if h.dimensionality == 0: return h.intra
+  if h.dimensionality == 0: return lambda k: h.intra
   elif h.dimensionality == 1: # one dimensional
     def hk(k):
       """k dependent hamiltonian, k goes from 0 to 1"""

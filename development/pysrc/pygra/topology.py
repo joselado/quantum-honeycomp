@@ -509,13 +509,13 @@ def berry_green_generator(f,k=[0.,0.,0.],dk=0.05,operator=None,
     gym = f(e=e,k=k-dy) # compute at this k and this energy
     g = (gxp + gyp + gxm + gym)/4. # average Green function
     # Now apply the formula
-    gI = lg.inv(g) # inverse
+    gI = g.I # inverse
     omega = ((gxp-gxm)@(gyp-gym) - (gyp-gym)@(gxp-gxm))@gI
 #    omega = g*((gxp.I-gxm.I)*(gyp-gym) -(gyp.I-gym.I)*(gxp-gxm))
 #    omega += -g*(gyp.I-gym.I)*(gxp-gxm)
     if operator is not None: omega = operator(omega,k=k) 
     if full: return omega/(4.*dk*dk*2.*np.pi) # return the full matrix
-    else: return np.trace(omega)/(4.*dk*dk*2.*np.pi) # return contribution
+    else: return omega.trace()[0,0]/(4.*dk*dk*2.*np.pi) # return contribution
   return fint # return the function
 
 
@@ -539,21 +539,28 @@ def berry_green(f,emin=-10.0,k=[0.,0.,0.],ne=100,dk=0.0001,operator=None):
 #  return np.sum([fint(e) for e in es]) # return
 
 
-def berry_operator(h,delta=1e-1,**kwargs):
-    """Return ap operator that computes the Berry curvature for a certain
-    wavefunction"""
-    if h.dimensionality!=2: raise
-    h = h.copy()
-    h.turn_dense()
-    hk = h.get_hk_gen() # get generator
-    gk = h.get_gk_gen(delta=delta) # get generator
-    def bk(k): return berry_green_generator(gk,k=k,**kwargs) # berry gen
-    def outf(w,k=[0.,0.,0.]):
-        m = hk(k) # bloch Hamiltonian
-        e = algebra.braket_wAw(w,m) # energy
-        o = bk(k)(e).real*delta # Berry curvature
-        return o
-    return outf
+#
+#def berry_frequency_density(h,delta=0.002,
+#        energies=np.linspace(-3.0,3.0,100),nk=10,dk=1e-1,
+#                     **kwargs):
+#  """Write in a file an energy map of the Berry curvature"""
+#  f = h.get_gk_gen(delta=delta)
+#  def pfun(e):
+#    def fint(k): # function to integrate
+#      fint2 = berry_green_generator(f,k=k,dk=dk,**kwargs) # get the function
+#      return fint2(e).real
+##    o = integrate.dblquad(fint, 0, 1, lambda x: 0, lambda x: 1,epsabs=10.0,
+##                epsrel=10.0)[0]
+#    ks=klist.kmesh(h.dimensionality,nk)
+#    o = np.mean([fint(k) for k in ks])
+#    print("Doing",e,o)
+#    return o
+#  out = parallel.pcall(pfun,energies) # parallel calculation
+#  out = np.array(out)
+#  np.savetxt("BERRY_FREQUENCY_DENSITY.OUT",np.matrix([energies,out]).T) 
+#  return (energies,out)
+#
+
 
 
 def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
