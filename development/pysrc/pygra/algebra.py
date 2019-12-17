@@ -1,4 +1,4 @@
-from scipy.sparse import issparse
+from scipy.sparse import issparse,bmat
 from scipy.sparse import csc_matrix as csc
 import scipy.linalg as dlg
 import scipy.sparse.linalg as slg
@@ -6,6 +6,32 @@ import numpy as np
 from .algebratk import sparsetensor
 
 maxsize = 10000
+
+
+def hermitian(m):
+    return np.transpose(np.conjugate(m))
+
+H = hermitian # alias
+
+
+
+def inv(m):
+    return dlg.inv(todense(m))
+
+
+def trace(m):
+    return np.trace(m)
+
+def dagger(m):
+    return np.conjugate(np.transpose(m))
+
+
+def densebmat(ms):
+    """Turn a block matrix dense"""
+    ms = [[todense(mi) for mi in mij] for mij in m]
+    return todense(bmat(ms)) # return block matrix
+
+
 
 def braket_wAw(w,A,wi=None):
   """

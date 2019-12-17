@@ -28,8 +28,8 @@ class Hopping():
 
 def turn_multicell(h):
   """Transform a normal hamiltonian into a multicell hamiltonian"""
+  if h.is_multicell: return h # if it is already multicell
   ho = h.copy() # copy hamiltonian
-  if ho.is_multicell: return ho # if it is already multicell
   hoppings = [] # list of hoppings
   # directions
   dirs = []
@@ -298,37 +298,7 @@ def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
 
 
 
-def derivative(h,k,order=[1,0]):
-  """Calculate the derivative of the Hamiltonian"""
-  if derivative < 1: raise
-  if h.is_multicell==False: raise
-  if h.dimensionality == 0: return None
-  if h.dimensionality == 1: # one dimensional
-      mout = h.intra*0.0 # initialize
-      for t in h.hopping: # loop over matrices
-        phi = t.dir[0]*k # phase
-        pref = (dir[0]*1j)**order[0] # prefactor
-        tk = t*pref*t.m * np.exp(1j*np.pi*2.*phi) # k hopping
-        mout = mout + tk # add contribution
-      return mout
-  if h.dimensionality == 2: # two dimensional
-      k = np.array([k[0],k[1]]) # convert to array
-      mout = h.intra*0.0 # initialize
-      for t in h.hopping: # loop over matrices
-        d = t.dir
-        d = np.array([d[0],d[1]]) # vector director of hopping
-        phi = d.dot(k) # phase
-        pref1 = (d[0]*1j)**order[0] # prefactor
-        pref2 = (d[1]*1j)**order[1] # prefactor
-        pref = pref1*pref2 # total prefactor
-        tk = pref*t.m * np.exp(1j*np.pi*2.*phi) # derivative of the first
-        mout = mout + tk # add to the hamiltonian
-      return mout
-
-
-
-
-
+from .current import derivative
 
 
 

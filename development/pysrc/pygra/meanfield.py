@@ -237,7 +237,8 @@ def guess(h,mode="ferro",fun=0.01):
   elif mode=="ferroZ":
     h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
-    h0.add_magnetism([np.random.random(3)-0.5 for i in h.geometry.r])
+    n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
+    return m
   elif mode=="CDW":
     h0.add_onsite(h.geometry.sublattice)
   elif mode=="potential":

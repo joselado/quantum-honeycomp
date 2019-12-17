@@ -32,7 +32,7 @@ def add_peierls(h,mag_field=0.0,new=False):
   celldis = np.sqrt(a1.dot(a1))
   from numpy import array
   norb = h.intra.shape[0]  # number of orbitals
-
+  if h.is_multicell: raise
   if new:
     print("New method to calculate peierls")
     g = h.geometry # geometry

@@ -113,6 +113,27 @@ def hopping_spinless(m,cutoff=0.001):
 
 
   
+def extract_from_hamiltonian(self,name):
+    """Extract a quantity from a Hamiltonian"""
+    if name=="density":
+      if self.has_eh: raise # not implemented
+      return onsite(self.intra,has_spin=self.has_spin)
+    elif name=="mx" and self.has_spin:
+      if self.has_eh: raise # not implemented
+      return mx(self.intra)
+    elif name=="swave":
+        if self.check_mode("spinful_nambu"): return swave(self.intra)
+        elif self.check_mode("spinless_nambu"): 
+            from .sctk import spinless
+            return spinless.extract_swave(self.intra)
+        else: raise
+    elif name=="my" and self.has_spin:
+      if self.has_eh: raise # not implemented
+      return my(self.intra)
+    elif name=="mz" and self.has_spin:
+      if self.has_eh: raise # not implemented
+      return mz(self.intra)
+    else: raise
 
 
 

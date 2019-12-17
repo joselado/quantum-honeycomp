@@ -3,9 +3,11 @@ from . import parallel
 from . import algebra
 from . import magnetism
 
-def dominant_correlation(h0,filling=0.5,dm=1e-1,write=False):
+def dominant_correlation(h0,filling=0.5,dm=1e-1,
+        write=False,**kwargs):
     """Compute the dominant magnetic correlator"""
     h = h0.copy() # copy hamiltonian
+    h.turn_dense()
     h.set_filling(filling) # set the desired filling
     if not h.has_spin: raise # only for spinful
     n = len(h.geometry.r) # number of sites
@@ -14,8 +16,9 @@ def dominant_correlation(h0,filling=0.5,dm=1e-1,write=False):
         ms = [[0.,0.,0.] for j in range(n)]
         ms[ii] = [0.,0.,dm] # perturbation
         magnetism.add_magnetism(hi,ms) # add local exchange fields
-        hi.set_filling(filling) # set the desired filling
-        out = hi.compute_vev("sz",delta=dm/2.) # compute magnetization
+        hi.set_filling(filling,**kwargs) # set the desired filling
+        print("Done correlator site",ii)
+        out = hi.compute_vev("sz",delta=dm/2.,**kwargs) # compute magnetization
         return -np.array(out)/dm # return output
     out = parallel.pcall(getrow,range(n)) # perform all the computations
     from . import rkky
@@ -30,3 +33,11 @@ def dominant_correlation(h0,filling=0.5,dm=1e-1,write=False):
     if write: h.geometry.write_profile(chi,name="CHI_PROFILE.OUT")
     return chi
 
+
+
+
+
+
+
+
+#def magnetic_chi_ij_perturation_theory(h0,filling=0.5,dm=1e-1,write=False)

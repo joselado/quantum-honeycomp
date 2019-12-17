@@ -135,7 +135,7 @@ def get_magnetization(h,nkp=20):
   """Return the magnetization of the system"""
   totkp = nkp**(h.dimensionality)
   nat = h.intra.shape[0]//2 # number of atoms
-  eigvals,eigvecs = h.eigenvectors(nkp)
+  eigvals,eigvecs = h.get_eigenvectors(nk=nkp)
   voccs = [] # accupied vectors
   eoccs = [] # accupied eigenvalues
   occs = [] # accupied eigenvalues

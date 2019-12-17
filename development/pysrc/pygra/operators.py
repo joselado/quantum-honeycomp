@@ -7,6 +7,8 @@ from .superconductivity import build_eh
 import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
+from . import algebra
+from . import topology
 from . import superconductivity
 from .algebra import braket_wAw
 
@@ -22,6 +24,23 @@ def index(h,n=[0]):
   return h.spinless2full(m) # return matrix
 
 
+
+def rfunction2operator(h,f):
+    """Given a function that takes a position, return the operator"""
+    n = len(h.geometry.r)
+    val = [f(ri) for ri in h.geometry.r]
+    inds = range(n)
+    m = csc((val,(inds,inds)),shape=(n,n),dtype=np.complex)
+    return h.spinless2full(m) # return matrix
+
+
+def density2operator(h,d):
+    """Given a function that takes a position, return the operator"""
+    n = len(h.geometry.r)
+    if len(d)!=n: raise
+    inds = range(n)
+    m = csc((d,(inds,inds)),shape=(n,n),dtype=np.complex)
+    return h.spinless2full(m) # return matrix
 
 
 
@@ -122,13 +141,17 @@ def get_electron(h):
   """Operator to project on the electron sector"""
   if not h.has_eh:
       return np.identity(h.intra.shape[0])
-  else: # only for e-h systems
+  elif h.check_mode("spinful_nambu"): # only for e-h systems
       op = superconductivity.proje
       r = h.geometry.r
       out = [[None for ri in r] for rj in r]
       for i in range(len(r)): # loop over positions
         out[i][i] = op
       return bmat(out)
+  elif h.check_mode("spinless_nambu"):
+      from .sctk import spinless
+      return spinless.proje(h.intra.shape[0])
+  else: raise
 
 
 def get_hole(h):
@@ -276,10 +299,23 @@ def get_sublattice(h,mode="both"):
 
 def get_velocity(h):
   """Return the velocity operator"""
-  vk = current.current_operator(h)
-  def f(w,k=[0.,0.,0.]):
-    return braket_wAw(w,vk(k)).real
-  return f
+  if h.dimensionality==1:
+    vk = current.current_operator(h)
+    def f(w,k=[0.,0.,0.]):
+      return braket_wAw(w,vk(k)).real
+    return f
+  elif h.dimensionality==2:
+    def f(w,k=[0.,0.,0.]):
+      vx = current.derivative(h,k,order=[0,1])
+      vy = current.derivative(h,k,order=[1,0])
+      R = np.array(h.geometry.get_k2K())
+#      R = algebra.inv(R) # not sure if this is ok
+      v = [braket_wAw(w,vx),braket_wAw(w,vy),0]
+      v = np.array(v).real
+      return v@R@v # return the scalar product
+    return f
+  else: raise
+
 
 
 get_current = get_velocity
@@ -431,11 +467,67 @@ def get_valley_taux(h,projector=False):
 def get_operator(op,k=[0.,0.,0.],h=None):
     """Get a function that acts as an operator"""
     if op is None: return None
-    if callable(op): 
+    elif callable(op): 
         return lambda v: op(v,k=k) # assume it yields a number
-    if type(op) is np.array: 
+    elif type(op) is np.array: 
         return lambda v: braket_wAw(v,op) # assume it yields a matrix
     else: raise
 
 
+def get_berry(h,**kwargs):
+    """Return Berry operator"""
+    return topology.berry_operator(h,**kwargs)
+
+def get_valley_berry(h,**kwargs):
+    """Return Valley Berry operator"""
+    return get_operator_berry(h,"valley",**kwargs)
+
+
+def get_operator_berry(h,name,**kwargs):
+    """Return Valley Berry operator"""
+    op = h.get_operator(name,return_matrix=True)
+    return topology.berry_operator(h,operator=op,**kwargs)
+
+
+
+def get_sz_berry(h,**kwargs):
+    """Return Valley Berry operator"""
+    return get_operator_berry(h,"sz",**kwargs)
+
+
+def get_matrix_operator(h,name,k=None,**kwargs):
+    """Return a function that takes a matrix as input and returns another
+    matrix"""
+    if name=="valley":
+        op = get_valley(h,projector=True) # valley operator
+        return op
+    elif name in ["valley_spin","spin_valley","valley_sz","sz_valley"]:
+        op = get_valley(h,projector=True) # valley operator
+        sz = h.get_operator("sz")
+        return lambda m,k=None: op(m,k=k)@sz # return operator
+    else:
+        op = h.get_operator(name) # assume that it is a matrix
+        return lambda m,k=None: op@m
+
+
+def bool_layer_array(g,n=0):
+    """Return the lowest layer array"""
+    fac = []
+    z0 = sorted(np.unique(g.z).tolist())[n]
+    for z in g.z:
+        if abs(z-z0)<1e-3: fac.append(1)
+        else: fac.append(0)
+    fac = np.array(fac)
+    return fac
+
+
+bottom_layer = lambda g: bool_layer_array(g,n=0)
+top_layer = lambda g: bool_layer_array(g,n=1)
+
+def get_valley_layer(self,n=0,**kwargs):
+    """Get the valley operator for a specific layer"""
+    ht = self.copy() # create a dummy
+    fac = bool_layer_array(self.geometry,n=n) # create array
+    ht.geometry.sublattice = self.geometry.sublattice * fac
+    return get_valley(ht,**kwargs) # return the valley operator
 

@@ -29,7 +29,7 @@ def get_geometry(modify=True):
   lattice_name = getbox("lattice") # get the option
   if lattice_name=="Honeycomb":
     geometry_builder = geometry.honeycomb_lattice
-  if lattice_name=="Honeycomb rectangular":
+  elif lattice_name=="Honeycomb 4 sites":
     geometry_builder = geometry.honeycomb_lattice_square_cell
   elif lattice_name=="Square":
     geometry_builder = geometry.square_lattice
@@ -42,7 +42,10 @@ def get_geometry(modify=True):
   elif lattice_name=="Triangular":
     geometry_builder = geometry.triangular_lattice
   elif lattice_name=="Triangular tripartite":
-    geometry_builder = geometry.triangular_lattice_tripartite
+    geometry_builder = lambda: geometry.triangular_lattice(n=3)
+  elif lattice_name=="Honeycomb 6 sites":
+    geometry_builder = lambda: geometry.honeycomb_lattice(n=3)
+  else: raise
   g = geometry_builder() # call the geometry
   nsuper = int(get("nsuper"))
   g = g.supercell(nsuper)
@@ -217,8 +220,8 @@ def solve_scf():
   U = get("hubbard")
   filling = get("filling_scf")
   filling = filling%1.
-  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
-                mf=mf,mode="U",smearing=get("smearing_scf"),
+  scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=U,
+                mf=mf,T=get("smearing_scf"),
                 mix = get("mix_scf"))
   scf.hamiltonian.save() # save in a file
   comp.kill()
@@ -228,7 +231,7 @@ def solve_scf():
 def show_magnetism():
   """Show the magnetism of the system"""
   h = pickup_hamiltonian() # get the Hamiltonian
-  h.write_magnetization() # write the magnetism
+  h.write_magnetization(nrep=int(get("magnetization_nrep"))) 
   execute_script("qh-moments",mayavi=True)
 
 

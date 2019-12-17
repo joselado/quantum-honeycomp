@@ -17,7 +17,9 @@ except:
   print("Mayavi is not working")
   path = os.path.realpath(__file__) 
   import sys
-  os.system("python "+path)
+  args = "  "
+  for i in range(len(sys.argv)): args += "  "+sys.argv[i]
+  os.system("python "+path+args)
   exit()
 
 

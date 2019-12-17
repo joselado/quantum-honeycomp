@@ -15,7 +15,7 @@ def full_dm(h,use_fortran=True,nk=10,delta=1e-2):
   elif h.dimensionality == 2: fac = 1./nk**2
   elif h.dimensionality == 3: fac = 1./nk**3
   else: raise
-  es,vs = h.eigenvectors() # get eigenvectors
+  es,vs = h.get_eigenvectors(nk=nk) # get eigenvectors
   if use_fortran:
     dm = density_matrixf90.density_matrix(np.array(es),np.array(vs),delta)
     return dm*fac

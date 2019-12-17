@@ -1190,7 +1190,12 @@
             </item>
             <item>
              <property name="text">
-              <string>Honeycomb rectangular</string>
+              <string>Honeycomb 4 sites</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Honeycomb 6 sites</string>
              </property>
             </item>
             <item>

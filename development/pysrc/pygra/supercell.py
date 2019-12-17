@@ -1,5 +1,7 @@
 from __future__ import print_function,division
 import numpy as np
+import scipy.linalg as lg
+from . import sculpt
 
 
 
@@ -137,5 +139,46 @@ def return_unique(rs1,rs2):
 #  """Request a unit cell with as many atoms"""
 
 
+def target_angle_volume(g,angle=None,n=5,volume=None,same_length=False):
+    """Return a supercell, targetting a certain new angle between vectors"""
+    if g.dimensionality!=2: raise # only for 2d
+    a1 = g.a1
+    a2 = g.a2
+    def getm(): # get the matrix
+      out = [] # empty list
+      vs = [] # volumes
+      for i in range(-n,n+1):
+        for j in range(-n,n+1):
+          for k in range(-n,n+1):
+            for l in range(-n,n+1):
+                store = False
+                a1n = i*a1 + j*a2
+                a2n = k*a1 + l*a2
+                v = lg.norm(np.cross(a1n,a2n)) # new volume
+                v /= lg.norm(np.cross(a1,a2)) # new volume
+                if abs(v)<1e-6: continue # zero volume
+                u1 = a1n/np.sqrt(a1n.dot(a1n)) # normalize
+                u2 = a2n/np.sqrt(a2n.dot(a2n)) # normalize
+                if angle is not None: # check if it has the desired angle
+                    diff = u1.dot(u2)-np.cos(angle*np.pi) # difference
+                    if abs(diff)>1e-6: continue # next try 
+                if same_length: # check if they must have the same length
+                    diff = a1n.dot(a1n) - a2n.dot(a2n)
+                    if abs(diff)>1e-6: continue # next try 
+                if volume is not None: # target such volume
+                    if abs(v-volume)>1e-6: continue
+                    else: return [[i,j,0],[k,l,0],[0,0,1]]
+                out.append([[i,j,0],[k,l,0],[0,0,1]]) # orthogonal, return
+                vs.append(v) # volume
+      if len(out)==0: return None # nothng found
+      vs = np.array(vs) # as array
+      return [o for (v,o) in sorted(zip(vs,out))][0]
+    out = getm() # get rotation matrix
+    if out is None: raise
+    g = g.supercell(out)
+    g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])) # set in the x direction
+    return g
 
+
+target_angle = target_angle_volume
 

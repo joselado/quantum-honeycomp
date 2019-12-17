@@ -13,7 +13,7 @@ from . import parallel
 from . import algebra
 
 def ldos0d(h,e=0.0,delta=0.01,write=True):
-  """Calculates the local density of states of a hamiltonian and
+  """Calculates the local density of states of a Hamiltonian and
      writes it in file"""
   if h.dimensionality==0:  # only for 0d
     iden = np.identity(h.intra.shape[0],dtype=np.complex) # create identity
@@ -136,6 +136,13 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None):
   return ds
 
 
+def ldos_diagonalization(m,e=0.0,**kwargs):
+    """Compute the LDOS using exact diagonalization"""
+    if algebra.issparse(m): return ldos_arpack(m,e=e,**kwargs) # sparse
+    else: ldos_waves(m,es=[e],**kwargs)[0] # dense
+
+
+
 
 def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,
         nk=40,operator=None):
@@ -207,46 +214,44 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos2d(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
-             random=True,num_wf=20):
+def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
+             random=True,**kwargs):
   """ Calculate DOS for a 2d system"""
   if mode=="green":
     from . import green
-    if h.dimensionality!=2: raise # only for 1d
+    if h.dimensionality!=2: raise # only for 2d
     if nk is not None:
       print("LDOS using normal integration with nkpoints",nk)
+      h = h.turn_dense() # turn the matrix to dense
       gb,gs = green.bloch_selfenergy(h,energy=e,delta=delta,mode="full",nk=nk)
       d = [ -(gb[i,i]).imag for i in range(len(gb))] # get imaginary part
     else:
       print("LDOS using renormalization adaptative Green function")
       gb,gs = green.bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")
       d = [ -(gb[i,i]).imag for i in range(len(gb))] # get imaginary part
-  elif mode=="arpack": # arpack diagonalization
+  elif mode=="arpack" or mode=="diagonalization": # arpack diagonalization
     from . import klist
     if nk is None: nk = 10
     hkgen = h.get_hk_gen() # get generator
     ds = [] # empty list
     ks = klist.kmesh(h.dimensionality,nk=nk)
+    if random: ks = [np.random.random(3) for k in ks] # random mesh
     ts = timing.Testimator(title="LDOS",maxite=len(ks))
     for k in ks: # loop over kpoints
       ts.iterate()
-      if random:
-        k = np.random.random(3) # random k-point
-      hk = csc_matrix(hkgen(k)) # get Hamiltonian
-      ds += [ldos_arpack(hk,num_wf=num_wf,robust=False,
-                     tol=0,e=e,delta=delta)]
-    d = ds[0]*0.0 # inititlize
-    for di in ds: d += di # add
-    d /=len(ds) # normalize
+      hk = hkgen(k) # get Hamiltonian
+      ds += [ldos_diagonalization(hk,e=e,delta=delta,**kwargs)]
+    d = np.mean(ds,axis=0) # average
+  else: raise # not recognized
+  # write result
   d = spatial_dos(h,d) # convert to spatial resolved DOS
   g = h.geometry  # store geometry
   x,y = g.x,g.y # get the coordinates
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+  return (x,y,d) # return LDOS
 
-
-ldos = ldos2d
 
 
 def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
@@ -271,10 +276,6 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
       evals += [ie for ie in e]
       ws += [iw for iw in w]
       ps += [op(iw,k=k) for iw in w] # weights
-#      evals = np.concatenate([evals,e]) # store
-#      ws = np.concatenate([ws,w]) # store
-#    raise
-#    (evals,ws) = h.eigenvectors(nk) # get the different eigenvectors
   else:
     print("Diagonalizing in LDOS, DENSE mode")
     for k in ks: # loop

@@ -316,7 +316,7 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
       for g in out: # loop
         if operator is None: d = -g.trace()[0,0].imag # only the trace 
         elif callable(operator): d = operator(g,k=k) # call the operator
-        else:  d = -(g*operator).trace()[0,0].imag # assume it is a matrix
+        else:  d = -(g@operator).trace()[0,0].imag # assume it is a matrix
         fo.write(str(d)+"   ") # write in a file
       fo.write("\n") # next line
       fo.flush() # flush

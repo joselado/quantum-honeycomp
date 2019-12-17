@@ -5,11 +5,22 @@ import numpy
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--nx",default=50)
-parser.add_argument("--ny",default=50)
+parser.add_argument("--nx",default=300)
+parser.add_argument("--ny",default=300)
+parser.add_argument("--input",default="")
+parser.add_argument("--column",default="2")
 #        description="Frames per second in the video")
 args = parser.parse_args() # get the arguments
 
+name = args.input
+
+nx = int(args.nx)
+ny = int(args.ny)
+col = int(args.column)
+
+if name=="":
+    print("Provide an input file")
+    exit()
 
 
 def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
@@ -25,9 +36,10 @@ def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
       return z+1.0
     xs = [c[0] for c in centers] # get x coordinates
     ys = [c[1] for c in centers] # get y coordinates
-    dxy = (max(xs) - min(xs))/200
-    x = np.linspace(min(xs),max(xs),args.nx)
-    y = np.linspace(min(ys),max(ys),args.ny)
+    dx = (np.max(xs) - np.min(xs))/10
+    dy = (np.max(ys) - np.min(ys))/10
+    x = np.linspace(min(xs)-dx,max(xs)+dx,nx)
+    y = np.linspace(min(ys)-dy,max(ys)+dy,ny)
     fo = open(name,"w") # open output file
     for ix in x:
       for iy in y:
@@ -41,18 +53,13 @@ def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
 
 import sys
 # get the centers of the balls
-try:
-  name = sys.argv[1]
-except:
-  print("Usage qh-interpolate name")
-  exit() # exit
 m = np.genfromtxt(name).transpose()
 
 centers = [[m[0,i],m[1,i],0.] for i in range(len(m[0]))]
 
-heights = m[2]
+heights = m[col]
 #heights = read_density()
-heights = 4*heights/max(heights)
+heights = 4*heights/np.max(heights)
 #heights = np.sqrt(heights)
 #balls = [ball(center=c) for c in centers]
 

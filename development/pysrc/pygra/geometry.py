@@ -5,6 +5,7 @@ from scipy.sparse import bmat
 from scipy.sparse import csc_matrix as csc
 from . import sculpt
 from .supercell import non_orthogonal_supercell
+from . import supercell as supercelltk
 from . import checkclass
 import scipy.linalg as lg
 
@@ -54,26 +55,27 @@ class Geometry:
       f = self.periodic_vector() # get the function
       self.get_distance = f # store that function
     self.dimensionality = 0 # set as finite
+  def get_orthogonal(self):
+      return supercelltk.target_angle_volume(self,angle=0.5)
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
     if np.array(nsuper).shape==(3,3):
-#    try:
-#      nsuper[0][0] # if matrix is given
-      print("Supercell",nsuper)
-      return non_orthogonal_supercell(self,nsuper)
-#    except: pass # continue with normal way
+      return supercelltk.non_orthogonal_supercell(self,nsuper)
     if self.dimensionality==1:
       if checkclass.is_iterable(nsuper): nsuper = nsuper[0]
-      s = supercell1d(self,nsuper)
+      return supercell1d(self,nsuper)
     elif self.dimensionality==2:
-      try: # two number given
+      try: # two numbers given
         nsuper1 = nsuper[0]
         nsuper2 = nsuper[1]
       except: # one number given
         nsuper1 = nsuper
         nsuper2 = nsuper
-      s = supercell2d(self,n1=nsuper1,n2=nsuper2)
+      if abs(nsuper1-np.round(nsuper1))>1e-6 or abs(nsuper2-np.round(nsuper2))>1e-6:
+          return supercelltk.target_angle_volume(self,angle=None,
+                  volume=nsuper1*nsuper2)
+      else: return supercell2d(self,n1=nsuper1,n2=nsuper2)
     elif self.dimensionality==3:
       try: # two number given
         nsuper1 = nsuper[0]
@@ -154,6 +156,7 @@ class Geometry:
   def get_k2K_generator(self):
     R = self.get_k2K() # get the matrix
     def f(k):
+#      return R@np.array(k) # to natural coordinates
       r = np.matrix(k).T # real space vectors
       return np.array((R*r).T)[0]
     return f # return function
@@ -628,7 +631,7 @@ def supercell1d(g,nsuper):
 ########### begin 2d geometries ################
 ################################################
 
-def honeycomb_lattice():
+def honeycomb_lattice(n=1):
   """
   Create a honeycomb lattice
   """
@@ -645,6 +648,8 @@ def honeycomb_lattice():
   g.sublattice = [(-1.)**i for i in range(len(g.x))] # subattice number
   g.update_reciprocal() # update reciprocal lattice vectors
   g.get_fractional()
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
@@ -659,7 +664,7 @@ def buckled_honeycomb_lattice(n=1):
 
 
 
-def triangular_lattice():
+def triangular_lattice(n=1):
   """
   Creates a triangular lattice
   """
@@ -673,6 +678,8 @@ def triangular_lattice():
   g.xyz2r() # create r coordinates
   g.has_sublattice = False # has sublattice index
   g.update_reciprocal() # update reciprocal lattice vectors
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
@@ -682,20 +689,17 @@ def triangular_lattice_tripartite():
   """
   Creates a triangular lattice with three sites per unit cell
   """
-  g0 = triangular_lattice() # generate a triangular lattice
-  g = g0.copy() # copy geometry
-  g.r = [g.r[0],g.r[0]+g.a1,g.r[0]+g.a2+g.a1] # positions
-  g.a1 = g0.a1 - g0.a2
-  g.a2 = g0.a1 + 2.*g0.a2
-  g.r2xyz() # 
-  g.center()
-  g.has_sublattice = True # does not have sublattice index
-  g.sublattice_number = 3 # three sublattices
-  g.sublattice = [0,1,2] # the three sublattices
-  g.has_sublattice = True # has sublattice index
-  g.update_reciprocal() # update reciprocal lattice vectors
-  return g
+  g = triangular_lattice()
+  return supercelltk.target_angle(g,angle=1./3.,volume=3,same_length=True)
 
+
+
+def triangular_lattice_pentapartite():
+  """
+  Creates a triangular lattice with three sites per unit cell
+  """
+  g = triangular_lattice()
+  return supercelltk.target_angle(g,angle=1./3.,volume=5,same_length=True)
 
 
 
@@ -842,7 +846,7 @@ def lieb_lattice():
 
 def kagome_lattice():
   """
-  Creates a honeycomb lattice
+  Creates a Kagome lattice
   """
   g = Geometry() # create geometry
   dx = 1./2.
@@ -1200,7 +1204,7 @@ def get_k2K(g):
   uz = uz/np.sqrt(uz.dot(uz))
   a2kn = np.matrix([ux,uy,uz]) # matrix for the change of basis
   r2a = np.matrix([ux,uy,uz]).T.I # from real space to lattice vectors
-  R = a2kn*r2a*a2kn.T # rotation matrix
+  R = a2kn@r2a@a2kn.T # rotation matrix
   return R
 
 
@@ -1533,16 +1537,18 @@ def neighbor_cells(num,dim=3):
 
 
 
-def write_profile(g,d,name="PROFILE.OUT",nrep=1,normal_order=False):
+def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   """Write a certain profile in a file"""
-  if g.dimensionality == 0: nrep =1
+  if g.dimensionality == 0: nrep = 1
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:
       m = np.array([go.x,go.y,go.z,d.tolist()*(nrep**g.dimensionality)]).T
+      header = "x        y       z        profile"
   else:
       m = np.array([go.x,go.y,d.tolist()*(nrep**g.dimensionality),go.z]).T
-  np.savetxt(name,m) # save in file
+      header = "x        y     profile      z"
+  np.savetxt(name,m,fmt='%.5f',delimiter="    ",header=header) # save in file
 
 
 
@@ -1614,10 +1620,9 @@ def multireplicas(self,n):
 
 
 
-def write_vasp(g0):
+def write_vasp(g0,s=1.42):
     """Turn a geometry into vasp geometry"""
     g = g0.copy() # copy geometry
-    s = 1.42
     if g.dimensionality==3: pass
     elif g.dimensionality==2:
         g.r[:,2] -= np.min(g.r[:,2])

@@ -51,14 +51,16 @@ def get_spinless2full(h,time_reversal=False):
     def outf(m): 
         if time_reversal: return m2spin_sparse(m,np.conjugate(m)) # spinful
         else: return m2spin_sparse(m) # spinful
-  elif h.has_spin and h.has_eh: # spinful and no eh
+  elif h.check_mode("spinful_nambu"): # spinful and eh
     from .superconductivity import build_eh
     def outf(m): 
         if time_reversal: m2 = m2spin_sparse(m,np.conjugate(m)) # spinful
         else: m2 = m2spin_sparse(m) # spinful
 #        m2 = m2spin_sparse(m) # spinful
         return build_eh(m2) # add e-h
-  elif not h.has_spin and h.has_eh: raise # not implemented
+  elif h.check_mode("spinless_nambu"): 
+      from .sctk import spinless
+      return spinless.nambu
   else: raise
   return outf
 

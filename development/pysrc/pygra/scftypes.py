@@ -80,7 +80,7 @@ class scfclass():
       self.hamiltonian.turn_sparse()
       print("WARNING!!! using sparse mode")
       print("Use this mode only if you know what you are doing!!!!\n\n")
-      es,ws,ks = self.hamiltonian.eigenvectors(self.nkgrid,kpoints=True,
+      es,ws,ks = self.hamiltonian.get_eigenvectors(nk=self.nkgrid,kpoints=True,
                               sparse=True,numw=self.num_waves)
       if np.max(np.abs(es))*0.9<self.energy_cutoff: 
         print("NOT ENOUGH STATES, recalling with",self.num_waves*2)
@@ -88,7 +88,7 @@ class scfclass():
         self.update_occupied_states() # call again
 #  raise 
     else: # any other, use brute force
-      es,ws,ks = self.hamiltonian.eigenvectors(self.nkgrid,kpoints=True)
+      es,ws,ks = self.hamiltonian.get_eigenvectors(nk=self.nkgrid,kpoints=True)
 #    self.kfac = float(len(ks))/self.hamiltonian.intra.shape[0] 
     # number of kpoints of the calculation
 #    mine = min(es)*0.9 # minimum energy retained
@@ -112,7 +112,8 @@ class scfclass():
     """Update the object with the eigenvectors of a single kpoint,
     this function is used for the adaptive method of SCF"""
     if not self.scfmode=="fermi": raise # only for this mode
-    es,ws,ks = self.hamiltonian.eigenvectors(self.nkgrid,kpoints=True,k=k)
+    es,ws,ks = self.hamiltonian.get_eigenvectors(nk=self.nkgrid,
+            kpoints=True,k=k)
     self.kfac = 1
     self.gap = get_gap(es,self.fermi) # store the gap
     eoccs,voccs,koccs = get_occupied_states(es,ws,ks,self.fermi) # occupied states
@@ -442,7 +443,7 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
     if mine is None: mine = -1000000 # accept all
     else: mine = -np.abs(mine)
     for (e,v,k) in zip(es,ws,ks): # loop over eigenvals,eigenvecs
-      weight = np.sqrt((-np.tanh((e-fermi)/smearing) + 1.0)/2.0) # smearing
+      weight = 1./(np.exp((e-fermi)/smearing)+1.0) # occupation
       voccs.append(v*weight) # store
       eoccs.append(e*weight) # store
       koccs.append(k) # store
@@ -472,6 +473,8 @@ def get_gap(es,fermi):
 from .selfconsistency.hubbard import hubbardscf
 from .selfconsistency.coulomb import coulombscf
 
+repulsive_hubbard = hubbardscf
+from .selfconsistency.attractive_hubbard_spinless import attractive_hubbard
 
 def get_super_correlator(voccs,weight=None,totkp=1):
   """Get the different correlators for a superconducting system"""
@@ -539,24 +542,21 @@ def write_magnetization(mag):
 
 
 
-
-def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
+def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
                   maxerror=1e-05,silent=False,mf=None,
-                  smearing=None,fermi_shift=0.0,
+                  smearing=None,fermi_shift=0.0,save=True,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
                   broyden=False,callback=None,**kwargs):
   """ Solve a generalized selfcnsistent problem"""
+  mf_file = "MF.pkl"
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms
   htmp = h.copy()  # copy hamiltonian
   htmp.turn_dense() # turn to dense Hamiltonian
   # generalate the necessary list of correlators
   if mf is None: # generate initial mean field
-    if mag is None: 
-      old_mf = np.random.random(h.intra.shape)
-      old_mf += old_mf.T
-    else:
-      old_mf = selective_U_matrix(U,directional_mean_field(mag)) 
+    try:  old_mf = inout.load(mf_file) # load the file
+    except: old_mf = meanfield.guess(h,"random") # random guess
   else: old_mf = mf # use guess
   # get the pairs for the correlators
   ndim = h.intra.shape[0] # dimension
@@ -616,6 +616,7 @@ def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.2,
       scf.smearing = None # last iteration without smearing
     if stop_scf: break # stop the calculation
   if broyden: scf = meanfield.broyden_solver(scf)
+  if save: inout.save(scf.mf,mf_file) # save mean field
   file_etot.close() # close file
   file_error.close() # close file
   file_gap.close() # close file

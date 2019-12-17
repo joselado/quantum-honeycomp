@@ -207,6 +207,26 @@ def add_swave(delta=0.0,is_sparse=False,rs=None):
   return build_eh(zero,coupling=coupling,is_sparse=is_sparse) # return matrix
 
 
+def add_swave_to_hamiltonian(self,delta,**kwargs):
+    """Add the swave coupling to the Hamiltonian"""
+    # spinless Hamiltonian
+    if self.check_mode("spinless") or self.check_mode("spinless_nambu"): 
+        from .sctk import spinless
+        spinless.add_swave_to_hamiltonian(self,delta)
+        # spinful Hamiltonian
+    elif self.check_mode("spinful") or self.check_mode("spinful_nambu"): 
+      self.turn_nambu() # add electron hole
+      self.intra = self.intra + add_swave(delta=delta,rs=self.geometry.r,is_sparse=self.is_sparse)
+    else: raise
+
+
+
+
+
+
+
+
+
 def add_pxipy(delta=0.0,is_sparse=False,r1=None,r2=None):
   """Add px x + py y pairing"""
   def deltafun(r1i,r2i):
@@ -289,7 +309,7 @@ def reorder(m):
     R[2*i+2*nr,4*i+2] = 1.0 # down holes
     R[2*i+1+2*nr,4*i+3] = 1.0 # up holes
   R = csc_matrix(R) # to sparse
-  return R.H*m*R
+  return R.H@m@R
 
 
 

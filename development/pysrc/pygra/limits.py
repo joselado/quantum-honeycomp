@@ -1,1 +1,1 @@
-densedimension = 5000 # maximum allowed dimension for dense matrices
+densedimension = 10000 # maximum allowed dimension for dense matrices

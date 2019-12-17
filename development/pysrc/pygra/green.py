@@ -443,7 +443,7 @@ def get1dhamiltonian(hin,k=[0.0,0.,0.],reverse=False):
 #  ons = h.intra + tky + tky.H  # intra of k dependent chain
 #  hop = h.tx + tkxy + tkxmy  # hopping of k-dependent chain
   (ons,hop) = multicell.kchain(hin,k=k)
-  if reverse: return (ons,hop.H) # return 
+  if reverse: return (ons,algebra.hermitian(hop)) # return 
   else: return (ons,hop) # return 
   
 
@@ -470,8 +470,21 @@ def green_kchain(h,k=0.,energy=0.,delta=0.01,only_bulk=True,
 
 
 
-
-
+def green_surface_cells(gs,hop,ons,delta=1e-2,e=0.0,n=0):
+    """Compute the surface Green's function for several unit cells"""
+    hopH = algebra.H(hop) # Hermitian
+    ez = (e+1j*delta)*np.identity(ons.shape[0]) # energy
+    gt = np.zeros(ons.shape[0],dtype=np.complex) # energy
+    sigmar = hop@gs@algebra.H(hop) # of the infinite right part
+    out = []
+    for i in range(n):
+      sigmal = algebra.H(hop)@gt@hop # selfenergy
+      # couple infinite right to finite left
+      gemb = algebra.inv(ez - ons - sigmal- sigmar) # full dyson equation
+      # compute surface spectral function of the left block only
+      gt = algebra.inv(ez - ons - sigmal) # return Dyson equation
+      out.append(gemb) # store this green's function
+    return out # return green's functions
 
 
 
@@ -488,7 +501,8 @@ def green_kchain_evaluator(h,k=0.,delta=0.01,only_bulk=True,
       sigma = hop@sf@hop.H # selfenergy
       if callable(hs): ons2 = ons + hs(k)
       else: ons2 = ons + hs
-      sf = (ez - ons2 - sigma).I # return Dyson
+      sf = algebra.inv(ez - ons2 - sigma) # return Dyson
+    # which green function to return
     if only_bulk:  return gf
     else:  return gf,sf
   (ons,hop) = get1dhamiltonian(h,k,reverse=reverse) # get 1D Hamiltonian
@@ -571,12 +585,13 @@ def interface_multienergy(h1,h2,k=[0.0,0.,0.],energies=[0.0],delta=0.01,
 
 
 
-def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],delta=0.01,hs=None):
+def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
   """Get the Green function of an interface"""
   from scipy.sparse import csc_matrix as csc
   from scipy.sparse import bmat
-  fun1 = green_kchain_evaluator(h1,k=k,delta=delta,hs=hs,
-                   only_bulk=False,reverse=True) # surface green function 
+  fun1 = green_kchain_evaluator(h1,k=k,
+                   only_bulk=False,reverse=reverse,
+                   **kwargs) # surface green function 
   out = [] # output
   for energy in energies: # loop
     gs1,sf1 = fun1(energy)

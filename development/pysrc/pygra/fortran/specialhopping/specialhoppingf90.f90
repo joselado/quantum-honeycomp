@@ -33,8 +33,8 @@ do i=1,n ! loop over sites
     if (rij2.lt.1.d-02) cycle ! same atom, skip iteration
     rij = sqrt(rij2) ! distance
     ! intralayer hopping
-    t = exp(-lamb*(rij - 1.d00))*(dx*dx+dy*dy)/rij2*exp(-lambz*dz*dz)
-    t = t + tinter*exp(-lambi*(rij-dl))*dz*dz/rij2 ! interlayer hopping
+    t = -exp(-lamb*(rij - 1.d00))*(dx*dx+dy*dy)/rij2*exp(-lambz*dz*dz)
+    t = t - tinter*exp(-lambi*(rij-dl))*dz*dz/rij2 ! interlayer hopping
     if (abs(t).lt.mint) cycle ! too small hopping
     if (k.gt.nmax) then
       write(*,*) "Not large enough array",nmax,k,mint,t

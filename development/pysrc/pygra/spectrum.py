@@ -296,7 +296,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
   if mode=="mesh":
     from .klist import kmesh
     kp = kmesh(h.dimensionality,nk=nk)
-    etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
+    etot = np.mean(parallel.pcall(enek,kp)) # compute total energy
   elif mode=="random":
     kp = [np.random.random(3) for i in range(nk)] # random points
     etot = np.mean(parallel.pcall(enek,kp)) # compute total eenrgy
@@ -316,7 +316,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
 
 
 
-def eigenvalues(h0,nk):
+def eigenvalues(h0,nk=10):
     """Return all the eigenvalues of a Hamiltonian"""
     from . import klist
     h = h0.copy() # copy hamiltonian
@@ -328,9 +328,9 @@ def eigenvalues(h0,nk):
       est = timing.Testimator(maxite=len(ks))
       for k in ks: # loop
         est.iterate()
-        es += lg.eigvalsh(hkgen(k)).tolist() # add
+        es += algebra.eigvalsh(hkgen(k)).tolist() # add
     else:
-        f = lambda k: lg.eigvalsh(hkgen(k)) # add
+        f = lambda k: algebra.eigvalsh(hkgen(k)) # add
         es = parallel.pcall(f,ks) # call in parallel
         es = np.array(es)
         es = es.reshape(es.shape[0]*es.shape[1])
@@ -390,9 +390,13 @@ def singlet_map(h,nk=40,nsuper=3,mode="abs"):
 
 def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
     """Set the filling of a Hamiltonian"""
+    if h.has_eh: raise
     fill = filling + extrae/h.intra.shape[0] # filling
     n = h.intra.shape[0]
-    use_kpm = n>algebra.maxsize # use the KPM method
+    use_kpm = False
+    if n>algebra.maxsize: # use the KPM method
+        use_kpm = True
+        print("Using KPM in set_filling")
     if use_kpm: # use KPM
         es,ds = h.get_dos(energies=np.linspace(-5.0,5.0,1000),
                 use_kpm=True,delta=delta,nk=nk,random=False)
@@ -408,4 +412,18 @@ def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
         from .scftypes import get_fermi_energy
         efermi = get_fermi_energy(es,fill)
     h.shift_fermi(-efermi) # shift the fermi energy
+
+
+
+def get_filling(h,**kwargs):
+    """Get the filling of a Hamiltonian at this energy"""
+    if h.check_mode("spinless_nambu"): # spinless Nambu Hamiltonian
+        from .sctk import spinless
+        return spinless.get_filling(h,**kwargs)
+    elif h.check_mode("spinful_nambu"): raise # spinful Nambu
+    else:
+      es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
+      es = np.array(es)
+      esf = es[es<0.0]
+      return len(esf)/len(es) # return filling
 

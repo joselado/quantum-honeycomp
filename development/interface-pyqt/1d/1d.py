@@ -196,8 +196,8 @@ def solve_scf():
   U = get("hubbard")
   filling = get("filling_scf")
   filling = filling%1.
-  scf = scftypes.selfconsistency(h,nkp=nk,filling=filling,g=U,
-                mf=mf,mode="U",smearing=get("smearing_scf"),
+  scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=U,
+                mf=mf,T=get("smearing_scf"),
                 mix = get("mix_scf"))
   scf.hamiltonian.save() # save in a file
   comp.kill()

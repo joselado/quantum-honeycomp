@@ -3,38 +3,15 @@ import numpy as np
 
 from . import extract
 
-def swave(h0,name="SWAVE.OUT",rep=1):
+def swave(h,name="SWAVE.OUT",nrep=3):
   """Write the swave pairing of a Hamiltonian"""
-  h = h0.supercell(rep)
-  f1 = open("AMPLITUDE_"+name,"w")
-  f2 = open("PHASE_"+name,"w")
-  f3 = open(name,"w")
-  if not h.has_spin: raise
   if not h.has_eh: raise
-  ds = extract.swave(h.intra) # get the pairing
-  r = h.geometry.r
-  f1.write("# x y |Delta|\n")
-  f2.write("# x y |phi|\n")
-  f3.write("# x y ReD  ImD\n")
-  for i in range(len(r)):
-    ri = r[i] # position
-    di = ds[i]
-    f1.write(str(ri[0])+"    ")
-    f2.write(str(ri[0])+"    ")
-    f3.write(str(ri[0])+"    ")
-    f1.write(str(ri[1])+"    ")
-    f2.write(str(ri[1])+"    ")
-    f3.write(str(ri[1])+"    ")
-    f1.write(str(np.abs(di))+"    ")
-    f2.write(str(np.angle(di))+"    ")
-    f3.write(str(di.real)+"    ")
-    f3.write(str(di.imag)+"    ")
-    f1.write("\n")
-    f2.write("\n")
-    f3.write("\n")
-  f1.close()
-  f2.close()
-  f3.close()
+  d = h.extract("swave") # get the pairing
+  g = h.geometry # get the geometry
+  g.write_profile(np.abs(d),name="AMPLITUDE_"+name,
+          normal_order=True,nrep=nrep)
+  g.write_profile(np.angle(d)/(2*np.pi),name="PHASE_"+name,
+          normal_order=True,nrep=nrep)
 
 
 def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False):

@@ -502,6 +502,7 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),
         ds = parallel.pcall(fun,energies) # compute DOS with an operator
         np.savetxt("DOS.OUT",np.matrix([energies,ds]).T) # write in a file
         return (energies,ds)
+      else: raise
 
 
 def autodos(h,auto=True,**kwargs):
@@ -545,6 +546,22 @@ def bulkandsurface(h1,energies=np.linspace(-1.,1.,100),operator=None,
   dosout/=nk # normalize
   np.savetxt("DOS_BULK_SURFACE.OUT",np.matrix([energies,dosout[0],dosout[1]]).T)
 
+
+
+
+def surface2bulk(h,n=50,nk=3000,delta=1e-3,e=0.0,**kwargs):
+    """Compute the DOS from the surface to the bulk"""
+    if h.dimensionality==2:
+      def f(k):
+        (ons,hop) = green.get1dhamiltonian(h,[k,0.,0.])
+        gf,sf = green.green_renormalization(ons,hop,energy=e,
+                delta=delta,**kwargs)
+        out = green.green_surface_cells(sf,hop,ons,delta=delta,e=e,n=n)
+        return np.array([-algebra.trace(o).imag for o in out]) # DOS
+      ks = np.linspace(0.,1.,nk) # loop
+      out = np.mean([f(k) for k in ks],axis=0)
+    else: raise
+    return np.array([range(n),out]) # return array
 
 
 

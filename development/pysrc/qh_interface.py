@@ -8,7 +8,6 @@ from pygra import hamiltonians
 from pygra import klist
 from pygra import geometry
 from pygra import sculpt
-from pygra import interactions
 from pygra import multilayers
 from pygra import dos
 from pygra import ldos

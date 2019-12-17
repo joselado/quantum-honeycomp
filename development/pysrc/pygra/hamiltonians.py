@@ -18,6 +18,7 @@ from . import kekule
 from . import algebra
 from . import groundstate
 from . import rotate_spin
+from . import topology
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat
@@ -47,15 +48,15 @@ class hamiltonian():
     return get_spinful2full(self)(m) # return
   def kchain(self,k=0.):
     return kchain(self,k)
-  def eigenvectors(self,nk=10,kpoints=False,k=None,sparse=False,numw=None):
-    return eigenvectors(self,nk=nk,kpoints=kpoints,k=k,
-                                 sparse=sparse,numw=numw)
-  def get_filling(self,energy=0.5,nk=10):
+  def get_eigenvectors(self,**kwargs):
+      from .htk.eigenvectors import get_eigenvectors
+      return get_eigenvectors(self,**kwargs)
+  def modify_hamiltonian_matrices(self,f):
+      """Modify all the matrices of a Hamiltonian"""
+      modify_hamiltonian_matrices(self,f)
+  def get_filling(self,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
-    es = spectrum.eigenvalues(self,nk=nk) # eigenvalues
-    es = np.array(es)
-    esf = es[es<energy]
-    return len(esf)/len(es) # return filling
+    return spectrum.get_filling(self,**kwargs) # eigenvalues
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)
@@ -81,9 +82,9 @@ class hamiltonian():
     """ Generate kdependent hamiltonian"""
     if self.is_multicell: return multicell.hk_gen(self) # for multicell
     else: return hk_gen(self) # for normal cells
-  def get_ldos(self,nk=4,e=0.0,mode="arpack",delta=0.05,nrep=3):
+  def get_ldos(self,**kwargs):
       from . import ldos
-      ldos.ldos(self,e=e,delta=delta,nk=nk,mode=mode,nrep=nrep)
+      return ldos.ldos(self,**kwargs)
   def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator
@@ -95,18 +96,22 @@ class hamiltonian():
         U = np.diag([self.geometry.bloch_phase(k,r) for r in frac_r])
         U = np.matrix(U) # this is without .H
         U = self.spinless2full(U) # increase the space if necessary
-        hk = U.H@hk@U
+        Ud = np.conjugate(U.T) # dagger
+        hk = Ud@hk@U
 #        print(csc_matrix(np.angle(hk)))
 #        exit()
-      if operator is not None: hk = operator.H@hk@operator # project
-      out = lg.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
-#      print(self.geometry.frac_r) 
-#      exit()
+      if operator is not None: 
+          hk = algebra.dagger(operator)@hk@operator # project
+      out = algebra.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
       return out
     return f
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""
     print_hamiltonian(self)
+  def check_mode(self,n):
+      """Verify the type of Hamiltonian"""
+      from .htk.mode import check_mode
+      return check_mode(self,n)
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
@@ -123,6 +128,8 @@ class hamiltonian():
     """ Adds a sublattice imbalance """
     if self.geometry.has_sublattice and self.geometry.sublattice_number==2:
       add_sublattice_imbalance(self,mass)
+    else:
+        print("WARNING, no sublattice present, skipping")
   def add_antiferromagnetism(self,mass):
     """ Adds antiferromagnetic imbalanc """
     if self.geometry.has_sublattice:
@@ -135,11 +142,9 @@ class hamiltonian():
     """Add electron hole degree of freedom"""
     self.get_eh_sector = get_eh_sector_odd_even # assign function
     turn_nambu(self)
-  def add_swave(self,delta=0.0,phi=None):
-    """ Adds spin mixing insite electron hole pairing"""
-    self.turn_nambu() # add electron hole
-    if phi is not None: delta = delta*np.exp(1j*phi*np.pi)
-    self.intra = self.intra + add_swave(delta=delta,rs=self.geometry.r,is_sparse=self.is_sparse)
+  def add_swave(self,*args,**kwargs):
+    """ Adds swave superconducting pairing"""
+    superconductivity.add_swave_to_hamiltonian(self,*args,**kwargs)
   def add_pairing(self,delta=0.0,**kwargs):
     """ Add a general pairing matrix, uu,dd,ud"""
     superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)
@@ -194,50 +199,26 @@ class hamiltonian():
       add_magnetism(self,m)
   def turn_spinful(self,enforce_tr=False):
     """Turn the hamiltonian spinful""" 
+    if self.has_spin: return # already spinful
     if self.is_sparse: # sparse Hamiltonian
       self.turn_dense() # dense Hamiltonian
       self.turn_spinful(enforce_tr=enforce_tr) # spinful
       self.turn_sparse()
     else: # dense Hamiltonian
-      if self.has_spin: return # already spinful
-      if self.is_multicell: # if multicell
-        from .multicell import turn_spinful as ts
-        ts(self) # turn spinful
-      else:
-        from .increase_hilbert import spinful
-        from .superconductivity import time_reversal
-        def fun(m):
-            if enforce_tr: return spinful(m,np.conjugate(m))
-            else: return spinful(m)
-        if not self.has_spin:
-          self.has_spin = True
-          self.intra = fun(self.intra) 
-          if self.dimensionality==0: pass
-          elif self.dimensionality==1:
-            self.inter = fun(self.inter) 
-          elif self.dimensionality==2:
-            self.tx = fun(self.tx) 
-            self.ty = fun(self.ty) 
-            self.txy = fun(self.txy) 
-            self.txmy = fun(self.txmy) 
-          else: raise
+      from .increase_hilbert import spinful
+      def fun(m):
+          if enforce_tr: return spinful(m,np.conjugate(m))
+          else: return spinful(m)
+      self.modify_hamiltonian_matrices(fun) # modify the matrices
+      self.has_spin = True # set spinful
   def remove_spin(self):
     """Removes spin degree of freedom"""
-    if self.has_spin: # if has spin remove the component
-      self.intra = des_spin(self.intra,component=0)
-      if self.is_multicell: # conventional
-        for i in range(len(self.hopping)):
-          self.hopping[i].m = des_spin(self.hopping[i].m)
-      else:
-        if self.dimensionality==1: # if one dimensional
-          self.inter = des_spin(self.inter,component=0)
-        elif self.dimensionality==2: # if one dimensional
-          self.tx = des_spin(self.tx,component=0)
-          self.txy = des_spin(self.txy,component=0)
-          self.ty = des_spin(self.ty,component=0)
-          self.txmy = des_spin(self.txmy,component=0)
-        else: raise
-      self.has_spin = False  # flag for nonspin calculation
+    if self.check_mode("spinless"): return # do nothing
+    elif self.check_mode("spinful"):
+        def f(m): return des_spin(m,component=0)
+        self.modify_hamiltonian_matrices(f) # modify the matrices
+        self.has_spin = False # set to spinless
+    else: raise
   def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
@@ -426,9 +407,6 @@ class hamiltonian():
       else: raise
       ops = [o@op for o in ops] # define operators
       return spectrum.ev(self,operator=ops,**kwargs).real
-      
-#    from .magnetism import get_magnetization
-#    return get_magnetization(self,nkp=nkp)
   def get_1dh(self,k=0.0):
       """Return a 1d Hamiltonian"""
       if self.is_multicell: raise # not implemented
@@ -455,69 +433,19 @@ class hamiltonian():
       """Clean a Hamiltonian"""
       from .clean import clean_hamiltonian
       clean_hamiltonian(self)
-  def get_operator(self,name,projector=False):
+  def get_operator(self,name,projector=False,return_matrix=False,**kwargs):
       """Return a certain operator"""
-      if name=="None": return None
-      elif name=="sx": return operators.get_sx(self)
-      elif name=="sy": return operators.get_sy(self)
-      elif name=="sz": return operators.get_sz(self)
-      elif name=="current": 
-          if self.dimensionality==1: return operators.get_current(self)
-          else: raise
-      elif name=="sublattice": return operators.get_sublattice(self,mode="both")
-      elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")
-      elif name=="sublatticeB": return operators.get_sublattice(self,mode="B")
-      elif name=="interface": return operators.get_interface(self)
-      elif name=="spair": return operators.get_pairing(self,ptype="s")
-      elif name=="deltax": return operators.get_pairing(self,ptype="deltax")
-      elif name=="deltay": return operators.get_pairing(self,ptype="deltay")
-      elif name=="deltaz": return operators.get_pairing(self,ptype="deltaz")
-      elif name=="electron": return operators.get_electron(self)
-      elif name=="hole": return operators.get_hole(self)
-      elif name=="zposition": return operators.get_zposition(self)
-      elif name=="surface": return operators.get_surface(self)
-      elif name=="yposition": return operators.get_yposition(self)
-      elif name=="xposition": return operators.get_xposition(self)
-      elif name=="velocity": return operators.get_velocity(self)
-      elif name=="electrons": return operators.get_electron(self)
-      # total magnetizations
-      elif name=="mx": 
-        return self.get_operator("sx")*self.get_operator("electron")
-      elif name=="my": 
-        return self.get_operator("sy")*self.get_operator("electron")
-      elif name=="mz": 
-        return self.get_operator("sz")*self.get_operator("electron")
-      elif name=="valley": return operators.get_valley(self,projector=projector)
-      elif name=="inplane_valley": return operators.get_inplane_valley(self)
-      elif name=="valley_upper": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_valley(ht)
-      elif name=="inplane_valley_upper": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_inplane_valley(ht)
-      elif name=="valley_lower": 
-        print("This operator only makes sense for TBG")
-        ht = self.copy()
-        ht.geometry.sublattice = self.geometry.sublattice * (-np.sign(self.geometry.z)+1.0)/2.0
-        return operators.get_valley(ht)
-      elif name=="ipr": return operators.ipr 
-      else: raise
-  def extract(self,name="mz"): 
-      """Extract somethign from the Hamiltonian"""
-      if self.has_eh: raise # not implemented
-      if name=="density":
-        return extract.onsite(self.intra,has_spin=self.has_spin)
-      elif name=="mx" and self.has_spin:
-        return extract.mx(self.intra)
-      elif name=="my" and self.has_spin:
-        return extract.my(self.intra)
-      elif name=="mz" and self.has_spin:
-        return extract.mz(self.intra)
-      else: raise
+      if projector: 
+          print("projector is deprecated, use return_matrix")
+          return_matrix = True
+      if return_matrix: 
+          return operators.get_matrix_operator(self,name,**kwargs)
+      else:
+          from .operatorlist import get_scalar_operator
+          return get_scalar_operator(self,name,**kwargs)
+  def extract(self,name): 
+      """Extract something from the Hamiltonian"""
+      return extract.extract_from_hamiltonian(self,name)
   def write_magnetization(self,nrep=5):
     """Extract the magnetization and write it in a file"""
     if not self.has_eh: # without electron hole
@@ -546,6 +474,9 @@ class hamiltonian():
               normal_order=normal_order,nrep=nrep)
   def write_hopping(self,**kwargs):
       groundstate.hopping(self,**kwargs)
+  def write_swave(self,**kwargs):
+      """Write the swave pairing"""
+      groundstate.swave(self,**kwargs)
   def get_ipr(self,**kwargs):
       """Return the IPR"""
       from . import ipr
@@ -665,74 +596,7 @@ def diagonalize(h,nkpoints=100):
 
 
 def diagonalize_hk(k):
-  return lg.eigh(hk(k))
-
-
-
-
-
-def eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
-  import scipy.linalg as lg
-  from scipy.sparse import csc_matrix as csc
-  shape = h.intra.shape
-  if h.dimensionality==0:
-    vv = algebra.eigh(h.intra)
-    vecs = [v for v in vv[1].transpose()]
-    if kpoints: return vv[0],vecs,[[0.,0.,0.] for e in vv[0]]
-    else: return vv[0],vecs
-  elif h.dimensionality>0:
-    f = h.get_hk_gen()
-    if k is None: 
-      from .klist import kmesh
-      kp = kmesh(h.dimensionality,nk=nk) # generate a mesh
-    else:  kp = np.array([k]) # kpoint given on input
-#    vvs = [lg.eigh(f(k)) for k in kp] # diagonalize k hamiltonian
-    nkp = len(kp) # total number of k-points
-    if sparse: # sparse Hamiltonians
-      vvs = [slg.eigsh(csc(f(k)),k=numw,which="LM",sigma=0.0,tol=1e-10) for k in kp] # 
-
-    else: # dense Hamiltonians
-      from . import parallel
-      if parallel.cores>1: # in parallel
-#        vvs = parallel.multieigh([f(k) for k in kp]) # multidiagonalization
-        vvs = parallel.pcall(lambda k: algebra.eigh(f(k)),kp)
-      else: vvs = [algebra.eigh(f(k)) for k in kp] # 
-    nume = sum([len(v[0]) for v in vvs]) # number of eigenvalues calculated
-    eigvecs = np.zeros((nume,h.intra.shape[0]),dtype=np.complex) # eigenvectors
-    eigvals = np.zeros(nume) # eigenvalues
-
-    #### New way ####
-#    eigvals = np.array([iv[0] for iv in vvs]).reshape(nkp*shape[0],order="F")
-#    eigvecs = np.array([iv[1].transpose() for iv in vvs]).reshape((nkp*shape[0],shape[1]),order="F")
-#    if kpoints: # return also the kpoints
-#      kvectors = [] # empty list
-#      for ik in kp: 
-#        for i in range(h.intra.shape[0]): kvectors.append(ik) # store
-#      return eigvals,eigvecs,kvectors
-#    else:
-#      return eigvals,eigvecs
-
-    #### Old way, slightly slower but clearer ####
-    iv = 0
-    kvectors = [] # empty list
-    for ik in range(len(kp)): # loop over kpoints
-      vv = vvs[ik] # get eigenvalues and eigenvectors
-      for (e,v) in zip(vv[0],vv[1].transpose()):
-        eigvecs[iv] = v.copy()
-        eigvals[iv] = e.copy()
-        kvectors.append(kp[ik])
-        iv += 1
-    if kpoints: # return also the kpoints
-#      for iik in range(len(kp)):
-#        ik = kp[iik] # store kpoint 
-#        for e in vvs[iik][0]: kvectors.append(ik) # store
-      return eigvals,eigvecs,kvectors
-    else:
-      return eigvals,eigvecs
-  else:
-    raise
-
-
+  return algebra.eigh(hk(k))
 
 
 
@@ -956,7 +820,7 @@ def hk_gen(h):
       try: kp = k[0]
       except: kp = k
       tk = h.inter * h.geometry.bloch_phase([1.],kp) # get the bloch phase
-      ho = h.intra + tk + tk.H # hamiltonian
+      ho = h.intra + tk + algebra.dagger(tk) # hamiltonian
       return ho
     return hk  # return the function
   elif h.dimensionality == 2: 
@@ -972,7 +836,7 @@ def hk_gen(h):
       for p in ptk: # loop over hoppings
 #        tk = p[0]*np.exp(1j*np.pi*2.*(p[1].dot(k)))  # add bloch hopping
         tk = p[0]*h.geometry.bloch_phase(p[1],k)  # add bloch hopping
-        ho = ho + tk + tk.H  # add bloch hopping
+        ho = ho + tk + algebra.dagger(tk)  # add bloch hopping
       return ho
     return hk
   else: raise
@@ -1016,31 +880,34 @@ from .kanemele import generalized_kane_mele
 def turn_nambu(self):
   """Turn a Hamiltonian an Nambu Hamiltonian"""
   from .superconductivity import build_eh as nambu # redefine
-  if self.has_eh: return # do nothing if already has eh
-#  self.get_eh_sector = get_eh_sector_odd_even # assign function
-#  if not self.has_eh: # if has not been assigned yet
-#    self.nambu_tauz = get_nambu_tauz(self.intra) # assign matrix
-  # add pairing
-  self.intra = nambu(self.intra,is_sparse=self.is_sparse)
-  if self.is_multicell: # for multicell hamiltonians
-    for i in range(len(self.hopping)): # loop over hoppings
-      self.hopping[i].m = nambu(self.hopping[i].m,is_sparse=self.is_sparse) # put in nambu form
-  else: # conventional way
-    if self.dimensionality==0: pass # one dimensional systems
-    elif self.dimensionality==1: # one dimensional systems
-      self.inter = nambu(self.inter,is_sparse=self.is_sparse)
-    elif self.dimensionality==2: # two dimensional systems
-      self.tx = nambu(self.tx,is_sparse=self.is_sparse)
-      self.ty = nambu(self.ty,is_sparse=self.is_sparse)
-      self.txy = nambu(self.txy,is_sparse=self.is_sparse)
-      self.txmy = nambu(self.txmy,is_sparse=self.is_sparse)
-    else: raise
+  if self.check_mode("spinful_nambu"): return # do nothing
+  if not self.check_mode("spinful"): raise # error
+  def f(m): return nambu(m,is_sparse=self.is_sparse)
+  self.modify_hamiltonian_matrices(f) # modify all the matrices
   self.has_eh = True
 
 
+
+def modify_hamiltonian_matrices(self,f):
+  """Apply a certain function to all the matrices"""
+  self.intra = f(self.intra)
+  if self.is_multicell: # for multicell hamiltonians
+    for i in range(len(self.hopping)): # loop over hoppings
+      self.hopping[i].m = f(self.hopping[i].m) # put in nambu form
+  else: # conventional way
+    if self.dimensionality==0: pass # one dimensional systems
+    elif self.dimensionality==1: # one dimensional systems
+      self.inter = f(self.inter)
+    elif self.dimensionality==2: # two dimensional systems
+      self.tx = f(self.tx)
+      self.ty = f(self.ty)
+      self.txy = f(self.txy)
+      self.txmy = f(self.txmy)
+    else: raise
+
+
+
 from . import inout
-
-
 
 def load(input_file="hamiltonian.pkl"):  return inout.load(input_file)
 
