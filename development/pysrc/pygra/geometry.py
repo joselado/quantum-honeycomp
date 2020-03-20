@@ -678,7 +678,7 @@ def triangular_lattice(n=1):
   g.xyz2r() # create r coordinates
   g.has_sublattice = False # has sublattice index
   g.update_reciprocal() # update reciprocal lattice vectors
-  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+  if n>1: return supercelltk.target_angle_volume(g,angle=1./3.,volume=int(n),
           same_length=True) 
   return g
 
@@ -690,7 +690,8 @@ def triangular_lattice_tripartite():
   Creates a triangular lattice with three sites per unit cell
   """
   g = triangular_lattice()
-  return supercelltk.target_angle(g,angle=1./3.,volume=3,same_length=True)
+  return supercelltk.target_angle_volume(g,angle=1./3.,volume=3,
+          same_length=True)
 
 
 
@@ -844,7 +845,7 @@ def lieb_lattice():
 
 
 
-def kagome_lattice():
+def kagome_lattice(n=1):
   """
   Creates a Kagome lattice
   """
@@ -862,6 +863,8 @@ def kagome_lattice():
   g.has_sublattice = True # does not have sublattice index
   g.sublattice_number = 3 # three sublattices
   g.sublattice = [0,1,2] # the three sublattices
+  if n>1: return supercelltk.target_angle(g,angle=1./3.,volume=int(n),
+          same_length=True) 
   return g
 
 
@@ -1059,10 +1062,11 @@ def read(input_file="POSITIONS.OUT"):
 
 
 
-def bulk2ribbon(h,n=10):
-  """Converts a hexagonal bulk hamiltonian into a ribbon hamiltonian"""
-  from .hexagonal import bulk2ribbon as br
-  return br(h,n=n)
+from .ribbon import bulk2ribbon
+#def bulk2ribbon(h,n=10):
+#  """Converts a hexagonal bulk hamiltonian into a ribbon hamiltonian"""
+#  from .hexagonal import bulk2ribbon as br
+#  return br(h,n=n)
 
 
 def get_reciprocal2d(a1,a2):
@@ -1226,11 +1230,11 @@ def get_reciprocal(a1,a2,a3):
   return b1,b2,b3
 
 
-def get_fractional(g,center=False):
+def get_fractional_function(g,center=False):
   """Get fractional coordinates"""
 #  if g.dimensionality<2: raise # stop 
   dim = g.dimensionality # dimensionality
-  if dim==0: return
+  if dim==0: return lambda x: x
   elif dim==1: # one dimensional
     R = np.array([g.a1,[0.,1.,0.],[0.,0.,1.]]).T # transformation matrix
     if np.max(np.abs(g.a1[1:2]))>1e-6: raise
@@ -1242,13 +1246,18 @@ def get_fractional(g,center=False):
   else: raise
   g.has_fractional = True # has fractional coordinates
   L = lg.inv(R) # inverse matrix
-  store = [] # empty list
-  for r in g.r:
-    rn = L@np.array(r)  # transform
-    store.append(rn) # store
+  def f(r):
+      if center: return (L@np.array(r))%1.0  # transform
+      else: return L@np.array(r)  # transform
+  return f
+
+
+def get_fractional(g,center=False):
+  dim = g.dimensionality # dimensionality
+  if dim==0: return
+  f = get_fractional_function(g,center=center)
+  store = [f(r) for r in g.r] # empty list
   store = np.array(store) # convert to array
-  if center: # center the unit cell
-      store = store%1.
   # if you remove the shift the Berry Green formalism does not work
   if dim>0: g.frac_x = store[:,0]
   if dim>1: g.frac_y = store[:,1]

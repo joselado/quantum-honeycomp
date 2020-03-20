@@ -92,13 +92,13 @@ def initialize():
   h = g.get_hamiltonian(has_spin=True)
   h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
-  if abs(get("rashba")) > 0.0: h.add_rashba(get("rashba"))  # Rashba field
+  h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
   h.shift_fermi(get("fermi")) # shift fermi energy
-  if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-  if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
-  if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
-  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
+  h.add_kane_mele(get("kanemele")) # intrinsic SOC
+  h.add_haldane(get("haldane")) # intrinsic SOC
+  h.add_antihaldane(get("antihaldane")) 
+  h.add_anti_kane_mele(get("antikanemele")) 
   if abs(get("swave"))>0.0: 
       h = h.get_multicell()
       special_pairing(h)

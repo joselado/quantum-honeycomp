@@ -41,13 +41,14 @@ def names_soc_orbitals(specie):
   datoms = ["Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn"]
   datoms += ["Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd"]
   datoms += ["Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg"]
-  if name in datoms: return dorbs # for dorbitals
   patoms = ["B","C","N","O","F","P"]
   patoms += ["Al","Si","P","S","Cl"]
   patoms += ["Ga","Ge","As","Se","Br"]
   patoms += ["In","Sn","An","Te","I"]
   patoms += ["Tl","Pb","Bi","Po","At"]
-  if name in patoms: return porbs # for dorbitals
+  if name in datoms: return dorbs # for dorbitals
+  elif name in patoms: return porbs # for dorbitals
+  else: raise
 
 
 

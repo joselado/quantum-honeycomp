@@ -50,9 +50,23 @@ def get(name,string=False):
     out = obj.text()
     print(name,out)
     if string: return out # return as string
-    else: return float(out) # return as float
+    try: # if it is a number
+        return float(out) # return as float
+    except: # execute
+        print("Here")
+        if "import os" in out: raise # silly sanity check
+        out = out.replace("\n","")
+        a = eval("lambda r: "+out) # execute the string
+        # try the function
+        try: 
+            a([0.,0.,0.])
+            return a
+        except:
+            modify(name,0)
+            return 0.0
   except:
     print(name,"not found, set to zero")
+    modify(name,0) # set this value
     return 0
 
 
@@ -78,9 +92,11 @@ def set_combobox(name,cs=[]):
 
 
 def modify(name,text):
-  obj = getattr(form,name) # get the object
-  out = obj.setText(str(text))
-  app.processEvents() # update the interface
+  try:
+    obj = getattr(form,name) # get the object
+    out = obj.setText(str(text))
+    app.processEvents() # update the interface
+  except: pass
 
 
 def set_value(name,text):

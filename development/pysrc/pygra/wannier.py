@@ -124,6 +124,7 @@ def get_index_orbital(specie,atom,orbital,input_file="wannier.win"):
   ll = read_between("begin atoms_frac","end atoms_frac",input_file)
   lorb = read_between("begin projections","end projections",input_file)
   iorb = 0 # index in the matrix
+  print(specie)
   for l in lorb: # loop over orbitals
     sname = l.split(":")[0] # name of the atom
     oname = l.split(":")[1] # name of the orbital

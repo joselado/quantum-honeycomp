@@ -139,7 +139,7 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None):
 def ldos_diagonalization(m,e=0.0,**kwargs):
     """Compute the LDOS using exact diagonalization"""
     if algebra.issparse(m): return ldos_arpack(m,e=e,**kwargs) # sparse
-    else: ldos_waves(m,es=[e],**kwargs)[0] # dense
+    else: return ldos_waves(m,es=[e],**kwargs)[0] # dense
 
 
 
@@ -214,15 +214,17 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
 
 
 
-def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
-             random=True,**kwargs):
+def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
+             random=True,silent=False,write=True,**kwargs):
   """ Calculate DOS for a 2d system"""
+  if ks is not None and mode=="green": raise
   if mode=="green":
     from . import green
     if h.dimensionality!=2: raise # only for 2d
+    h = h.copy()
+    h.turn_dense()
     if nk is not None:
       print("LDOS using normal integration with nkpoints",nk)
-      h = h.turn_dense() # turn the matrix to dense
       gb,gs = green.bloch_selfenergy(h,energy=e,delta=delta,mode="full",nk=nk)
       d = [ -(gb[i,i]).imag for i in range(len(gb))] # get imaginary part
     else:
@@ -234,9 +236,10 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
     if nk is None: nk = 10
     hkgen = h.get_hk_gen() # get generator
     ds = [] # empty list
-    ks = klist.kmesh(h.dimensionality,nk=nk)
-    if random: ks = [np.random.random(3) for k in ks] # random mesh
-    ts = timing.Testimator(title="LDOS",maxite=len(ks))
+    if ks is None:
+      ks = klist.kmesh(h.dimensionality,nk=nk)
+      if random: ks = [np.random.random(3) for k in ks] # random mesh
+    ts = timing.Testimator(title="LDOS",maxite=len(ks),silent=silent)
     for k in ks: # loop over kpoints
       ts.iterate()
       hk = hkgen(k) # get Hamiltonian
@@ -249,7 +252,7 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,mode="green",
   x,y = g.x,g.y # get the coordinates
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
-  write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+  if write: write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
   return (x,y,d) # return LDOS
 
 
@@ -316,6 +319,13 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
     fo.write(name0+"\n") # name of the file
     fo.flush() # flush
   fo.close() # close file
+  fmap = open("DOSMAP.OUT","w")
+  for ii in range(len(h.geometry.x)):
+      for ie in range(len(es)):
+          fmap.write(str(ii)+"  ")
+          fmap.write(str(es[ie])+"  ")
+          fmap.write(str(outs[ie][ii])+"\n")
+  fmap.close()
   # Now calculate the DOS
   from .dos import calculate_dos
   es2 = np.linspace(min(es),max(es),len(es)*10)

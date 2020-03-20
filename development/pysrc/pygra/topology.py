@@ -557,7 +557,7 @@ def berry_operator(h,delta=1e-1,**kwargs):
 
 
 def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
-        ne=100,dk=0.0001,operator=None,
+        ne=100,dk=0.0001,operator=None,integral_mode="complex",
                   delta=0.002,integral=True,eps=1e-1,
                   energy=0.0,emax=0.0):
   """Return the Berry curvature map at a certain kpoint"""
@@ -589,6 +589,11 @@ def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
   else: # evaluate at the fermi energy
     out = fint(energy).real
   return out # return result
+
+
+def spatial_berry_density(h,**kwargs):
+    return berry_green_map(h,integral=False,**kwargs)
+
 
 
 def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,operator=None,**kwargs):

@@ -11,18 +11,16 @@ except:
   print("Not possible to use FORTRAN rutines, kanemele.py")
   use_fortran = False
 
+import numbers 
 def is_number(s):
-    try:
-        float(s)
-        return True
-    except:
-        return False
+    return isinstance(s, numbers.Number)
 
+isnumber = is_number
 
 def generalized_kane_mele(r1,r2,rm,fun=0.0):
   """Return the Kane-Mele generalized Hamiltonian"""
   if fun==0.0: return 0
-  if is_number(fun): kmfun = lambda i,j: fun # function that always returns fun
+  if is_number(fun): kmfun = lambda r: fun # function that always returns fun
   elif callable(fun): kmfun = fun # callable function
   else: raise # no idea
   nsites = len(r1) # number of sites
@@ -35,7 +33,8 @@ def generalized_kane_mele(r1,r2,rm,fun=0.0):
       if dr.dot(dr)>4.1:
         continue # if too far away, next iteration
       ur = km_vector(r1[i],r2[j],rm) # kane mele vector
-      sm = (sx*ur[0] + sy*ur[1] + sz*ur[2])*kmfun(r1[i],r2[j]) # contribution
+      r3 = (r1[i] + r2[j])/2.0
+      sm = (sx*ur[0] + sy*ur[1] + sz*ur[2])*kmfun(r3) # contribution
       if mout[i][j] is None: mout[i][j] = csc_matrix(1j*sm) # add contribution
       else: mout[i][j] += csc_matrix(1j*sm) # add contribution
   return bmat(mout) # return matrix
@@ -63,7 +62,7 @@ def haldane(r1,r2,rm,fun=0.0,sublattice=None):
   """Return the Haldane coupling"""
   if sublattice is None: sublattice = np.zeros(len(r1)) + 1.0
   if fun==0.0: return 0
-  if is_number(fun): kmfun = lambda i,j: fun # function that always returns fun
+  if is_number(fun): kmfun = lambda r: fun # function that always returns fun
   elif callable(fun): kmfun = fun # callable function
   else: raise # no idea
   nsites = len(r1) # number of sites
@@ -80,7 +79,8 @@ def haldane(r1,r2,rm,fun=0.0,sublattice=None):
 #      ur = km_vector(r1[i],r2[j],rm) # kane mele vector
 #      print(rijs)
       ur = km_vector(r1[i],r2[j],rijs) # kane mele vector
-      sm = ur[2]*kmfun(r1[i],r2[j]) # clockwise or anticlockwise
+      r3 = (r1[i] + r2[j])/2.0
+      sm = ur[2]*kmfun(r3) # clockwise or anticlockwise
       mout[i,j] = 1j*sm*(sublattice[i]+sublattice[j])/2. # store
   return csc_matrix(mout) # return matrix
 
@@ -231,6 +231,8 @@ from .increase_hilbert import spinful,spinful_sparse
 def add_haldane_like(self,t,spinless_generator,
         sublattice=None,time_reversal=False):
   """Add to a Hamiltonian a Haldane-like hopping"""
+  if isnumber(t): 
+      if t==0.0: return # skip
   g = self.geometry
   if sublattice is None: sublattice = np.zeros(len(g.r)) + 1.0 # ones
   def generator(r1,r2,rs,fun=t,sublattice=sublattice): # define function

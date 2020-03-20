@@ -12,6 +12,23 @@ from . import topology
 from . import superconductivity
 from .algebra import braket_wAw
 
+import numbers
+def isnumber(s):
+    return isinstance(s, numbers.Number)
+
+class Operator():
+    def __init__(self,m):
+        raise
+        if type(m)==np.array:
+            self.m = lambda k=None: m # create dummy function
+        elif type(m)==Operator: 
+            self.m = m.m
+        else: raise
+    def __mul__(self,a):
+        out = Operator(self)
+        out.m = lambda k=None: self.m(k=k)@a.m(k=k)
+        return out
+
 
 
 
@@ -350,7 +367,7 @@ def get_valley(h,projector=False,delta=None):
     es = es/(np.abs(es)+delta) # renormalize the valley eigenvalues
     vs = np.matrix(vs) # convert
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
-    return vs*m0*vs.H # return renormalized operator
+    return vs@m0@vs.H # return renormalized operator
   if projector: # function returns a matrix
     def fun(m=None,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint

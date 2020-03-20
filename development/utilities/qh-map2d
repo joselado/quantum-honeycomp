@@ -17,8 +17,8 @@ def getplot(obj):
     y = m[1]
     z = m[2]
     # get dimensions assuming uniform grid
-    ux = np.unique(x)
-    uy = np.unique(y)
+    ux = np.unique(np.round(x,5))
+    uy = np.unique(np.round(y,5))
     ny = len(ux)
     nx = len(uy)
     z2d = z.reshape(ny,nx) # makes a (Zy,Zx) matrix out of z
@@ -61,11 +61,14 @@ def getplot(obj):
     plt.plot(ya,z2d[iy,:],cx)
     plt.xlabel(args.ylabel)
     plt.ylabel(args.zlabel)
-    plt.subplot(223) # first figure
+    plt.subplot(223) # second figure
     plt.plot(xa,z2d[:,ix],cy)
     plt.xlabel(args.xlabel)
     plt.ylabel(args.zlabel)
     plt.tight_layout()
+    if args.save_cuts=="True":
+        np.savetxt("XCUT_"+args.input,np.array([ya,z2d[iy,:]]).T)
+        np.savetxt("YCUT_"+args.input,np.array([xa,z2d[:,ix]]).T)
     return fig
 
 
@@ -77,6 +80,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input",default="2D.OUT",help='Input file')
 parser.add_argument("--xlabel",default="x",help='x label')
 parser.add_argument("--ylabel",default="y",help='y label')
+parser.add_argument("--save_cuts",default="False",help='Save the cuts')
 parser.add_argument("--zlabel",default="z",help='z label')
 parser.add_argument("--title",default="Colormap",help='Window title')
 args = parser.parse_args() # get the arguments

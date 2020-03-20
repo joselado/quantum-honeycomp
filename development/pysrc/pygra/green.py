@@ -613,7 +613,7 @@ def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
 
 
 def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
-  """alculates the selfenergy of a certain supercell """
+  """Calculates the selfenergy of a certain supercell """
   try:   # if two number given
     nsuper1 = nsuper[0]
     nsuper2 = nsuper[1]

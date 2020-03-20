@@ -3,7 +3,7 @@ import numpy as np
 from . import supercell
 from . import sculpt
 
-def bulk2ribbon(g,boundary=[1,0],n=10,clean=True):
+def bulk2ribbon(g,n=10,boundary=[1,0],clean=True):
   """Return the geometry of a ribbon"""
   go = g.copy() # copy
   m = [[boundary[0],boundary[1],0],[0,1,0],[0,0,1]] # supercell

@@ -93,14 +93,14 @@ def initialize():
   j = np.array([get("Bx"),get("By"),get("Bz")])
   h.add_zeeman(j) # Zeeman field
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
-  if check("rashba"): h.add_rashba(get("rashba"))  # Rashba field
+  h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
   h.add_crystal_field(qtwrap.get("crystalfield")) 
   h.shift_fermi(get("fermi")) # shift fermi energy
-  if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
-  if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
-  if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
+  h.add_kane_mele(get("kanemele")) # intrinsic SOC
+  h.add_anti_kane_mele(get("antikanemele")) 
+  h.add_haldane(get("haldane")) # intrinsic SOC
+  h.add_antihaldane(get("antihaldane")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
   if abs(get("inplaneb"))>0.0:
       h.add_inplane_bfield(b=get("inplaneb"),phi=get("inplaneb_phi"))

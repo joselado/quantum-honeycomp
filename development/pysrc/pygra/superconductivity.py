@@ -209,6 +209,9 @@ def add_swave(delta=0.0,is_sparse=False,rs=None):
 
 def add_swave_to_hamiltonian(self,delta,**kwargs):
     """Add the swave coupling to the Hamiltonian"""
+    from .operators import isnumber
+    if isnumber(delta):
+        if delta==0.0: return 
     # spinless Hamiltonian
     if self.check_mode("spinless") or self.check_mode("spinless_nambu"): 
         from .sctk import spinless

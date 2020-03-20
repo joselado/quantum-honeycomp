@@ -69,7 +69,6 @@ def modify_geometry(g):
         inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
         if inds.shape==(): inds = [inds]
       except: inds = [] # Nothing
-      print(inds)
       g = sculpt.remove(g,inds) # remove those atoms
   if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
       g = sculpt.remove_unibonded(g,iterative=True)
@@ -86,20 +85,18 @@ def initialize():
   """ Initialize the calculation"""
   g = get_geometry() # get the geometry
   h = g.get_hamiltonian(has_spin=True)
-  h.add_peierls(get("peierls")) # magnetic field
   h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   if abs(get("rashba")) > 0.0: h.add_rashba(get("rashba"))  # Rashba field
   h.add_antiferromagnetism(get("mAF"))  # AF order
   h.add_crystal_field(qtwrap.get("crystalfield")) 
   h.shift_fermi(get("fermi")) # shift fermi energy
-  if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-  if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
-  if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
-  if abs(get("antikanemele"))>0.0:  h.add_anti_kane_mele(get("antikanemele")) 
-  if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
-#  h.add_peierls(get("peierls")) # shift fermi energy
-
+  h.add_kane_mele(get("kanemele")) # intrinsic SOC
+  h.add_haldane(get("haldane")) # intrinsic SOC
+  h.add_antihaldane(get("antihaldane")) 
+  h.add_anti_kane_mele(get("antikanemele")) 
+  h.add_peierls(get("peierls")) # magnetic field
+  h.add_swave(get("swave")) 
   return h
 
 
