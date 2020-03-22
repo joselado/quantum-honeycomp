@@ -120,14 +120,14 @@ def add_haldane(h,t):
 def add_modified_haldane(h,t):
   """Add Haldane to a Hamiltonian"""
 #  if h.has_eh: raise # not for spinful
-  if not h.geometry.has_sublattice: raise # if it does not have sublattice
+  if not h.geometry.has_sublattice: return # if it does not have sublattice
   add_haldane_like(h,t,haldane,sublattice=h.geometry.sublattice) 
 
 
 def add_anti_kane_mele(h,t):
   """Add Haldane to a Hamiltonian"""
   if not h.has_spin: raise
-  if not h.geometry.has_sublattice: raise # if it does not have sublattice
+  if not h.geometry.has_sublattice: return # if it does not have sublattice
   add_haldane_like(h,t,haldane,sublattice=h.geometry.sublattice,
           time_reversal = True) 
 

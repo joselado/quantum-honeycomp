@@ -7,6 +7,9 @@ def add_rashba(self,c):
     """
     Add rashba to a Hamiltonian
     """
+    from .operators import isnumber
+    if isnumber(c):
+        if c==0.0: return
     if not self.has_spin: raise # not implemented
     g = self.geometry
     is_sparse = self.is_sparse # saprse Hamiltonian
