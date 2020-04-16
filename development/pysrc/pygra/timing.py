@@ -5,7 +5,7 @@ printall = False
 
 class Testimator:
   def __init__(self,title="",maxite=None,silent=False):
-    self.t0 = time.clock() # starting time
+    self.t0 = time.perf_counter() # starting time
     self.title = title
     self.maxite = maxite
     self.silent = silent
@@ -13,7 +13,7 @@ class Testimator:
     if len(title)>0: print(title)
   def remaining(self,i,tot):
     """Print the ramining time in this task"""
-    t = time.clock() # current time
+    t = time.perf_counter() # current time
     dt = t - self.t0 # difference in time
     out = self.title + " " # empty line
     for j in range(10):

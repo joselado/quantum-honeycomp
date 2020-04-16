@@ -21,7 +21,8 @@ from interfacetk import common # common routines for all the geometries
 
 common.initialize(qtwrap) # do several common initializations
 
-
+qtwrap.set_combobox("scf_initialization",meanfield.spinful_guesses)
+qtwrap.set_combobox("bands_color",operators.operator_list)
 
 
 def get_geometry(modify=True):
@@ -217,11 +218,13 @@ def solve_scf():
   h = initialize() # initialize the Hamiltonian
   mf = scftypes.guess(h,mode=scfin)
   nk = int(get("nk_scf"))
-  U = get("hubbard")
+  U = get("U")
+  V1 = get("V1")
+  V2 = get("V2")
   filling = get("filling_scf")
   filling = filling%1.
-  scf = scftypes.hubbardscf(h,nkp=nk,filling=filling,g=U,
-                mf=mf,T=get("smearing_scf"),
+  scf = meanfield.Vinteraction(h,nk=nk,filling=filling,U=U,V1=V1,V2=V2,
+                mf=mf,load_mf=False,#T=get("smearing_scf"),
                 mix = get("mix_scf"))
   scf.hamiltonian.save() # save in a file
   comp.kill()

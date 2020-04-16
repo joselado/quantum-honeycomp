@@ -219,7 +219,7 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
   return v_ij_fast_coulomb(ii,jvs2,2*n)
 
 
-
+spinful_guesses = ["Fully random","ferro","antiferro","ferroX","ferroY","CDW"]
 
 
 def guess(h,mode="ferro",fun=0.01):
@@ -238,7 +238,9 @@ def guess(h,mode="ferro",fun=0.01):
     h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
+    m = m + m.T.conjugate()
     return m
+  elif mode=="Fully random": return None
   elif mode=="CDW":
     h0.add_onsite(h.geometry.sublattice)
   elif mode=="potential":
@@ -405,5 +407,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
 
 
 
+from .selfconsistency import densitydensity
 
-
+hubbardscf = densitydensity.hubbard
+Vinteraction = densitydensity.Vinteraction

@@ -1,9 +1,13 @@
 import numpy as np
 import scipy.linalg as lg
 from . import parallel
+from numba import jit
+
 try:
     from . import chif90
+    use_fortran = True
 except:
+    use_fortran = False
     print("Error, chif90 not found")
 
 
@@ -16,9 +20,26 @@ def chargechi(h,i=0,j=0,es=np.linspace(-3.0,3.0,100),delta=0.01,temp=1e-7):
     ws = np.transpose(ws)
     if i<0: raise
     if j<0: raise
-    return es,chif90.elementchi(ws,esh,ws,esh,es,i+1,j+1,temp,delta)
+    if use_fortran:
+      return es,chif90.elementchi(ws,esh,ws,esh,es,i+1,j+1,temp,delta)
+    else:
+      out = 0*es + 0j # initialize
+      return es,elementchi(ws,esh,ws,esh,es,i,j,temp,delta,out)
 
-
+@jit(nopython=True)
+def elementchi(ws1,es1,ws2,es2,omegas,ii,jj,T,delta,out):
+    """Compute the response function"""
+    out  = out*0.0 # initialize
+    n = len(ws1) # number of wavefunctions
+    for i in range(n):
+      oi = es1[i]<0.0 # first occupation
+      for j in range(n):
+          oj = es2[j]<0.0 # second occupation
+          fac = ws1[i][ii]*ws2[j][ii] # add the factor
+          fac *= np.conjugate(ws1[i][jj]*ws2[j][jj]) # add the factor
+          fac *= oi - oj # occupation factor
+          out = out + fac*(1./(es1[i]-es2[j] - omegas + 1j*delta))
+    return out
 
 def chargechi_nowf(h,i=0,j=0,es=np.linspace(-3.0,3.0,100),delta=0.01,temp=1e-7):
     """Compute charge response function"""

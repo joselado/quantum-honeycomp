@@ -21,7 +21,7 @@ def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False):
   if h.has_spin: (ii,jj,ts) = extract.hopping_spinful(h.intra)
   else: (ii,jj,ts) = extract.hopping_spinless(h.intra)
   f = open(name,"w") # write file
-  for (i,j,t) in zip(ii,jj,ts):
+  for (i,j,t) in zip(ii,jj,np.abs(ts)):
     if skip(h.geometry.r[i],h.geometry.r[j]): continue
     f.write(str(h.geometry.r[i][0])+"  ")
     f.write(str(h.geometry.r[i][1])+"  ")

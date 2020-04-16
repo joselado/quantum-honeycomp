@@ -193,7 +193,7 @@ def show_ldos():
   nk = get("nk_ldos_single")
   nk = int(round(np.sqrt(nk)))
   nsuper = int(get("nsuper_ldos_single"))
-  ldos.ldos2d(h,e=e,delta=delta,nk=nk,mode="arpack",nrep=nsuper)
+  ldos.ldos(h,e=e,delta=delta,nk=nk,mode="arpack",nrep=nsuper)
   execute_script("qh-fast-ldos LDOS.OUT  ")
 #  execute_script("qh-multildos ")
 #  execute_script("tb90-calculate-ldos "+str(get("stm_bias")))

@@ -12,6 +12,7 @@ from scipy.sparse import csc_matrix
 
 mf_file = "MF.pkl" # mean field file
 
+
 def coulombscf(h,g=1.0,nkp = 100,filling=0.5,mix=0.9,
                   maxerror=1e-05,silent=False,mf=None,
                   smearing=None,fermi_shift=0.0,

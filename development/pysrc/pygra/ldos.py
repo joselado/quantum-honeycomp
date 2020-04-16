@@ -11,6 +11,7 @@ from . import operators
 from . import timing
 from . import parallel
 from . import algebra
+from .increase_hilbert import full2profile as spatial_dos
 
 def ldos0d(h,e=0.0,delta=0.01,write=True):
   """Calculates the local density of states of a Hamiltonian and
@@ -335,26 +336,6 @@ def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
 
 
 
-
-
-
-
-
-
-
-
-
-
-def spatial_dos(h,dos):
-  """Resums a certain DOS to show only the spatial dependence"""
-  if h.has_spin == False and h.has_eh==False: return np.array(dos)
-  elif h.has_spin == True and h.has_eh==False: 
-    return np.array([dos[2*i]+dos[2*i+1] for i in range(len(dos)//2)])
-  elif h.has_spin == False and h.has_eh==True: 
-    return np.array([dos[2*i]+dos[2*i+1] for i in range(len(dos)//2)])
-  elif h.has_spin == True and h.has_eh==True: 
-    return np.array([dos[4*i]+dos[4*i+1]+dos[4*i+2]+dos[4*i+3] for i in range(len(dos)//4)])
-  else: raise
 
 
 def write_ldos(x,y,dos,output_file="LDOS.OUT",z=None):

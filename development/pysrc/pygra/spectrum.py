@@ -316,7 +316,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
 
 
 
-def eigenvalues(h0,nk=10):
+def eigenvalues(h0,nk=10,notime=False):
     """Return all the eigenvalues of a Hamiltonian"""
     from . import klist
     h = h0.copy() # copy hamiltonian
@@ -325,10 +325,10 @@ def eigenvalues(h0,nk=10):
     hkgen = h.get_hk_gen() # get generator
     if parallel.cores==1:
       es = [] # empty list
-      est = timing.Testimator(maxite=len(ks))
+      if not notime: est = timing.Testimator(maxite=len(ks))
       for k in ks: # loop
-        est.iterate()
-        es += algebra.eigvalsh(hkgen(k)).tolist() # add
+          if not notime: est.iterate()
+          es += algebra.eigvalsh(hkgen(k)).tolist() # add
     else:
         f = lambda k: algebra.eigvalsh(hkgen(k)) # add
         es = parallel.pcall(f,ks) # call in parallel
@@ -409,11 +409,23 @@ def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
         efermi = f(fill) # get the fermi energy
     else: # dense Hamiltonian, use ED
         es = eigenvalues(h,nk=nk)
-        from .scftypes import get_fermi_energy
         efermi = get_fermi_energy(es,fill)
     h.shift_fermi(-efermi) # shift the fermi energy
 
 
+def get_fermi_energy(es,filling,fermi_shift=0.0):
+  """Return the Fermi energy"""
+  ne = len(es) ; ifermi = int(round(ne*filling)) # index for fermi
+  sorte = np.sort(es) # sorted eigenvalues
+  fermi = (sorte[ifermi-1] + sorte[ifermi])/2.+fermi_shift # fermi energy
+  return fermi
+
+
+def get_fermi4filling(h,filling,nk=8):
+    """Return the fermi energy for a certain filling"""
+    if h.has_eh: raise # not implemented
+    es = eigenvalues(h,nk=nk,notime=True)
+    return get_fermi_energy(es,filling)
 
 def get_filling(h,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""

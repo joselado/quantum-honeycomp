@@ -21,8 +21,12 @@ mf_file = "MF.pkl" # mean field file
 def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
                   maxerror=1e-05,silent=False,mf=None,
                   T=None,collinear=False,fermi_shift=0.0,
-                  maxite=1000,save=False):
+                  maxite=1000,save=False,nk=None,U=None):
   """ Solve a selfconsistent Hubbard mean field"""
+  # alternative input variables
+  if nk is not None: nkp = nk
+  if U is not None: g = U
+  #############################
   mix = 1. - mix
   U = g # redefine
   if not h.has_spin: raise
@@ -67,6 +71,8 @@ def hubbardscf(h,g=1.0,nkp = 100,filling=0.5,mag=None,mix=0.9,
     t3 = time.time()
     error = np.max(np.abs(old_mf-mf)) # absolute difference
     # total energy
+    print("DC energy",edc)
+    print("Occupied energies",np.sum(eoccs)/totkp)
     etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
     file_etot.write(str(ite)+"    "+str(etot)+"\n") # write energy in file
     file_error.write(str(ite)+"    "+str(error)+"\n") # write energy in file

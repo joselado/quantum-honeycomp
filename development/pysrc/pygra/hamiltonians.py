@@ -57,6 +57,13 @@ class hamiltonian():
   def get_filling(self,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
     return spectrum.get_filling(self,**kwargs) # eigenvalues
+  def full2profile(self,x):
+      """Transform a 1D array in the full space to the spatial basis"""
+      from .increase_hilbert import full2profile
+      return full2profile(self,x)
+  def get_hopping_dict(self):
+      """Return the dictionary with the hoppings"""
+      return multicell.get_hopping_dict(self)
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)
@@ -72,6 +79,7 @@ class hamiltonian():
     self.is_sparse = False
     self.is_multicell = False # for hamiltonians with hoppings to several neighbors
     self.hopping_dict = {} # hopping dictonary
+    self.has_hopping_dict = False # has hopping dictonary
     self.non_hermitian = False # non hermitian Hamiltonian
     if not geometry is None:
 # dimensionality of the system
@@ -115,6 +123,9 @@ class hamiltonian():
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
+  def get_fermi4filling(self,filling,**kwargs):
+      """Return the fermi energy for a certain filling"""
+      return spectrum.get_fermi4filling(self,filling,**kwargs)
   def get_dos(self,**kwargs):
       from . import dos
       return dos.dos(self,**kwargs)

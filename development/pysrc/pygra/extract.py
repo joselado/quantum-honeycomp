@@ -96,18 +96,27 @@ def hopping_spinful(m,cutoff=0.001):
 
 def hopping_spinless(m,cutoff=0.001):
   """Extract hopping"""
-  n = m.shape[0] # number of sites
-  ii = []
-  jj = []
-  ts = []
-  for i in range(n):
-    for j in range(i,n):
-      t = np.abs(m[i,j]) 
-      if t>cutoff:
-        ii.append(i)
-        jj.append(j)
-        ts.append(t)
-  return ii,jj,np.array(ts) # return pairs
+  from scipy.sparse import coo_matrix
+  m = coo_matrix(m) # transform to coo_matrix
+  m.eliminate_zeros() # remove zeros
+  row,col,data = m.row,m.col,m.data
+  absd = np.abs(data) # absolute value
+  row = row[absd>cutoff]
+  col = col[absd>cutoff]
+  data = data[absd>cutoff]
+  return row,col,data
+#  n = m.shape[0] # number of sites
+#  ii = []
+#  jj = []
+#  ts = []
+#  for i in range(n):
+#    for j in range(i,n):
+#      t = np.abs(m[i,j]) 
+#      if t>cutoff:
+#        ii.append(i)
+#        jj.append(j)
+#        ts.append(t)
+#  return ii,jj,np.array(ts) # return pairs
 
 
 

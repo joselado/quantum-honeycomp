@@ -351,6 +351,7 @@ def get_spin_current(h):
 def get_valley(h,projector=False,delta=None):
   """Return a callable that calculates the valley expectation value
   using the modified Haldane coupling"""
+  if h.dimensionality==0: projector = True # zero dimensional
   ho = h.copy() # copy Hamiltonian
   ho.turn_multicell()
   ho.clean() # set to zero
@@ -362,8 +363,7 @@ def get_valley(h,projector=False,delta=None):
 #    return m
     if delta is None: return m # do nothing
     if issparse(m): return m # temporal workaround
-    if issparse(m): m = m.todense() # I should fix this
-    (es,vs) = lg.eigh(m) # diagonalize
+    (es,vs) = algebra.eigh(m) # diagonalize
     es = es/(np.abs(es)+delta) # renormalize the valley eigenvalues
     vs = np.matrix(vs) # convert
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
@@ -381,7 +381,9 @@ def get_valley(h,projector=False,delta=None):
       hk = hkgen(k) # evaluate Hamiltonian
       hk = sharpen(hk) # sharpen the valley
       return braket_wAw(w,hk).real # return the braket
-  return fun # return function
+  if h.dimensionality==0: 
+      return fun(np.identity(h.intra.shape[0])) # zero dimensional
+  else: return fun # return function
 
 
 
@@ -547,4 +549,7 @@ def get_valley_layer(self,n=0,**kwargs):
     fac = bool_layer_array(self.geometry,n=n) # create array
     ht.geometry.sublattice = self.geometry.sublattice * fac
     return get_valley(ht,**kwargs) # return the valley operator
+
+operator_list = ["None","Sx","Sy","Sz","sublattice","Berry","valleyberry","IPR"]
+
 

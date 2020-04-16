@@ -13,7 +13,6 @@ from . import meanfield
 from . import groundstate
 from . import parallel
 
-
 from .meanfield import guess # function to calculate guesses
 try:
   from . import correlatorsf90
@@ -42,6 +41,7 @@ class scfclass():
   def save(self,output_file="SCF.pkl"):
     inout.save(self,output_file)
   def __init__(self,h):
+    self.has_index2vec = False
     self.iteration = 0 # initialize
     self.scfmode = "filling" # do SCF fixing the number of filled states
     self.interactions = [] # empty list
@@ -137,7 +137,7 @@ class scfclass():
       self.hamiltonian.hopping = multicell.collect_hopping(self.hamiltonian)
   def setup_interaction(self,mode="Hubbard",g=1.0,**kwargs):
     """Create the operators that will determine the interactions"""
-    if timing: t0 = time.clock()
+    if timing: t0 = time.perf_counter()
     interactions = [] # empty list
     has_eh = self.hamiltonian.has_eh # has electron hole
     nat = self.sites # number of sites
@@ -212,7 +212,7 @@ class scfclass():
               interactions.append(meanfield.v_ij_spinless(i,j,nat,g=2*g,d=d)) 
       else: raise # ups
     self.interactions += interactions # store list
-    if timing: print("Time in creating MF operators",time.clock()-t0)
+    if timing: print("Time in creating MF operators",time.perf_counter()-t0)
     self.setup_multicorrelator()
   def setup_multicorrelator(self):
     """Create the neccesary arrays to calculate the different
@@ -288,50 +288,10 @@ class scfclass():
       cs[k] = v.vbv 
       k += 1
     self.cij = cs.copy() # store
-  def update_mean_field(self,mixing=0.95):
+  def update_mean_field(self,**kwargs):
     """Calculate the expectation values of the different operators"""
-    mfnew = dict() # new mean field
-    accu = 0.0 # accumulator
-    from . import check
-    for key in self.mf: mfnew[key] = self.hamiltonian.intra*0.  # initialize 
-    if self.correlator_mode == "multicorrelator":
-      np.savetxt("VS_SCF.OUT",np.matrix([range(len(self.cij)),np.abs(self.cij)]).T)
-    if self.write_vabv: 
-        fvs = open("VAV_VBV.OUT","w") # open file
-        fvs.write("# dx dy dz i j abs(v)\n")
-    for v in self.interactions: # loop over interactions
-      if v.contribution=="AB":
-        tmp = v.a*v.vbv*v.g + v.b*v.vav*v.g # add contribution
-        accu += np.abs(v.vbv) + np.abs(v.vav)
-      elif v.contribution=="A":
-        tmp = v.a*v.vbv*v.g 
-        accu += np.abs(v.vbv) 
-      else: raise
-      if self.write_vabv: # write in a file
-        fvs.write(str(v.dir[0])+"   ")
-        fvs.write(str(v.dir[1])+"   ")
-        fvs.write(str(v.dir[2])+"   ")
-        fvs.write(str(v.i)+"   ")
-        fvs.write(str(v.j)+"   ")
-        fvs.write(str(np.abs(v.vav)+np.abs(v.vbv))+"\n")
-      # store in the dictionary
-      if not tuple(v.dir) in mfnew:
-          mfnew[tuple(v.dir)] = tmp  # store
-          print("WARNING, tuple",tuple(v.dir)," not present in mf")
-      else: mfnew[tuple(v.dir)] = mfnew[tuple(v.dir)] + tmp  # store
-    if self.write_vabv: fvs.close() # close file
-    accu /= len(self.interactions)*2
-    if not self.silent: print("Average value of expectation values",accu)
-    self.error = error_meanfield(self.mf,mfnew)/self.sites # get the error
-    self.mf = mix_meanfield(self.mf,mfnew,mixing=mixing) # new mean field
-    if self.hamiltonian.has_eh: 
-      print("################################")
-      print("Enforcing electron-hole symmetry")
-      print("################################")
-      self.mf = meanfield.enforce_eh(self.hamiltonian,self.mf)
-    if not self.silent: print("ERROR",self.error)
-    check.check_dict(self.mf)
-#    exit()
+    from .scftk.updatescf import update_mean_field
+    update_mean_field(self,**kwargs)
   def get_total_energy(self):
     """Return the total energy"""
     eout = np.sum(self.energies)/self.kfac 
@@ -352,13 +312,13 @@ class scfclass():
     except: 
         print("WARNING, hamiltonian is non hermitian in mean field")
         raise
-    t1 = time.clock()
+    t1 = time.perf_counter()
     self.update_occupied_states(fermi_shift=self.fermi_shift)
-    t2 = time.clock()
+    t2 = time.perf_counter()
     self.update_expectation_values() # calculate expectation values
-    t3 = time.clock()
+    t3 = time.perf_counter()
     self.update_mean_field(mixing=mixing) # calculate mean field
-    t4 = time.clock()
+    t4 = time.perf_counter()
     self.iteration += 1
     if not self.silent:
       print("Time in diagonalization",t2-t1)
@@ -389,23 +349,6 @@ class scfclass():
     self.cij = cij
     self.cij2v() # update
 
-def error_meanfield(mf1,mf2):
-  """Return the difference between two mean fields"""
-  error = 0.0 # initialize
-  for key in mf1:
-    error += np.sum(np.abs(mf1[key]-mf2[key])) # sum error
-  return error
-
-
-def mix_meanfield(mf1,mf2,mixing=0.9):
-  """Mix the two mean fields"""
-  out = dict() # create dictionary
-  for key in mf2:
-    if key in mf1: # if present in the old one
-      out[key] = mf1[key]*(1-mixing)+mf2[key]*mixing # sum error
-    else:
-      out[key] = mf2[key] # sum error
-  return out
 
 
 
@@ -453,12 +396,8 @@ def get_occupied_states(es,ws,ks,fermi,smearing=None,mine=None):
   return eoccs,voccs,koccs
 
 
-def get_fermi_energy(es,filling,fermi_shift=0.0):
-  """Return the Fermi energy"""
-  ne = len(es) ; ifermi = int(round(ne*filling)) # index for fermi
-  sorte = np.sort(es) # sorted eigenvalues
-  fermi = (sorte[ifermi-1] + sorte[ifermi])/2.+fermi_shift # fermi energy
-  return fermi
+from .spectrum import get_fermi_energy
+
 
 def get_gap(es,fermi):
   """Return the gap"""
@@ -472,6 +411,7 @@ def get_gap(es,fermi):
 
 from .selfconsistency.hubbard import hubbardscf
 from .selfconsistency.coulomb import coulombscf
+from .selfconsistency.densitydensity import densitydensity
 
 repulsive_hubbard = hubbardscf
 from .selfconsistency.attractive_hubbard_spinless import attractive_hubbard
@@ -543,11 +483,12 @@ def write_magnetization(mag):
 
 
 def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
-                  maxerror=1e-05,silent=False,mf=None,
+                  maxerror=1e-05,silent=False,mf=None,nk=None,
                   smearing=None,fermi_shift=0.0,save=True,
                   mode="Hubbard",energy_cutoff=None,maxite=1000,
                   broyden=False,callback=None,**kwargs):
   """ Solve a generalized selfcnsistent problem"""
+  if nk is not None: nkp = nk # redefine
   mf_file = "MF.pkl"
   os.system("rm -f STOP") # remove stop file
   nat = h.intra.shape[0]//2 # number of atoms

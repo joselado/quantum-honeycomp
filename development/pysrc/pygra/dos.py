@@ -196,7 +196,7 @@ def calculate_dos_hkgen(hkgen,ks,ndos=100,delta=None,
   def fun(k): # function to execute
     if parallel.cores==1: tr.iterate() # print the info
     hk = hkgen(k) # Hamiltonian
-    t0 = time.clock() # time
+    t0 = time.perf_counter() # time
     if is_sparse: # sparse Hamiltonian 
       es = algebra.smalleig(hk,numw=numw,tol=delta/1e3) # eigenvalues
       ws = np.zeros(es.shape[0])+1.0 # weight

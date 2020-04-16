@@ -8,6 +8,7 @@ from .supercell import non_orthogonal_supercell
 from . import supercell as supercelltk
 from . import checkclass
 import scipy.linalg as lg
+from numba import jit
 
 try:
   from . import supercellf90
@@ -41,6 +42,8 @@ class Geometry:
     self.atoms_names = [] # no name for the atoms
     self.atoms_have_names = False # atoms do not have names
     self.ncells = 2 # number of neighboring cells returned
+  def neighbor_distances(self,**kwargs):
+      return neighbor_distances(self,**kwargs)
   def get_index(self,r,**kwargs):
     return get_index(self,r,**kwargs)
   def __add__(self,g1):
@@ -178,8 +181,8 @@ class Geometry:
     return get_diameter(self)  
   def periodic_vector(self):
     return periodic_vector(self)
-  def fn_distance(self):
-    return fn_distance(self)
+#  def fn_distance(self):
+#    return fn_distance(self)
   def get_sublattice(self):
     """Initialize the sublattice"""
     if self.has_sublattice: self.sublattice = get_sublattice(self.r)
@@ -925,15 +928,17 @@ def honeycomb_lattice_C6():
   with C6 rotational symmetry
   """
   g = honeycomb_lattice() # create geometry
-  m = [[2,1,0],[1,2,0],[0,0,1]]
-  g = non_orthogonal_supercell(g,m)
-  g.r[0] = g.r[0] + g.a2
-  g.r[1] = g.r[1] + g.a2
-  g.r[4] = g.r[4] - g.a2 + g.a1
-  # if it looks stupid but it works, it is not stupid
-  g.r2xyz()
-  g.update_reciprocal() # update reciprocal lattice vectors
-  return g
+  return supercelltk.target_angle_volume(g,angle=1./3.,volume=3,
+          same_length=True)
+#  m = [[2,1,0],[1,2,0],[0,0,1]]
+#  g = non_orthogonal_supercell(g,m)
+#  g.r[0] = g.r[0] + g.a2
+#  g.r[1] = g.r[1] + g.a2
+#  g.r[4] = g.r[4] - g.a2 + g.a1
+#  # if it looks stupid but it works, it is not stupid
+#  g.r2xyz()
+#  g.update_reciprocal() # update reciprocal lattice vectors
+#  return g
  
 
 
@@ -1435,36 +1440,36 @@ diamond_lattice = diamond_lattice_minimal
 
 
 
-
-def fn_distance(g):
-  """Return distance between first neighbors"""
-  minr = 100
-  vectors = []
-  if g.dimensionality==0:
-    vectors = [np.array([0.,0.,0.])]
-  elif g.dimensionality==1:
-    for i in range(-1,2):
-      vectors += [i*g*a1]
-  elif g.dimensionality==2:
-    for i in range(-1,2):
-      for j in range(-1,2):
-        vectors += [i*g.a1 + j*g.a2]
-  elif g.dimensionality==3:
-    for i in range(-1,2):
-      for j in range(-1,2):
-        for k in range(-1,2):
-          vectors += [i*g.a1 + j*g.a2 + k*g.a3]
-  for v in vectors:
-    for i in range(len(g.r)):
-      for j in range(len(g.r)):
-        if i==j: continue
-        ri = g.r[i]
-        rj = g.r[j]
-        dr = ri-rj + v
-        dr = dr.dot(dr)
-        if dr<minr: minr = dr # store
-  return np.sqrt(minr) # return distance
-
+#
+#def fn_distance(g):
+#  """Return distance between first neighbors"""
+#  minr = 100
+#  vectors = []
+#  if g.dimensionality==0:
+#    vectors = [np.array([0.,0.,0.])]
+#  elif g.dimensionality==1:
+#    for i in range(-1,2):
+#      vectors += [i*g*a1]
+#  elif g.dimensionality==2:
+#    for i in range(-1,2):
+#      for j in range(-1,2):
+#        vectors += [i*g.a1 + j*g.a2]
+#  elif g.dimensionality==3:
+#    for i in range(-1,2):
+#      for j in range(-1,2):
+#        for k in range(-1,2):
+#          vectors += [i*g.a1 + j*g.a2 + k*g.a3]
+#  for v in vectors:
+#    for i in range(len(g.r)):
+#      for j in range(len(g.r)):
+#        if i==j: continue
+#        ri = g.r[i]
+#        rj = g.r[j]
+#        dr = ri-rj + v
+#        dr = dr.dot(dr)
+#        if dr<minr: minr = dr # store
+#  return np.sqrt(minr) # return distance
+#
 
 
 # two dimensional geometries
@@ -1696,5 +1701,29 @@ def sum_geometries(g1,g2):
     return g
 
 
+def neighbor_distances(g,nsuper=2):
+    """Return distances to neighbors"""
+    g = g.supercell(nsuper) # create supercell
+    r = g.r # positions
+    n = len(r)
+    out = np.zeros(n*n) # empty array
+    out = neighbor_distances_jit(r,out) # distances
+    out = np.round(out,6) # unique distances
+    out = np.unique(out) # unique distances
+    return np.array([out[i+1] for i in range(len(out)-1)]) # return
+    
+
+@jit(nopython=True)
+def neighbor_distances_jit(r,out):
+    n = len(r) # number of sites
+    k = 0
+    for i in range(n):
+        for j in range(n):
+            dr = r[i]-r[j]
+            dis = dr[0]*dr[0]+dr[1]*dr[1]+dr[2]*dr[2]
+            dis = np.sqrt(dis) # square root
+            out[k] = dis # store
+            k+=1 # increase
+    return out
 
 

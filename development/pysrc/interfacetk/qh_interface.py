@@ -28,6 +28,7 @@ from pygra import potentials
 from pygra import supercell
 from pygra import scftypes
 from pygra import indexing
+from pygra import meanfield
 from pygra import specialgeometry
 from pygra import specialhopping
 from pygra import timeevolution

@@ -82,11 +82,11 @@ def tails_python(vs,use_fortran=use_fortran):
 def test_tails(vs):
   """Perform a test of tails comparing Python and fortran"""
   import time
-  t0 = time.clock() # timing
+  t0 = time.perf_counter() # timing
   out1 = tails(vs,use_fortran=True) # fortran routine
-  t1 = time.clock() # timing
+  t1 = time.perf_counter() # timing
   out2 = tails(vs,use_fortran=False) # python routine
-  t2 = time.clock() # timing
+  t2 = time.perf_counter() # timing
   diff = np.mean(np.abs(np.array(out1)-np.array(out2))) # deviation
   avg = np.mean(np.abs(out1) + np.abs(out2))/2. # average
 #  print("Deviation",diff)

@@ -704,5 +704,7 @@ def get_operator(h,op):
 
 
 
+from .topologytk import realspace
 
+real_space_chern = realspace.real_space_chern
 

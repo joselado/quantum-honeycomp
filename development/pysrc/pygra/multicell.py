@@ -65,25 +65,31 @@ def turn_multicell(h):
 
 def get_tij(h,rij=np.array([0.,0.,0.]),zero=False):
   """Get the hopping between cells with certain indexes"""
-  drij = [int(round(ir)) for ir in rij] # put as integer
-  drij = (drij[0],drij[1],drij[2]) # as a tuple
-  try: return h.hopping_dict[drij] # try using the dictionary
-  except: # if it doesn't exist, look for it
-    rij = np.array(rij) # convert into array
-    if rij.dot(rij)<0.001: return h.intra # if vector 0
-    for t in h.hopping: # loop over hoppings 
-      d = t.dir - rij # diference vector
-      d = d.dot(d) # module
-      if d < 0.001: # if same vector
-        h.hopping_dict[drij] = t.m # store element in dictionary
-        return t.m # return matrix
-    # not found
-    if zero: 
-      h.hopping_dict[drij] = h.intra*0.0 # store element in dictionary
-      return h.intra*0. # zero matrix
-    else:
-      h.hopping_dict[drij] = None # store element in dictionary
-      return None # not found
+  drij = tuple([int(round(ir)) for ir in rij]) # put as integer
+  if not h.has_hopping_dict:
+      h.hopping_dict = get_hopping_dict(h)
+      h.has_hopping_dict = True
+  if drij in h.hopping_dict: return h.hopping_dict[drij]
+  else:
+      if zero: return h.intra*0.0
+      else: return None
+#  try: return h.hopping_dict[drij] # try using the dictionary
+#  except: # if it doesn't exist, look for it
+#    rij = np.array(rij) # convert into array
+#    if rij.dot(rij)<0.001: return h.intra # if vector 0
+#    for t in h.hopping: # loop over hoppings 
+#      d = t.dir - rij # diference vector
+#      d = d.dot(d) # module
+#      if d < 0.001: # if same vector
+#        h.hopping_dict[drij] = t.m # store element in dictionary
+#        return t.m # return matrix
+#    # not found
+#    if zero: 
+#      h.hopping_dict[drij] = h.intra*0.0 # store element in dictionary
+#      return h.intra*0. # zero matrix
+#    else:
+#      h.hopping_dict[drij] = None # store element in dictionary
+#      return None # not found
 
 def hk_gen(h):
   """Generate a k dependent hamiltonian"""
@@ -518,7 +524,13 @@ def kchain(h,k=[0.,0.,0.]):
 
 
 
-
+def get_hopping_dict(h):
+    """Return the hopping dictionary"""
+    h = h.get_multicell()
+    out = dict()
+    out[(0,0,0)] = h.intra
+    for t in h.hopping: out[tuple(t.dir)] = t.m # store
+    return out # return
 
 
 

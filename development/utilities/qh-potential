@@ -32,8 +32,8 @@ def getfig(main):
         maxc = np.max(np.abs(color))
         minc = -maxc
   elif main.get_combobox("Range")=="Sign":
-        maxc = np.max(np.abs(color))
-        minc = -maxc
+        maxc = 1
+        minc = -1
         color = np.sign(color)
   cplot = plt.scatter(x,y,s=scale,c=color,
           edgecolor="none",cmap=args.cmap,

@@ -4,16 +4,16 @@ import numpy as np
 def get_scalar_operator(self,name,**kwargs):
       """Return the conventional operator"""
       if name=="None": return None
-      elif name=="berry": 
+      elif name in ["berry","Berry"]: 
           return operators.get_berry(self,**kwargs)
       elif name=="valleyberry": 
           return operators.get_operator_berry(self,"valley",**kwargs)
       elif name=="szvalleyberry": 
           return operators.get_operator_berry(self,"sz_valley",**kwargs)
       elif name=="szberry": return operators.get_sz_berry(self,**kwargs)
-      elif name=="sx": return operators.get_sx(self)
-      elif name=="sy": return operators.get_sy(self)
-      elif name=="sz": return operators.get_sz(self)
+      elif name in ["sx","Sx"]: return operators.get_sx(self)
+      elif name in ["sy","Sy"]: return operators.get_sy(self)
+      elif name in ["sz","Sz"]: return operators.get_sz(self)
       elif name=="current": return operators.get_current(self)
       elif name=="velocity": return operators.get_velocity(self)
       elif name=="sublattice": return operators.get_sublattice(self,mode="both")
@@ -48,7 +48,7 @@ def get_scalar_operator(self,name,**kwargs):
         return operators.get_inplane_valley(ht)
       elif name=="valley_lower" or name=="valley_bottom":
         return operators.get_valley_layer(self,n=0)
-      elif name=="ipr": return operators.ipr
+      elif name in ["ipr","IPR"]: return operators.ipr
       else: raise
 
 
