@@ -219,10 +219,11 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
   return v_ij_fast_coulomb(ii,jvs2,2*n)
 
 
-spinful_guesses = ["Fully random","ferro","antiferro","ferroX","ferroY","CDW"]
+spinful_guesses = ["Fully random","ferro","antiferro",
+        "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane"]
 
 
-def guess(h,mode="ferro",fun=0.01):
+def guess(h,mode="ferro",fun=0.1):
   """Return a mean field matrix guess given a certain Hamiltonian"""
   h0 = h.copy() # copy Hamiltonian
   h0 = h0.get_multicell() # multicell
@@ -240,6 +241,16 @@ def guess(h,mode="ferro",fun=0.01):
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = m + m.T.conjugate()
     return m
+  elif mode=="dimerization":
+    n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
+    m = 1j*(m - m.T.conjugate())
+    return m
+  elif mode=="Haldane":
+      h = h.copy() ; h.clean() ; h.add_haldane(fun) # Haldane coupling
+      return h.get_hopping_dict()
+  elif mode in ["antihaldane","valley"]:
+      h = h.copy() ; h.clean() ; h.add_antihaldane(fun) # Haldane coupling
+      return h.get_hopping_dict()
   elif mode=="Fully random": return None
   elif mode=="CDW":
     h0.add_onsite(h.geometry.sublattice)

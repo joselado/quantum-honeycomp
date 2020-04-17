@@ -10,7 +10,7 @@ def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
   if numw is not None: sparse = True
   if h.dimensionality==0:
     vv = algebra.eigh(h.intra)
-    vecs = [v for v in vv[1].transpose()]
+    vecs = np.array([v for v in vv[1].transpose()])
     if kpoints: return vv[0],vecs,np.array([[0.,0.,0.] for e in vv[0]])
     else: return vv[0],vecs
   elif h.dimensionality>0:

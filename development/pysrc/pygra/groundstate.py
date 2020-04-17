@@ -27,7 +27,7 @@ def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False):
     f.write(str(h.geometry.r[i][1])+"  ")
     f.write(str(h.geometry.r[j][0])+"  ")
     f.write(str(h.geometry.r[j][1])+"  ")
-    f.write(str(t)+"\n")
+    f.write(str(np.round(t,4))+"\n")
   f.close()
 
 

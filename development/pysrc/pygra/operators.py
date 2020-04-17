@@ -550,6 +550,6 @@ def get_valley_layer(self,n=0,**kwargs):
     ht.geometry.sublattice = self.geometry.sublattice * fac
     return get_valley(ht,**kwargs) # return the valley operator
 
-operator_list = ["None","Sx","Sy","Sz","sublattice","Berry","valleyberry","IPR"]
+operator_list = ["None","Sx","Sy","Sz","valley","sublattice","Berry","valleyberry","IPR"]
 
 

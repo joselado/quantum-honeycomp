@@ -554,7 +554,7 @@
        <attribute name="title">
         <string>SCF</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_14">
+       <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
          <widget class="QTabWidget" name="tabWidget_4">
           <property name="currentIndex">
@@ -564,7 +564,7 @@
            <attribute name="title">
             <string>Basic</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_5">
+           <layout class="QGridLayout" name="gridLayout_14">
             <item row="0" column="0" colspan="2">
              <layout class="QGridLayout" name="gridLayout_10">
               <item row="0" column="1">
@@ -576,7 +576,17 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>ferro</string>
+                  <string>ferroX</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>ferroY</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>ferroZ</string>
                  </property>
                 </item>
                 <item>
@@ -593,33 +603,92 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_23">
-                <property name="text">
-                 <string>Hubbard</string>
-                </property>
-               </widget>
+              <item row="1" column="0" colspan="2">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_21">
+                  <property name="text">
+                   <string>U</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="U">
+                  <property name="toolTip">
+                   <string>Local Hubbard interaction</string>
+                  </property>
+                  <property name="text">
+                   <string>2.0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_23">
+                  <property name="text">
+                   <string>V1</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="V1">
+                  <property name="toolTip">
+                   <string>First neighbor interaction</string>
+                  </property>
+                  <property name="text">
+                   <string>0.0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_40">
+                  <property name="text">
+                   <string>V2</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="V2">
+                  <property name="toolTip">
+                   <string>Second neighbor interaction</string>
+                  </property>
+                  <property name="text">
+                   <string>0.0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="hubbard">
-                <property name="text">
-                 <string>2.0</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_34">
-                <property name="text">
-                 <string>Filling</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="filling_scf">
-                <property name="text">
-                 <string>0.5</string>
-                </property>
-               </widget>
+              <item row="2" column="0" colspan="2">
+               <layout class="QGridLayout" name="gridLayout_7">
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_29">
+                  <property name="text">
+                   <string>Extra electron</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLineEdit" name="filling_scf">
+                  <property name="text">
+                   <string>0.5</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_28">
+                  <property name="text">
+                   <string>FIlling</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QLineEdit" name="extra_electron">
+                  <property name="text">
+                   <string>0.0</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
               </item>
              </layout>
             </item>
@@ -643,13 +712,27 @@
            <attribute name="title">
             <string>Convergence</string>
            </attribute>
-           <layout class="QGridLayout" name="gridLayout_7">
+           <layout class="QGridLayout" name="gridLayout_21">
             <item row="0" column="0">
              <layout class="QGridLayout" name="gridLayout_12">
               <item row="0" column="0">
                <widget class="QLabel" name="label_32">
                 <property name="text">
                  <string>Mixing</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_27">
+                <property name="text">
+                 <string># of kpoints</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="nk_scf">
+                <property name="text">
+                 <string>10</string>
                 </property>
                </widget>
               </item>
@@ -660,14 +743,14 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
+              <item row="2" column="0">
                <widget class="QLabel" name="label_33">
                 <property name="text">
                  <string>Smearing</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
+              <item row="2" column="1">
                <widget class="QLineEdit" name="smearing_scf">
                 <property name="text">
                  <string>0.01</string>

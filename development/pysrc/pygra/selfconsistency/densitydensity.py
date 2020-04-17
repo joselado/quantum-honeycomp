@@ -118,7 +118,11 @@ def mix_mf(mf,mf0,mix=0.8):
     out = dict() # initialize
     for key in mf: # loop
         if key not in mf0: out[key] = mf[key]
-        else: out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
+        else:
+            #v0 = np.tanh(mf0[key]/mix)
+            #v1 = np.tanh(mf[key]/mix)
+            #out[key] = np.arctanh((v0+v1)/2.)*mix
+            out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
         #out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
     return out
 
@@ -242,8 +246,8 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
     def f(mf,h=h1):
       """Function to minimize"""
 #      print("Iteration #",ii) # Iteration
+      mf0 = deepcopy(mf) # copy
       h = h1.copy()
-      if os.path.exists("STOP"): return mf # return result
       hop = update_hamiltonian(hop0,mf) # add the mean field to the Hamiltonian
       set_hoppings(h,hop) # set the new hoppings in the Hamiltonian
       if callback_h is not None:
@@ -262,6 +266,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       scf = SCF() # create object
       scf.hamiltonian = h # store
       scf.mf = mf # store mean field
+      if os.path.exists("STOP"): scf.mf = mf0 # use the guess
       scf.dm = dm # store density matrix
       scf.v = v # store interaction
       return scf
@@ -281,17 +286,68 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         if diff<maxerror: 
             inout.save(scf.mf,mf_file) # save the mean field
             return scf
-      do_scf = False
-#    else:
-#        print("Solver used:",solver)
-#        import scipy.optimize as optimize 
-#        if solver=="newton": fsolver = optimize.newton_krylov
-#        elif solver=="anderson": fsolver = optimize.anderson
-#        elif solver=="broyden": fsolver = optimize.broyden2
-#        elif solver=="linear": fsolver = optimize.linearmixing
-#        else: raise
-#        def fsol(x): return x - f(x) # function to solve
-#        dold = fsolver(fsol,dold,f_tol=maxerror)
+    else: # use different solvers
+        scf = f(mf) # perform one iteration
+        fmf2a = get_mf2array(scf) # convert MF to array
+        fa2mf = get_array2mf(scf) # convert array to MF
+        def fsol(x): # define the function to solve
+            mf1 = fa2mf(x) # convert to a MF
+            scf1 = f(mf1) # compute function
+            xn = fmf2a(scf1.mf) # new vector
+            diff = x - xn # difference vector
+            print("ERROR",np.max(np.abs(diff)))
+            print()
+            return x - xn # return vector
+        x0 = fmf2a(scf.mf) # initial guess
+        # these methods do seem too efficient, but lets have them anyway
+        if solver=="krylov":
+            from scipy.optimize import newton_krylov
+            x = newton_krylov(fsol,x0,rdiff=1e-3) # use the solver
+        elif solver=="anderson":
+            from scipy.optimize import anderson
+            x = anderson(fsol,x0) # use the solver
+        elif solver=="broyden1":
+            from scipy.optimize import broyden1
+            x = broyden1(fsol,x0,f_tol=maxerror*100) # use the solver
+        elif solver=="linear":
+            from scipy.optimize import linearmixing
+            x = linearmixing(fsol,x0,f_tol=maxerror*100) # use the solver
+        else: raise # unrecognised solver
+        mf = fa2mf(x) # transform to MF
+        scf = f(mf) # compute the SCF with the solution
+        inout.save(scf.mf,mf_file) # save the mean field
+        return scf # return the mean field
+
+
+def get_mf2array(scf):
+    """Function to transform the mean field in an array"""
+    nt = len(scf.mf) # number of terms in the dictionary
+    n = scf.mf[(0,0,0)].shape[0]
+    def fmf2a(mf):
+        print(mf[(0,0,0)].real)
+        out = [mf[key].real for key in mf] # to plain array
+        out += [mf[key].imag for key in mf] # to plain array
+        out = np.array(out)
+        print(out.shape)
+        out = out.reshape(nt*n*n*2) # reshape
+        return out
+    return fmf2a # return function
+
+def get_array2mf(scf):
+    """Function to transform an array into a mean field"""
+    ds = [key for key in scf.mf] # store keys
+    nt = len(scf.mf) # number of terms in the dictionary
+    n = scf.mf[(0,0,0)].shape[0] # size
+    def fa2mf(a):
+        a = a.copy().reshape((2*nt,n*n)) # reshape array
+        mf =  dict()
+        print(a.shape)
+        for i in range(len(ds)):
+            d = ds[i]
+            m = a[i,:] + 1j*a[i+nt,:] # get matrix
+            mf[d] = m.reshape((n,n)) # store
+        return mf
+    return fa2mf # return function
 
 
 def densitydensity(h,filling=0.5,**kwargs):
@@ -348,8 +404,8 @@ def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
     def fun(r1,r2):
         dr = r1-r2
         dr = np.sqrt(dr.dot(dr)) # distance
-        if abs(dr-nd[0])<1e-6: return V1
-        if abs(dr-nd[1])<1e-6: return V2
+        if abs(dr-nd[0])<1e-6: return V1/2.
+        if abs(dr-nd[1])<1e-6: return V2/2.
         return 0.0
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             fun=fun) 

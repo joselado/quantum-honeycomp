@@ -65,7 +65,7 @@ def get_dos(h,window,silent=False):
   nk = max([int(window.get("dos_nk")),1])
   delta = window.get("dos_delta")
   ewindow = abs(window.get("dos_ewindow"))
-  energies = np.linspace(-ewindow,ewindow,ewindow/delta*5) # get the energies
+  energies = np.linspace(-ewindow,ewindow,int(ewindow/delta*5)) # get the energies
   if window.getbox("dos_mode")=="Green":
     dos.dos(h,delta=delta,nk=nk,energies=energies,mode="Green") # compute DOS
   else:
