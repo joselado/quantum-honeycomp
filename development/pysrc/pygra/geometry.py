@@ -60,6 +60,8 @@ class Geometry:
     self.dimensionality = 0 # set as finite
   def get_orthogonal(self):
       return supercelltk.target_angle_volume(self,angle=0.5)
+  def closest_index(self,r):
+      return sculpt.get_closest(self,n=1,r0=r)[0]
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
@@ -1437,41 +1439,6 @@ diamond_lattice = diamond_lattice_minimal
 
 
 
-
-
-
-#
-#def fn_distance(g):
-#  """Return distance between first neighbors"""
-#  minr = 100
-#  vectors = []
-#  if g.dimensionality==0:
-#    vectors = [np.array([0.,0.,0.])]
-#  elif g.dimensionality==1:
-#    for i in range(-1,2):
-#      vectors += [i*g*a1]
-#  elif g.dimensionality==2:
-#    for i in range(-1,2):
-#      for j in range(-1,2):
-#        vectors += [i*g.a1 + j*g.a2]
-#  elif g.dimensionality==3:
-#    for i in range(-1,2):
-#      for j in range(-1,2):
-#        for k in range(-1,2):
-#          vectors += [i*g.a1 + j*g.a2 + k*g.a3]
-#  for v in vectors:
-#    for i in range(len(g.r)):
-#      for j in range(len(g.r)):
-#        if i==j: continue
-#        ri = g.r[i]
-#        rj = g.r[j]
-#        dr = ri-rj + v
-#        dr = dr.dot(dr)
-#        if dr<minr: minr = dr # store
-#  return np.sqrt(minr) # return distance
-#
-
-
 # two dimensional geometries
 geometries2d = [] 
 geometries2d += [honeycomb_lattice]
@@ -1566,20 +1533,8 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
 
 
 
+from .indexing import get_index
 
-
-def get_index(g,r,replicas=False):
-    """Given a certain position, return the index of it in the geometry"""
-    if replicas: # check the replicas
-      ds = g.neighbor_directions()
-      rset = [g.replicas(d) for d in ds]  # all sets of replicas
-    else:
-      rset = [g.r] # list of positions
-    for rs in rset: # loop over set of sites
-      for i in range(len(rs)):
-        ri = rs[i] # get this position
-        if np.sum(np.abs(ri-r))<0.0001: return i # return index
-    return None # not found
 
 
 def same_site(r1,r2):

@@ -1,5 +1,6 @@
 from scipy.sparse import issparse,bmat
 from scipy.sparse import csc_matrix as csc
+from scipy.sparse import csc_matrix
 import scipy.linalg as dlg
 import scipy.sparse.linalg as slg
 import numpy as np
@@ -170,6 +171,7 @@ def smalleig(m,numw=10,evecs=False,tol=1e-7):
   """
   Return the smallest eigenvalues using arpack
   """
+  m = csc_matrix(m) # sparse matrix
   eig,eigvec = slg.eigsh(m,k=numw,which="LM",sigma=0.0,
                                   tol=tol)
   if evecs:  return eig,eigvec.transpose()  # return eigenvectors

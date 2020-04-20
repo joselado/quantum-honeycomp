@@ -5,6 +5,7 @@ from scipy.sparse import csc_matrix as csc
 from scipy.sparse import csc_matrix 
 from scipy.sparse import bmat
 import os
+from numba import jit
 import numpy as np
 from . import klist
 from . import operators
@@ -28,24 +29,42 @@ def ldos0d(h,e=0.0,delta=0.01,write=True):
 
 
 
-def ldoskpm(h,m,energies=np.linspace(-1.,1.,100),
-        delta=0.01,scale = 10.0,i=0):
+def dos_site_kpm(h,energies=np.linspace(-1.,1.,1000),
+        delta=0.01,scale = 10.0,i=0,nk=5,sector=None):
     """Compute a local DOS using the KPM"""
-    npol = 1*int(scale/delta) # number of polynomials
+    h = h.copy()
+    h.turn_sparse()
+    npol = 5*int(scale/delta) # number of polynomials
     from . import kpm
-    def get(j):
+    def getm(m,j): # for the matrix
       es,ds = kpm.ldos(m,i=j,scale=scale,npol=npol,ne=npol*5)
       return es,ds # return
+    def get(j): # for the kpoint
+        ks = klist.kmesh(h.dimensionality,nk=nk)
+        hk = h.get_hk_gen() # get generator
+        out = [getm(hk(k),j) for k in ks] # compute all
+        ds = np.mean([o[1] for o in out],axis=0)
+        es = out[0][0]
+        return es,ds
+#        if h.dimensonality!=0: raise # not implemented
+#        return getm(h.intra)
     from scipy.interpolate import interp1d
     if h.has_spin and h.has_eh: # spin with electron-hole
-        (es,ds1) = get(4*i)
-        (es,ds2) = get(4*i+1)
-        (es,ds3) = get(4*i+2)
-        (es,ds4) = get(4*i+3)
-        ds = ds1+ds2+ds3+ds4
+        if sector is None:
+            (es,ds1) = get(4*i)
+            (es,ds2) = get(4*i+1)
+            (es,ds3) = get(4*i+2)
+            (es,ds4) = get(4*i+3)
+            ds = ds1+ds2+ds3+ds4
+        elif sector=="electron":
+            (es,ds1) = get(4*i)
+            (es,ds2) = get(4*i+1)
+            ds = ds1+ds2
+        else: raise
     elif h.has_spin and not h.has_eh: # spinful
         (es,ds1) = get(2*i)
         (es,ds2) = get(2*i+1)
+        ds = ds1+ds2
     elif not h.has_spin and not h.has_eh: # spinless
         (es,ds) = get(i)
     else: raise
@@ -56,17 +75,17 @@ def ldoskpm(h,m,energies=np.linspace(-1.,1.,100),
 
 
 
-def dos_site(h,i=0,mode="ED",energies=np.linspace(-1.,1.,100),**kwargs):
+def dos_site(h,i=0,mode="ED",energies=np.linspace(-1.,1.,500),**kwargs):
     """DOS in a particular site for different energies"""
-    if h.dimensionality!=0: raise # only for 0d
     if mode=="ED":
+      if h.dimensionality!=0: raise # only for 0d
       out = []
       for e in energies:
           d = ldos0d(h,e=e,write=False,**kwargs)
           out.append(d[i]) # store
       return (energies,np.array(out)) # return result
     elif mode=="KPM":
-        return ldoskpm(h,h.intra,energies=energies,i=i,**kwargs)
+        return dos_site_kpm(h,energies=energies,i=i,**kwargs)
 
 
 
@@ -118,22 +137,38 @@ def ldos_arpack(intra,num_wf=10,robust=False,tol=0,e=0.0,delta=0.01):
 
 
 
-def ldos_waves(intra,es = [0.0],delta=0.01,operator=None):
+def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,num_bands=None):
   """Calculate the DOS in a set of energies by full diagonalization"""
   es = np.array(es) # array with energies
-  eig,eigvec = lg.eigh(intra) 
+  if num_bands is None:
+      eig,eigvec = algebra.eigh(intra) 
+  else:
+      eig,eigvec = algebra.smalleig(intra,numw=num_bands,evecs=True)
+      eigvec = eigvec.T
   ds = [] # empty list
-  for energy in es: # loop over energies
-    d = np.array([0.0 for i in range(intra.shape[0])]) # initialize
-    for (v,ie) in zip(eigvec.transpose(),eig): # loop over wavefunctions
-      v2 = (np.conjugate(v)*v).real # square of wavefunction
-      if operator is None: weight = 1.0
-      else: weight = operator(v) # get the weight
-      fac = delta/((energy-ie)**2 + delta**2) # factor to create a delta
-      d += weight*fac*v2 # add contribution
+  if operator is None: weights = es*0. + 1.0
+  else: weights = [operator(v).real for v in eigvec.transpose()] # weights
+  v2s = [(np.conjugate(v)*v).real for v in eigvec.transpose()]
+  ds = [[0.0 for i in range(intra.shape[0])] for e in es] # initialize
+  ds = ldos_waves_jit(np.array(es),
+          np.array(eigvec).T,np.array(eig),np.array(weights),
+          np.array(v2s),np.array(ds),delta)
+  return ds
+
+@jit(nopython=True)
+def ldos_waves_jit(es,eigvec,eig,weights,v2s,ds,delta):
+  for i in range(len(es)): # loop over energies
+    energy = es[i] # energy
+    d = ds[i]
+    for j in range(len(eig)):
+        v = eigvec[j]
+        ie = eig[j]
+        weight = weights[j]
+        v2 = v2s[j]
+        fac = delta/((energy-ie)**2 + delta**2) # factor to create a delta
+        d += weight*fac*v2 # add contribution
     d /= np.pi # normalize
-    ds.append(d) # store
-  ds = np.array(ds) # convert to array
+    ds[i] = d # store
   return ds
 
 
@@ -146,7 +181,7 @@ def ldos_diagonalization(m,e=0.0,**kwargs):
 
 
 def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,
-        nk=40,operator=None):
+        nk=40,operator=None,**kwargs):
   """Write a map of the ldos using full diagonalization"""
   if delta is None:
     delta = (np.max(energies)-np.min(energies))/len(energies) # delta
@@ -156,7 +191,7 @@ def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,
     hk = hkgen(k) # get Hamiltonian
     op = operators.get_operator(operator,k=k) # get the operator
     # LDOS for this kpoint
-    ds = ldos_waves(hk,es=energies,delta=delta,operator=op) 
+    ds = ldos_waves(hk,es=energies,delta=delta,operator=op,**kwargs) 
     return ds
   ks = [np.random.random(3) for ik in range(nk)] # kpoints
   ds = parallel.pcall(getd,ks) # get densities

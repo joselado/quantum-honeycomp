@@ -212,7 +212,7 @@ def local_dos(m_in,i=0,n=200,use_fortran=use_fortran):
 
 
 
-def ldos0d(m_in,i=0,scale=10.,npol=None,ne=500,kernel="jackson"):
+def ldos(m_in,i=0,scale=10.,npol=None,ne=500,kernel="jackson"):
   """Return two arrays with energies and local DOS"""
   if npol is None: npol = ne
   mus = local_dos(csc_matrix(m_in)/scale,i=i,n=npol) # get coefficients
@@ -222,7 +222,7 @@ def ldos0d(m_in,i=0,scale=10.,npol=None,ne=500,kernel="jackson"):
 
 
 
-ldos = ldos0d
+ldos0d = ldos
 
 
 

@@ -20,9 +20,6 @@ from interfacetk.qh_interface import * # import all the libraries needed
 from interfacetk import common # common routines for all the geometries
 common.initialize(qtwrap) # several initilizations
 
-qtwrap.set_combobox("scf_initialization",meanfield.spinful_guesses)
-qtwrap.set_combobox("bands_color",operators.operator_list)
-
 
 
 def get_geometry(modify=True):
@@ -174,23 +171,8 @@ def show_structure_3d(self):
 
 def solve_scf():
   """Perform a selfconsistent calculation"""
-  comp = computing() # create the computing window
-  scfin = getbox("scf_initialization")
-  h = initialize() # initialize the Hamiltonian
-  mf = scftypes.guess(h,mode=scfin)
-  nk = int(get("nk_scf"))
-  U = get("U")
-  V1 = get("V1")
-  V2 = get("V2")
-  filling = get("filling_scf")
-  filling = filling%1. # filling
-  extrae = get("extra_electron")
-  filling += extrae/h.intra.shape[0] # extra electron
-  scf = meanfield.Vinteraction(h,nk=nk,filling=filling,U=U,V1=V1,V2=V2,
-                mf=mf,load_mf=False,#T=get("smearing_scf"),
-                mix = get("mix_scf"))
-  scf.hamiltonian.save() # save in a file
-  comp.kill()
+  h = initialize()
+  common.solve_scf(h,qtwrap)
 
 
 def pickup_hamiltonian():

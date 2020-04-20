@@ -146,10 +146,38 @@ def extract_from_hamiltonian(self,name):
 
 
 
+def extract_onsite_matrix_function(h,**kwargs):
+    """Extract a certain function"""
+    h = h.copy() # copy
+    if h.check_mode("spinful"): # not implemented
+      m = h.intra # get the matrix
+      n = len(h.geometry.r) # number of sites
+      if 2*n!=m.shape[0]: raise
+      def f(r):
+        ind = h.geometry.get_index(r,**kwargs) # get the index
+        if ind is None: return np.zeros((2,2),dtype=np.complex)
+        else: return m[2*ind:2*ind+2,2*ind:2*ind+2]
+    return f # return function
+
+def extract_magnetism_function(h,**kwargs):
+    """Function that return the magnetization"""
+    fm = extract_onsite_matrix_function(h,**kwargs) # create the function
+    def f(r):
+        m = fm(r) # get the matrix
+        mx = m[0,1].real
+        my = m[0,1].imag
+        mz = (m[0,0] - m[1,1]).real/2.
+        return np.array([mx,my,mz])
+    return f # return function
 
 
-
-
+def extract_onsite_function(h,**kwargs):
+    """Function that return the onsite energy"""
+    fm = extract_onsite_matrix_function(h,**kwargs) # create the function
+    def f(r):
+        m = fm(r) # get the matrix
+        return (m[0,0] + m[1,1]).real/2.
+    return f # return function
 
 
 

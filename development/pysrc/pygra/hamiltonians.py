@@ -475,6 +475,7 @@ class hamiltonian():
         mz = np.genfromtxt("MZ.OUT").transpose()[3]
         np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
         return np.array([mx,my,mz])
+    else: raise
 #    return np.array([mx,my,mz]).transpose()
   def write_onsite(self,nrep=5,normal_order=False):
       """Extract onsite energy"""

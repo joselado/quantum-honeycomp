@@ -4,6 +4,7 @@ import numpy as np
 from scipy.sparse import csc_matrix as csc
 from scipy.sparse import bmat,diags
 from .superconductivity import build_eh
+from scipy.sparse import issparse
 import scipy.linalg as lg
 #from bandstructure import braket_wAw
 from . import current
@@ -357,7 +358,6 @@ def get_valley(h,projector=False,delta=None):
   ho.clean() # set to zero
   ho.add_modified_haldane(1.0/4.5) # add modified Haldane coupling
   hkgen = ho.get_hk_gen() # get generator for the hk Hamiltonian
-  from scipy.sparse import issparse
   def sharpen(m):
     """Sharpen the eigenvalues of a matrix"""
 #    return m
@@ -488,9 +488,11 @@ def get_operator(op,k=[0.,0.,0.],h=None):
     if op is None: return None
     elif callable(op): 
         return lambda v: op(v,k=k) # assume it yields a number
-    elif type(op) is np.array: 
+    elif type(op) is np.ndarray or type(op)==np.matrix or issparse(op): 
         return lambda v: braket_wAw(v,op) # assume it yields a matrix
-    else: raise
+    else: 
+        print("Unrecognized type in get_operator",type(op))
+        raise
 
 
 def get_berry(h,**kwargs):
@@ -550,6 +552,6 @@ def get_valley_layer(self,n=0,**kwargs):
     ht.geometry.sublattice = self.geometry.sublattice * fac
     return get_valley(ht,**kwargs) # return the valley operator
 
-operator_list = ["None","Sx","Sy","Sz","valley","sublattice","Berry","valleyberry","IPR"]
+operator_list = ["None","Sx","Sy","Sz","valley","sublattice","Berry","valleyberry","IPR","electron","hole"]
 
 

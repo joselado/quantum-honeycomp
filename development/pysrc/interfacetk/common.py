@@ -1,7 +1,7 @@
 from .qh_interface import execute_script
 import numpy as np
 from pygra import klist
-from qh_interface import *
+from .qh_interface import *
 from pygra import parallel
 
 def get_operator(h,opname,projector=False):
@@ -119,6 +119,26 @@ def get_fermi_surface(h,window):
 
 
 
+def solve_scf(h,window):
+  """Perform a selfconsistent calculation"""
+  get = window.get # redefine
+#  comp = computing() # create the computing window
+  scfin = window.getbox("scf_initialization")
+  mf = scftypes.guess(h,mode=scfin)
+  nk = int(get("nk_scf"))
+  U = get("U")
+  V1 = get("V1")
+  V2 = get("V2")
+  filling = get("filling_scf")
+  filling = filling%1. # filling
+  extrae = get("extra_electron")
+  filling += extrae/h.intra.shape[0] # extra electron
+  scf = meanfield.Vinteraction(h,nk=nk,filling=filling,U=U,V1=V1,V2=V2,
+                mf=mf,load_mf=False,#T=get("smearing_scf"),
+                mix = get("mix_scf"))
+  scf.hamiltonian.save() # save in a file
+#  comp.kill()
+
 
 
 def get_z2(h,window):
@@ -169,6 +189,8 @@ def initialize(window):
     """Do various initializations"""
     cs = ["RGB","hot","inferno","plasma","bwr","rainbow","gnuplot"]
     set_colormaps(window.form,"bands_colormap",cs=cs) # set the bands
+    window.set_combobox("scf_initialization",meanfield.spinful_guesses)
+    window.set_combobox("bands_color",operators.operator_list)
 
 
 
