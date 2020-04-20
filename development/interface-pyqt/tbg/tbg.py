@@ -102,7 +102,7 @@ def initialize():
     h.add_antiferromagnetism(get("mAF"))  # AF order
     h.add_kane_mele(get("kanemele")) # intrinsic SOC
   h.shift_fermi(get("fermi")) # shift fermi energy
-  if is_checked("set_half_filling"): h.set_filling(nk=2)
+  if is_checked("set_half_filling"): h.set_filling(.5,nk=2)
   if False:
     h.add_swave(get("swave"))
   if False:
