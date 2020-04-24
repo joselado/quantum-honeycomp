@@ -441,6 +441,7 @@ def get_inplane_valley(h):
 
 def tofunction(A):
     """Transform this object into a callable function"""
+    if A is None: return lambda x,k=0.0: 1.0
     return Operator(A) # use operator
 #    if A is None: return lambda x,k=0.0: 1.0 # no input
 #    if callable(A): return A # if it is a function

@@ -122,7 +122,6 @@ def twisted_multilayer(m0=3,rotate=True,shift=None,
   g.r = np.concatenate([gi.r for gi in gs]).copy() # all the positions
   if g.has_sublattice:
     g.sublattice = np.concatenate([gi.sublattice for gi in gs]).copy() 
-
 #  g.r = np.concatenate([g2.r,g.r]).copy()
  # g.r = g1.r
   g.r2xyz() # update
