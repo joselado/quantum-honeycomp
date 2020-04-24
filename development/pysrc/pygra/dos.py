@@ -9,6 +9,7 @@ from . import checkclass
 from . import green
 from . import algebra
 from . import parallel
+from numba import jit
 from .klist import kmesh
 
 try:
@@ -36,10 +37,17 @@ def calculate_dos(es,xs,d,use_fortran=use_fortran,w=None):
 #      return ys
 #    else: # conventional mode
       ys = np.zeros(xs.shape[0]) # initialize
-      for (e,iw) in zip(es,w): # loop over energies
-         de = xs - e # E - Ei
-         de = d/(d*d + de*de) # 1/(delta^2 + (E-Ei)^2)
-         ys += de*iw # times the weight
+      ys = calculate_dos_jit(es,xs,d,w,ys) # compute
+      return ys
+
+@jit
+def calculate_dos_jit(es,xs,d,w,ys):
+      for i in range(len(es)): # loop over energies
+          e = es[i]
+          iw = w[i]
+          de = xs - e # E - Ei
+          de = d/(d*d + de*de) # 1/(delta^2 + (E-Ei)^2)
+          ys += de*iw # times the weight
       return ys
 
 
@@ -462,7 +470,7 @@ def dos_kpm(h,scale=10.0,ewindow=4.0,ne=10000,
 
 
 
-def dos(h,energies=np.linspace(-4.0,4.0,400),
+def get_dos(h,energies=np.linspace(-4.0,4.0,400),
             use_kpm=False,mode="ED",**kwargs):
   """Calculate the density of states"""
   if use_kpm: # KPM
@@ -504,6 +512,8 @@ def dos(h,energies=np.linspace(-4.0,4.0,400),
         return (energies,ds)
       else: raise
 
+
+dos = get_dos # redefine
 
 def autodos(h,auto=True,**kwargs):
     """Automatic computation of DOS"""

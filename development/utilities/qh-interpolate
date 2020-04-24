@@ -2,11 +2,12 @@
 
 import numpy as np
 import numpy 
-
+from numba import jit
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--nx",default=300)
 parser.add_argument("--ny",default=300)
+parser.add_argument("--smooth",default=2)
 parser.add_argument("--input",default="")
 parser.add_argument("--column",default="2")
 #        description="Frames per second in the video")
@@ -17,23 +18,33 @@ name = args.input
 nx = int(args.nx)
 ny = int(args.ny)
 col = int(args.column)
+smooth = float(args.smooth)
 
 if name=="":
     print("Provide an input file")
     exit()
 
 
+@jit(nopython=True)
+def wave_jit(x,y,centers,heights,fac,z):
+  for i in range(len(centers)):
+    c = centers[i]
+    h = heights[i]
+    r = ((x-c[0])**2+(y-c[1])**2)*fac # renormalized gaussian       
+    z += h*np.exp(-(r))-c[2]
+  return z+1.0
+
+
+
+
 def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
-    """ Creates a set of lorentzian at that position and with a height"""
+    """ Creates a set of gaussians at that position and with a height"""
     if len(heights)<len(centers):
       heights = [10. for i in centers]
-    fac = 5.0 # factor to mix the gaussians
+    fac = 1./smooth # factor to mix the gaussians
     def wave(x,y):
-      z = 0.
-      for (c,h) in zip(centers,heights):
-        r = ((x-c[0])**2+(y-c[1])**2)*fac # renormalized gaussian       
-        z += h*np.exp(-(r))-c[2]
-      return z+1.0
+        z = x*0.0 + y*0.0
+        return wave_jit(x,y,np.array(centers),np.array(heights),fac,z)
     xs = [c[0] for c in centers] # get x coordinates
     ys = [c[1] for c in centers] # get y coordinates
     dx = (np.max(xs) - np.min(xs))/10
@@ -42,8 +53,8 @@ def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
     y = np.linspace(min(ys)-dy,max(ys)+dy,ny)
     fo = open(name,"w") # open output file
     for ix in x:
-      for iy in y:
-        iz = wave(ix,iy)
+      z = wave(ix,y)
+      for (iy,iz) in zip(y,z):
         fo.write(str(ix)+"    ")
         fo.write(str(iy)+"    ")
         fo.write(str(iz)+"\n")
@@ -59,7 +70,7 @@ centers = [[m[0,i],m[1,i],0.] for i in range(len(m[0]))]
 
 heights = m[col]
 #heights = read_density()
-heights = 4*heights/np.max(heights)
+#heights = 4*heights/np.max(heights)
 #heights = np.sqrt(heights)
 #balls = [ball(center=c) for c in centers]
 

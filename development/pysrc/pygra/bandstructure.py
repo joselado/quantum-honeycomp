@@ -138,13 +138,16 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
       es,ws = diagf(hk)
       ws = ws.transpose() # transpose eigenvectors
       def evaluate(w,k,A): # evaluate the operator
-        if callable(A):  
-          try: waw = A(w,k=kpath[k]) # call the operator
-          except: 
-            print("Check out the k optional argument in operator")
-            waw = A(w) # call the operator
-        else: waw = braket_wAw(w,A).real # calculate expectation value
-        return waw # return the result
+          if type(A)==operators.Operator:
+              Aw = A(w,k=kpath[k])
+              waw = algebra.braket_ww(w,Aw).real # as an operator object
+          elif callable(A):  
+            try: waw = A(w,k=kpath[k]) # call the operator
+            except: 
+              print("Check out the k optional argument in operator")
+              waw = A(w) # call the operator
+          else: waw = braket_wAw(w,A).real # calculate expectation value
+          return waw # return the result
       for (e,w) in zip(es,ws):  # loop over waves
         if isinstance(operator, (list,)): # input is a list
             waws = [evaluate(w,k,A) for A in operator]

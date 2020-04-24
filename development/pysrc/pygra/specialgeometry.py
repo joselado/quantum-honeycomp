@@ -115,6 +115,7 @@ def twisted_multilayer(m0=3,rotate=True,shift=None,
         dr = shift[ii][0]*g0.a1 + shift[ii][1]*g0.a2 # shift geometry
         dr = dr + np.array([0.,0.,dz*(ii-len(rot)/2.+.5)]) # shift layer
         gs.append(rotate_layer(g,i*theta,dr=dr))
+      #  gs.append(g.copy())
         ii += 1 # increase counter
   else: raise
 #  g.r = np.concatenate([g1.r,g.r,g2.r]).copy()
@@ -179,7 +180,11 @@ def rotate_layer(g,theta,dr=[0.,0.,0.]):
     g1s = g1.supercell(2) # supercell
 #    g1.a1 = g.a1.copy()
 #    g1.a2 = g.a2.copy()
-    g1.r = sculpt.retain_unit_cell(g1s.r,g.a1,g.a2,g.a3,dim=2) # get positions
+    inuc = sculpt.sites_in_unit_cell(g1s.r,g.a1,g.a2,g.a3,dim=2)
+    g1.r = g1s.r[inuc==1.]
+    if g1.has_sublattice:
+        g1.sublattice = g1s.sublattice[inuc==1.]
+#    g1.r = sculpt.retain_unit_cell(g1s.r,g.a1,g.a2,g.a3,dim=2) # get positions
     g1.r2xyz() # update
     g1.x += dr[0] # shift upper layer
     g1.y += dr[1] # shift upper layer

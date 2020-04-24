@@ -44,7 +44,8 @@ def get_geometry(modify=True):
   n = int(qtwrap.get("cell_size")) # size of the unit cell
   name = qtwrap.getbox("multilayer_type")
   if name=="Twisted bilayer":
-    g = specialgeometry.twisted_bilayer(n)
+    g = specialgeometry.twisted_multilayer(n,rot=[0,1])
+    #g = specialgeometry.twisted_bilayer(n)
   elif name=="Aligned bilayer AA":
     g = specialgeometry.twisted_multilayer(n,rot=[0,0])
   elif name=="Aligned bilayer AB":
@@ -92,10 +93,7 @@ def initialize():
 #  h.add_sublattice_imbalance(lambda r: mu*(r[2]>0.))  # upper mass
 #  h.add_sublattice_imbalance(lambda r: ml*(r[2]<0.))  # lower mass
   efield = get("interlayer_bias")
-  def bias(r):
-    if r[2]<0.0: return efield
-    else: return -efield
-  h.shift_fermi(bias)
+  h.add_onsite(lambda r: r[2]*efield)
   if h.has_spin:
     h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
     h.add_rashba(get("rashba"))  # Rashba field

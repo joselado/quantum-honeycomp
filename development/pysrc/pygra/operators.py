@@ -2,6 +2,7 @@
 from __future__ import division
 import numpy as np
 from scipy.sparse import csc_matrix as csc
+from scipy.sparse import csc_matrix
 from scipy.sparse import bmat,diags
 from .superconductivity import build_eh
 from scipy.sparse import issparse
@@ -19,16 +20,45 @@ def isnumber(s):
 
 class Operator():
     def __init__(self,m):
-        raise
-        if type(m)==np.array:
-            self.m = lambda k=None: m # create dummy function
+        """Initialization"""
+        if type(m)==np.ndarray or issparse(m):
+            self.m = lambda v,k=None: m@v # create dummy function
         elif type(m)==Operator: 
             self.m = m.m
-        else: raise
+        elif isinstance(m, numbers.Number): 
+            self.m = lambda v,k=None: m*v
+        elif callable(m): 
+            self.m = m # as function
+        else: 
+            print("Unrecognised type",type(m))
+            raise
     def __mul__(self,a):
+        """Define the multiply method"""
+        if type(a)==Operator:
+            out = Operator(self)
+            out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
+            return out
+        else:
+            return self + Operator(a) # convert to operator
+    def __add__(self,a):
+        """Define the add method"""
+        if type(a)==Operator:
+            out = Operator(self)
+            out.m = lambda v,k=None: self.m(v,k=k) + a.m(v,k=k)
+            return out
+        else:
+            return self + Operator(a) # convert to operator
+    def __sub__(self,a):
+        """Substraction method"""
+        return self + (-a)
+    def __neg__(self):
+        """Negative operator"""
         out = Operator(self)
-        out.m = lambda k=None: self.m(k=k)@a.m(k=k)
+        out.m = lambda v,k=None: -self.m(v,k=k)
         return out
+    def __call__(self,v,k=None):
+        """Define the call method"""
+        return self.m(v,k=k) 
 
 
 
@@ -411,14 +441,15 @@ def get_inplane_valley(h):
 
 def tofunction(A):
     """Transform this object into a callable function"""
-    if A is None: return lambda x,k=0.0: 1.0 # no input
-    if callable(A): return A # if it is a function
-    else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
+    return Operator(A) # use operator
+#    if A is None: return lambda x,k=0.0: 1.0 # no input
+#    if callable(A): return A # if it is a function
+#    else: return lambda x,k=0.0: braket_wAw(x,A).real # if it is a matrix
 
 
 def ipr(w,k=None):
     """IPR operator"""
-    return np.sum(np.abs(w)**4)
+    return np.sum(np.abs(w)**4)*w # return a vector
 
 
 def get_envelop(h,sites=[],d=0.3):
@@ -535,10 +566,12 @@ def bool_layer_array(g,n=0):
     """Return the lowest layer array"""
     fac = []
     z0 = sorted(np.unique(g.z).tolist())[n]
-    for z in g.z:
-        if abs(z-z0)<1e-3: fac.append(1)
-        else: fac.append(0)
-    fac = np.array(fac)
+    fac = g.z*0. # initialize
+    fac[np.abs(g.z-z0)<1e-3] = 1.0
+#    for z in g.z:
+#        if abs(z-z0)<1e-3: fac.append(1)
+#        else: fac.append(0)
+#    fac = np.array(fac)
     return fac
 
 
@@ -554,4 +587,9 @@ def get_valley_layer(self,n=0,**kwargs):
 
 operator_list = ["None","Sx","Sy","Sz","valley","sublattice","Berry","valleyberry","IPR","electron","hole"]
 
-
+def get_layer(self,n=0):
+   fac = bool_layer_array(self.geometry,n=n)
+   inds = range(len(fac)) # sites
+   d = len(fac)
+   m = csc_matrix((fac,(inds,inds)),shape=(d,d),dtype=np.complex) # matrix
+   return self.spinless2full(m)

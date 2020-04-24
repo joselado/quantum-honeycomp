@@ -434,12 +434,13 @@ def chain(n=1):
 
 
 
-def bichain():
+def bichain(n=1):
   """ Create a chain """
   g = square_ribbon(1) 
   g = g.supercell(2)
   g.has_sublattice = True
   g.sublattice = [(-1)**i for i in range(len(g.x))]
+  g = g.supercell(n)
   return g
 
 

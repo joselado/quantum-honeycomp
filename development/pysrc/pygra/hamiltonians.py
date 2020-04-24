@@ -128,7 +128,7 @@ class hamiltonian():
       return spectrum.get_fermi4filling(self,filling,**kwargs)
   def get_dos(self,**kwargs):
       from . import dos
-      return dos.dos(self,**kwargs)
+      return dos.get_dos(self,**kwargs)
   def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
     return get_bands_nd(self,**kwargs)
@@ -446,14 +446,16 @@ class hamiltonian():
       clean_hamiltonian(self)
   def get_operator(self,name,projector=False,return_matrix=False,**kwargs):
       """Return a certain operator"""
-      if projector: 
-          print("projector is deprecated, use return_matrix")
-          return_matrix = True
-      if return_matrix: 
-          return operators.get_matrix_operator(self,name,**kwargs)
-      else:
-          from .operatorlist import get_scalar_operator
-          return get_scalar_operator(self,name,**kwargs)
+      from . import operatorlist
+      return operators.Operator(operatorlist.get_operator(self,name,**kwargs))
+#      if projector: 
+#          print("projector is deprecated, use return_matrix")
+#          return_matrix = True
+#      if return_matrix: 
+#          return operators.get_matrix_operator(self,name,**kwargs)
+#      else:
+#          from .operatorlist import get_scalar_operator
+#          return get_scalar_operator(self,name,**kwargs)
   def extract(self,name): 
       """Extract something from the Hamiltonian"""
       return extract.extract_from_hamiltonian(self,name)

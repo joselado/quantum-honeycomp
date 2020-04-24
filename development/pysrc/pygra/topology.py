@@ -547,12 +547,12 @@ def berry_operator(h,delta=1e-1,**kwargs):
     h.turn_dense()
     hk = h.get_hk_gen() # get generator
     gk = h.get_gk_gen(delta=delta) # get generator
-    def bk(k): return berry_green_generator(gk,k=k,**kwargs) # berry gen
+    def bk(k): return berry_green_generator(gk,k=k,**kwargs) 
     def outf(w,k=[0.,0.,0.]):
         m = hk(k) # bloch Hamiltonian
         e = algebra.braket_wAw(w,m) # energy
-        o = bk(k)(e).real*delta # Berry curvature
-        return o
+        o = bk(k)(e)*delta # Berry curvature
+        return o*w # return a vector
     return outf
 
 

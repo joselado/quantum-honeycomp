@@ -1,7 +1,8 @@
 from . import operators
 import numpy as np
 
-def get_scalar_operator(self,name,**kwargs):
+
+def get_operator(self,name,**kwargs):
       """Return the conventional operator"""
       if name=="None": return None
       elif name in ["berry","Berry"]: 
@@ -32,12 +33,15 @@ def get_scalar_operator(self,name,**kwargs):
       elif name=="xposition": return operators.get_xposition(self)
       elif name=="electrons": return operators.get_electron(self)
       elif name=="mx":
-        return self.get_operator("sx")*self.get_operator("electron")
+        return self.get_operator("sx")@self.get_operator("electron")
       elif name=="my":
-        return self.get_operator("sy")*self.get_operator("electron")
+        return self.get_operator("sy")@self.get_operator("electron")
       elif name=="mz":
-        return self.get_operator("sz")*self.get_operator("electron")
-      elif name=="valley": return operators.get_valley(self)
+        return self.get_operator("sz")@self.get_operator("electron")
+      elif name=="layer": return operators.get_layer(self,**kwargs)
+      elif name=="valley": 
+          f = operators.get_valley(self,projector=True)
+          return lambda w,k=None: f(k=k)@w
       elif name=="inplane_valley": return operators.get_inplane_valley(self)
       elif name=="valley_upper" or name=="valley_top":
         return operators.get_valley_layer(self,n=-1)
@@ -52,4 +56,5 @@ def get_scalar_operator(self,name,**kwargs):
       else: raise
 
 
+get_scalar_operator = get_operator
 

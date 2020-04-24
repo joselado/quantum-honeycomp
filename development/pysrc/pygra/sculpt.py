@@ -1,6 +1,8 @@
 from __future__ import print_function
 from . import geometry
 from copy import deepcopy
+from . import algebra
+from numba import jit
 import numpy as np
 try: 
   import clean_geometryf90
@@ -372,26 +374,32 @@ def set_xy_plane(g):
 
 
 
-def retain_unit_cell(r,a1,a2,a3,dim=3):
+def sites_in_unit_cell(r,a1,a2,a3,dim=3):
   """Retain position located in the unit cell defined by a1,a2,a3"""
-  R = np.matrix([a1,a2,a3]).T # transformation matrix
-  L = R.I # inverse matrix
-  rs = [] # output
+  R = np.array([a1,a2,a3]).T # transformation matrix
+  L = algebra.inv(R) # inverse matrix
 #  d0 = -np.random.random()*0.001 - .5 # accuracy
   d0 = 0.00234231421 - 0.5 # random number
   d1 = 1.0 + d0 # accuracy
-
+  retain = [] # empty list
   for ri in r: # loop over positions
-    rn = L*np.matrix(ri).T  # transform
-    rn = np.array([rn.T[0,i] for i in range(3)]) # convert to array
+    rn = L@ri  # transform
     n1,n2,n3 = rn[0],rn[1],rn[2]
     if dim==3:
-      if d0<n1<d1 and d0<n2<d1 and d0<n3<d1:
-         rs.append(ri)
+        if d0<n1<d1 and d0<n2<d1 and d0<n3<d1:
+            retain.append(1)
+        else: retain.append(0)
     if dim==2:
-      if d0<n1<d1 and d0<n2<d1:
-         rs.append(ri)
-  return np.array(rs) # return positions
+        if d0<n1<d1 and d0<n2<d1:
+            retain.append(1)
+        else: retain.append(0)
+  retain = np.array(retain)
+  return retain
+
+def retain_unit_cell(r,a1,a2,a3,dim=3):
+    """Retain position located in the unit cell defined by a1,a2,a3"""
+    retain = sites_in_unit_cell(r,a1,a2,a3,dim=3)
+    return r[retain==1.]
 
 
 
