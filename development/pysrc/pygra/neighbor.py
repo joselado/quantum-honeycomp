@@ -1,12 +1,10 @@
 from __future__ import print_function
 import numpy as np
 from scipy.sparse import csc_matrix,bmat
+from numba import jit
 
 
 minimum_hopping = 1e-3
-
-
-
 
 
 try: 
@@ -23,23 +21,46 @@ try:
 
 
 except:
-  print("ERROR, neighbor fortran routine is not well compiled")
   def find_first_neighbor(r1,r2):
      """Calls the fortran routine"""
-     print("Using ultraslow function!!!!!!!!!!")
-     pairs = []
-     for i in range(len(r1)):
-       for j in range(len(r2)):
+     r1 = np.array(r1)
+     r2 = np.array(r2)
+     nn = number_neighbors_jit(r1,r2) # number of first neighbors
+     out = np.zeros((nn,2),dtype=np.int) # generate indexes
+     out = find_first_neighbor_jit(r1,r2,out) # generate all the pairs
+     return out
+
+@jit(nopython=True)
+def number_neighbors_jit(r1,r2):
+    """Number of neighbors"""
+    out = 0
+    for i in range(len(r1)):
+      for j in range(len(r2)):
          ri = r1[i]
          rj = r2[j]
          dr = ri-rj
-         dr = dr.dot(dr)
-         if 0.8<dr<1.2: pairs.append([i,j])
-     return np.array(pairs)
-#  try:
-#      import numba 
-#      from .numbaneighbor import find_first_neighbor
-#  except: pass
+         dr2 = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]
+         if 0.99<dr2<1.01: out += 1 # increase
+    return out # number of neighbors
+
+@jit(nopython=True)
+def find_first_neighbor_jit(r1,r2,pairs):
+    """Number of neighbors"""
+    out = 0
+    for i in range(len(r1)):
+      for j in range(len(r2)):
+         ri = r1[i]
+         rj = r2[j]
+         dr = ri-rj
+         dr2 = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]
+         if 0.99<dr2<1.01:
+             pairs[out,0] = i
+             pairs[out,1] = j
+             out += 1 # increase
+    return pairs # number of neighbors
+
+
+
 
 
 
@@ -48,7 +69,7 @@ def connections(r1,r2):
   pairs = find_first_neighbor(r1,r2) # get the pairs of first neighbors
   out = [[] for i in range(len(r1))] # output list
   for p in pairs:
-    out[p[0]].append(p[1]) 
+    out[int(p[0])].append(int(p[1])) 
   return out # return list
 
 

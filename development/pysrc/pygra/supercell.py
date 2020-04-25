@@ -2,6 +2,7 @@ from __future__ import print_function,division
 import numpy as np
 import scipy.linalg as lg
 from . import sculpt
+from numba import jit
 
 
 
@@ -107,11 +108,14 @@ def non_orthogonal_supercell(gin,m,ncheck=2,mode="fill",reducef=lambda x: x):
 # from numba import jit
 
 
-#@jit
 def replicate3d(rs,a1,a2,a3,n1,n2,n3):
+  ro = np.zeros((n1*n2*n3*nc,3)) # allocate output array
+  return replicate3d_jit(rs,a1,a2,a3,n1,n2,n3,ro) # compute
+
+@jit(nopython=True)
+def replicate3d_jit(rs,a1,a2,a3,n1,n2,n3,ro):
   """Function to make a three dimensional supercell"""
   nc = len(rs)
-  ro = np.zeros((n1*n2*n3*nc,3)) # allocate output array
   ik = 0
   for i in range(n1):
     for j in range(n2):

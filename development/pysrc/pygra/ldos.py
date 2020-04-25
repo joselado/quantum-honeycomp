@@ -248,6 +248,15 @@ def ldos1d(h,e=0.0,delta=0.001,nrep=3):
   return d
 
 
+def ldos_projector(h,e=0.0,**kwargs):
+    """Return an operator to project onto that region"""
+    (x,y,d) = ldos(h,e=0.0,mode="arpack",silent=True,write=False,**kwargs)
+    inds = np.array(range(len(d))) # indexes
+    n = len(d)
+    d = d/np.sum(d) # normalize
+    m = csc_matrix((d,(inds,inds)),shape=(n,n),dtype=np.complex) # matrix
+    m = h.spinless2full(m) # to full matrix
+    return operators.Operator(m) # convert to operator
 
 
 def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
@@ -286,9 +295,10 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
   d = spatial_dos(h,d) # convert to spatial resolved DOS
   g = h.geometry  # store geometry
   x,y = g.x,g.y # get the coordinates
-  go = h.geometry.copy() # copy geometry
-  go = go.supercell(nrep) # create supercell
-  if write: write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+  if write: 
+      go = h.geometry.copy() # copy geometry
+      go = go.supercell(nrep) # create supercell
+      write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
   return (x,y,d) # return LDOS
 
 

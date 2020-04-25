@@ -561,20 +561,24 @@ def berry_green_map_kpoint(h,emin=None,k=[0.,0.,0.],
                   delta=0.002,integral=True,eps=1e-1,
                   energy=0.0,emax=0.0):
   """Return the Berry curvature map at a certain kpoint"""
+  if operator is not None: # this is a dirty workaround
+    if type(operator) is str:
+      operator = h.get_operator(operator) 
+    else: pass
   f = h.get_gk_gen(delta=delta,canonical_phase=True) # green function generator
   fgreen = berry_green_generator(f,k=k,dk=dk,operator=operator,full=True) 
   # No minimum energy provided
-  if emin is None:
+  if emin is None and integral:
       emin = algebra.eigvalsh(h.get_hk_gen()(k))[0] - 1.0
       print("Minimum energy",emin)
   def fint(x):  
 #    return fgreen(x).trace()[0,0] # return diagonal
     return np.diag(fgreen(x)) # return diagonal
-  es = np.linspace(emin,0.,ne) # energies used for the integration
   ### The original function is defined in the complex plane,
   # we will do a change of variables of the form z = re^(iphi) - r0
   # so that dz = re^(iphi) i dphi
   if integral: # integrate up to the fermi energy
+    es = np.linspace(emin,0.,ne) # energies used for the integration
     def fint2(x):
       """Function to integrate using a complex contour, from 0 to 1"""
       de = emax-emin # energy window of the integration
@@ -596,23 +600,18 @@ def spatial_berry_density(h,**kwargs):
 
 
 
-def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,operator=None,**kwargs):
+def berry_green_map(h,nrep=5,k=[0.,0.,0.],nk=None,**kwargs):
   """
   Write the Berry curvature of a kpoint in a file
   """
-  if operator is not None:
-    # this is a dirty workaround
-    if type(operator) is str:
-      operator = h.get_operator(operator,return_matrix=True) 
-    else: pass
   if nk is None: # kpoint given
-    out = berry_green_map_kpoint(h,operator=operator,**kwargs) # get the result
+    out = berry_green_map_kpoint(h,k=k,**kwargs) 
   else: # kpoint not given
-    from . import klist
-    out = [] # empty list
-    for i in range(nk): # random mesh
-      ik = np.random.random(3) # random kpoint
-      out.append(berry_green_map_kpoint(h,operator=operator,**kwargs))
+    ks = klist.kmesh(h.dimensionality,nk) # kpoints
+    def f(ki):
+        print("kpoint",ki)
+        return berry_green_map_kpoint(h,k=ki,**kwargs)
+    out = parallel.pcall(f,ks) # compute all
     out = np.mean(out,axis=0) # resum
   from . import geometry
   from .ldos import spatial_dos

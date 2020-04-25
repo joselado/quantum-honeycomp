@@ -138,7 +138,7 @@ def add_kane_mele(self,t):
   from .multicell import close_enough # check if two rs are close
   g = self.geometry
   if not self.has_spin: raise  # only for spinfull
-  if self.is_multicell:   # multicell Hamiltonians
+  if self.is_multicell:   # multicell Hamiltonian
     ncells = 2 # number of neighboring cells to check
     if self.dimensionality==1:  # three dimensional
       rs = [] # all the cells
@@ -168,7 +168,7 @@ def add_kane_mele(self,t):
     self.intra = self.intra + m # add matrix
     for i in range(len(self.hopping)): # loop over hoppings
       d = self.hopping[i].dir
-      print("Adding Kane Mele in hopping",d,end="\r")
+      print("Generating Haldane-like",d,end="\r")
       r2 = [ri + d[0]*g.a1 + d[1]*g.a2 +d[2]*g.a3 for ri in g.r] # second vectors
       m = generalized_kane_mele(g.r,r2,rs,fun=t) # kane mele coupling
       m = self.spinful2full(m) # convert the matrix
@@ -273,14 +273,13 @@ def add_haldane_like(self,t,spinless_generator,
     dirs = [[0,0,0]] + [t.dir for t in self.hopping] # directions
     def pfun(d): # function to parallelize
 #    for i in range(len(self.hopping)): # loop over hoppings
-      print("Adding Kane Mele in hopping",d)
+      print("Generating Haldane-like",d)
       r2 = self.geometry.replicas(d)
       return generator(g.r,r2,rs,fun=t,sublattice=sublattice) 
     ms = parallel.pcall(pfun,dirs) # get matrices
     self.intra = self.intra + ms[0] # intracell matrix
     for i in range(len(self.hopping)):
         self.hopping[i].m += ms[i+1] # store
-
     return
 
   else:  # conventional Hamiltonian
