@@ -110,7 +110,7 @@ def get_grids_jit(x,y,gridx,gridy):
 def ldos_at_energy(evals,ds,e,delta):
     """Compute the different local density of states at each energy"""
     de2 = (evals-e)**2 # difference in energy
-    out = np.sum(ds.T*delta/(de2+delta),axis=1)
+    out = np.sum(ds.T*delta/(de2+delta**2),axis=1)
     return out # return that density
 
 
