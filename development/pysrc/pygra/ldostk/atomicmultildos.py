@@ -19,33 +19,34 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
     # generate a dictionary with all the real space local orbitals
     ##########################################################
     lodict = dict() # dictionary for the local orbitals
+    # get the grids
+    x,y = get_grids(h.geometry,nrep=nrep,dr=dr,
+            deltax=ratomic*3,deltay=ratomic*3)
+    r = np.zeros((len(x),3)) ; r[:,0] = x ; r[:,1] = y
     for d in dl: # loop over directions
           rrep = h.geometry.replicas(d) # replicas in this direction
           for i in range(len(rrep)): # loop over the atoms
               r0 = rrep[i] # get this center
               if h.has_eh:
                 if h.has_spin: # spinful
-                  lodict[(tuple(d),4*i)] = get_orbital(r0) # store this function
-                  lodict[(tuple(d),4*i+1)] = get_orbital(r0) # store 
-                  lodict[(tuple(d),4*i+2)] = lambda r: 0. # store 
-                  lodict[(tuple(d),4*i+3)] = lambda r: 0. # store 
+                  lodict[(tuple(d),4*i)] = get_orbital(r0)(r) # store 
+                  lodict[(tuple(d),4*i+1)] = get_orbital(r0)(r) # store 
+                  lodict[(tuple(d),4*i+2)] = 0. # store 
+                  lodict[(tuple(d),4*i+3)] = 0. # store 
                 else: raise
               else:
                 if h.has_spin: # spinful
-                  lodict[(tuple(d),2*i)] = get_orbital(r0) # store this function
-                  lodict[(tuple(d),2*i+1)] = get_orbital(r0) # store 
+                  lodict[(tuple(d),2*i)] = get_orbital(r0)(r) # store 
+                  lodict[(tuple(d),2*i+1)] = get_orbital(r0)(r) # store 
                 else: # spinless
-                  lodict[(tuple(d),i)] = get_orbital(r0) # store this function
+                  lodict[(tuple(d),i)] = get_orbital(r0)(r) # store 
     ##########################################################
     # now compute the real-space wavefunctions including the Bloch phase
-    # get the grids
-    x,y = get_grids(h.geometry,nrep=nrep,dr=dr,
-            deltax=ratomic*3,deltay=ratomic*3)
     ds = np.zeros((len(vs),len(x))) # zero array
     for i in range(len(vs)): # loop over wavefunctions
         w = vs[i] # get the current Bloch wavefunction
         k = ks[i] # get the current bloch wavevector
-        d = get_real_space_density(w,k,dl,lodict,x,y,h.geometry)
+        d = get_real_space_density(w,k,dl,lodict,h.geometry)
         ds[i] = d # store in the list
     # now compute all the LDOS
     os.system("rm -rf MULTILDOS")
@@ -65,16 +66,15 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
 
 
 
-def get_real_space_density(w,k,dl,lodict,x,y,g):
+def get_real_space_density(w,k,dl,lodict,g):
     """Compute the orbital in real space"""
     nc = len(w) # number of components of the Bloch wavefunction
     nd = len(dl) # number of unit cells to consider
-    out = np.zeros(len(x),dtype=np.complex) # wavefunction in real space
-    r = np.zeros((len(x),3)) ; r[:,0] = x ; r[:,1] = y
+    out = 0. # wavefunction in real space
     for d in dl:
         phi = g.bloch_phase(d,k) # get the Bloch phase
         for i in range(nc):
-            out = out + w[i]*phi*lodict[(tuple(d),i)](r) # call and add
+            out = out + w[i]*phi*lodict[(tuple(d),i)] # add contribution
     return (out*np.conjugate(out)).real # return 
 
 
