@@ -95,6 +95,7 @@ def modify_geometry(g):
       g = sculpt.remove(g,inds) # remove those atoms
   if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
       g = sculpt.remove_unibonded(g,iterative=True)
+  g.center()
   return g # return geometry
   
 

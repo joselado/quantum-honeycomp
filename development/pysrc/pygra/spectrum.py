@@ -4,10 +4,12 @@ import scipy.linalg as lg
 import scipy.sparse.linalg as slg
 import os
 from .operators import operator2list
+from . import operators
 from . import parallel
 from . import kpm
 from . import timing
 from . import algebra
+from . import densitymatrix
 
 from .fermisurface import multi_fermi_surface
 
@@ -254,8 +256,7 @@ def ev2d(h,nk=50,nsuper=1,reciprocal=False,
 
 def ev(h,operator=None,nk=30,**kwargs):
   """Calculate the expectation value of a certain number of operators"""
-  from .densitymatrix import full_dm
-  dm = full_dm(h,nk=nk,use_fortran=True,**kwargs)
+  dm = densitymatrix.full_dm(h,nk=nk,use_fortran=True,**kwargs)
   if operator is None: # no operator given on input
     operator = [] # empty list
   elif not isinstance(operator,list): # if it is not a list
@@ -264,6 +265,24 @@ def ev(h,operator=None,nk=30,**kwargs):
   out = np.array(out) # return the result
   out = out.reshape(out.shape[0]) # reshape in case there are indexes
   return out # return array
+
+
+
+def real_space_vev(h,operator=None,nk=1,nrep=3,name="REAL_SPACE_VEV.OUT",
+        **kwargs):
+    """Compute the expectation value in real space"""
+    if nk>1: raise # only Gamma point implemented
+    dm = densitymatrix.full_dm(h,nk=nk,**kwargs) # Gamma point DM
+    operator = operators.Operator(operator) # convert to operator
+    rho = operator(dm,k=[0.,0.,0.]) # compute the projected DM
+    rho = np.diag(rho).real # extract the diagonal
+    rho = h.full2profile(rho) # resum if necessary
+    h.geometry.write_profile(rho,nrep=5,name=name)
+    return rho
+
+
+
+
 
 
 

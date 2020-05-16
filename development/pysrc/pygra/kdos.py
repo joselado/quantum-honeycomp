@@ -147,9 +147,17 @@ def write_surface_3d(h,energies=None,klist=None,delta=0.01):
 
 def kdos_bands(h,use_kpm=False,kpath=None,scale=10.0,frand=None,
                  ewindow=4.0,ne=1000,delta=0.01,ntries=10,nk=100,
-                 operator=None,energies=np.linspace(-3.0,3.0,200)):
+                 operator=None,energies=np.linspace(-3.0,3.0,200),
+                 mode="ED",**kwargs):
   """Calculate the KDOS bands using the KPM"""
-  if not use_kpm: # conventional method
+  if use_kpm: mode ="KPM" # conventional method
+  if mode=="ED":
+      from . import dos
+      def pfun(k):
+        (es,ds) = h.get_dos(ks=[k],operator=operator,energies=energies,
+                delta=delta)
+        return energies,ds
+  elif mode=="green":
     f = h.get_gk_gen(delta=delta) # Green generator
     def pfun(k): # do it for this k-point
         def gfun(e):
@@ -157,7 +165,7 @@ def kdos_bands(h,use_kpm=False,kpath=None,scale=10.0,frand=None,
             m = green.GtimesO(m,operator,k=k)
             return -np.trace(m).imag # return DOS
         return energies,np.array([gfun(e) for e in energies])
-  else:
+  elif mode=="KPM": # KPM method
     if operator is not None: raise # not implemented
     hkgen = h.get_hk_gen() # get generator
     def pfun(k): # do it for this k-point

@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import numpy as np
 from numba import jit
+from . import parallel
 
 try:
   from . import density_matrixf90
@@ -9,6 +10,7 @@ except:
   use_fortran = False
   print("Fortran routines not working in densitymatrix.py")
  
+use_fortran = False
 
 def full_dm(h,use_fortran=True,nk=10,fermi=0.0,delta=1e-2,ds=None):
   if h.dimensionality == 0: fac = 1.
@@ -29,7 +31,8 @@ def full_dm(h,use_fortran=True,nk=10,fermi=0.0,delta=1e-2,ds=None):
     es = es - fermi # shift by the Fermi energy
     ks = np.array(ks) # to array
     n = h.intra.shape[0] # dimensionality
-    out = [full_dm_python_d(n,es,vs,ks,d)*fac for d in ds] # compute all the DM
+    out = parallel.pcall(lambda x: full_dm_python_d(n,es,vs,ks,x)*fac,ds)
+#    out = [full_dm_python_d(n,es,vs,ks,d)*fac for d in ds] # compute all the DM
     return out # return all the density matrices
 
 

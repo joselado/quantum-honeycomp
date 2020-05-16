@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import csc_matrix
+from numba import jit
 
 try:
     from . import specialhoppingf90
@@ -120,7 +121,30 @@ def phase_C3(g,phi=0.0):
 
 
 
+def distance_hopping_matrix(vs,ds):
+    """Return a hopping that to the 1-th neighbor is vs"""
+    vs = np.array(vs)
+    ds = np.array(ds)
+    def mgenerator(r1,r2):
+        r1 = np.array(r1)
+        r2 = np.array(r2)
+        n = len(r1)
+        out = np.zeros((n,n),dtype=np.complex) # output
+        return distance_hopping_matrix_jit(r1,r2,vs,ds**2,out) 
+    return mgenerator
 
+@jit(nopython=True)
+def distance_hopping_matrix_jit(r1,r2,vs,ds2,out):
+    """Return a hopping that to the 1-th neighbor is vs"""
+    n = len(r1) # number of sites
+    nn = len(ds2) # number of neighbors
+    for i in range(n):
+      for j in range(n):
+          dr = r1[i] - r2[j] # difference
+          dr2 = dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]
+          for k in range(nn):
+              if np.abs(ds2[k]-dr2)<1e-6: out[i,j] = vs[k]
+    return out
 
 
 

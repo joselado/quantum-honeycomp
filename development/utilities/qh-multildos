@@ -21,6 +21,15 @@ from interfacetk import plotpyqt
 
 
 
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input",default="MULTILDOS",help='Input folder')
+parser.add_argument("--grid",default="False",help='Use grid mode')
+args = parser.parse_args() # get the arguments
+
+
+
 #fig.set_facecolor("white") # white
 
 folder = "MULTILDOS/" # folder with all the stuff
@@ -73,7 +82,18 @@ def plot(main):
   sat = np.power(sat,4) # exponential scale
   color = np.tanh(color*sat)
   color = color/np.abs(max(color))
-  cplot = ax.scatter(x,y,s=scale*size,c=color,edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
+  if args.grid=="False":
+    cplot = ax.scatter(x,y,s=scale*size,c=color,
+            edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
+    ax.set_facecolor(main.get_combobox("Background"))
+  else:
+      z = z/np.max(z)
+      z = np.tanh(z*(sat*2+1e-6))
+      z = z/np.max(z)
+      zmap = z.reshape((len(np.unique(x)),len(np.unique(y))))
+      cplot = ax.imshow(zmap.T, aspect='auto', origin='lower',
+            cmap = cmap,interpolation="bicubic",vmin=0,vmax=1,
+            extent = (np.min(x), np.max(x), np.min(y), np.max(y)))
   cb = fig.colorbar(cplot,ticks=[0,1])
   cb.ax.set_yticklabels([0,'Max'])
   ax.axis("equal")
@@ -83,9 +103,6 @@ def plot(main):
   ax.set_xlim([np.min(x)*zoom,np.max(x)*zoom])
   ax.set_ylim([np.min(y)*zoom,np.max(y)*zoom])
   ax.set_title("LDOS E="+str(round(float(energy),3)))
-  try:
-    ax.set_facecolor(main.get_combobox("Background"))
-  except: pass
   axd.clear()  # clear DOS
   axd.plot(md[0],md[1]) # plot DOS
   yys = np.array([0,max(md[1])]) # y positions

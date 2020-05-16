@@ -14,11 +14,17 @@ def swave(h,name="SWAVE.OUT",nrep=3):
           normal_order=True,nrep=nrep)
 
 
-def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False):
+def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False,
+        spin_imbalance=False):
   """Write the magnitude of the hopping in a file"""
   if h.has_eh: raise
   h = h.supercell(nrep)
-  if h.has_spin: (ii,jj,ts) = extract.hopping_spinful(h.intra)
+  if h.has_spin: 
+      if spin_imbalance:
+          (ii,jj,ts) = extract.hopping_spinful_difference(h.intra,
+                  skip_same_site=True)
+      else:
+          (ii,jj,ts) = extract.hopping_spinful(h.intra)
   else: (ii,jj,ts) = extract.hopping_spinless(h.intra)
   f = open(name,"w") # write file
   for (i,j,t) in zip(ii,jj,np.abs(ts)):

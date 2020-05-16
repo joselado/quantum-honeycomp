@@ -94,6 +94,26 @@ def hopping_spinful(m,cutoff=0.001):
   return ii,jj,np.array(ts) # return pairs
 
 
+def hopping_spinful_difference(m,cutoff=0.001,skip_same_site=False):
+  """Extract hopping"""
+  n = m.shape[0]//2 # number sites
+  ii = []
+  jj = []
+  ts = []
+  for i in range(n):
+    for j in range(i,n):
+      if i==j and skip_same_site: continue
+      t = np.abs(m[2*i,2*j]) - np.abs(m[2*i+1,2*j+1])
+      if abs(t)>cutoff:
+        ii.append(i)
+        jj.append(j)
+        ts.append(t)
+  return ii,jj,np.array(ts) # return pairs
+
+
+
+
+
 def hopping_spinless(m,cutoff=0.001):
   """Extract hopping"""
   from scipy.sparse import coo_matrix

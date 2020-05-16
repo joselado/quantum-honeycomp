@@ -156,9 +156,14 @@ def get_multildos(h,window):
     numw = int(window.get("multildos_numw"))
     ne = 100 # 100 points
     delta = window.get("multildos_delta")
+    proj = window.getbox("basis_ldos")
+    if proj=="Real space atomic orbitals":  projection = "atomic"
+    else: projection = "TB" # default one
     ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),
-            nk=nk,delta=delta,nrep=nrep,numw=numw)
-    execute_script("qh-multildos ")
+            nk=nk,delta=delta,nrep=nrep,numw=numw,
+            projection=projection,ratomic=window.get("ratomic_ldos"))
+    if projection=="TB": execute_script("qh-multildos ")
+    else: execute_script("qh-multildos --grid True")
 
 
 

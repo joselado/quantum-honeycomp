@@ -8,6 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--nx",default=300)
 parser.add_argument("--ny",default=300)
 parser.add_argument("--smooth",default=2)
+parser.add_argument("--smooth_nxny",default="False")
 parser.add_argument("--input",default="")
 parser.add_argument("--xcut",default="")
 parser.add_argument("--ycut",default="")
@@ -28,25 +29,39 @@ if name=="":
 
 
 @jit(nopython=True)
-def wave_jit(x,y,centers,heights,fac,z):
+def wave_jit(x,y,centers,heights,facx,facy,z):
   for i in range(len(centers)):
     c = centers[i]
     h = heights[i]
-    r = ((x-c[0])**2+(y-c[1])**2)*fac # renormalized gaussian       
-    z += h*np.exp(-(r))-c[2]
-  return z+1.0
+    r = facx*(x-c[0])**2+facy*(y-c[1])**2 # renormalized gaussian       
+    z += h*np.exp(-(r))
+  return z
 
 
 
 
 def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
     """ Creates a set of gaussians at that position and with a height"""
-    if len(heights)<len(centers):
-      heights = [10. for i in centers]
-    fac = 1./smooth # factor to mix the gaussians
+    if len(heights)<len(centers): raise
+    if args.smooth_nxny == "True":
+        if args.xcut!="":
+            facx = nx/float(args.xcut)
+        else:
+            facx = nx/np.max(np.abs(np.array(centers)[:,0]))
+        if args.ycut!="":
+            facy = ny/float(args.ycut)
+        else:
+            facy = ny/np.max(np.abs(np.array(centers)[:,1]))
+        facx = facx/smooth
+        facy = facy/smooth
+    else:
+      fac = 1./smooth # factor to mix the gaussians
+      facx = fac
+      facy = fac
+    print(facx,facy)
     def wave(x,y):
         z = x*0.0 + y*0.0
-        return wave_jit(x,y,np.array(centers),np.array(heights),fac,z)
+        return wave_jit(x,y,np.array(centers),np.array(heights),facx,facy,z)
     xs = [c[0] for c in centers] # get x coordinates
     ys = [c[1] for c in centers] # get y coordinates
     dx = (np.max(xs) - np.min(xs))/10
@@ -71,14 +86,14 @@ m = np.genfromtxt(name).transpose()
 if args.xcut!="": # given value
     xc = float(args.xcut)
     m = m[:,np.abs(m[0,:])<xc]
-if args.xcut!="": # given value
+if args.ycut!="": # given value
     yc = float(args.ycut)
     m = m[:,np.abs(m[1,:])<yc]
 
 
 centers = [[m[0,i],m[1,i],0.] for i in range(len(m[0]))]
 
-heights = m[col]
+heights = m[col,:]
 #heights = read_density()
 #heights = 4*heights/np.max(heights)
 #heights = np.sqrt(heights)

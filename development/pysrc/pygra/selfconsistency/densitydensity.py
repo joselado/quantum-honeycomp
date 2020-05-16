@@ -252,15 +252,15 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       set_hoppings(h,hop) # set the new hoppings in the Hamiltonian
       if callback_h is not None:
           h = callback_h(h) # callback for the Hamiltonian
-      t0 = time.clock() # time
+      t0 = time.perf_counter() # time
       dm = get_dm(h,nk=nk) # get the density matrix
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
-      t1 = time.clock() # time
+      t1 = time.perf_counter() # time
       mf = get_mf(v,dm) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
-      t2 = time.clock() # time
+      t2 = time.perf_counter() # time
       print("Time in density matrix = ",t1-t0) # Difference
       print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
@@ -401,14 +401,18 @@ def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
     h.turn_dense()
     # define the function
     nd = h.geometry.neighbor_distances() # distance to first neighbors
-    def fun(r1,r2):
-        dr = r1-r2
-        dr = np.sqrt(dr.dot(dr)) # distance
-        if abs(dr-nd[0])<1e-6: return V1/2.
-        if abs(dr-nd[1])<1e-6: return V2/2.
-        return 0.0
+ #   def fun(r1,r2):
+ #       dr = r1-r2
+ #       dr = np.sqrt(dr.dot(dr)) # distance
+ #       if abs(dr-nd[0])<1e-6: return V1/2.
+ #       if abs(dr-nd[1])<1e-6: return V2/2.
+ #       return 0.0
+    from .. import specialhopping
+    mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.],nd[0:2])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
-            fun=fun) 
+            mgenerator=mgenerator) 
+ #   hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
+ #           fun=fun) 
     v = hv.get_hopping_dict() # hopping dictionary
     if h.has_spin: #raise # not implemented
         for d in v: # loop

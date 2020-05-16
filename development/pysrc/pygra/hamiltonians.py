@@ -113,6 +113,10 @@ class hamiltonian():
       out = algebra.inv(np.identity(hk.shape[0])*(e+1j*delta) - hk)
       return out
     return f
+  def to_canonical_gauge(self,m,k):
+      """Return a matrix in the canonical gauge"""
+      from . import gauge
+      return gauge.to_canonical_gauge(self,m,k) # return the matrix
   def print_hamiltonian(self):
     """Print hamiltonian on screen"""
     print_hamiltonian(self)

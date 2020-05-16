@@ -45,7 +45,6 @@ def get_klist(g,ns,nk=100):
     fbl = open("BANDLINES.OUT","w")
     for i in range(len(ns)): 
         fbl.write(str(kinds[i])+" "+ns[i]+"\n")
-
     return ks # return vector
 
 

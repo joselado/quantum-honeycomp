@@ -5,6 +5,8 @@ import scipy.linalg as dlg
 import scipy.sparse.linalg as slg
 import numpy as np
 from .algebratk import sparsetensor
+from numba import jit
+from . import parallel
 
 maxsize = 10000
 
@@ -106,27 +108,49 @@ def get_representation(wfs,A):
 
 error = 1e-7
 
+def todouble(vs,ind):
+    """Double the eigenvectors"""
+    nv = vs.shape[0]
+    dim = vs.shape[1]
+    vout = np.zeros((dim*2,nv),dtype=np.complex) # output vector
+    return todouble_jit(vs,ind,vout,nv,dim)
+
+@jit(nopython=True)
+def todouble_jit(vs,ind,vout,nv,dim):
+    """Double the eigenvectors, jit routine"""
+    for i in range(dim):
+        vout[2*i+ind,:] = vs[i,:]
+    return vout
+
 
 
 accelerate = False
 
 def eigh(m):
     """Wrapper for linalg"""
+    m = todense(m)
+    if np.max(np.abs(m.imag))<error: m = m.real # real matrix
     if not accelerate: return dlg.eigh(m)
-    from . import algebraf90
+#    from . import algebraf90
     # check if doing slices helps
     n = m.shape[0] # size of the matrix
     mo = m[0:n:2,1:n:2] # off diagonal is zero
 #    if False: # assume block diagonal
     if np.max(np.abs(mo))<error: # assume block diagonal
         # detected block diagonal
-        (es0,vs0) = eigh(m[0:n:2,0:n:2]) # recall
-        (es1,vs1) = eigh(m[1:n:2,1:n:2]) # recall
+        ms = [m[0:n:2,0:n:2],m[1:n:2,1:n:2]]
+        out = parallel.pcall(lambda x: dlg.eigh(x),ms)
+        (es0,vs0) = out[0]
+        (es1,vs1) = out[1]
+   #     (es0,vs0) = eigh(m[0:n:2,0:n:2]) # recall
+   #     (es1,vs1) = eigh(m[1:n:2,1:n:2]) # recall
         es = np.concatenate([es0,es1]) # concatenate array
-        vs0 = algebraf90.todouble(vs0.T,0)
-        vs1 = algebraf90.todouble(vs1.T,1)
-        vs = np.concatenate([vs0,vs1])
-        return (es,vs.T) # return the eigenvaleus and eigenvectors
+        #vs0 = algebraf90.todouble(vs0.T,0)
+        #vs1 = algebraf90.todouble(vs1.T,1)
+        vs0 = todouble(vs0,0) # double the degrees of freedom
+        vs1 = todouble(vs1,1) # double the degrees of freedom
+        vs = np.concatenate([vs0.T,vs1.T]).T
+        return (es,vs) # return the eigenvaleus and eigenvectors
 
     else:
       if np.max(np.abs(m.imag))<error: # assume real
@@ -137,6 +161,7 @@ def eigh(m):
 def eigvalsh(m):
     """Wrapper for linalg"""
     m = todense(m) # turn the matrix dense
+    if np.max(np.abs(m.imag))<error: m = m.real # real matrix
     if not accelerate: return dlg.eigvalsh(m)
     # check if doing slices helps
     n = m.shape[0] # size of the matrix
@@ -144,8 +169,8 @@ def eigvalsh(m):
 #    if False: # assume block diagonal
     if np.max(np.abs(mo))<error: # assume block diagonal
         # detected block diagonal
-        es0 = eigvalsh(m[0:n:2,0:n:2]) # recall
-        es1 = eigvalsh(m[1:n:2,1:n:2]) # recall
+        es0 = dlg.eigvalsh(m[0:n:2,0:n:2]) # recall
+        es1 = dlg.eigvalsh(m[1:n:2,1:n:2]) # recall
         es = np.concatenate([es0,es1]) # concatenate array
         return es
 

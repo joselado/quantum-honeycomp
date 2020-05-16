@@ -529,7 +529,9 @@ def get_hopping_dict(h):
     h = h.get_multicell()
     out = dict()
     out[(0,0,0)] = h.intra
-    for t in h.hopping: out[tuple(t.dir)] = t.m # store
+    for t in h.hopping: 
+        if np.max(np.abs(t.m))>1e-7:
+          out[tuple(t.dir)] = t.m # store
     return out # return
 
 

@@ -303,8 +303,17 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
 
 
 
-def multi_ldos(h,es=np.linspace(-1.0,1.0,100),delta=0.01,nrep=3,nk=100,numw=3,
-        random=False,op=None):
+def multi_ldos(h,projection="TB",**kwargs):
+    """Compute the LDOS at different energies, and save everything in a file"""
+    if projection=="TB": return multi_ldos_tb(h,**kwargs)
+    elif projection=="atomic": 
+        from .ldostk import atomicmultildos
+        return atomicmultildos.multi_ldos(h,**kwargs)
+
+
+def multi_ldos_tb(h,es=np.linspace(-1.0,1.0,100),delta=0.01,
+        nrep=3,nk=100,numw=3,
+        random=False,op=None,**kwargs):
   """Calculate many LDOS, by diagonalizing the Hamiltonian"""
   print("Calculating eigenvectors in LDOS")
   ps = [] # weights

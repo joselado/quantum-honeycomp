@@ -1586,7 +1586,7 @@ def multireplicas(self,n):
     if self.dimensionality==0: return self.r
     else: # bigger dimensionality
         for d in dl:  out += self.replicas(d) # add this direction
-    return out
+    return np.array(out)
 
 
 

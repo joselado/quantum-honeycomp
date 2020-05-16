@@ -100,15 +100,9 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
   if num_bands is None: # all the bands
     if operator is not None: 
       def diagf(m): # diagonalization routine
-        if h.is_sparse and h.intra.shape[0]<maxdim: 
-          return algebra.eigh(m.todense()) # all eigenvals and eigenfuncs
-        else:
           return algebra.eigh(m) # all eigenvals and eigenfuncs
     else: 
       def diagf(m): # diagonalization routine
-        if h.is_sparse and h.intra.shape[0]<maxdim: 
-          return algebra.eigvalsh(m) # all eigenvals and eigenfuncs
-        else:
           return algebra.eigvalsh(m) # all eigenvals and eigenfuncs
   else: # using arpack
     h = h.copy()
