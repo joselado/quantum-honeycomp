@@ -76,13 +76,13 @@ def plot(main):
   scale = scale/np.sqrt(num)*700
   cmap = plt.get_cmap(main.get_combobox("colormap")) 
   color = scale/np.max(scale) # between 0 and 1
-  size = main.get_slider("Size")/50 # size reescaling
-  size = np.power(size,4) # exponential scale
   sat = main.get_slider("Saturation")/50 # saturation
   sat = np.power(sat,4) # exponential scale
   color = np.tanh(color*sat)
   color = color/np.abs(max(color))
   if args.grid=="False":
+    size = main.get_slider("Size")/50 # size reescaling
+    size = np.power(size,4) # exponential scale
     cplot = ax.scatter(x,y,s=scale*size,c=color,
             edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
     ax.set_facecolor(main.get_combobox("Background"))
@@ -92,7 +92,8 @@ def plot(main):
       z = z/np.max(z)
       zmap = z.reshape((len(np.unique(x)),len(np.unique(y))))
       cplot = ax.imshow(zmap.T, aspect='auto', origin='lower',
-            cmap = cmap,interpolation="bicubic",vmin=0,vmax=1,
+            cmap = cmap,interpolation=main.get_combobox("Interpolation"),
+            vmin=0,vmax=1,
             extent = (np.min(x), np.max(x), np.min(y), np.max(y)))
   cb = fig.colorbar(cplot,ticks=[0,1])
   cb.ax.set_yticklabels([0,'Max'])
@@ -121,12 +122,16 @@ def plot(main):
 
 app,main = plotpyqt.get_interface(plot)
 main.add_slider(label="Energy") # Slider for the dots
-main.add_slider(label="Size",v0=50) # Slider for the dots
+if args.grid=="False":
+  main.add_slider(label="Size",v0=50) # Slider for the dots
 main.add_slider(label="Saturation",v0=50) # Saturation
 main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,40)) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
-main.add_combobox(["black","white"],label="Background") # Slider for the dots
+if args.grid=="False":
+  main.add_combobox(["black","white"],label="Background") # Slider for the dots
+if not args.grid=="False":
+  main.add_combobox(["bicubic","none",'bilinear'],label="Interpolation") 
 main.setWindowTitle("Local DOS")
 
 main.plot()

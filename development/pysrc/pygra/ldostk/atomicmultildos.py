@@ -15,7 +15,7 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
             return np.exp(-np.sqrt(dr2)/ratomic)
         return f # return the wavefunction
     evals,vs,ks = h.get_eigenvectors(nk=nk,kpoints=True) # compute wavefunctions
-    dl = h.geometry.neighbor_directions(nrep+4) # directions of the neighbors
+    dl = h.geometry.neighbor_directions(nrep+int(ratomic)*10) # directions of the neighbors
     # generate a dictionary with all the real space local orbitals
     ##########################################################
     lodict = dict() # dictionary for the local orbitals
