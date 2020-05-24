@@ -9,7 +9,7 @@ qhroot = os.environ["QHROOT"] # root path
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
-import qtwrap # import the library with simple wrappaers to qt4
+from interfacetk import qtwrap # import the library with simple wrappaers to qt4
 get = qtwrap.get  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
