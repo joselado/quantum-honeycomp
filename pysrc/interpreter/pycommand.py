@@ -3,13 +3,13 @@ import os
 import sys
 import platform
 
-def correct_python():
+def correct_python(pyint="python"):
     """CHeck if a suitable Python is installed"""
     try:
         import scipy
         import numpy
         import multiprocessing
-        out,err = subprocess.Popen(['python', '--version'],
+        out,err = subprocess.Popen([pyint, '--version'],
                stdout=subprocess.PIPE,
                stderr=subprocess.STDOUT).communicate()
     except: out = ""
@@ -18,7 +18,7 @@ def correct_python():
 
 def install_python():
     """Install a correct Python distribution"""
-    if correct_python(): 
+    if get_python() is not None: 
         print("Found a correct python distribution")
         return # nothing to do
     pwd = os.getcwd() # get the current directory
@@ -52,17 +52,22 @@ def install_dependencies():
 def get_python():
   """Return the path for Anaconda Python, which has pyqt by default"""
   if correct_python(): return "python" # default python command
-  else:
+  else: # try the local one (if present)
     dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
-    return dirname +"/python_interpreter/python3/bin/python"
+    pyint = dirname +"/python_interpreter/python3/bin/python" # local one
+    if correct_python(pyint): return pyint # return the local one
+  return None # no Python
 
 
 def get_pip():
   """Return the path for Anaconda Python, which has pyqt by default"""
-  if correct_python(): return "python" # default python command
-  else:
+  if correct_python(): return "pip" # default python command
+  else: # try the local one (if present)
     dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
-    return dirname +"/python_interpreter/python3/bin/pip"
+    pyint = dirname +"/python_interpreter/python3/bin/python" # local one
+    pipint = dirname +"/python_interpreter/python3/bin/pip" # local one
+    if correct_python(pyint): return pipint # return the local one
+  return None # no Python
 
 
 def add_to_path():
