@@ -69,13 +69,10 @@ signals["multilayergraphene"] = call_mode("multilayergraphene",pyqt=True)
 
 
 def update_qh():
-    print("This is temporarily disabled")
+    os.chdir(qhroot) # go to the main directory
+    os.system("git pull") # pull the directory
+    os.system("python install.py") # reinstall if necessary
     exit()
-#    qhpath = os.environ["QHROOT"]
-#    os.chdir(qhpath) # go to the QH folder
-#    os.system("cp download_latest.py ../") # copy script
-#    os.chdir("..") # one folder less
-#    os.system("python download_latest.py") # execute script
 
 
 signals["update_qh"] = update_qh # update Quantum Honeycomp 
