@@ -71,7 +71,7 @@ signals["multilayergraphene"] = call_mode("multilayergraphene",pyqt=True)
 def update_qh():
     os.chdir(qhroot) # go to the main directory
     os.system("git pull") # pull the directory
-    os.system("python install.py") # reinstall if necessary
+#    os.system("python install.py") # reinstall if necessary
     exit()
 
 
