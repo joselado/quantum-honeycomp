@@ -256,11 +256,11 @@ class Geometry:
     Remove one site
     """
     return sculpt.remove(self,[i])
-  def center_in_atom(self):
+  def center_in_atom(self,n0=None):
     """
     Center the geometry in an atom
     """
-    n0 = sculpt.get_central(self)[0] # get the index
+    if n0 is None: n0 = sculpt.get_central(self)[0] # get the index
     sculpt.shift(self,r=self.r[n0]) # shift the geometry
   def get_central(self,n=1):
       """
@@ -1526,6 +1526,7 @@ def neighbor_cells(num,dim=3):
 def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep = 1
+  if callable(d): d = np.array([d(ri) for ri in g.r]) # call
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:

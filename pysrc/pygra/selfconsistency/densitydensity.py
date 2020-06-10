@@ -8,6 +8,7 @@ import os
 from .. import densitymatrix
 from copy import deepcopy
 from numba import jit
+from .. import utilities
 
 class Interaction():
     def __init__(self,h=None):
@@ -172,7 +173,7 @@ def get_dm(h,nk=1):
         dm[ds[i]] = dms[i] # store
     return dm # return dictionary with the density matrix
 
-def get_mf(v,dm):
+def get_mf(v,dm,only_dd=True):
     """Get the mean field"""
     zero = dm[(0,0,0)]*0. # zero
     mf = dict()
@@ -184,14 +185,10 @@ def get_mf(v,dm):
     for d in v: # loop over directions
         d2 = (-d[0],-d[1],-d[2]) # minus this direction
         # add the normal terms
-        m = normal_term_ij(v[d],dm[d2]) # get matrix
-#        print(d)
-#        print(np.abs(m))
-        #print(np.abs(v[d]))
-        #print(np.abs(dm[d2]))
-        mf[d] = mf[d] + m # add normal term
-        #if d==(0,0,0): 
-        mf[d2] = mf[d2] + dag(m) # add normal term
+        if not only_dd: # only density density terms
+          m = normal_term_ij(v[d],dm[d2]) # get matrix
+          mf[d] = mf[d] + m # add normal term
+          mf[d2] = mf[d2] + dag(m) # add normal term
         m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
         mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
         m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix
@@ -223,7 +220,7 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,
+        load_mf=True,only_dd=False,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -257,7 +254,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
-      mf = get_mf(v,dm) # return the mean field
+      mf = get_mf(v,dm,only_dd=only_dd) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time
@@ -385,13 +382,20 @@ def hubbard(h,U=1.0,**kwargs):
     if h.has_eh: raise # not implemented
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
-    n = h.intra.shape[0]//2 # number of spinless sites
     zero = h.intra*0. # initialize
-    for i in range(n): 
-        zero[2*i,2*i+1] = U # Hubbard interaction
+    U = utilities.obj2fun(U) # redefine as a function
+    if h.has_spin:
+      n = h.intra.shape[0]//2 # number of spinless sites
+      for i in range(n): zero[2*i,2*i+1] = U(i) # Hubbard interaction
+    else: 
+      n = h.intra.shape[0] # number of spinless sites
+      for i in range(n): zero[i,i] = U(i) # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
-    return densitydensity(h,v=v,**kwargs)
+    if h.has_spin:
+      return densitydensity(h,v=v,**kwargs)
+    else:
+      return densitydensity(h,v=v,only_dd=True,**kwargs)
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):

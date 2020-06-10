@@ -12,9 +12,21 @@ def float2array(z):
 def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
   """ Add Zeeman to the hamiltonian """
   # convert the input into a list
-  def convert(z):
-    if checkclass.is_iterable(z): return z # iterable, input is an array
-    else: return [0.,0.,z] # input is a number
+  def evaluate_J(z,r,i):
+    if checkclass.is_iterable(z): # it is a list/array
+        if checkclass.is_iterable(z[0]):  # each element is a list/array
+            return np.array(z[i]) # iterable, input is an array
+        out = [0.,0.,0.] # not iterable
+        for j in range(len(z)): # loop over elements
+            if callable(z[j]):  # each element is a function
+               out[j] = z[j](r) # call the function
+            else: # if it is number
+               out[j] = z[j]
+        return np.array(out)
+    elif callable(z): # it is a function
+        m = r(r) # call
+        if checkclass.is_iterable(m): return np.array(m) # it is an array
+        else: return np.array([0.,0.,m]) # number
   from scipy.sparse import coo_matrix as coo
   from scipy.sparse import bmat
   if h.has_spin: # only if the system has spin
@@ -23,18 +35,11 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
     # create matrix to add to the hamiltonian
     bzee = [[None for i in range(no)] for j in range(no)]
     # assign diagonal terms
-    if not callable(zeeman): # if it is a number
-      for i in range(no):
-        zeeman = convert(zeeman) # convert to list
-        bzee[i][i] = zeeman[0]*sx+zeeman[1]*sy+zeeman[2]*sz
-    elif callable(zeeman): # if it is a function
-      r = h.geometry.r  # z position
-      for i in range(no):
-        mm = zeeman(r[i])  # get the value of the zeeman
-        mm = convert(mm) # convert to list
-        bzee[i][i] = mm[0]*sx+mm[1]*sy+mm[2]*sz
-    else:
-      raise
+    r = h.geometry.r  # z position
+    for i in range(no):
+        JJ = evaluate_J(zeeman,r[i],i) # evaluate the exchange
+        print(JJ)
+        bzee[i][i] = JJ[0]*sx+JJ[1]*sy+JJ[2]*sz
     bzee = bmat(bzee) # create matrix
     h.intra = h.intra + h.spinful2full(bzee) # Add matrix 
   if not h.has_spin:  # still have to implement this...

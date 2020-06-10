@@ -124,7 +124,7 @@ def todouble_jit(vs,ind,vout,nv,dim):
 
 
 
-accelerate = False
+accelerate = True
 
 def eigh(m):
     """Wrapper for linalg"""
