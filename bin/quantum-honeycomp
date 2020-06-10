@@ -1,0 +1,42 @@
+#!/usr/bin/python
+from __future__ import print_function
+import os
+import sys
+import platform
+
+
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--utility",default="",
+        help='Just use an utility and exit')
+args = parser.parse_args() # get the arguments
+
+
+
+
+def get_qhroot():
+  """Gets the root path of quantum honeycomp"""
+  return os.path.dirname(os.path.realpath(__file__))+"/../" 
+
+qhroot = get_qhroot()  # get the root path
+os.environ["QHROOT"] = qhroot # create the environmental variable
+
+
+def get_command(name="python"):
+  """Return the path for Anaconda Python, which has pyqt by default"""
+  dirname = os.path.dirname(os.path.realpath(__file__))
+  sys.path.append(dirname+"/../pysrc/interpreter") # add this path
+  import pycommand
+  return pycommand.get_python()
+
+
+python = get_command()
+
+# use an utility and exit
+if args.utility!="": # non empty string
+  os.system(python + " "+qhroot+"/utilities/"+args.utility)
+  exit()
+
+
+os.system(python+" "+qhroot+"bin/versions/quantum-honeycomp-pyqt")
