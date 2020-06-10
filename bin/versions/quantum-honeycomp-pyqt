@@ -31,16 +31,10 @@ python = get_command() # Python command
 def call_mode(mode,folder=None,pyqt=False):
   """ Returns a function which calls a particular quantum honeycomp mode"""
   if folder is None: folder = mode # if not provided
-  path = os.environ["QHROOT"]+"/" # QH root path
+  path = qhroot
   def launch(self):
     """Function to launch a particular calculation, passes qhroot as input"""
-    if pyqt:
-      os.system(python+" "+path+"interface-pyqt/"+mode+"/"+mode+".py   "+path +"  &")
-    else:
-      if platform.system()=="Linux": # for Linux
-        os.system(python+" "+path+"systems/"+mode+"/"+mode+".py   "+path +"  &")
-      else:
-        print("Not available in",platform.system())
+    os.system(python+" "+path+"interface-pyqt/"+mode+"/"+mode+".py   "+path +"  &")
   return launch
 
 
