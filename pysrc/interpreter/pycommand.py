@@ -72,7 +72,7 @@ def add_to_path():
     if out=="/bin/bash":
         if platform.system()=="Linux":  rcfile = home+"/.bashrc"
         else: rcfile = home+"/.bash_profile"
-    elif out=="/usr/bin/zsh": 
+    elif out=="/bin/zsh": 
         rcfile = home+"/.zshrc"
     qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
     ls = open(rcfile,"r").read()
