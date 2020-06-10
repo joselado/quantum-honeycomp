@@ -6,4 +6,5 @@ __pycache__
 *.swp
 compiling.txt
 python_interpreter
+old_versions
 data

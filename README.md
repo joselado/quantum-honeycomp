@@ -11,13 +11,22 @@ This program allows to perform tight binding calculations with a user friendly i
 The program runs in Linux and Mac machines. 
 
 Clone the github repository
+```bash
 git clone https://github.com/joselado/quantum-honeycomp
+```
 
 and execute the script install as
-python install
+```bash
+python install.py
+```
 
 The script will install all the required dependencies if they are not already
-present.
+present. Afterwards, you can run the program by executing in a terminal
+
+```bash
+quantum-honeycomp
+```
+
 
 For using this program in Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
 a version of ubuntu in that virtual machine, and following the previous instructions.
