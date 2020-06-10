@@ -10,9 +10,14 @@ This program allows to perform tight binding calculations with a user friendly i
 
 The program runs in Linux and Mac machines. 
 
-Download the file "quantum-honeycomp-latest.tar", uncompress it, and execute the script "install". Afterwards, you can execute the program by writting in a terminal "quantum-honeycomp"
+Clone the github repository
+git clone https://github.com/joselado/quantum-honeycomp
 
-This program uses several Python libraries. The simplest way of getting all the dependencies is by installing Python Anaconda from https://www.anaconda.com/distribution/#download-section 
+and execute the script install as
+python install
+
+The script will install all the required dependencies if they are not already
+present.
 
 For using this program in Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
 a version of ubuntu in that virtual machine, and following the previous instructions.
