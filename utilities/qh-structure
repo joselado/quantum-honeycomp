@@ -13,6 +13,8 @@ parser.add_argument("--input",default="POSITIONS.OUT",
         help='Input file with the bands')
 parser.add_argument("--color",default="False",
         help='Input file with the bands')
+parser.add_argument("--colorcol",default="3",
+        help='Input file with the bands')
 
 args = parser.parse_args() # get the arguments
 
@@ -29,7 +31,8 @@ rs = np.genfromtxt(args.input) # get positions
 # scatter the central cell
 
 if args.color=="True":
-    ax.scatter(rs[:,0],rs[:,1],rs[:,2],s=120,c=rs[:,3],cmap="rainbow") 
+    cc = int(args.colorcol)
+    ax.scatter(rs[:,0],rs[:,1],rs[:,2],s=120,c=rs[:,cc],cmap="rainbow") 
 else:
     ax.scatter(rs[:,0],rs[:,1],rs[:,2],s=120,c="black") # scatter the points
 
