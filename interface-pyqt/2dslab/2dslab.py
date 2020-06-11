@@ -199,7 +199,7 @@ def show_structure(self):
   nsuper = int(get("nsuper_struct"))
   g = g.supercell(nsuper)
   g.write()
-  execute_script("qh-structure POSITIONS.OUT")
+  execute_script("qh-structure")
 
 
 

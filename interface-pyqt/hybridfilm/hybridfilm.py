@@ -208,8 +208,8 @@ def show_structure(self):
   nsuper = int(get("nsuper_struct"))
   g = g.supercell(nsuper)
   g.write()
-#  execute_script("qh-light-structure POSITIONS.OUT")
-  execute_script("qh-structure POSITIONS.OUT")
+  g.write_profile(np.sign(g.z),name="PROFILE.OUT",normal_order=True,nrep=1)
+  execute_script("qh-structure --input PROFILE.OUT --color True")
 #  execute_script("qh-structure  ")
 
 

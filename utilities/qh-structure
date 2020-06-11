@@ -5,48 +5,33 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import sys
 
+
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input",default="POSITIONS.OUT",
+        help='Input file with the bands')
+parser.add_argument("--color",default="False",
+        help='Input file with the bands')
+
+args = parser.parse_args() # get the arguments
+
+
+
 fig = plt.figure()
 fig.set_facecolor("white")
 ax = fig.add_subplot(111, projection='3d')
 fig.subplots_adjust(.1,.1,.9,.9)
 ax.set_aspect("auto")
 
-rs = np.genfromtxt("POSITIONS.OUT") # get positions
-try: dim = int(np.genfromtxt("DIMENSIONALITY.OUT"))
-except: dim = 0 # zero dimensional
-
-# get the lattice
-try: lat = np.genfromtxt("LATTICE.OUT") # get the vectors
-except: lat = [] # empty lattice
-
+rs = np.genfromtxt(args.input) # get positions
 
 # scatter the central cell
-def scatter(rs,c="red"):
-  rs2 = np.array(rs).transpose() # transpose
-  ax.scatter(rs2[0],rs2[1],rs2[2],s=120,c=c) # scatter the points
 
-try: replicas = int(sys.argv[1])
-except: replicas = 0
-
-scatter(rs)
-
-print("Dimension",dim)
-print("Replicas",replicas)
-
-# scatter neighboring cells
-if dim==1: # one dimensional
-  for i in range(-replicas,replicas+1):
-    if i!=0:
-      scatter([ri + i*lat for ri in rs],c="blue") # scatter replicas
-
-if dim==2: # one dimensional
-  for i in range(-replicas,replicas+1):
-    for j in range(-replicas,replicas+1):
-      if i!=0 or j!=0:
-        scatter([ri + i*lat[0] + j*lat[1] for ri in rs],c="blue") 
-
-
-
+if args.color=="True":
+    ax.scatter(rs[:,0],rs[:,1],rs[:,2],s=120,c=rs[:,3],cmap="rainbow") 
+else:
+    ax.scatter(rs[:,0],rs[:,1],rs[:,2],s=120,c="black") # scatter the points
 
 # this is a workaround to fix the same scale
 
@@ -64,8 +49,6 @@ ax.set_ylim(mid_y - max_range, mid_y + max_range)
 ax.set_zlim(mid_z - max_range, mid_z + max_range)
 ###################################
 # end of the workaround
-
-
 
 
 
