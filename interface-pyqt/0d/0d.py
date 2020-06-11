@@ -199,7 +199,13 @@ def show_dos():
   common.get_dos(h,qtwrap) # compute DOS
 
 
-
+def show_local_chern():
+  h = pickup_hamiltonian() # get hamiltonian
+  op = getbox("operator_chern")
+  if op=="None": op=None
+  else: op = h.get_operator(op)
+  topology.real_space_chern(h,operator=op)
+  execute_script("qh-potential --input REAL_SPACE_CHERN.OUT")
 
 
 
@@ -220,6 +226,7 @@ signals["show_magnetism"] = show_magnetism
 signals["select_atoms_removal"] = select_atoms_removal
 signals["select_atom_time_evolution"] = select_atom_time_evolution
 signals["show_time_evolution"] = show_time_evolution
+signals["show_local_chern"] = show_local_chern
 
 
 

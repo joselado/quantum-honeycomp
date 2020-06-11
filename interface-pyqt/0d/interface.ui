@@ -820,6 +820,50 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab_13">
+       <attribute name="title">
+        <string>Topology</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_23">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_22">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="operator_chern">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Valley</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sz</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_34">
+            <property name="text">
+             <string>Operator</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QPushButton" name="show_local_chern">
+            <property name="text">
+             <string>Show local Chern number</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_10">
        <attribute name="title">
         <string>Time evolution</string>

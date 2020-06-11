@@ -22,8 +22,10 @@ class Operator():
     def __init__(self,m,linear=True):
         """Initialization"""
         self.linear = linear
+        self.matrix = None
         if type(m)==np.ndarray or issparse(m):
             self.m = lambda v,k=None: m@v # create dummy function
+            self.matrix = m
         elif type(m)==Operator: 
             self.m = m.m
             self.linear = m.linear
@@ -39,6 +41,8 @@ class Operator():
         if type(a)==Operator:
             out = Operator(self)
             out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
+            if self.matrix is not None and a.matrix is not None:
+                out.matrix = self.matrix@a.matrix
             out.linear = self.linear and a.linear
             return out
         else:
@@ -48,6 +52,8 @@ class Operator():
         if type(a)==Operator:
             out = Operator(self)
             out.m = lambda v,k=None: self.m(v,k=k) + a.m(v,k=k)
+            if self.matrix is not None and a.matrix is not None:
+                out.matrix = self.matrix + a.matrix
             out.linear = self.linear and a.linear
             return out
         else:
@@ -63,6 +69,9 @@ class Operator():
     def __call__(self,v,k=None):
         """Define the call method"""
         return self.m(v,k=k) 
+    def get_matrix(self):
+        """Return matrix if possible"""
+        if self.matrix is not None: return self.matrix
 
 
 

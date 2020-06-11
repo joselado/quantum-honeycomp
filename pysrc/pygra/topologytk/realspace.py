@@ -5,8 +5,8 @@ from .. import densitymatrix
 def real_space_chern(h,operator=None):
     """Compute the real space Chern number"""
     if h.dimensionality!=0: raise
-    X = h.get_operator("xposition")
-    Y = h.get_operator("yposition")
+    X = h.get_operator("xposition").get_matrix()
+    Y = h.get_operator("yposition").get_matrix()
 #    X = np.diag(h.geometry.x)
 #    Y = np.diag(h.geometry.y)
     m = h.get_hk_gen()([0.,0.,0.]) # get the matrix
