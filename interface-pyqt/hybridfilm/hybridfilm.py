@@ -115,7 +115,7 @@ def initialize():
   return h
 
 
-def show_bands(self=0):
+def show_bands():
   h = pickup_hamiltonian() # get hamiltonian
   common.get_bands(h,qtwrap) # wrapper
 
@@ -134,7 +134,7 @@ def show_ldos():
 
 
 
-def show_dosbands(self=0):
+def show_dosbands():
   h = pickup_hamiltonian() # get hamiltonian
   kdos.kdos_bands(h,scale=get("scale_kbands"),ewindow=get("window_kbands"),
                    ne=int(get("ne_kbands")),delta=get("delta_kbands"),
@@ -143,7 +143,7 @@ def show_dosbands(self=0):
 
 
 
-def show_dos(self):
+def show_dos():
   h = pickup_hamiltonian() # get hamiltonian
 #  mode = getbox("mode_dos") # mode for the DOS
   if h.dimensionality==0:
@@ -173,7 +173,7 @@ def pickup_hamiltonian():
 
 
 
-def show_stm(self):
+def show_stm():
   h = pickup_hamiltonian() # get hamiltonian
 #  ldos.multi_ldos()
   ewin = abs(get("window_ldos")) # energy window
@@ -195,14 +195,14 @@ def show_berry2d():
 
   
 
-def show_magnetism(self):
+def show_magnetism():
   h = pickup_hamiltonian() # get hamiltonian
   h.get_magnetization() # get the magnetization
   execute_script("tb90-magnetism  ")
 #  execute_script("qh-magnetism  ")
 
 
-def show_structure(self):
+def show_structure():
   """Show the lattice of the system"""
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))
@@ -213,7 +213,7 @@ def show_structure(self):
 #  execute_script("qh-structure  ")
 
 
-def show_structure_3d(self):
+def show_structure_3d():
   """Show the lattice of the system"""
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))
@@ -226,7 +226,7 @@ def show_structure_3d(self):
 
 
 
-def show_kdos(self):
+def show_kdos():
   h = pickup_hamiltonian()  # get the hamiltonian
   ew = get("ewindow_kdos")
   new = int(get("mesh_kdos")) # scale as kpoints
@@ -243,14 +243,14 @@ def show_kdos(self):
 
 
 
-def show_berry1d(self):
+def show_berry1d():
   h = pickup_hamiltonian()  # get the hamiltonian
   ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
   topology.write_berry(h,ks)
   execute_script("qh-berry1d  label  ")
 
 
-def show_z2(self):
+def show_z2():
   h = pickup_hamiltonian()  # get the hamiltonian
   nk = get("nk_topology")
   topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant

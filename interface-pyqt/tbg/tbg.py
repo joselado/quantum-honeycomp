@@ -117,7 +117,7 @@ def initialize():
 
 
 
-def show_bands(self):
+def show_bands():
   h = pickup_hamiltonian()  # get the hamiltonian
   common.get_bands(h,qtwrap) # wrapper
   
@@ -134,7 +134,7 @@ def check_parallel():
 
   
 
-def show_dos(self):
+def show_dos():
   comp = computing() # create the computing window
   h = pickup_hamiltonian()  # get the hamiltonian
   nk = int(round(np.sqrt(get("nk_dos"))))
@@ -200,7 +200,7 @@ def show_ldos():
 
 
 
-def show_z2_invariant(self):
+def show_z2_invariant():
   h = pickup_hamiltonian()  # get the hamiltonian
   nk = get("nkpoints")/4
   topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
@@ -209,7 +209,7 @@ def show_z2_invariant(self):
 
 
 
-def show_kdos(self):
+def show_kdos():
   h = pickup_hamiltonian()  # get the hamiltonian
   ew = get("e_kdos")
   new = int(get("nkpoints")/10) # scale as kpoints
@@ -219,7 +219,7 @@ def show_kdos(self):
   execute_script("qh-kdos KDOS.OUT  ")
 
 
-def show_dosbands(self=0):
+def show_dosbands():
   h = pickup_hamiltonian() # get hamiltonian
   kpath = klist.default(h.geometry,nk=int(get("nk_kbands")))
   kdos.kdos_bands(h,scale=get("scale_kbands"),ewindow=get("window_kbands"),
@@ -230,7 +230,7 @@ def show_dosbands(self=0):
 
 
 
-def show_2dband(self):
+def show_2dband():
   h = pickup_hamiltonian()  # get the hamiltonian
   nk = get("nkpoints")/4
   ns = get_text("num_2dband") # get indexes of the bands
@@ -253,7 +253,7 @@ def show_2dband(self):
 
 
 
-def show_structure_3d(self):
+def show_structure_3d():
   """Show the lattice of the system"""
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))
@@ -271,7 +271,7 @@ def show_multildos():
   common.get_multildos(h,qtwrap)
 
 
-def select_atoms_removal(self):
+def select_atoms_removal():
   g = get_geometry(modify=False) # get the unmodified geometry
   g.write() # write geometry
   execute_script("qh-remove-atoms-geometry-3d") # remove the file

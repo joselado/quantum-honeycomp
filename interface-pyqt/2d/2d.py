@@ -57,7 +57,7 @@ def get_geometry(modify=True):
 
 
 
-def select_atoms_removal(self):
+def select_atoms_removal():
   g = get_geometry(modify=False) # get the unmodified geometry
   g.write() # write geometry
   execute_script("qh-remove-atoms-geometry") # remove the file
@@ -128,7 +128,7 @@ def special_pairing(h):
 
 
 
-def show_bands(self=0):
+def show_bands():
   comp = computing() # create the computing window
   h = pickup_hamiltonian() # get hamiltonian
   common.get_bands(h,qtwrap) # get the band structure
@@ -136,7 +136,7 @@ def show_bands(self=0):
 
 
 
-def show_dosbands(self=0):
+def show_dosbands():
   h = pickup_hamiltonian() # get hamiltonian
   kdos.kdos_bands(h,scale=get("scale_kbands"),ewindow=get("window_kbands"),
                    ne=int(get("ne_kbands")),delta=get("delta_kbands"),
@@ -166,7 +166,7 @@ def pickup_hamiltonian():
   
 
 
-def show_structure(self):
+def show_structure():
   """Show the lattice of the system"""
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))
@@ -178,19 +178,19 @@ def show_structure(self):
 
 
 
-def show_kdos(self):
+def show_kdos():
   h = pickup_hamiltonian()  # get the hamiltonian
   common.get_kdos(h,qtwrap) # get the KDOS
 
 
 
 
-def show_berry1d(self):
+def show_berry1d():
   h = pickup_hamiltonian()  # get the hamiltonian
   common.get_berry1d(h,qtwrap) # compute Berry 1D
 
 
-def show_z2(self):
+def show_z2():
   h = pickup_hamiltonian()  # get the hamiltonian
   common.get_z2(h,qtwrap) # compute Berry 1D
 
@@ -240,7 +240,7 @@ def show_magnetism():
 
 
 
-def show_structure_3d(self):
+def show_structure_3d():
   """Show the lattice of the system"""
   g = get_geometry() # get the geometry
   nsuper = int(get("nsuper_struct"))

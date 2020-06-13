@@ -27,9 +27,11 @@ app = QtWidgets.QApplication(sys.argv)  # A new instance of QApplication
 
 def get_failsafe(f):
     """Return a function that if fails things do not break down"""
-    def fout(*args,**kwargs):
-        try: f(*args,**kwargs)
-        except: return None
+    def fout():
+        try: f()
+        except: 
+            print("Something wrong happened")
+            return None
     return fout
 
 
@@ -48,7 +50,7 @@ class App(QtGui.QMainWindow, interface.Ui_MainWindow):
       for d in ds: ds2[d] = get_failsafe(ds[d]) 
       for d in ds2:
           bu = getattr(self,d) # label in the interface
-          fun = ds[d] # function to call
+          fun = ds2[d] # function to call
 #          self.connect(bu, SIGNAL("clicked()"),fun) # connect name to function
           bu.clicked.connect(fun) # connect name to function
 

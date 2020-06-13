@@ -24,7 +24,7 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
                out[j] = z[j]
         return np.array(out)
     elif callable(z): # it is a function
-        m = r(r) # call
+        m = z(r) # call
         if checkclass.is_iterable(m): return np.array(m) # it is an array
         else: return np.array([0.,0.,m]) # number
   from scipy.sparse import coo_matrix as coo

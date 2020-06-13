@@ -32,7 +32,7 @@ def call_mode(mode,folder=None,pyqt=False):
   """ Returns a function which calls a particular quantum honeycomp mode"""
   if folder is None: folder = mode # if not provided
   path = qhroot
-  def launch(self):
+  def launch():
     """Function to launch a particular calculation, passes qhroot as input"""
     os.system(python+" "+path+"interface-pyqt/"+mode+"/"+mode+".py   "+path +"  &")
   return launch

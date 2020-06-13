@@ -158,12 +158,16 @@ def indirect_gap(h):
   # We will assume that the chemical potential is at zero
   def func(k): # conduction band eigenvalues
     es = gete(k) # get eigenvalues
-    es = es[es>0.] # conduction band
-    return np.min(es) # minimum energy
+    try:
+        es = es[es>0.] # conduction band
+        return np.min(es) # minimum energy
+    except: return 0.0
   def funv(k): # valence band eigenvalues
     es = gete(k) # get eigenvalues
-    es = -es[es<0.] # valence band
-    return np.min(es) # maximum energy
+    try:
+        es = -es[es<0.] # valence band
+        return np.min(es) # maximum energy
+    except: return 0.0
   def funcv(k): # valence band eigenvalues
     es = gete(k) # get eigenvalues
     ec = np.min(es[es>0.0]) # conduction band
