@@ -143,7 +143,7 @@ def solve_scf(h,window):
 
 def get_z2(h,window):
     nk = int(np.sqrt(window.get("topology_nk")))
-    topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
+    topology.z2_vanderbilt(h,nk=nk,nt=nk//2) # calculate z2 invariant
     execute_script("qh-wannier-center  ") # plot the result
 
 
