@@ -35,46 +35,16 @@ from pygra import timeevolution
 
 import platform
 
+
+dirname = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(dirname+"/../interpreter") # add this path
+import pycommand
+
+
 def get_python():
-  try:
-    return get_anaconda_command("python") # return anaconda
-  except:
-    if platform.system()=="Linux":
-      python = "/usr/bin/python3" # Python 3
-    else:
-      python ="python" # Python for mac
-    return python
+  return pycommand.get_python()
 
-
-
-
-
-def get_anaconda_command(name="python"):
-  """Return the path for Anaconda Python, which has pyqt by default"""
-  os.system("rm -f /tmp/qh_commands.txt") # remove
-  os.system("which -a "+name+"  > /tmp/qh_commands.txt") # run the command
-  lines = open("/tmp/qh_commands.txt").read() # read the lines
-  lines = lines.split("\n") # split the lines
-  del lines[-1] # remove the last one
-  print("Found ",len(lines),"python paths\n")
-  for l in lines: print(l)
-  for l in lines: # loop over pythons
-    l = l.split(" ")[-1] # get last line 
-    if "anaconda" in l:
-      print("\nFound Anaconda ",name,"in",l)
-      return l
-  print("Anaconda",name,"not found")
-  raise
-
-
-
-
-
-
-
-
-
-
+get_anaconda_command = get_python
 
 
 
@@ -132,9 +102,6 @@ def execute_script(name,background=True,mayavi=False):
     python = get_anaconda_command("python") # get the anaconda python
   except:
     python = get_python() # get the correct interpreter
-  dirname = os.path.dirname(os.path.realpath(__file__))
-  sys.path.append(dirname+"/../interpreter") # add this path
-  import pycommand
   python = pycommand.get_python()
   if background: os.system(python+" "+scriptpath+" &") # execute the script
   else: os.system(python+" "+scriptpath) # execute the script

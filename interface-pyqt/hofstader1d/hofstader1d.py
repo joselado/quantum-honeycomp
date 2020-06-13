@@ -85,7 +85,7 @@ def initialize():
   return h
 
 
-def show_bands(self=0):
+def show_bands():
   h = pickup_hamiltonian() # get hamiltonian
   opname = getbox("bands_color")
   if opname=="None": op = None # no operators
@@ -100,7 +100,7 @@ def show_bands(self=0):
 
 
 
-def show_dosbands(self=0):
+def show_dosbands():
   h = pickup_hamiltonian() # get hamiltonian
   kdos.kdos_bands(h,scale=get("scale_kbands"),ewindow=get("window_kbands"),
                    ne=int(get("ne_kbands")),delta=get("delta_kbands"),
@@ -125,7 +125,7 @@ def show_interactive_ldos():
 
 
 
-def show_dos(self):
+def show_dos():
   h = pickup_hamiltonian() # get hamiltonian
 #  mode = getbox("mode_dos") # mode for the DOS
   if h.dimensionality==0:
