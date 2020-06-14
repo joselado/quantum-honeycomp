@@ -137,7 +137,8 @@ def ldos_arpack(intra,num_wf=10,robust=False,tol=0,e=0.0,delta=0.01):
 
 
 
-def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,num_bands=None):
+def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,
+        num_bands=None,k=None):
   """Calculate the DOS in a set of energies by full diagonalization"""
   es = np.array(es) # array with energies
   if num_bands is None:
@@ -147,13 +148,15 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,num_bands=None):
       eigvec = eigvec.T
   ds = [] # empty list
   if operator is None: weights = es*0. + 1.0
-  else: weights = [operator(v).real for v in eigvec.transpose()] # weights
+  else: weights = [operator.braket(v,k=k) for v in eigvec.transpose()] # weights
   v2s = [(np.conjugate(v)*v).real for v in eigvec.transpose()]
   ds = [[0.0 for i in range(intra.shape[0])] for e in es] # initialize
   ds = ldos_waves_jit(np.array(es),
           np.array(eigvec).T,np.array(eig),np.array(weights),
           np.array(v2s),np.array(ds),delta)
   return ds
+
+
 
 @jit(nopython=True)
 def ldos_waves_jit(es,eigvec,eig,weights,v2s,ds,delta):
@@ -189,9 +192,8 @@ def ldosmap(h,energies=np.linspace(-1.0,1.0,40),delta=None,
   dstot = np.zeros((len(energies),h.intra.shape[0])) # initialize
   def getd(k): # get LDOS
     hk = hkgen(k) # get Hamiltonian
-    op = operators.get_operator(operator,k=k) # get the operator
     # LDOS for this kpoint
-    ds = ldos_waves(hk,es=energies,delta=delta,operator=op,**kwargs) 
+    ds = ldos_waves(hk,k=k,es=energies,delta=delta,operator=operator,**kwargs) 
     return ds
   ks = [np.random.random(3) for ik in range(nk)] # kpoints
   ds = parallel.pcall(getd,ks) # get densities

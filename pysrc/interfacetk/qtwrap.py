@@ -65,7 +65,6 @@ def get(name,string=False):
   try:
     obj = getattr(form,name) # get the object
     out = obj.text()
-    print(name,out)
     if string: return out # return as string
     try: # if it is a number
         return float(out) # return as float

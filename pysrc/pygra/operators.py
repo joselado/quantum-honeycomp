@@ -72,8 +72,17 @@ class Operator():
     def get_matrix(self):
         """Return matrix if possible"""
         if self.matrix is not None: return self.matrix
+    def braket(self,w,**kwargs):
+        """Compute an expectation value"""
+        wi = self(w,**kwargs) # apply the operator
+        out =  algebra.braket_ww(w,wi)
+        if np.abs(out.imag)<1e-8: return out.real
+        else: return out
 
 
+def object2operator(a):
+    if a is None: return None
+    else: return Operator(a)
 
 
 
@@ -363,7 +372,7 @@ def get_velocity(h):
   if h.dimensionality==1:
     vk = current.current_operator(h)
     def f(w,k=[0.,0.,0.]):
-      return braket_wAw(w,vk(k)).real
+        return vk(k)@w
     return f
   elif h.dimensionality==2:
     def f(w,k=[0.,0.,0.]):
@@ -373,8 +382,8 @@ def get_velocity(h):
 #      R = algebra.inv(R) # not sure if this is ok
       v = [braket_wAw(w,vx),braket_wAw(w,vy),0]
       v = np.array(v).real
-      return v@R@v # return the scalar product
-    return f
+      return R@v # return the scalar product
+    return Operator(f)
   else: raise
 
 
@@ -531,14 +540,15 @@ def get_valley_taux(h,projector=False):
 
 def get_operator(op,k=[0.,0.,0.],h=None):
     """Get a function that acts as an operator"""
-    if op is None: return None
-    elif callable(op): 
-        return lambda v: op(v,k=k) # assume it yields a number
-    elif type(op) is np.ndarray or type(op)==np.matrix or issparse(op): 
-        return lambda v: braket_wAw(v,op) # assume it yields a matrix
-    else: 
-        print("Unrecognized type in get_operator",type(op))
-        raise
+    return Operator(op)
+#    if op is None: return None
+#    elif callable(op): 
+#        return lambda v: op(v,k=k) # assume it yields a number
+#    elif type(op) is np.ndarray or type(op)==np.matrix or issparse(op): 
+#        return lambda v: braket_wAw(v,op) # assume it yields a matrix
+#    else: 
+#        print("Unrecognized type in get_operator",type(op))
+#        raise
 
 
 def get_berry(h,**kwargs):

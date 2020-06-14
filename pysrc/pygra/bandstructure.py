@@ -60,21 +60,6 @@ def current_bands(h,klist=None):
 
 
 
-#
-#def braket_wAw(w,A,wi=None):
-#  """
-#  Compute the braket of a wavefunction
-#  """
-#  if wi is None: wi = w
-#  if issparse(A): # sparse matrices
-#    return (np.conjugate(wi)@A@w) # modern way
-#  else: # matrices and arrays
-#    return (np.conjugate(wi)@A@w)[0,0] # modern way
-#
-#  w = np.matrix(w) # convert to matrix
-#  if wi is None: wi = w
-#  else: wi = np.matrix(wi) # convert to matrix
-#  return ((wi.T).H*A*w.T)[0,0] # expectation value
 
 
 def ket_Aw(A,w):
@@ -133,8 +118,7 @@ def get_bands_nd(h,kpath=None,operator=None,num_bands=None,
       ws = ws.transpose() # transpose eigenvectors
       def evaluate(w,k,A): # evaluate the operator
           if type(A)==operators.Operator:
-              Aw = A(w,k=kpath[k])
-              waw = algebra.braket_ww(w,Aw).real # as an operator object
+              waw = A.braket(w,k=kpath[k]).real
           elif callable(A):  
             try: waw = A(w,k=kpath[k]) # call the operator
             except: 
