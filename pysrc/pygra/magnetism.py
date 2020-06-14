@@ -27,6 +27,7 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
         m = z(r) # call
         if checkclass.is_iterable(m): return np.array(m) # it is an array
         else: return np.array([0.,0.,m]) # number
+    else: return np.array([0.,0.,z]) # just a number
   from scipy.sparse import coo_matrix as coo
   from scipy.sparse import bmat
   if h.has_spin: # only if the system has spin
