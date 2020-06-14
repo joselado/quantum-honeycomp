@@ -23,7 +23,7 @@ class Operator():
         """Initialization"""
         self.linear = linear
         self.matrix = None
-        if type(m)==np.ndarray or issparse(m):
+        if type(m)==np.ndarray or issparse(m) or type(m)==np.matrix:
             self.m = lambda v,k=None: m@v # create dummy function
             self.matrix = m
         elif type(m)==Operator: 
@@ -426,6 +426,7 @@ def get_valley(h,delta=None,**kwargs):
       hk = sharpen(hk) # sharpen the valley
       if m is None: return hk # just return the valley operator
       else: return m@hk # return the projector
+  if h.dimensionality==0: return fun() # return a matrix
   return fun # return function
 
 
