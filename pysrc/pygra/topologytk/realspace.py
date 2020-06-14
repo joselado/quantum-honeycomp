@@ -20,10 +20,12 @@ def real_space_chern(h,operator=None):
 #    Ph = np.conjugate(P.T) # dagger
     A,B = P@X@P,P@Y@P # define the two operators
     if operator is not None: # in case there is a certain projector
-        C1 = A@operator@B - B@A@operator # compute the commutator
-        C2 = A@B@operator - B@operator@A # compute the commutator
+        op = operator.get_matrix()
+        C1 = A@op@B - B@A@op # compute the commutator
+        C2 = A@B@op - B@op@A # compute the commutator
         C = (C1+C2)/2. # average
-    else: C = A@B - B@A # compute the commutator
+    elif operator is None: C = A@B - B@A # compute the commutator
+    else: raise
     C = np.pi*2*np.diagonal(C).imag # diagonal part
     C = C/scale # normalize
 #    print(P - P@P)

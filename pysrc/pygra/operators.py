@@ -401,7 +401,7 @@ def get_spin_current(h):
 
 
 
-def get_valley(h,projector=False,delta=None):
+def get_valley(h,delta=None,**kwargs):
   """Return a callable that calculates the valley expectation value
   using the modified Haldane coupling"""
   if h.dimensionality==0: projector = True # zero dimensional
@@ -420,22 +420,12 @@ def get_valley(h,projector=False,delta=None):
     vs = np.matrix(vs) # convert
     m0 = np.matrix(np.diag(es)) # build new hamiltonian
     return vs@m0@vs.H # return renormalized operator
-  if projector: # function returns a matrix
-    def fun(m=None,k=None):
+  def fun(m=None,k=None):
       if h.dimensionality>0 and k is None: raise # requires a kpoint
       hk = hkgen(k) # evaluate Hamiltonian
       hk = sharpen(hk) # sharpen the valley
       if m is None: return hk # just return the valley operator
       else: return m@hk # return the projector
-  else: # conventional way
-    def fun(w,k=None):
-      if h.dimensionality>0 and k is None: raise # requires a kpoint
-      hk = hkgen(k) # evaluate Hamiltonian
-      hk = sharpen(hk) # sharpen the valley
-      return braket_wAw(w,hk).real # return the braket
-#  if h.dimensionality==0: 
-#      return fun(np.identity(h.intra.shape[0])) # zero dimensional
-#  else: 
   return fun # return function
 
 

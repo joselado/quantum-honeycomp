@@ -202,10 +202,9 @@ def show_dos():
 def show_local_chern():
   h = pickup_hamiltonian() # get hamiltonian
   op = getbox("operator_chern")
-  if op=="None": op=None
-  else: op = h.get_operator(op)
+  op = h.get_operator(op)
   topology.real_space_chern(h,operator=op)
-  execute_script("qh-potential --input REAL_SPACE_CHERN.OUT")
+  execute_script("qh-potential --input REAL_SPACE_CHERN.OUT --cmap rainbow")
 
 
 

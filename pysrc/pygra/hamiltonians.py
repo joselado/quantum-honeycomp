@@ -448,7 +448,7 @@ class hamiltonian():
       """Clean a Hamiltonian"""
       from .clean import clean_hamiltonian
       clean_hamiltonian(self)
-  def get_operator(self,name,projector=False,return_matrix=False,**kwargs):
+  def get_operator(self,name,**kwargs):
       """Return a certain operator"""
       from . import operatorlist
       return operators.object2operator(operatorlist.get_operator(self,name,

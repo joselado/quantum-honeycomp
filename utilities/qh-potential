@@ -35,6 +35,8 @@ def getfig(main):
         maxc = 1
         minc = -1
         color = np.sign(color)
+  csat = (1 - main.get_slider("Saturation"))
+  minc,maxc = minc*csat,maxc*csat
   cplot = plt.scatter(x,y,s=scale,c=color,
           edgecolor="none",cmap=args.cmap,
           vmin=minc,vmax=maxc)
@@ -76,6 +78,8 @@ main.add_slider(label="Size",vs=np.linspace(0.,2,100),
         v0=int(args.size))
 main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,100),
         v0=int(args.zoom))
+main.add_slider(label="Saturation",vs=np.linspace(0.0,1.0,100),
+        v0=0)
 main.add_combobox(["Default","Symmetric","Sign"],label="Range")
 
 # execute the interface
