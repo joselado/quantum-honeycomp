@@ -39,7 +39,6 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
     r = h.geometry.r  # z position
     for i in range(no):
         JJ = evaluate_J(zeeman,r[i],i) # evaluate the exchange
-        print(JJ)
         bzee[i][i] = JJ[0]*sx+JJ[1]*sy+JJ[2]*sz
     bzee = bmat(bzee) # create matrix
     h.intra = h.intra + h.spinful2full(bzee) # Add matrix 

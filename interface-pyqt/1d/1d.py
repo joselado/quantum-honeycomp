@@ -165,9 +165,7 @@ def show_structure():
   nsuper = int(get("nsuper_struct"))
   g = g.supercell(nsuper)
   g.write()
-#  execute_script("qh-light-structure POSITIONS.OUT")
-  execute_script("qh-structure-bond POSITIONS.OUT")
-#  execute_script("qh-structure  ")
+  execute_script("qh-structure-bond --input POSITIONS.OUT")
 
 
 
