@@ -425,7 +425,7 @@ def get_valley(h,delta=None,**kwargs):
       hk = hkgen(k) # evaluate Hamiltonian
       hk = sharpen(hk) # sharpen the valley
       if m is None: return hk # just return the valley operator
-      else: return m@hk # return the projector
+      else: return hk@m # return the projector
   if h.dimensionality==0: return fun() # return a matrix
   return fun # return function
 

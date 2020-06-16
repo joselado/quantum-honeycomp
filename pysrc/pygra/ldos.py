@@ -342,7 +342,7 @@ def multi_ldos_tb(h,es=np.linspace(-1.0,1.0,100),delta=0.01,
       if random:
         k = np.random.random(3) # random vector
         print("RANDOM vector in LDOS")
-      e,w = lg.eigh(hk(k))
+      e,w = algebra.eigh(hk(k))
       w = w.transpose()
       evals += [ie for ie in e]
       ws += [iw for iw in w]
