@@ -42,6 +42,8 @@ parser.add_argument("--zwindow",default="None",
         help='zwindow')
 parser.add_argument("--bonds",default="True",
         help='xwindow')
+parser.add_argument("--magnetization",default="True",
+        help='xwindow')
 parser.add_argument("--bondl",default="1.1",
         help='xwindow')
 
@@ -236,13 +238,15 @@ def plot_magnetization_cylinders(xyz,mag,dr=[0.,0.,0.]):
 create_lattice(xyz)    # plot the atoms
   
 (ind,mag) = get_magnetization() # get the orbital index and magnetizations
-plot_magnetization(xyz,mag)   # plot the magnetization as cylinders
+if args.magnetization=="True":
+  plot_magnetization(xyz,mag)   # plot the magnetization as cylinders
 
 ############################
 # Create bonds ############
 ############################
 rs = xyz.transpose() 
-create_bonds(rs,rs)
+if args.bonds=="True":
+  create_bonds(rs,rs)
 
 
 figure.scene.disable_render = False
