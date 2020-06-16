@@ -189,9 +189,7 @@ def show_stm():
 
 def show_berry2d():
   h = pickup_hamiltonian() # get hamiltonian
-  nk = int(get("nk_topology"))
-  topology.berry_map(h,nk=nk)
-  execute_script("qh-berry2d BERRY_MAP.OUT")
+  common.get_berry2d(h,qtwrap)
 
   
 
@@ -223,39 +221,21 @@ def show_structure_3d():
 
 
 
-
-
-
 def show_kdos():
   h = pickup_hamiltonian()  # get the hamiltonian
-  ew = get("ewindow_kdos")
-  new = int(get("mesh_kdos")) # scale as kpoints
-  energies = np.linspace(-ew,ew,new) # number of ene
-  kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
-  kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
-  execute_script("qh-kdos-both KDOS.OUT  ")
-
-
-
-
-
-
+  common.get_kdos(h,qtwrap) # get the KDOS
 
 
 
 def show_berry1d():
   h = pickup_hamiltonian()  # get the hamiltonian
-  ks = klist.default(h.geometry,nk=int(get("nk_topology")))  # write klist
-  topology.write_berry(h,ks)
-  execute_script("qh-berry1d  label  ")
+  common.get_berry1d(h,qtwrap)
+
 
 
 def show_z2():
   h = pickup_hamiltonian()  # get the hamiltonian
-  nk = get("nk_topology")
-  topology.z2_vanderbilt(h,nk=nk,nt=nk/2) # calculate z2 invariant
-  execute_script("qh-wannier-center  ") # plot the result
-
+  common.get_z2(h,qtwrap)
 
 
 

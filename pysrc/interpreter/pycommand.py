@@ -45,7 +45,8 @@ def install_python():
 def install_dependencies():
     pip = get_pip() # pip command
     for l in ["mayavi","multiprocessing","numba"]:
-        os.system(pip+" install "+l) # install this library
+        try: os.system(pip+" install "+l) # install this library
+        except: pass
 
 
 

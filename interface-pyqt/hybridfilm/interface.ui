@@ -406,6 +406,102 @@
       </widget>
      </widget>
     </item>
+    <item row="1" column="1">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Geometry</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_14">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="nsuper">
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Supercell</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Type of lattice</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="lattice">
+            <item>
+             <property name="text">
+              <string>Diamond</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Cubic</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pyrochlore</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Hyperhoneycomb</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="thickness">
+            <property name="text">
+             <string>10</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_43">
+            <property name="text">
+             <string>Thickness</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_46">
+      <property name="toolTip">
+       <string>This module allows to compute heterostructures consisting of two different films. You have to specify the parameters of the two films</string>
+      </property>
+      <property name="text">
+       <string>About</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="1">
      <widget class="QTabWidget" name="tabWidget_3">
       <property name="currentIndex">
@@ -416,7 +512,21 @@
         <string>Structure</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_13">
-        <item row="0" column="0">
+        <item row="1" column="0">
+         <widget class="QPushButton" name="show_structure">
+          <property name="text">
+           <string>Show structure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="show_structure_3d">
+          <property name="text">
+           <string>Show 3D structure</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
          <layout class="QGridLayout" name="gridLayout_3">
           <item row="0" column="0">
            <widget class="QLabel" name="label_7">
@@ -433,20 +543,6 @@
            </widget>
           </item>
          </layout>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="show_structure">
-          <property name="text">
-           <string>Show structure</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="show_structure_3d">
-          <property name="text">
-           <string>Show 3D structure</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -736,9 +832,9 @@
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="0" column="1">
-           <widget class="QLineEdit" name="nk_topology">
+           <widget class="QLineEdit" name="topology_nk">
             <property name="text">
-             <string>200</string>
+             <string>400</string>
             </property>
            </widget>
           </item>
@@ -749,6 +845,32 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_47">
+            <property name="text">
+             <string>Operator</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="topology_operator">
+            <item>
+             <property name="text">
+              <string>None</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Sz</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Valley</string>
+             </property>
+            </item>
+           </widget>
+          </item>
          </layout>
         </item>
         <item row="0" column="1">
@@ -756,7 +878,7 @@
           <item row="3" column="0">
            <widget class="QPushButton" name="show_chern">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Chern number</string>
@@ -836,102 +958,6 @@
       </widget>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QTabWidget" name="tabWidget">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
-      <property name="documentMode">
-       <bool>false</bool>
-      </property>
-      <property name="tabsClosable">
-       <bool>false</bool>
-      </property>
-      <property name="movable">
-       <bool>false</bool>
-      </property>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Geometry</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_14">
-        <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="nsuper">
-            <property name="text">
-             <string>1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Supercell</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>Type of lattice</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="lattice">
-            <item>
-             <property name="text">
-              <string>Diamond</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Cubic</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Pyrochlore</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Hyperhoneycomb</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="thickness">
-            <property name="text">
-             <string>10</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_43">
-            <property name="text">
-             <string>Thickness</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="label_46">
-      <property name="toolTip">
-       <string>This module allows to compute heterostructures consisting of two different films. You have to specify the parameters of the two films</string>
-      </property>
-      <property name="text">
-       <string>About</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -940,7 +966,7 @@
      <x>0</x>
      <y>0</y>
      <width>950</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
