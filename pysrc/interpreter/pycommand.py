@@ -6,9 +6,6 @@ import platform
 def correct_python(pyint="python"):
     """CHeck if a suitable Python is installed"""
     try:
-        import scipy
-        import numpy
-        import multiprocessing
         out,err = subprocess.Popen([pyint, '--version'],
                stdout=subprocess.PIPE,
                stderr=subprocess.STDOUT).communicate()
