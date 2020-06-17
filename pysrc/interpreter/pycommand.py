@@ -7,7 +7,7 @@ try:
     from .pythoninterpreter import mainpython
     print("Using the interpreter",mainpython)
 except:
-    mainpython = "python"
+    mainpython = "python3"
 
 
 
@@ -19,7 +19,7 @@ def correct_python(pyint=mainpython):
                stderr=subprocess.STDOUT).communicate()
     except: out = ""
     # check if Python has the correct version
-    return "Python 3.7" in str(out)
+    return "Python 3." in str(out)
 
 def install_python():
     """Install a correct Python distribution"""
@@ -60,7 +60,7 @@ def get_python():
   if correct_python(): return mainpython # default python command
   else: # try the local one (if present)
     dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
-    pyint = dirname +"/python_interpreter/python3/bin/python" # local one
+    pyint = dirname +"/python_interpreter/python3/bin/python3" # local one
     if correct_python(pyint): return pyint # return the local one
   return None # no Python
 
