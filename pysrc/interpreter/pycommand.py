@@ -18,6 +18,7 @@ def correct_python(install=False):
         import scipy
         import numpy
         import numba
+        import matplotlib
         return True
     except: 
         if install: 
@@ -58,7 +59,7 @@ def install_python():
 
 
 def install_dependencies():
-    for l in ["mayavi","numba","PyQt5"]:
+    for l in ["mayavi","numba","PyQt5","scipy","numpy","matplotlib"]:
         try: install_package(l)
         except: pass
 
