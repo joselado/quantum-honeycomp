@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 from __future__ import print_function
 import os
 import sys
@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--utility",default="",
         help='Just use an utility and exit')
 parser.add_argument("--python",default="",
-        help='Default Python itnerpreter')
+        help='Default Python interpreter')
 args = parser.parse_args() # get the arguments
 
 
