@@ -3,27 +3,32 @@ import os
 import sys
 import platform
 
-try:
-    from .pythoninterpreter import mainpython
-    print("Using the interpreter",mainpython)
-except:
-    mainpython = "python3"
+
+def write_python_exec(name):
+    dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
+    f = open(dirname+"/pythoninterpreter.py","w") # open file
+    f.write("mainpython = \""+name+"\"") # write this one
+    f.close() # close the file
 
 
-
-def correct_python(pyint=mainpython):
+def correct_python(install=False):
     """CHeck if a suitable Python is installed"""
     try:
-        out,err = subprocess.Popen([pyint, '--version'],
-               stdout=subprocess.PIPE,
-               stderr=subprocess.STDOUT).communicate()
-    except: out = ""
-    # check if Python has the correct version
-    return "Python 3.7" in str(out)
+        import PyQt5
+        import scipy
+        import numpy
+        import numba
+        return True
+    except: 
+        if install: 
+            install_dependencies() # try to install the dependencies
+            return correct_python(install=False) # try again
+        return False
 
 def install_python():
     """Install a correct Python distribution"""
-    if get_python() is not None: 
+    if correct_python(): # The current one is the right Python 
+        write_python_exec(sys.executable) # write this Python distribution
         print("Found a correct python distribution")
         return # nothing to do
     pwd = os.getcwd() # get the current directory
@@ -45,35 +50,29 @@ def install_python():
         anafile = "Anaconda3-2020.02-MacOSX-x86_64.sh " # file to install
     os.system("bash "+anafile+" -b -p "+pypath) # install anaconda
     os.system("rm "+anafile) # remove the installer
-    install_dependencies() # install the dependencies
+    # now get the executable
+    dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
+    pyint = dirname +"/python_interpreter/python3/bin/python3" # local one
+    write_python_exec(pyint) # write this Python distribution
+
+
 
 def install_dependencies():
-    pip = get_pip() # pip command
-    for l in ["mayavi","numba"]:
-        try: os.system(pip+" install "+l) # install this library
+    for l in ["mayavi","numba","PyQt5"]:
+        try: install_package(l)
         except: pass
 
 
 
 def get_python():
   """Return the path for Anaconda Python, which has pyqt by default"""
-  if correct_python(): return mainpython # default python command
-  else: # try the local one (if present)
-    dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
-    pyint = dirname +"/python_interpreter/python3/bin/python3" # local one
-    if correct_python(pyint): return pyint # return the local one
-  return None # no Python
-
-
-def get_pip():
-  """Return the path for Anaconda Python, which has pyqt by default"""
-  if correct_python(): return "pip" # default python command
-  else: # try the local one (if present)
-    dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
-    pyint = dirname +"/python_interpreter/python3/bin/python" # local one
-    pipint = dirname +"/python_interpreter/python3/bin/pip" # local one
-    if correct_python(pyint): return pipint # return the local one
-  return None # no Python
+  try:
+      from .pythoninterpreter import mainpython
+      return mainpython
+      print("Using the interpreter",mainpython)
+  except:
+      print("No python interpreter found, exiting")
+      exit()
 
 
 def add_to_path():
@@ -92,6 +91,5 @@ def add_to_path():
     open(rcfile,"w").write(ls+addrc) # add to the bash
 
 
-
-
-
+def install_package(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
