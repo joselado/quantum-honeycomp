@@ -27,7 +27,7 @@ def correct_python(install=False):
 
 def install_python():
     """Install a correct Python distribution"""
-    if correct_python(): # The current one is the right Python 
+    if correct_python(install=True): # The current one is the right Python 
         write_python_exec(sys.executable) # write this Python distribution
         print("Found a correct python distribution")
         return # nothing to do
