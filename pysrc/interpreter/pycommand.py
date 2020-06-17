@@ -59,7 +59,7 @@ def install_python():
 
 
 def install_dependencies():
-    for l in ["mayavi","numba","PyQt5","scipy","numpy","matplotlib"]:
+    for l in ["mayavi","numba","scipy","numpy","matplotlib"]:
         try: install_package(l,executable=get_python())
         except: pass
 
