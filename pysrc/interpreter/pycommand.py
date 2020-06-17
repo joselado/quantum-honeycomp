@@ -19,7 +19,7 @@ def correct_python(pyint=mainpython):
                stderr=subprocess.STDOUT).communicate()
     except: out = ""
     # check if Python has the correct version
-    return "Python 3." in str(out)
+    return "Python 3.7" in str(out)
 
 def install_python():
     """Install a correct Python distribution"""
