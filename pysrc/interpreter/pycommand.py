@@ -3,14 +3,22 @@ import os
 import sys
 import platform
 
-def correct_python(pyint="python"):
+try:
+    from .pythoninterpreter import mainpython
+except:
+    mainpython = "python"
+
+
+
+
+def correct_python(pyint=mainpython):
     """CHeck if a suitable Python is installed"""
     try:
         out,err = subprocess.Popen([pyint, '--version'],
                stdout=subprocess.PIPE,
                stderr=subprocess.STDOUT).communicate()
     except: out = ""
-    # check if JUlia has the correct version
+    # check if Python has the correct version
     return "Python 3.7" in str(out)
 
 def install_python():
@@ -49,7 +57,7 @@ def install_dependencies():
 
 def get_python():
   """Return the path for Anaconda Python, which has pyqt by default"""
-  if correct_python(): return "python" # default python command
+  if correct_python(): return mainpython # default python command
   else: # try the local one (if present)
     dirname = os.path.dirname(os.path.realpath(__file__)) # this directory
     pyint = dirname +"/python_interpreter/python3/bin/python" # local one
