@@ -7,7 +7,6 @@ import platform
   
 # Add path of the interface
 qhroot = os.path.dirname(os.path.realpath(__file__))+"/../../" 
-sys.path.append(qhroot+"/interface-pyqt/system_selection") 
 # Add path of the wrapper
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
