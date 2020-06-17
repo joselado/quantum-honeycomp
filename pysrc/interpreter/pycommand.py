@@ -60,7 +60,7 @@ def install_python():
 
 def install_dependencies():
     for l in ["mayavi","numba","PyQt5","scipy","numpy","matplotlib"]:
-        try: install_package(l)
+        try: install_package(l,executable=get_python())
         except: pass
 
 
@@ -92,5 +92,6 @@ def add_to_path():
     open(rcfile,"w").write(ls+addrc) # add to the bash
 
 
-def install_package(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+def install_package(package,executable=None):
+    if executable is None: executable = sys.executable
+    subprocess.check_call([executable, "-m", "pip", "install", package])

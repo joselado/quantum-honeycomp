@@ -21,7 +21,8 @@ python install.py
 ```
 
 The script will install all the required dependencies if they are not already
-present. Afterwards, you can run the program by executing in a terminal
+present for the python command used. Afterwards, you can run the program by 
+executing in a terminal
 
 ```bash
 quantum-honeycomp
