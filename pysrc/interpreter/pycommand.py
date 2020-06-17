@@ -5,9 +5,9 @@ import platform
 
 try:
     from .pythoninterpreter import mainpython
+    print("Using the interpreter",mainpython)
 except:
     mainpython = "python"
-
 
 
 

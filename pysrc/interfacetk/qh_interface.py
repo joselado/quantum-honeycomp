@@ -38,7 +38,7 @@ import platform
 
 dirname = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(dirname+"/../interpreter") # add this path
-import pycommand
+from interpreter import pycommand
 
 
 def get_python():
