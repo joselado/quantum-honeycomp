@@ -28,7 +28,6 @@ app = QtWidgets.QApplication(sys.argv)  # A new instance of QApplication
 def get_failsafe(f):
     """Return a function that if fails things do not break down"""
     def fout():
-        return f()
         try: f()
         except: 
             print("Something wrong happened")
