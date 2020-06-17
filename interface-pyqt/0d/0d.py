@@ -5,7 +5,7 @@ from __future__ import print_function
 import sys
 import os
 
-qhroot = os.environ["QHROOT"] # root path
+qhroot = os.path.dirname(os.path.realpath(__file__))+"/../../"
 sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
