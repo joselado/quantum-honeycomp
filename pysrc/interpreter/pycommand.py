@@ -88,7 +88,8 @@ def add_to_path():
     qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
     try: ls = open(rcfile,"r").read() # if the file exists
     except: ls = "" # otherwise
-    addrc = "\nexport PATH=\""+qhpath+"\":$PATH\n"
+    addrc = "alias quantum-honeycomp=\"" + get_python() +" "+qhpath+"/quantum-honeycomp\""
+#    addrc = "\nexport PATH=\""+qhpath+"\":$PATH\n"
     open(rcfile,"w").write(ls+addrc) # add to the bash
 
 
