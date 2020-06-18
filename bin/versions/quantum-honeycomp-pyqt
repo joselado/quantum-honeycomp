@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-from __future__ import print_function
 import sys
 import os
 import platform
@@ -14,11 +12,11 @@ sys.path.append(qhroot+"/interface-pyqt/system_selection") # python libraries
 from interfacetk import qtwrap # import the library with simple wrappers to pyqt
 window = qtwrap.main() # this is the main interface
 
+from interpreter import pycommand
 
 
 def get_command(name="python"):
   """Return the path for Anaconda Python, which has pyqt by default"""
-  from interpreter import pycommand
   return pycommand.get_python()
 
 
@@ -56,6 +54,8 @@ signals["multilayergraphene"] = call_mode("multilayergraphene",pyqt=True)
 def update_qh():
     os.chdir(qhroot) # go to the main directory
     os.system("git pull") # pull the directory
+#    pycommand.install_python()
+    pycommand.install_dependencies() # install dependencies if necessary
     exit()
 
 
