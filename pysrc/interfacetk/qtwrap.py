@@ -25,9 +25,10 @@ QtGui = QtWidgets
 app = QtWidgets.QApplication(sys.argv)  # A new instance of QApplication
 
 
-def get_failsafe(f):
+def get_failsafe(f,robust=True):
     """Return a function that if fails things do not break down"""
     def fout():
+        if not robust: return f()
         try: f()
         except: 
             print("Something wrong happened")
@@ -44,10 +45,10 @@ class App(QtGui.QMainWindow, interface.Ui_MainWindow):
     def run(self):
       self.show()  # Show the form
       app.exec_()  # and execute the app
-    def connect_clicks(self,ds):
+    def connect_clicks(self,ds,robust=True):
       """Connect the different functions"""
       ds2 = dict()
-      for d in ds: ds2[d] = get_failsafe(ds[d]) 
+      for d in ds: ds2[d] = get_failsafe(ds[d],robust=robust) 
       for d in ds2:
           bu = getattr(self,d) # label in the interface
           fun = ds2[d] # function to call
