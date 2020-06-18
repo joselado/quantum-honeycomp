@@ -22,7 +22,7 @@ def correct_python(install=False):
         return True
     except: 
         if install: 
-            install_dependencies() # try to install the dependencies
+            install_dependencies(executable=sys.executable) # try to install 
             return correct_python(install=False) # try again
         return False
 
@@ -58,9 +58,9 @@ def install_python():
 
 
 
-def install_dependencies():
+def install_dependencies(executable=get_python()):
     for l in ["mayavi","numba","scipy","numpy","matplotlib"]:
-        try: install_package(l,executable=get_python())
+        try: install_package(l,executable=executable)
         except: pass
 
 
