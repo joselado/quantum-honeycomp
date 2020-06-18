@@ -97,3 +97,15 @@ def add_to_path():
 def install_package(package,executable=None):
     if executable is None: executable = sys.executable
     subprocess.check_call([executable, "-m", "pip", "install", package])
+
+
+
+def run_qh():
+    """Run Quantum Honeycomp"""
+    qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
+    os.system(get_python() +" "+qhpath+"/quantum-honeycomp &")
+
+
+
+
+
