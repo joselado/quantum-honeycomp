@@ -58,7 +58,8 @@ def install_python():
 
 
 
-def install_dependencies(executable=get_python()):
+def install_dependencies(executable=None):
+    if executable is None: executable = get_python()
     for l in ["mayavi","numba","scipy","numpy","matplotlib"]:
         try: install_package(l,executable=executable)
         except: pass
