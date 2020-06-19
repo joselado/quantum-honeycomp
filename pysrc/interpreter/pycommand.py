@@ -63,6 +63,12 @@ def install_dependencies(executable=None):
     for l in ["mayavi","numba","scipy","numpy","matplotlib"]:
         try: install_package(l,executable=executable)
         except: pass
+    # try to compile fortran
+    try:
+        from ..pygra import compilefortran
+        compilefortran.compile_fortran() # compile fortran
+    except: 
+        print("Fortran was not compiled")
 
 
 
