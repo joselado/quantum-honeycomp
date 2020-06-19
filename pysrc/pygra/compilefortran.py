@@ -3,7 +3,7 @@ import os
 
 # names is a lists with pairs of name of folder, f90 file and .so file
 
-def compile_fortran():
+def compile_fortran(compiler=None):
     names = [("first_neigh","first_neighborsf90.f90","first_neighborsf90")] 
     names += [("kpm","kpm.f90","kpmf90")] 
     names += [("dos","dos.f90","dosf90")] 
@@ -23,7 +23,8 @@ def compile_fortran():
     
     import sys
     import os
-    compiler = os.path.dirname(os.path.realpath(sys.executable))+"/f2py"
+    if compiler is None:
+      compiler = os.path.dirname(os.path.realpath(sys.executable))+"/f2py"
     if not os.path.isfile(compiler):
         print(compiler,"does not exist")
         print("You may want to use another Python")

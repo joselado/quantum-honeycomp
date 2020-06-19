@@ -66,7 +66,8 @@ def install_dependencies(executable=None):
     # try to compile fortran
     try:
         from ..pygra import compilefortran
-        compilefortran.compile_fortran() # compile fortran
+        compiler = os.path.dirname(os.path.realpath(get_python()))+"/f2py"
+        compilefortran.compile_fortran(compiler=compiler) # compile fortran
     except: 
         print("Fortran was not compiled")
 
