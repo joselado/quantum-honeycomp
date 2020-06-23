@@ -76,7 +76,8 @@ def install_dependencies(executable=None):
 def get_python():
   """Return the path for Anaconda Python, which has pyqt by default"""
   try:
-      from .pythoninterpreter import mainpython
+      #from .pythoninterpreter import mainpython
+      mainpython = sys.executable
       return mainpython
       print("Using the interpreter",mainpython)
   except:
@@ -109,9 +110,9 @@ def install_package(package,executable=None):
 
 def run_qh():
     """Run Quantum Honeycomp"""
-    qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
-    os.system(get_python() +" "+qhpath+"/quantum-honeycomp &")
-
+    qhpath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+    qh = os.path.join(qhpath, "bin", "quantum-honeycomp.py")
+    os.system(sys.executable + " " + qh)
 
 
 
