@@ -35,33 +35,27 @@ from pygra import timeevolution
 from pygra import embedding
 
 import platform
-
+import pathlib
 
 dirname = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(dirname+"/../interpreter") # add this path
 from interpreter import pycommand
-
 
 def get_python():
   return pycommand.get_python()
 
 get_anaconda_command = get_python
 
-
-
-
-
-
-
 def get_qhroot():
   """Gets the root path of quantum honeycomp"""
   return os.path.dirname(os.path.realpath(__file__))+"/../../"
 
-
-
 def create_folder():
-  """Creates a temporal folder and goes to that one"""
-  os.chdir("/tmp")
+  """Creates a temporary folder in the tmp directory on *nix and goes to that one"""
+  """Workaround is to create a temporary directory locally. Keeps the files, but will need to clean up after a while."""
+  #dirname = os.path.dirname(os.path.realpath(__file__))
+  pathlib.Path("tmp").mkdir(parents=True, exist_ok=True)
+  os.chdir("tmp")
   # get the name of the folder
   i = 0
   forig = "qh-tmp-"
@@ -71,7 +65,8 @@ def create_folder():
     if not folder in folders:
       break # stop if folder doesn't exist
     i += 1 # increase the number
-  os.system("mkdir "+folder)  # create the temporal folder
+  #os.system("mkdir "+folder)  # create the temporal folder
+  pathlib.Path(folder).mkdir(parents=True, exist_ok=True) 
   os.chdir(folder)  # go to the temporal folder
   return folder  # return the name of the folder
 
