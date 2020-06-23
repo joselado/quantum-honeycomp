@@ -10,4 +10,5 @@ old_versions
 data
 pythoninterpreter.py
 *.tar
-.vscode/settings.json
+.vscode
+tmp/*
