@@ -7,9 +7,9 @@ from . import algebra
 is_child = False # check if you are running a child
 
 try:
-  from multiprocess import Pool
-  import multiprocess
-  maxcpu = multiprocess.cpu_count()
+  from multiprocessing import Pool
+  import multiprocessing
+  maxcpu = multiprocessing.cpu_count()
 except:
     print("Multiprocess not working")
     def Pool(n=1): # workaround
