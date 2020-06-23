@@ -17,7 +17,8 @@ args = parser.parse_args() # get the arguments
 
 def get_qhroot():
   """Gets the root path of quantum honeycomp"""
-  return os.path.dirname(os.path.realpath(__file__))+"/../" 
+  return os.path.dirname(os.path.dirname(os.path.realpath(__file__))) 
+  #return os.path.dirname(os.path.realpath(__file__))+"/../" 
 
 qhroot = get_qhroot()  # get the root path
 os.environ["QHROOT"] = qhroot # create the environmental variable
@@ -47,4 +48,4 @@ if args.utility!="": # non empty string
   exit()
 
 
-os.system(python+" "+qhroot+"bin/versions/quantum-honeycomp-pyqt")
+os.system(python+" "+qhroot+"/bin/versions/quantum-honeycomp-pyqt")
