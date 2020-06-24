@@ -81,15 +81,11 @@ def create_folder():
 
 def save_outputs(inipath,tmppath):
   """Save all the results in the original folder"""
-  fends = ["*.OUT","*.png","*.in"]
-  name = "QH_save" # name of the folder
-  savepath = inipath + "/"+name
+  savepath = inipath+"/QH_save" # name of the fodler where ot save
   print("Saving results in",savepath)
-  os.system("mkdir "+savepath) # create folder
-  for e in fends:
-    os.system("rm -f "+savepath+"/"+e) # clean
-    os.system("cp "+tmppath+"/"+e+"  "+savepath) # copy 
-  return
+  os.system("rm -rf "+savepath) # remove the folder
+  os.system("cp -r "+tmppath+"  "+savepath) # remove the folder
+
 
 
 def execute_script(name,background=True,mayavi=False):

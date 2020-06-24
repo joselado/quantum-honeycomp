@@ -208,8 +208,10 @@ def show_local_chern():
 
 
 
-
-save_results = lambda x: save_outputs(inipath,tmppath) # function to save
+inipath = os.getcwd() # get the initial directory
+folder = create_folder() # create a new folder
+tmppath = os.getcwd() # get the initial directory
+save_results = lambda: save_outputs(inipath,tmppath) # function to save
 
 
 # create signals
@@ -226,6 +228,7 @@ signals["select_atoms_removal"] = select_atoms_removal
 signals["select_atom_time_evolution"] = select_atom_time_evolution
 signals["show_time_evolution"] = show_time_evolution
 signals["show_local_chern"] = show_local_chern
+signals["save_results"] = save_results
 
 
 
@@ -233,8 +236,6 @@ signals["show_local_chern"] = show_local_chern
 
 #from qh_interface import create_folder # import all the libraries needed
 
-window.connect_clicks(signals)
-folder = create_folder()
-tmppath = os.getcwd() # get the initial directory
+window.connect_clicks(signals,robust=False)
 window.run()
 
