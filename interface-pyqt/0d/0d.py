@@ -236,6 +236,6 @@ signals["save_results"] = save_results
 
 #from qh_interface import create_folder # import all the libraries needed
 
-window.connect_clicks(signals,robust=False)
+window.connect_clicks(signals)
 window.run()
 
