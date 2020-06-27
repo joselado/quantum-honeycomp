@@ -147,6 +147,7 @@ def show_embedding_ldos():
 #    execute_script("qh-interpolate --input LDOS.OUT --dx -2 --dy -2 --smooth 1.0")
 #    execute_script("qh-ldos --input LDOS.OUT-interpolated ")
 
+inipath = os.getcwd() # get the initial directory
 
 save_results = lambda: save_outputs(inipath,tmppath) # function to save
 
