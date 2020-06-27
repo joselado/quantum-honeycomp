@@ -59,7 +59,7 @@ def update_qh():
     os.system("git pull") # pull the directory
     try: # try to compile fortran
         from pygra import compilefortran
-        compiler = os.path.dirname(os.path.realpath(get_python()))+"/f2py"
+        compiler = os.path.dirname(os.path.realpath(pycommand.get_python()))+"/f2py"
         compilefortran.compile_fortran(compiler=compiler) # compile fortran
     except: pass
     pycommand.run_qh()
