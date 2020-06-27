@@ -403,6 +403,46 @@ def retain_unit_cell(r,a1,a2,a3,dim=3):
 
 
 
+def indexes_line(g,r0,r1=None,width=2.0):
+    """Return the indexes along a certain line"""
+    if r1 is None: # workaround
+        r1 = np.array(r0)
+        r0 = np.array([0.,0.,0.])
+    i0 = g.closest_index(np.array(r0)) # first index
+    i1 = g.closest_index(np.array(r1)) # first index
+    r0 = g.r[i0] # initial point
+    r1 = g.r[i1] # final point
+    # now rotate the geometry to check which
+    # atoms to accept
+    gtmp = g.copy() # copy geometry
+    gtmp.dimensionality = 0 # this is just a workaround
+    gtmp.shift(r0) # shift the geometry
+    gtmp = rotate_a2b(gtmp,r1-r0,np.array([1.,0.,0.]))
+    # new positions
+    r0 = gtmp.r[i0]
+    r1 = gtmp.r[i1]
+    dr = r1 - r0 # vector between both points
+    dy = width # width accepted
+    dx = np.sqrt(dr.dot(dr))+0.1
+    # and every coordinate
+    x1,y1 = r0[0],r0[1]
+    x2,y2 = r1[0],r1[1]
+    ym = (y1+y2)/2. # average y
+    def fun(r):
+      """Function that decides which atoms to calculate"""
+      x0 = r[0]
+      y0 = r[1]
+      if (x1-dy)<x0<(x2+dy) and np.abs(y0-ym)<dy: return True
+      else: return False
+    inds = intersected_indexes(gtmp,fun) # indexes of the atoms
+    ur = dr/np.sqrt(dr.dot(dr)) # unitary vector
+    steps = [(gtmp.r[i] - r0).dot(ur) for i in inds] # proyect along that line
+    inds = [i for (s,i) in sorted(zip(steps,inds))] # sort by step
+    steps = sorted(steps) # sort the steps
+    return inds,np.array(steps) # return the index and associated steps
+
+
+
 
 
 

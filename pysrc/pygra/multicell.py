@@ -73,23 +73,6 @@ def get_tij(h,rij=np.array([0.,0.,0.]),zero=False):
   else:
       if zero: return h.intra*0.0
       else: return None
-#  try: return h.hopping_dict[drij] # try using the dictionary
-#  except: # if it doesn't exist, look for it
-#    rij = np.array(rij) # convert into array
-#    if rij.dot(rij)<0.001: return h.intra # if vector 0
-#    for t in h.hopping: # loop over hoppings 
-#      d = t.dir - rij # diference vector
-#      d = d.dot(d) # module
-#      if d < 0.001: # if same vector
-#        h.hopping_dict[drij] = t.m # store element in dictionary
-#        return t.m # return matrix
-#    # not found
-#    if zero: 
-#      h.hopping_dict[drij] = h.intra*0.0 # store element in dictionary
-#      return h.intra*0. # zero matrix
-#    else:
-#      h.hopping_dict[drij] = None # store element in dictionary
-#      return None # not found
 
 def hk_gen(h):
   """Generate a k dependent hamiltonian"""
@@ -254,7 +237,7 @@ def clean(h,cutoff=0.0001):
 def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
   """ Create a ribbon hamiltonian object"""
 #  raise # there is something wrong with this function
-  print("This function might have something wrong")
+#  print("This function might have something wrong")
   if not hin.is_multicell: h = turn_multicell(hin)
   else: h = hin # nothing otherwise
   hr = h.copy() # copy hamiltonian

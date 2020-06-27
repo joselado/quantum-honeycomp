@@ -11,6 +11,8 @@ parser.add_argument("--smooth",default=2)
 parser.add_argument("--smooth_nxny",default="False")
 parser.add_argument("--input",default="")
 parser.add_argument("--xcut",default="")
+parser.add_argument("--dx",default="")
+parser.add_argument("--dy",default="")
 parser.add_argument("--ycut",default="")
 parser.add_argument("--column",default="2")
 #        description="Frames per second in the video")
@@ -64,8 +66,10 @@ def write_interpolation(centers=[[0.,0.,0.]], heights=[10.0],name=""):
         return wave_jit(x,y,np.array(centers),np.array(heights),facx,facy,z)
     xs = [c[0] for c in centers] # get x coordinates
     ys = [c[1] for c in centers] # get y coordinates
-    dx = (np.max(xs) - np.min(xs))/10
-    dy = (np.max(ys) - np.min(ys))/10
+    if args.dx=="": dx = (np.max(xs) - np.min(xs))/10
+    else: dx = float(args.dx)
+    if args.dy=="": dy = (np.max(ys) - np.min(ys))/10
+    else: dy = float(args.dy)
     x = np.linspace(min(xs)-dx,max(xs)+dx,nx)
     y = np.linspace(min(ys)-dy,max(ys)+dy,ny)
     fo = open(name,"w") # open output file

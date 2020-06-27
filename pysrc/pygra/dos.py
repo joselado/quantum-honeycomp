@@ -27,15 +27,6 @@ def calculate_dos(es,xs,d,use_fortran=use_fortran,w=None):
     from . import dosf90 
     return dosf90.calculate_dos(es,xs,d,w) # use the Fortran routine
   else:
-#    if w is None: # no weights
-#      ndos = len(xs)
-#      delta = d/10.
-#      ys,xs = np.histogram(es,bins=ndos) # create the histogram
-#      lorentz = np.linspace(-1.,1.,len(ys)) # number of energies
-#      lorentz = delta/(delta*delta + lorentz*lorentz) # smoothing function
-#      ys = np.convolve(lorentz,ys,mode="same") # convolve lorentz and histogram
-#      return ys
-#    else: # conventional mode
       ys = np.zeros(xs.shape[0]) # initialize
       ys = calculate_dos_jit(es,xs,d,w,ys) # compute
       return ys
@@ -479,32 +470,7 @@ def get_dos(h,energies=np.linspace(-4.0,4.0,400),
   else: # conventional methods
       if mode=="ED": # exact diagonalization
         return dos_kmesh(h,energies=energies,**kwargs)
- #   if operator is None: # no operator given
-#        if h.dimensionality==0:
-#          return dos0d(h,energies=energies,delta=delta)
-#        elif h.dimensionality==1:
-#          return dos1d(h,energies=energies,delta=delta,nk=nk)
-#        elif h.dimensionality==2:
-#          return dos2d(h,use_kpm=False,nk=nk,ntries=ntries,delta=delta,
-#              ndos=len(energies),random=random,window=np.max(np.abs(energies)),
-#              energies=energies,**kwargs)
-#        elif h.dimensionality==3:
-#          return dos3d(h,nk=nk,delta=delta,energies=energies)
-#        else: raise
       elif mode=="Green": # Green function formalism
-#          from .green import bloch_selfenergy
-#          tr = timing.Testimator("KDOS") # generate object
-#          ie = 0
-#          out = [] # storage
-#          for e in energies: # loop
-#            tr.remaining(ie,len(energies)) # print status
-#            ie += 1 # increase
-#            g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0]
-#            out.append(-g.trace()[0,0].imag) # store dos
-#          np.savetxt("DOS.OUT",np.matrix([energies,out]).T) # write in a file
-#          return energies,np.array(out) # return
-#      else: raise
-#    else: # operator given on input
         def fun(e):
             return green.green_operator(h,operator,e=e,**kwargs) 
         ds = parallel.pcall(fun,energies) # compute DOS with an operator

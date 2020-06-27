@@ -614,6 +614,7 @@ def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
 
 def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   """Calculates the selfenergy of a certain supercell """
+  if h.dimensionality!=2: return NotImplemented
   try:   # if two number given
     nsuper1 = nsuper[0]
     nsuper2 = nsuper[1]
@@ -622,44 +623,14 @@ def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
     nsuper2 = nsuper
   print("Supercell",nsuper1,"x",nsuper2)
   ez = e + 1j*delta # create complex energy
-  from . import dyson2d
-  g = dyson2d.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper1,nsuper2,300,ez)
+  from . import dyson
+  g = dyson.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper1,nsuper2,300,ez)
   g = np.matrix(g) # convert to matrix
-  n = nsuper1*nsuper2 # number of cells
-  intrasuper = [[None for j in range(n)] for i in range(n)]
-  # create indexes (same order as in fortran routine)
-  k = 0
-  inds = []
-  for i in range(nsuper1):
-    for j in range(nsuper2):
-      inds += [(i,j)]
-      k += 1 
   # create hamiltonian of the supercell
-  from scipy.sparse import bmat
-  from scipy.sparse import csc_matrix as csc
-  tx = csc(h.tx)
-  ty = csc(h.ty)
-  txy = csc(h.txy)
-  txmy = csc(h.txmy)
-  intra = csc(h.intra)
-  for i in range(n):
-    intrasuper[i][i] = intra # intracell
-    (x1,y1) = inds[i]
-    for j in range(n):
-      (x2,y2) = inds[j]
-      dx = x2-x1
-      dy = y2-y1
-      if dx==1 and  dy==0: intrasuper[i][j] = tx  
-      if dx==-1 and dy==0: intrasuper[i][j] = tx.H  
-      if dx==0 and  dy==1: intrasuper[i][j] = ty  
-      if dx==0 and  dy==-1: intrasuper[i][j] = ty.H  
-      if dx==1 and  dy==1: intrasuper[i][j] = txy 
-      if dx==-1 and dy==-1: intrasuper[i][j] = txy.H 
-      if dx==1 and  dy==-1: intrasuper[i][j] = txmy  
-      if dx==-1 and dy==1: intrasuper[i][j] = txmy.H  
-  intrasuper = bmat(intrasuper).todense() # supercell
+  from .embedding import onsite_supercell
+  intrasuper = onsite_supercell(h,nsuper)
   eop = np.matrix(np.identity(len(g),dtype=np.complex))*(ez)
-  selfe = eop - intrasuper - g.I
+  selfe = eop - intrasuper - algebra.inv(g)
   return g,selfe
 
 

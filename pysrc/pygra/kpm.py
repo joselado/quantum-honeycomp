@@ -228,7 +228,7 @@ ldos0d = ldos
 
 def tdos(m_in,scale=10.,npol=None,ne=500,kernel="jackson",
               ntries=20,ewindow=None,frand=None,
-              operator=None):
+              operator=None,x=None):
   """Return two arrays with energies and local DOS"""
   if npol is None: npol = ne
   mus = random_trace(m_in/scale,ntries=ntries,n=npol,fun=frand,
@@ -239,7 +239,12 @@ def tdos(m_in,scale=10.,npol=None,ne=500,kernel="jackson",
     xx = abs(ewindow/scale) # scale
     xs = np.linspace(-xx,xx,ne,endpoint=True)*0.99 # energies
   ys = generate_profile(mus,xs,kernel=kernel).real
-  return (scale*xs,ys/scale)
+  (xs,ys) = (scale*xs,ys/scale)
+  if x is not None:
+    from scipy.interpolate import interp1d
+    f = interp1d(xs,ys,bounds_error=False,fill_value=0.0)
+    return x,f(x)
+  else: return xs,ys
 
 
 tdos0d = tdos # redefine

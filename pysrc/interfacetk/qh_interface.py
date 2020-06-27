@@ -32,6 +32,7 @@ from pygra import meanfield
 from pygra import specialgeometry
 from pygra import specialhopping
 from pygra import timeevolution
+from pygra import embedding
 
 import platform
 
@@ -54,7 +55,7 @@ get_anaconda_command = get_python
 
 def get_qhroot():
   """Gets the root path of quantum honeycomp"""
-  return os.environ["QHROOT"]+"/"
+  return os.path.dirname(os.path.realpath(__file__))+"/../../"
 
 
 

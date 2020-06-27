@@ -458,3 +458,6 @@ def ldos_defect(h,v,e=0.0,delta=0.001,n=1):
 
 
 
+from .ldostk.ldosr import ldosr_generator
+
+
