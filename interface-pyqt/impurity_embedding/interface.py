@@ -404,7 +404,7 @@ class Ui_MainWindow(object):
         self.energy_embedding_ldos.setText(_translate("MainWindow", "0.0"))
         self.label_15.setText(_translate("MainWindow", "# of kpoints"))
         self.delta_embedding_ldos.setText(_translate("MainWindow", "0.01"))
-        self.nk_embedding_ldos.setText(_translate("MainWindow", "10"))
+        self.nk_embedding_ldos.setText(_translate("MainWindow", "300"))
         self.ncells_embedding_ldos.setText(_translate("MainWindow", "31"))
         self.label_17.setText(_translate("MainWindow", "# of cells"))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab), _translate("MainWindow", "Single LDOS"))

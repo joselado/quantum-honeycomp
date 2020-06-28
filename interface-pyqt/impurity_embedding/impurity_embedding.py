@@ -141,7 +141,8 @@ def show_embedding_ldos():
     e = get("energy_embedding_ldos") # energy
     delta = get("delta_embedding_ldos") # energy
     ns = int(get("ncells_embedding_ldos"))
-    (x,y,d) = eb.ldos(nsuper=ns,e=e,delta=delta)
+    nk = int(get("nk_embedding_ldos"))
+    (x,y,d) = eb.ldos(nsuper=ns,e=e,delta=delta,nk=nk)
     np.savetxt("LDOS.OUT",np.array([x,y,d]).T)
     execute_script("qh-ldos --input LDOS.OUT")
 #    execute_script("qh-interpolate --input LDOS.OUT --dx -2 --dy -2 --smooth 1.0")

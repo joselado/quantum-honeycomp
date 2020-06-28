@@ -624,7 +624,7 @@ def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   print("Supercell",nsuper1,"x",nsuper2)
   ez = e + 1j*delta # create complex energy
   from . import dyson
-  g = dyson.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper1,nsuper2,300,ez)
+  g = dyson.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper1,nsuper2,nk,ez)
   g = np.matrix(g) # convert to matrix
   # create hamiltonian of the supercell
   from .embedding import onsite_supercell
