@@ -124,7 +124,12 @@ app,main = plotpyqt.get_interface(plot)
 main.add_slider(label="Energy") # Slider for the dots
 if args.grid=="False":
   main.add_slider(label="Size",v0=50) # Slider for the dots
-main.add_slider(label="Saturation",v0=50) # Saturation
+
+
+if args.grid=="False": v0 = 20
+else: v0 = 50
+
+main.add_slider(label="Saturation",v0=v0) # Saturation
 main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,40)) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots

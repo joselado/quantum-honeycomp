@@ -97,7 +97,7 @@ def initialize():
 #  h.add_antiferromagnetism(get("mAF"))  # AF order
   h.shift_fermi(get("fermi")) # shift fermi energy
 #  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-#  h.add_haldane(get("haldane")) # intrinsic SOC
+  h.add_haldane(get("haldane")) # intrinsic SOC
   h.add_antihaldane(get("antihaldane")) 
 #  h.add_anti_kane_mele(get("antikanemele")) 
 #  if abs(get("swave"))>0.0: 
