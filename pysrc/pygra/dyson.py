@@ -19,18 +19,18 @@ def dyson2d(intra,tx,ty,txy,txmy,nx,ny,nk,ez):
     else:
         ns = intra.shape[0]*nx*ny
         g = np.zeros((ns,ns),dtype=np.complex)
-        n = intra.shape[0] # size of the matrix
-        gs = np.zeros((nk*nk,n,n),dtype=np.complex_) # GF in k-points
-        gm = np.zeros((nx*2-1,ny*2-1,n,n),dtype=np.complex_) # GF in minicells
-        ks = np.zeros((nk*nk,2)) # kpoints
-        em = np.identity(n,dtype=np.complex_)*ez # identity times energy
-        return dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,em,gs,gm,ks,g)
+        return dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,g)
 
 
 @jit(nopython=True)
-def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,gs,gm,ks,g):
+def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,g):
     """jit version of the function"""
     n = intra.shape[0] # size of the matrix
+    gs = np.zeros((nk*nk,n,n),dtype=np.complex_) # GF in k-points
+    gm = np.zeros((nx*2-1,ny*2-1,n,n),dtype=np.complex_) # GF in minicells
+    ks = np.zeros((nk*nk,2)) # kpoints
+    em = np.identity(n) # identity times energy
+    em = em*ez # identity times energy
     ik = 0
     nk2 = nk*nk # total number of kpoints
     # Compute all the GF
@@ -41,7 +41,7 @@ def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,gs,gm,ks,g):
             m = np.exp(1j*kx)*tx + np.exp(1j*ky)*ty
             m = m + np.exp(1j*(kx+ky))*txy + np.exp(1j*(kx-ky))*txmy
             m = m + np.conjugate(m.T) + intra # Bloch Hamiltonian
-            gs[ik,:,:] = np.linalg.inv(ez - m) # store GF
+            gs[ik,:,:] = np.linalg.inv(em - m) # store GF
             ks[ik,0] = kx
             ks[ik,1] = ky
             ik += 1 # increase counter

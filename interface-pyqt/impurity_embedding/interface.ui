@@ -423,6 +423,13 @@
       </widget>
      </widget>
     </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QPushButton" name="save_results">
+      <property name="text">
+       <string>Save Results</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="1">
      <widget class="QTabWidget" name="tabWidget_3">
       <property name="enabled">
@@ -508,7 +515,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string># of kpoints</string>
+             <string>Number of k-points</string>
             </property>
            </widget>
           </item>
@@ -536,95 +543,11 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_17">
             <property name="text">
-             <string># of cells</string>
+             <string>NUmber of unit cells</string>
             </property>
            </widget>
           </item>
          </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tab_6">
-       <attribute name="title">
-        <string>DOS</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <layout class="QGridLayout" name="gridLayout_36">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_50">
-            <property name="text">
-             <string>Number of kpoints</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_51">
-            <property name="text">
-             <string>Energy window</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="dos_ewindow">
-            <property name="text">
-             <string>4.0</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="dos_delta">
-            <property name="text">
-             <string>0.01</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_48">
-            <property name="text">
-             <string>Smearing</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="dos_nk">
-            <property name="text">
-             <string>100</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QComboBox" name="dos_mode">
-            <item>
-             <property name="text">
-              <string>ED</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Green</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_47">
-            <property name="text">
-             <string>Mode</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="show_dos">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Density of states</string>
-          </property>
-         </widget>
         </item>
        </layout>
       </widget>
@@ -635,23 +558,6 @@
        <layout class="QGridLayout" name="gridLayout_28">
         <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_27">
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="multildos_delta">
-            <property name="toolTip">
-             <string>Energy smearing</string>
-            </property>
-            <property name="text">
-             <string>0.03</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_43">
-            <property name="text">
-             <string>Smearing</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_44">
             <property name="text">
@@ -659,20 +565,20 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="multildos_nk">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="nk_embedding_ldos_sweep">
             <property name="toolTip">
              <string>Number of kpoints used</string>
             </property>
             <property name="text">
-             <string>10</string>
+             <string>100</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QPushButton" name="show_multildos">
+          <item row="6" column="0" colspan="2">
+           <widget class="QPushButton" name="show_embedding_ldos_sweep">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>Show LDOS</string>
@@ -680,36 +586,67 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLineEdit" name="multildos_ewindow">
+           <widget class="QLineEdit" name="energy_window_embedding_ldos_sweep">
             <property name="toolTip">
              <string>Energy window</string>
             </property>
             <property name="text">
-             <string>1.5</string>
+             <string>0.5</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_45">
             <property name="text">
-             <string>Number of kpoints</string>
+             <string>Number of k-points</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_46">
             <property name="text">
              <string>Number of unit cells</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="multildos_nrep">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="ncells_embedding_ldos_sweep">
             <property name="toolTip">
              <string>Number of replicas of the unit cell to plot</string>
             </property>
             <property name="text">
-             <string>5</string>
+             <string>11</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="delta_embedding_ldos_sweep">
+            <property name="toolTip">
+             <string>Energy smearing</string>
+            </property>
+            <property name="text">
+             <string>0.05</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_43">
+            <property name="text">
+             <string>Smearing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Number of energies</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="num_energies_embedding_ldos_sweep">
+            <property name="text">
+             <string>10</string>
             </property>
            </widget>
           </item>
@@ -717,13 +654,6 @@
         </item>
        </layout>
       </widget>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <widget class="QPushButton" name="save_results">
-      <property name="text">
-       <string>Save Results</string>
-      </property>
      </widget>
     </item>
    </layout>

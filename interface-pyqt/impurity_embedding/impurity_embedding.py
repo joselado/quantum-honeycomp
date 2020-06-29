@@ -145,6 +145,25 @@ def show_embedding_ldos():
     (x,y,d) = eb.ldos(nsuper=ns,e=e,delta=delta,nk=nk)
     np.savetxt("LDOS.OUT",np.array([x,y,d]).T)
     execute_script("qh-ldos --input LDOS.OUT")
+
+
+def show_embedding_ldos_sweep():
+    h = pickup_hamiltonian()
+    vintra = h.intra.copy() ; vintra[0,0] = get("impurity_potential")
+    eb = embedding.Embedding(h,m=vintra)
+    ewin = get("energy_window_embedding_ldos_sweep") # energy
+    ne = int(get("num_energies_embedding_ldos_sweep")) # energy
+    es = np.linspace(-ewin,ewin,ne,endpoint=True) # number of energies
+    delta = get("delta_embedding_ldos_sweep") # energy
+    ns = int(get("ncells_embedding_ldos_sweep"))
+    nk = int(get("nk_embedding_ldos_sweep"))
+    ds = [] # density of states
+    eb.multildos(es=es,delta=delta,nk=nk,nsuper=ns) # compute
+    execute_script("qh-multildos ")
+
+
+
+
 #    execute_script("qh-interpolate --input LDOS.OUT --dx -2 --dy -2 --smooth 1.0")
 #    execute_script("qh-ldos --input LDOS.OUT-interpolated ")
 
@@ -157,13 +176,14 @@ signals = dict()
 signals["show_structure"] = show_structure  # show bandstructure
 signals["select_atoms_removal"] = select_atoms_removal
 signals["show_embedding_ldos"] = show_embedding_ldos
+signals["show_embedding_ldos_sweep"] = show_embedding_ldos_sweep
 signals["save_results"] = save_results
 
 
 
 
 
-window.connect_clicks(signals)
+window.connect_clicks(signals,robust=False)
 folder = create_folder()
 tmppath = os.getcwd() # get the initial directory
 window.run()

@@ -7,7 +7,7 @@ from . import algebra
 from . import timing
 import numpy as np
 import scipy.linalg as lg
-
+import os
 
 class Embedding():
     """Define an embedding object"""
@@ -15,7 +15,7 @@ class Embedding():
         self.h0 = h.copy() # Pristine Hamiltonian
         if m is not None: self.m = m # provided matrix
         else: self.m = h.intra.copy() # pristine one
-    def ldos(self,e=0.0,delta=1e-3,nsuper=3,nk=20,**kwargs):
+    def ldos(self,e=0.0,delta=1e-2,nsuper=3,nk=100,**kwargs):
         """Compute the local density of states"""
         h = self.h0
         g,selfe = green.supercell_selfenergy(h,e=e,delta=delta,nk=nk,
@@ -32,6 +32,21 @@ class Embedding():
         gs = self.h0.geometry.supercell(nsuper)
         x,y = gs.x,gs.y
         return x,y,ds
+    def multildos(self,es=np.linspace(-2.,2.,20),**kwargs):
+        """Compute the ldos at different energies"""
+        os.system("rm -rf MULTILDOS")
+        os.system("mkdir MULTILDOS")
+        ds = [] # total DOS
+        fo = open("MULTILDOS/MULTILDOS.TXT","w")
+        for e in es:
+            (x,y,d) = self.ldos(e=e,**kwargs) # compute LDOS
+            ds.append(np.mean(d)) # total DOS
+            name0 = "LDOS_"+str(e)+"_.OUT" # name
+            name = "MULTILDOS/"+name0
+            fo.write(name0+"\n") # name of the file
+            np.savetxt(name,np.array([x,y,d]).T) # save data
+        np.savetxt("MULTILDOS/DOS.OUT",np.array([es,ds]).T)
+
 
 
 
