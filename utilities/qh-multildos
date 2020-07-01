@@ -76,7 +76,7 @@ def plot(main):
   scale = scale/np.sqrt(num)*700
   cmap = plt.get_cmap(main.get_combobox("colormap")) 
   color = scale/np.max(scale) # between 0 and 1
-  sat = main.get_slider("Saturation")/50 # saturation
+  sat = main.get_slider("Saturation")*2 # saturation
   sat = np.power(sat,4) # exponential scale
   color = np.tanh(color*sat*10)
   color = color/np.abs(max(color))
@@ -126,11 +126,11 @@ if args.grid=="False":
   main.add_slider(label="Size",v0=50) # Slider for the dots
 
 
-if args.grid=="False": v0 = 20
-else: v0 = 50
+if args.grid=="False": v0 = 0.2
+else: v0 = 0.5
 
-main.add_slider(label="Saturation",v0=v0) # Saturation
-main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,40)) # Slider for the dots
+main.add_slider(label="Saturation",v0=v0,vs=np.linspace(0.01,1.,100)) # Saturation
+main.add_slider(label="Zoom",vs=np.linspace(0.01,1.1,40),v0=1.1) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
 if args.grid=="False":

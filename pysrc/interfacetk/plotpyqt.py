@@ -80,24 +80,23 @@ def get_interface(plot_figure,i=0):
             obj = self.findChild(QtWidgets.QComboBox,name)
             return obj.currentText()
         def add_slider(self,key=None,
-                label=None,vs=range(100),v0=0,
+                label=None,vs=range(100),v0=None,
                 next_row=True):
             """Add a slider"""
             vs = np.array(vs) # set as array
-            vmin = 0
-            vmax = len(vs)-1
             if key is None: 
                 if label is None: raise
                 key = label
             slider = QSlider(Qt.Horizontal,objectName=key)
             slider.vs = vs # store
-            slider.setMinimum(vmin)
-            slider.setMaximum(vmax)
+            slider.setMinimum(0) # minimum value
+            slider.setMaximum(len(vs)) # maximum value
             slider.setTickPosition(QSlider.TicksBelow)
             slider.setTickInterval(1)
-            if v0 is not None: slider.setValue(v0)
-            else: slider.setValue(vmin)
-#            slider.sliderMoved.connect(self.plot)
+            if v0 is None: v0 = min(vs) # not provided
+            dd = np.abs(vs-v0) # difference
+            ii = [y for (x,y) in sorted(zip(dd,range(len(dd))))][0]
+            slider.setValue(ii) # initial value
             slider.valueChanged.connect(self.plot)
             if next_row: 
                 self.column = 0 # start a new column
@@ -114,7 +113,8 @@ def get_interface(plot_figure,i=0):
         def get_slider(self,name):
             """Get the value of a slider"""
             slider = self.findChild(QSlider,name)
-            out = slider.value()
+            out = int(slider.value())
+            if out>=len(slider.vs): out = len(slider.vs) -1
             return slider.vs[int(out)]
         def add_text(self,key=None,label=None,text=""):
             """Add a text label"""
@@ -139,6 +139,13 @@ def get_interface(plot_figure,i=0):
     app = QApplication(sys.argv)
     main = Window()
     return app,main
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     def funfig(obj): # dummy function
