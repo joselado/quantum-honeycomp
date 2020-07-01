@@ -284,6 +284,13 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QPushButton" name="select_impurity_sites">
+          <property name="text">
+           <string>Select the sites with impurities</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>

@@ -70,13 +70,12 @@ def modify_geometry(g):
         inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
         if inds.shape==(): inds = [inds]
       except: inds = [] # Nothing
-      print(inds)
+#      print(inds)
       g = sculpt.remove(g,inds) # remove those atoms
   if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
       g = sculpt.remove_unibonded(g,iterative=True)
 #  g.save()
   return g # return geometry
-
 
 
 
@@ -136,7 +135,7 @@ def show_structure_3d():
 
 def show_embedding_ldos():
     h = pickup_hamiltonian()
-    vintra = h.intra.copy() ; vintra[0,0] = get("impurity_potential")
+    vintra = get_impurity_matrix(h)
     eb = embedding.Embedding(h,m=vintra)
     e = get("energy_embedding_ldos") # energy
     delta = get("delta_embedding_ldos") # energy
@@ -147,9 +146,25 @@ def show_embedding_ldos():
     execute_script("qh-ldos --input LDOS.OUT")
 
 
+def get_impurity_matrix(h):
+    """Get the impurity matrix"""
+    vintra = h.intra.copy() 
+    v = get("impurity_potential") # potential in this site
+    try:
+        inds = np.genfromtxt("IMPURITY_SITES.OUT") # read the indexes
+        inds = [int(i) for i in inds] # transform to integer
+    except:
+        inds = [0] # just the first site
+    for i in inds: vintra[i,i] = v # put this onsite energy
+    return vintra
+
+
+
+
+
 def show_embedding_ldos_sweep():
     h = pickup_hamiltonian()
-    vintra = h.intra.copy() ; vintra[0,0] = get("impurity_potential")
+    vintra = get_impurity_matrix(h)
     eb = embedding.Embedding(h,m=vintra)
     ewin = get("energy_window_embedding_ldos_sweep") # energy
     ne = int(get("num_energies_embedding_ldos_sweep")) # energy
@@ -161,6 +176,13 @@ def show_embedding_ldos_sweep():
     eb.multildos(es=es,delta=delta,nk=nk,nsuper=ns) # compute
     execute_script("qh-multildos ")
 
+
+
+def select_impurity_sites():
+    g = get_geometry() # get the geometry
+    np.savetxt("POSITIONS_PP.OUT",np.array(g.r)) # write in file
+    # select the sites
+    execute_script("qh-select-atoms-geometry  --input POSITIONS_PP.OUT --output IMPURITY_SITES.OUT --initially_selected \"0\"  --caption \" Sites with impurities\"")
 
 
 
@@ -177,6 +199,7 @@ signals["show_structure"] = show_structure  # show bandstructure
 signals["select_atoms_removal"] = select_atoms_removal
 signals["show_embedding_ldos"] = show_embedding_ldos
 signals["show_embedding_ldos_sweep"] = show_embedding_ldos_sweep
+signals["select_impurity_sites"] = select_impurity_sites
 signals["save_results"] = save_results
 
 
