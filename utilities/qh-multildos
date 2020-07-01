@@ -82,9 +82,10 @@ def plot(main):
   color = z
   cmap = plt.get_cmap(main.get_combobox("colormap")) 
   if args.grid=="False":
-    size = main.get_slider("Size")/50 # size reescaling
-    size = np.power(size,4) # exponential scale
-    cplot = ax.scatter(x,y,s=scale,c=color,
+    size = main.get_slider("Size") # size reescaling
+    size = (2*size)**4 # scale
+    size = 100*size
+    cplot = ax.scatter(x,y,s=size,c=color,
             edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
     ax.set_facecolor(main.get_combobox("Background"))
   else:
@@ -121,8 +122,7 @@ def plot(main):
 app,main = plotpyqt.get_interface(plot)
 main.add_slider(label="Energy") # Slider for the dots
 if args.grid=="False":
-  main.add_slider(label="Size",v0=50) # Slider for the dots
-
+  main.add_slider(label="Size",vs=np.linspace(0.0,1.0,100),v0=0.5) # Size
 
 if args.grid=="False": v0 = 0.9
 else: v0 = 0.5
