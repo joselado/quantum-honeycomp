@@ -69,27 +69,25 @@ def plot(main):
   x = m[0] # x position
   y = m[1] # y position
   z = m[2] # z position
-  
-  print("Maximum value is ",np.max(np.abs(z)))
-  num = np.sqrt(len(z))
-  scale = np.abs(z)/np.max(np.abs(z))
-  scale = scale/np.sqrt(num)*700
+  z = z/np.max(z) # normalize
+
+  minsat = main.get_slider("Min Saturation") # miminum saturation
+  maxsat = main.get_slider("Max Saturation") # maximum saturation
+  z[z>maxsat] = maxsat # minimum saturation
+  z = z/np.max(z) # reescale
+  z[z<minsat] = minsat # minimum saturation
+  z = z -minsat # shift
+  z = z/np.max(z) # normalize
+  scale = 30.0
+  color = z
   cmap = plt.get_cmap(main.get_combobox("colormap")) 
-  color = scale/np.max(scale) # between 0 and 1
-  sat = main.get_slider("Saturation")*2 # saturation
-  sat = np.power(sat,4) # exponential scale
-  color = np.tanh(color*sat*10)
-  color = color/np.abs(max(color))
   if args.grid=="False":
     size = main.get_slider("Size")/50 # size reescaling
     size = np.power(size,4) # exponential scale
-    cplot = ax.scatter(x,y,s=scale*size,c=color,
+    cplot = ax.scatter(x,y,s=scale,c=color,
             edgecolor="none",cmap=cmap,vmin=0.0,vmax=1.0)
     ax.set_facecolor(main.get_combobox("Background"))
   else:
-      z = z/np.max(z)
-      z = np.tanh(z*(sat*2+1e-6))
-      z = z/np.max(z)
       zmap = z.reshape((len(np.unique(x)),len(np.unique(y))))
       cplot = ax.imshow(zmap.T, aspect='auto', origin='lower',
             cmap = cmap,interpolation=main.get_combobox("Interpolation"),
@@ -126,10 +124,11 @@ if args.grid=="False":
   main.add_slider(label="Size",v0=50) # Slider for the dots
 
 
-if args.grid=="False": v0 = 0.2
+if args.grid=="False": v0 = 0.9
 else: v0 = 0.5
 
-main.add_slider(label="Saturation",v0=v0,vs=np.linspace(0.01,1.,100)) # Saturation
+main.add_slider(label="Max Saturation",v0=v0,vs=np.linspace(0.01,1.,100)) # Saturation
+main.add_slider(label="Min Saturation",v0=0.,vs=np.linspace(0.01,1.,100)) # Saturation
 main.add_slider(label="Zoom",vs=np.linspace(0.01,1.1,40),v0=1.1) # Slider for the dots
 cs = ["inferno","plasma","magma","rainbow","jet"]
 main.add_combobox(cs,label="Color Map",key="colormap") # Slider for the dots
