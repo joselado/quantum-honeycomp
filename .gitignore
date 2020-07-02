@@ -10,3 +10,5 @@ old_versions
 data
 pythoninterpreter.py
 *.tar
+.vscode
+tmp/*

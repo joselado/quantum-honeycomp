@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 
 
-import mayavi.mlab as mlab
+from mayavi import mlab as mlab
 import numpy as np
 import sys
 
