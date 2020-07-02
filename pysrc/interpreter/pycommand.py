@@ -115,4 +115,3 @@ def run_qh():
     qhpath = Path(__file__).resolve().parent.parent.parent
     qh = qhpath.joinpath('bin', "quantum-honeycomp.py")
     subprocess.run(["python", str(qh)])
-    #os.system(get_python() + " " + qh)
