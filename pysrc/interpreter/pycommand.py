@@ -83,6 +83,14 @@ def get_python():
       print("No python interpreter found, exiting")
       exit()
 
+def get_qh_path():
+    """Return the Quantum Honeycomp path"""
+    return os.path.dirname(os.path.realpath(__file__))+"/../../"
+
+def get_qh_command():
+    """Return the Quantum honeycomp command"""
+    return get_python() +" "+get_qh_path()+"/bin/quantum-honeycomp"
+
 
 def add_to_path():
     """Add quantum honeycomp to the PATH"""
@@ -96,7 +104,7 @@ def add_to_path():
     qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
     try: ls = open(rcfile,"r").read() # if the file exists
     except: ls = "" # otherwise
-    addrc = "alias quantum-honeycomp=\"" + get_python() +" "+qhpath+"/quantum-honeycomp\"\n"
+    addrc = "alias quantum-honeycomp=\"" + get_qh_command() +"\"\n\n"
 #    addrc = "\nexport PATH=\""+qhpath+"\":$PATH\n"
     open(rcfile,"w").write(ls+addrc) # add to the bash
 
@@ -112,6 +120,25 @@ def run_qh():
     qhpath = os.path.dirname(os.path.realpath(__file__))+"/../../bin"
     os.system(get_python() +" "+qhpath+"/quantum-honeycomp &")
 
+def create_icon():
+    """Create the Quantum Honeycomp icon"""
+    if platform.system()!="Linux": return # nothing to do
+    ls = "" # empty string
+    ls += "#!/usr/bin/env xdg-open\n" 
+    ls += "[Desktop Entry]\n"
+    ls += "Version=1\n"
+    ls += "Type=Application\n"
+    ls += "Terminal=false\n"
+    ls += "Exec=" + get_qh_command()+"\n"
+    ls += "Name=Quantum-Honeycomp\n"
+    ls += "Comment=Quantum-Honeycomp\n"
+    ls += "Icon="+get_qh_path()+"/screenshots/qh_icon.png"
+    name = get_qh_path()+"quantum-honeycomp.desktop" # icon name
+    open(name,"w").write(ls) # write the content
+    # and write it in the launcher folder
+    iconpath = os.environ["HOME"]+"/.local/share/applications/quantum-honeycomp.desktop"
+    open(iconpath,"w").write(ls) 
+    os.system("chmod +x "+name) # execution permission
 
 
 
