@@ -140,7 +140,8 @@ def show_embedding_ldos():
     e = get("energy_embedding_ldos") # energy
     delta = get("delta_embedding_ldos") # energy
     ns = int(get("ncells_embedding_ldos"))
-    nk = int(get("nk_embedding_ldos"))
+    nks = get("nk_scaling_embedding_ldos")
+    nk = common.get_nk(h,delta=delta,fac=20*nks) # number of kpoints
     (x,y,d) = eb.ldos(nsuper=ns,e=e,delta=delta,nk=nk)
     np.savetxt("LDOS.OUT",np.array([x,y,d]).T)
     execute_script("qh-ldos --input LDOS.OUT")
@@ -171,7 +172,8 @@ def show_embedding_ldos_sweep():
     es = np.linspace(-ewin,ewin,ne,endpoint=True) # number of energies
     delta = get("delta_embedding_ldos_sweep") # energy
     ns = int(get("ncells_embedding_ldos_sweep"))
-    nk = int(get("nk_embedding_ldos_sweep"))
+    nks = int(get("nk_scaling_embedding_ldos_sweep"))
+    nk = common.get_nk(h,delta=delta,fac=20*nks) # number of kpoints
     ds = [] # density of states
     eb.multildos(es=es,delta=delta,nk=nk,nsuper=ns) # compute
     execute_script("qh-multildos ")

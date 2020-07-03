@@ -167,6 +167,17 @@ def get_multildos(h,window):
 
 
 
+def get_nk(h,delta=1e-2,fac=1.0):
+    """Return the number of k-points to be used"""
+    n = h.intra.shape[0] # dimension of the Hamiltonian
+    d = h.dimensionality # dimensionality
+    nk = 1./(delta*n) # number of kpoints
+    if d==0: return 0
+    elif d==1: return int(nk*fac)
+    elif d==2: return int(np.sqrt(nk)*fac)
+    elif d==3: return int(nk**(1./3.)*fac)
+
+
 
 
 

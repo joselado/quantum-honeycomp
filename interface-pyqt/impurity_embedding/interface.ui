@@ -522,7 +522,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>Number of k-points</string>
+             <string>k-mesh accuracy</string>
             </property>
            </widget>
           </item>
@@ -534,9 +534,12 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="nk_embedding_ldos">
+           <widget class="QLineEdit" name="nk_scaling_embedding_ldos">
+            <property name="toolTip">
+             <string>Accuracy in the k-mesh, higher values are more accurate yet more computationally expensive</string>
+            </property>
             <property name="text">
-             <string>300</string>
+             <string>1.0</string>
             </property>
            </widget>
           </item>
@@ -550,7 +553,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_17">
             <property name="text">
-             <string>NUmber of unit cells</string>
+             <string>Number of unit cells</string>
             </property>
            </widget>
           </item>
@@ -573,12 +576,12 @@
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="nk_embedding_ldos_sweep">
+           <widget class="QLineEdit" name="nk_scaling_embedding_ldos_sweep">
             <property name="toolTip">
              <string>Number of kpoints used</string>
             </property>
             <property name="text">
-             <string>100</string>
+             <string>1.0</string>
             </property>
            </widget>
           </item>
@@ -605,7 +608,7 @@
           <item row="3" column="0">
            <widget class="QLabel" name="label_45">
             <property name="text">
-             <string>Number of k-points</string>
+             <string>k-mesh accuracy</string>
             </property>
            </widget>
           </item>
