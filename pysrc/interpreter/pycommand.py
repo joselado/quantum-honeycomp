@@ -137,7 +137,9 @@ def create_icon():
     open(name,"w").write(ls) # write the content
     # and write it in the launcher folder
     iconpath = os.environ["HOME"]+"/.local/share/applications/quantum-honeycomp.desktop"
-    open(iconpath,"w").write(ls) 
+    try: # this may not work for some Linux distros
+      open(iconpath,"w").write(ls) 
+    except: pass
     os.system("chmod +x "+name) # execution permission
 
 
