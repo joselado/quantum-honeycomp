@@ -100,7 +100,7 @@ def set_combobox(name,cs=[]):
     """Add the different colormaps to a combox"""
     try: cb = getattr(form,name)
     except:
-        print("Combobox",name,"not found")
+#        print("Combobox",name,"not found")
         return
     cb.clear() # clear the items
     cb.addItems(cs)

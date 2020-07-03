@@ -193,8 +193,8 @@ def check_parallel(qtwrap):
 def set_colormaps(form,name,cs=[]):
     """Add the different colormaps to a combox"""
     try: cb = getattr(form,name)
-    except:
-        print("Combobox",name,"not found")
+    except: 
+     #   print("Combobox",name,"not found")
         return
     cb.clear() # clear the items
     cb.addItems(cs)
