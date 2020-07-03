@@ -8,6 +8,8 @@ This program allows to perform tight binding calculations with a user friendly i
 
 # How to install #
 
+## Linux and Mac ##
+
 The program runs in Linux and Mac machines. 
 
 Clone the github repository
@@ -28,6 +30,7 @@ executing in a terminal
 quantum-honeycomp
 ```
 
+## Windows ##
 
 For using this program in Windows, the easiest solution is to create a virtual
 machine using [Virtual Box](https://www.virtualbox.org/), installing
