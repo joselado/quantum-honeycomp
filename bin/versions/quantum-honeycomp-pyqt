@@ -78,7 +78,7 @@ qtwrap.set_logo("qhlogo","quantum_honeycomp.png")
 # Set the version number
 version = open(os.environ["QHROOT"]+"/VERSION.TXT").read().replace("\n","")
 version = "Version "+version.replace(" ",".")
-qtwrap.modify("qh_version",version) # set the version number
+window.set("qh_version",version) # set the version number
 
 window.connect_clicks(signals,robust=False) # connect the clicks
 window.run()

@@ -42,9 +42,15 @@ class App(QtGui.QMainWindow, interface.Ui_MainWindow):
         super(self.__class__, self).__init__()
         self.setupUi(self)  # This is defined in interface.py file automatically
         # It sets up layout and widgets that are defined
+    def save_interface(self,**kwargs):
+        save_interface(self,**kwargs)
     def run(self):
-      self.show()  # Show the form
-      app.exec_()  # and execute the app
+        self.show()  # Show the form
+        app.exec_()  # and execute the app
+    def get(self,*args,**kwargs):
+        return get(*args,**kwargs)
+    def set(self,*args):
+        set_value(*args)
     def connect_clicks(self,ds,robust=True):
       """Connect the different functions"""
       ds2 = dict()
@@ -63,6 +69,7 @@ def main():
 
 
 def get(name,string=False):
+  """Return a certain value"""
   try:
     obj = getattr(form,name) # get the object
     out = obj.text()
@@ -114,12 +121,7 @@ def modify(name,text):
     app.processEvents() # update the interface
   except: pass
 
-
-def set_value(name,text):
-  obj = getattr(form,name) # get the object
-  out = obj.setText(str(text))
-  app.processEvents() # update the interface
-
+set_value = modify
 
 def is_checked(name):
   obj = getattr(form,name) # get the object
@@ -142,6 +144,31 @@ def set_logo(name,image):
   set_image(name,path)
   
 
+
+def save_interface(self,output=None):
+    if output is None: output = os.getcwd() + "/QH_save/interface.qh"
+    obs = dir(self) # all the different objects
+    out = dict() # dictionary
+    for obj in obs: # loop over objects
+        o = getattr(self,obj) # get this object
+        if type(o)==QtWidgets.QLineEdit: # line object
+            out[obj] = o.text() # save this info
+    import json
+    with open(output, 'w') as outf: # write as json file
+        json.dump(out, outf)
+#    load_interface(self,output)
+        
+
+
+def load_interface(self,inputfile):
+    a_file = open(inputfile, "r")
+    # this can be a bit dangerous
+    out = eval(a_file.read()) # create a dictionary
+    for obj in out: # loop over objects
+        o = getattr(self,obj) # get this object
+        if type(o)==QtWidgets.QLineEdit: # line object
+            self.set(obj,out[obj]) # set this value in the interface
+#    print(type(out))
 
 
 

@@ -10,9 +10,9 @@ sys.path.append(qhroot+"/pysrc/") # python libraries
 
 
 from interfacetk import qtwrap # import the library with simple wrappaers to qt4
-get = qtwrap.get  # get the value of a certain variable
 getbox = qtwrap.getbox  # get the value of a certain variable
 window = qtwrap.main() # this is the main interface
+get = window.get  # get the value of a certain variable
 
 
 
@@ -193,7 +193,9 @@ def select_impurity_sites():
 
 inipath = os.getcwd() # get the initial directory
 
-save_results = lambda: save_outputs(inipath,tmppath) # function to save
+def save_results():
+    save_outputs(inipath,tmppath) # function to save
+    window.save_interface(output=inipath+"/QH_save/interface.qh") # save 
 
 # create signals
 signals = dict()
@@ -205,7 +207,7 @@ signals["select_impurity_sites"] = select_impurity_sites
 signals["save_results"] = save_results
 
 
-
+window.set("info_tab","Results will be saved to "+inipath)
 
 
 window.connect_clicks(signals,robust=False)
