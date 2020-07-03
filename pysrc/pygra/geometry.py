@@ -139,15 +139,18 @@ class Geometry:
         h = parametric_hopping_hamiltonian(h,fc=fun) # add hopping
     if not is_sparse: h.turn_dense() # dense Hamiltonian
     return h # return the object
-  def write(self):
-    """ Writes the geometry in file"""
-    write_geometry(self)
-    write_xyz(self)
-    write_lattice(self)
-    write_sublattice(self)
+  def write(self,**kwargs):
+      """ Writes the geometry in file"""
+      write_positions(self,**kwargs)
+      write_xyz(self)
+      write_lattice(self)
+      write_sublattice(self)
+  def write_positions(self,**kwargs):
+      """Write the positions in a file"""
+      write_positions(self,**kwargs)
   def copy(self):
-    """Copy the geometry"""
-    return deepcopy(self)
+      """Copy the geometry"""
+      return deepcopy(self)
   def center(self):
     """ Centers the geometry in (0,0,0)"""
     self.x = self.x - sum(self.x)/len(self.x)
@@ -1103,7 +1106,7 @@ def apilate(g,drs=[np.array([0.,0.,0.])]):
 
 
 
-def write_geometry(g,output_file = "POSITIONS.OUT"):
+def write_positions(g,output_file = "POSITIONS.OUT"):
   """Writes the geometry associatted with a hamiltonian in a file"""
   x = g.x  # x posiions
   y = g.y  # y posiions
@@ -1115,7 +1118,7 @@ def write_geometry(g,output_file = "POSITIONS.OUT"):
   fg.close()
 
 
-
+write_geometry = write_positions
 
 
 def write_sublattice(g,output_file = "SUBLATTICE.OUT"):

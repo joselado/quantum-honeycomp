@@ -507,39 +507,47 @@ def get_sigma_minus(h):
 
 
 
-def get_valley_taux(h,projector=False):
+def get_valley_taux(h):
     """
     Return the tau x valley operator
     """
-    raise # this function is not ok
-    h0 = h.geometry.get_hamiltonian(has_spin=h.has_spin) # FN coupling
-    z = np.exp(1j*2.*np.pi/3.)
-    h0.clean()
-    # add the special hopping in the non-hermitian way
-    h0.add_chiral_kekule(t1=-1.+z,t2=-1.+1/z,hermitian=False) 
-    ## this operator should be sigma^+tau^+
-    hk1 = get_sigma_minus(h) # return sigma minus
-#    hk1 = lambda k: np.identity(h.intra.shape[0],dtype=np.complex)
-    hk0 = h0.get_hk_gen()
-    # now multiply in each side by \sigma_- to get rid of sigma_+
-    hk2 = lambda k: hk1(k)@hk0(k) + hk0(k)@hk1(k)
-    # now make it Hermitian to get sigma_x
-    hk3 = lambda k: hk2(k) + hk2(k).H
-    if projector: return lambda k: hk3(k) # return matrix
-    else: return lambda wf,k=None: braket_wAw(wf,hk3(k)) # return number
+    g = h.geometry
+    h0 = g.get_hamiltonian(has_spin=False) # FN coupling
+    h0.turn_multicell() # multicell Hamiltonian
+    h1 = h0.copy() # new Hmailtonian
+    h1.clean()
+    hs = h1.copy() # for sublattice
+    hs.add_onsite(0.5) ; hs.add_sublattice_imbalance(0.5) 
+    h1.add_kekule(1.0) # add kekule term 
+    hops = hs.get_multihopping() # Multihopping for sublattice
+    hop0 = h0.get_multihopping() # MultiHopping object
+    hop1 = h1.get_multihopping() # MultiHopping object
+    # kill hoppings that start in the A sublattice
+    hop0 = hop0*hops
+   # hop1 = hop0*hops
+    # now define the valley mixing
+    hop2 = 1j*hop0*hop1 
+    hop2 = hop1
+    hop2 = hop2 + hop2.get_dagger() # make it Hermitian
+    hop2 = hop2.get_dict() # get the dictionary
+    h2 = h0.copy() # dummy Hamiltonian
+    h2.clean()
+    h2.intra = hop2[(0,0,0)] # onsite matrix
+    del hop2[(0,0,0)] # onsite matrix
+    h2.hoppings = hop2 # store the rest of the hoppings
+    hk = h2.get_hk_gen() # get the generating function
+    return Operator(lambda m=None,k=None: m@hk(k)) # return operator
+
+
+
+
+
+
 
 
 def get_operator(op,k=[0.,0.,0.],h=None):
     """Get a function that acts as an operator"""
     return Operator(op)
-#    if op is None: return None
-#    elif callable(op): 
-#        return lambda v: op(v,k=k) # assume it yields a number
-#    elif type(op) is np.ndarray or type(op)==np.matrix or issparse(op): 
-#        return lambda v: braket_wAw(v,op) # assume it yields a matrix
-#    else: 
-#        print("Unrecognized type in get_operator",type(op))
-#        raise
 
 
 def get_berry(h,**kwargs):
@@ -609,3 +617,11 @@ def get_layer(self,n=0):
    d = len(fac)
    m = csc_matrix((fac,(inds,inds)),shape=(d,d),dtype=np.complex) # matrix
    return self.spinless2full(m)
+
+
+
+
+
+
+
+

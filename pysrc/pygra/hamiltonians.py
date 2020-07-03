@@ -64,6 +64,9 @@ class hamiltonian():
   def get_hopping_dict(self):
       """Return the dictionary with the hoppings"""
       return multicell.get_hopping_dict(self)
+  def get_multihopping(self):
+      out = multicell.get_hopping_dict(self)
+      return multicell.MultiHopping(out) # return the object
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)
@@ -771,13 +774,10 @@ def shift_fermi(h,fermi):
     return
 
 
+import numbers
 
 def is_number(s):
-    try:
-        float(s)
-        return True
-    except:
-        return False
+    return isinstance(x, numbers.Number)
 
 def is_hermitic(m):
   mh = m.H

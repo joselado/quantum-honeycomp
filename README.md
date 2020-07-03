@@ -33,9 +33,10 @@ For using this program in Windows, the easiest solution is to create a virtual
 machine using [Virtual Box](https://www.virtualbox.org/), installing
 a version of [Ubuntu](https://releases.ubuntu.com/20.04/) 
 in that virtual machine, and following the previous
-instructions. Alternatively, you can use
+instructions. Alternatively, you can try
 [this version](https://github.com/TheGreatFox/quantum-honeycomp) 
-that was adapted for a Windows system.
+that was adapted for a Windows system (latest updates may not be included in
+it).
 
 # Examples
 This program allows to study a variety of electronic states by means of tight binding models as shown below.
@@ -93,12 +94,14 @@ https://journals.aps.org/prb/abstract/10.1103/PhysRevB.82.121407
 
 # Capabilities #
 - Tight binding models in different lattices (triangular, square, honeycomb, Kagome, Lieb, diamond, pyrochlore)
+- Possibility of crafting your own lattice interactively
 - Tunable parameters in the Hamiltonian (Fermi energy, magnetic order, sublattice imbalance, magnetic field,  Rashba spin-orbit coupling, intrinsic spin-orbit coupling, Haldane coupling, anti-Haldane coupling, s-wave superconductivity)
 - Different results are automatically plotted from the interface
 - Band structure of 0d,1d,2d systems
 - Density of states of 0d,1d,2d systems
-- Selfconsistent mean field Hubbard calculations of 0d,1d,2d systems
+- Selfconsistent mean-field Hubbard calculations of 0d,1d,2d systems
 - Berry curvature, Chern number and Z2 invariant in 2d systems
-- Special module to deal with systems with 100000 atoms using the Kernel polynomial method
+- Special module to deal with systems with more than 100000 atoms using the Kernel polynomial method
 - Special modules to study 1d and 2d study interfaces between different systems
+- Special module for single impurities in pristine infinite systems using the embedding technique
 

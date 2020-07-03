@@ -43,6 +43,7 @@ def get_operator(self,name,**kwargs):
         return self.get_operator("sz")@self.get_operator("electron")
       elif name=="layer": return operators.get_layer(self,**kwargs)
       elif name=="valley":  return operators.get_valley(self)
+      elif name=="valley_x":  return operators.get_valley_taux(self)
       elif name=="inplane_valley": return operators.get_inplane_valley(self)
       elif name=="valley_upper" or name=="valley_top":
         return operators.get_valley_layer(self,n=-1)
