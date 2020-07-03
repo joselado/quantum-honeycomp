@@ -57,11 +57,12 @@ signals["impurity_embedding"] = call_mode("impurity_embedding")
 def update_qh():
     os.chdir(qhroot) # go to the main directory
     os.system("git pull") # pull the directory
-    try: # try to compile fortran
-        from pygra import compilefortran
-        compiler = os.path.dirname(os.path.realpath(pycommand.get_python()))+"/f2py"
-        compilefortran.compile_fortran(compiler=compiler) # compile fortran
-    except: pass
+    pycommand.create_icon() # create the icon
+#    try: # try to compile fortran
+#        from pygra import compilefortran
+#        compiler = os.path.dirname(os.path.realpath(pycommand.get_python()))+"/f2py"
+#        compilefortran.compile_fortran(compiler=compiler) # compile fortran
+#    except: pass
     pycommand.run_qh()
 #    pycommand.install_python()
 #    pycommand.install_dependencies() # install dependencies if necessary
