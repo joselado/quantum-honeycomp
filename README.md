@@ -29,9 +29,13 @@ quantum-honeycomp
 ```
 
 
-For using this program in Windows, the easiest solution is to create a virtual machine using Virtual Box, installing
-a version of ubuntu in that virtual machine, and following the previous instructions.
-
+For using this program in Windows, the easiest solution is to create a virtual
+machine using [Virtual Box](https://www.virtualbox.org/), installing
+a version of [Ubuntu](https://releases.ubuntu.com/20.04/) 
+in that virtual machine, and following the previous
+instructions. Alternatively, you can use
+[this version](https://github.com/TheGreatFox/quantum-honeycomp) 
+that was adapted for a Windows system.
 
 # Examples
 This program allows to study a variety of electronic states by means of tight binding models as shown below.
