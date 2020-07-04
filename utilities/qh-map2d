@@ -93,10 +93,9 @@ path += "/../pysrc"
 sys.path.append(path) # add library
 from interfacetk import plotpyqt
 app,window = plotpyqt.get_interface(getplot)
-window.add_slider(label="xcut",vs=np.linspace(0.,1.,100),v0=30) # Slider for the dots
-window.add_slider(label="ycut",vs=np.linspace(0.,1.,100),v0=30) # Slider for the dots
-window.add_slider(label="Saturation",vs=np.linspace(0.,1.,100),
-        v0=50) # Slider for the dots
+window.add_slider(label="xcut",vs=np.linspace(0.,1.,100),v0=0.5) # Slider for the dots
+window.add_slider(label="ycut",vs=np.linspace(0.,1.,100),v0=0.5) # Slider for the dots
+window.add_slider(label="Saturation",vs=np.linspace(0.,1.,100),v0=0.1)
 window.add_combobox(["red","blue","green","black"],label="Color xcut",key="cx")
 window.add_combobox(["blue","red","green","black"],label="Color ycut",key="cy")
 window.add_combobox(["inferno","hot","plasma","viridis","cool","rainbow"],label="Color map",key="cmap")
