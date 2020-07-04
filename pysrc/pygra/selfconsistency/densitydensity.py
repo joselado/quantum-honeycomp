@@ -258,7 +258,7 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,compute_dd=True,
+        load_mf=True,compute_cross=True,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -292,7 +292,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
-      mf = get_mf(v,dm,compute_dd=compute_dd,
+      mf = get_mf(v,dm,compute_cross=compute_cross,
               has_eh=h0.has_eh) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
@@ -435,7 +435,7 @@ def hubbard(h,U=1.0,**kwargs):
     if h.has_spin:
       return densitydensity(h,v=v,**kwargs)
     else:
-      return densitydensity(h,v=v,compute_dd=False,**kwargs)
+      return densitydensity(h,v=v,compute_cross=False,**kwargs)
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
