@@ -242,15 +242,24 @@ def get_bulk(h,fac=0.2):
     g = h.geometry
     g.center() # center the geometry
     out = np.array([1. for ir in r]) # initialize
-    if h.dimensionality==1:
+    if h.dimensionality==0:
+        dr = r[:,0]**2 + r[:,1]**2 # radii
+        dr = dr - np.min(dr)
+        dr = dr/np.max(dr) # to interval 0,1
+        out[fac>dr] = 0.0 # set to zero
+    elif h.dimensionality==1:
         dr = r[:,1] # y positions
+        dr = dr - np.min(dr)
+        dr = dr/np.max(dr) # to interval 0,1
+        out[fac>dr] = 0.0 # set to zero
+        out[(1.-fac)<dr] = 0.0 # set to zero
     elif h.dimensionality==2:
         dr = r[:,2] # z positions
+        dr = dr - np.min(dr)
+        dr = dr/np.max(dr) # to interval 0,1
+        out[fac>dr] = 0.0 # set to zero
+        out[(1.-fac)<dr] = 0.0 # set to zero
     else: return NotImplemented
-    dr = dr - np.min(dr)
-    dr = dr/np.max(dr) # to interval 0,1
-    out[fac>dr] = 0.0 # set to zero
-    out[(1.-fac)<dr] = 0.0 # set to zero
     from scipy.sparse import diags
     n = len(r) # number of sites
     out = diags([out],[0],shape=(n,n),dtype=np.complex) # create matrix
