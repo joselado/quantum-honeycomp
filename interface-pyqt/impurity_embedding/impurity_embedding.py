@@ -70,11 +70,9 @@ def modify_geometry(g):
         inds = np.array(np.genfromtxt("REMOVE_ATOMS.INFO",dtype=np.int))
         if inds.shape==(): inds = [inds]
       except: inds = [] # Nothing
-#      print(inds)
       g = sculpt.remove(g,inds) # remove those atoms
   if qtwrap.is_checked("remove_single_bonded"): # remove single bonds
       g = sculpt.remove_unibonded(g,iterative=True)
-#  g.save()
   return g # return geometry
 
 

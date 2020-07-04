@@ -100,3 +100,23 @@ def full2profile(h,profile,check=True):
   return out
 
 
+
+def des_spin(m,component=0):
+    """Removes the spin degree of freedom"""
+    from scipy.sparse import issparse
+    sparse = issparse(m) # initial matrix is sparse
+    m = coo_matrix(m) # convert
+    n = m.shape[0]//2
+    d1,r1,c1 = [],[],[]
+    d0,r0,c0 = m.data,m.row,m.col
+    for i in range(len(d0)):
+        if r0[i]%2==component and c0[i]%2==component:
+            d1.append(d0[i])
+            r1.append(r0[i]//2)
+            c1.append(c0[i]//2)
+    mo = csc_matrix((d1,(r1,c1)),shape=(n,n),dtype=np.complex)
+    if not sparse: return mo.todense()
+    else: return mo
+
+
+

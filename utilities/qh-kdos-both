@@ -99,7 +99,7 @@ def getplot(obj):
   
 
 app,main = plotpyqt.get_interface(getplot)
-main.add_slider(label="Saturation",vs=np.linspace(0.,1.,100),v0=10) # Saturation
+main.add_slider(label="Saturation",vs=np.linspace(0.,1.,100),v0=0.1) # Saturation
 main.add_combobox(["inferno","hot","plasma","viridis","cool","rainbow"],label="Color map",key="cmap")
 main.add_combobox(["bicubic","none"],label="Interpolation")
 

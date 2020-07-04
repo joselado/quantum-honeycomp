@@ -32,6 +32,7 @@ def get_bands(h,window):
     num_bands = int(window.get("nbands"))
     if num_bands<1: num_bands = None # all the eigenvalues
     check_parallel(window) # check if use parallelization
+    if op is None: h = h.reduce() # reduce dimensionality if possible
     h.get_bands(operator=op,kpath=kpath,num_bands=num_bands)
     command = "qh-bands --dim "+str(h.dimensionality) 
     if op is not None: command += " --cblabel "+opname
@@ -48,6 +49,7 @@ def get_kdos(h,window):
     new = int(window.get("kdos_mesh")) # scale as kpoints
     energies = np.linspace(-ew,ew,new) # number of ene
     kpath = [[i,0.,0.] for i in np.linspace(0.,1.,new)]
+    h = h.reduce() # reduce dimensionality if possible
     kdos.surface(h,energies=energies,delta=ew/new,kpath=kpath)
     command = "qh-kdos-both --input KDOS.OUT"
     execute_script(command) # execute the script
@@ -113,6 +115,7 @@ def get_fermi_surface(h,window):
     nk = int(window.get("fs_nk")) # number of kpoints
     numw = int(window.get("fs_numw")) # number of waves for sparse
     delta = window.get("fs_delta")
+    h = h.reduce() # reduce dimensionality if possible
     spectrum.multi_fermi_surface(h,nk=nk,energies=energies,
         delta=delta,nsuper=1,numw=numw)
     execute_script("qh-multifermisurface")
@@ -159,6 +162,7 @@ def get_multildos(h,window):
     proj = window.getbox("basis_ldos")
     if proj=="Real space atomic orbitals":  projection = "atomic"
     else: projection = "TB" # default one
+    h = h.reduce() # reduce dimensionality if possible
     ldos.multi_ldos(h,es=np.linspace(-ewin,ewin,ne),
             nk=nk,delta=delta,nrep=nrep,numw=numw,
             projection=projection,ratomic=window.get("ratomic_ldos"))
