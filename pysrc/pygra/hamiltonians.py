@@ -230,6 +230,15 @@ class hamiltonian():
         self.modify_hamiltonian_matrices(f) # modify the matrices
         self.has_spin = False # set to spinless
     else: raise
+  def remove_nambu(self):
+    if self.check_mode("spinful_nambu"): 
+        def f(m):
+            return superconductivity.get_eh_sector(m,i=0,j=0)
+        self.modify_hamiltonian_matrices(f) # modify the matrices
+        self.has_eh = False # set to normal
+    elif self.check_mode("spinful"): pass
+    elif self.check_mode("spinless"): pass
+    else: raise
   def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)

@@ -144,12 +144,16 @@ def hopping_spinless(m,cutoff=0.001):
   
 def extract_from_hamiltonian(self,name):
     """Extract a quantity from a Hamiltonian"""
+    h0 = self.copy()
     if name=="density":
-      if self.has_eh: raise # not implemented
-      return onsite(self.intra,has_spin=self.has_spin)
+      if self.has_eh: 
+          h0.remove_nambu()
+          m = h0.intra
+      else: m = self.intra
+      return onsite(m,has_spin=self.has_spin)
     elif name=="mx" and self.has_spin:
-      if self.has_eh: raise # not implemented
-      return mx(self.intra)
+      if self.has_eh: h0.remove_nambu() # not implemented
+      return mx(h0.intra)
     elif name=="swave":
         if self.check_mode("spinful_nambu"): return swave(self.intra)
         elif self.check_mode("spinless_nambu"): 
@@ -157,11 +161,11 @@ def extract_from_hamiltonian(self,name):
             return spinless.extract_swave(self.intra)
         else: raise
     elif name=="my" and self.has_spin:
-      if self.has_eh: raise # not implemented
-      return my(self.intra)
+      if self.has_eh: h0.remove_nambu() # not implemented
+      return my(h0.intra)
     elif name=="mz" and self.has_spin:
-      if self.has_eh: raise # not implemented
-      return mz(self.intra)
+      if self.has_eh: h0.remove_nambu() # not implemented
+      return mz(h0.intra)
     else: raise
 
 

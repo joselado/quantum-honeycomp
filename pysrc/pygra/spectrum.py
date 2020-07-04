@@ -442,9 +442,13 @@ def get_fermi_energy(es,filling,fermi_shift=0.0):
 
 def get_fermi4filling(h,filling,nk=8):
     """Return the fermi energy for a certain filling"""
-    if h.has_eh: raise # not implemented
-    es = eigenvalues(h,nk=nk,notime=True)
-    return get_fermi_energy(es,filling)
+    if h.has_eh: 
+        h0 = h.copy()
+        h0.remove_nambu()
+        return get_fermi4filling(h0,filling,nk=nk) # workaround
+    else:
+        es = eigenvalues(h,nk=nk,notime=True)
+        return get_fermi_energy(es,filling)
 
 def get_filling(h,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
@@ -453,8 +457,8 @@ def get_filling(h,**kwargs):
         return spinless.get_filling(h,**kwargs)
     elif h.check_mode("spinful_nambu"): raise # spinful Nambu
     else:
-      es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
-      es = np.array(es)
-      esf = es[es<0.0]
-      return len(esf)/len(es) # return filling
+        es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
+        es = np.array(es)
+        esf = es[es<0.0]
+        return len(esf)/len(es) # return filling
 

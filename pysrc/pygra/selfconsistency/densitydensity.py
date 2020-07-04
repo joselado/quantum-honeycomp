@@ -53,7 +53,7 @@ def normal_term_ji(v,dm):
     out = dm*0.0 # initialize
     return normal_term_ji_jit(v,dm,out) # return the normal term
 
-@jit
+@jit(nopython=True)
 def normal_term_jit(v,dm,out):
     """Return the normal terms, jit function"""
     n = len(v[0])
@@ -66,7 +66,7 @@ def normal_term_jit(v,dm,out):
     return out
 
 
-@jit
+@jit(nopython=True)
 def normal_term_ii_jit(v,dm,out):
     """Return the normal terms, jit function"""
     n = len(v[0])
@@ -75,7 +75,7 @@ def normal_term_ii_jit(v,dm,out):
         out[i,i] = out[i,i] + v[i,j]*dm[j,j]
     return out
 
-@jit
+@jit(nopython=True)
 def normal_term_jj_jit(v,dm,out):
     """Return the normal terms, jit function"""
     n = len(v[0])
@@ -85,7 +85,7 @@ def normal_term_jj_jit(v,dm,out):
     return out
 
 
-@jit
+@jit(nopython=True)
 def normal_term_ij_jit(v,dm,out):
     """Return the normal terms, jit function"""
     n = len(v[0])
@@ -95,7 +95,7 @@ def normal_term_ij_jit(v,dm,out):
     return out
 
 
-@jit
+@jit(nopython=True)
 def normal_term_ji_jit(v,dm,out):
     """Return the normal terms, jit function"""
     n = len(v[0])
@@ -173,7 +173,43 @@ def get_dm(h,nk=1):
         dm[ds[i]] = dms[i] # store
     return dm # return dictionary with the density matrix
 
-def get_mf(v,dm,only_dd=True):
+
+
+def get_mf(v,dm,has_eh=False,**kwargs):
+    """Get the mean field matrix"""
+    if has_eh:
+        # let us assume that it is a full Nambu spinor
+        # (this may not be general, but good enough in the meantime)
+        from .. import superconductivity
+        dme = dict() # dictionary
+        dma01 = dict() # dictionary
+        dma10 = dict() # dictionary
+        op = superconductivity.get_nambu2signless(dm[(0,0,0)]) # transform
+        for key in dm: # extract the electron part 
+            m = op.T@dm[key]@op # transform to the new basis
+            dme[key] = superconductivity.get_eh_sector(m,i=0,j=0)
+            dma01[key] = superconductivity.get_eh_sector(m,i=0,j=1)
+            dma10[key] = superconductivity.get_eh_sector(m,i=1,j=0)
+        mfe = get_mf_normal(v,dme,**kwargs) # electron part of the mean field
+        # anomalous part
+        mfa01 = get_mf_normal(v,dma01,compute_dd=False,add_dagger=False) 
+        mfa10 = get_mf_normal(v,dma10,compute_dd=False,add_dagger=False) 
+        # now rebuild the Hamiltonian
+        mf = dict()
+        for key in v:
+            m = superconductivity.build_nambu_matrix(mfe[key],
+                    c12 = -mfa10[key],c21=-mfa01[key]
+                    )
+            m = op.T@m@op # undo the transformation
+            mf[key] = m # store this matrix
+        return mf # return mean field matrix
+    else: return get_mf_normal(v,dm,**kwargs) # no BdG Hamiltonian
+
+
+
+
+def get_mf_normal(v,dm,compute_dd=True,add_dagger=True,
+        compute_cross=True):
     """Get the mean field"""
     zero = dm[(0,0,0)]*0. # zero
     mf = dict()
@@ -185,14 +221,16 @@ def get_mf(v,dm,only_dd=True):
     for d in v: # loop over directions
         d2 = (-d[0],-d[1],-d[2]) # minus this direction
         # add the normal terms
-        if not only_dd: # only density density terms
-          m = normal_term_ij(v[d],dm[d2]) # get matrix
-          mf[d] = mf[d] + m # add normal term
-          mf[d2] = mf[d2] + dag(m) # add normal term
-        m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
-        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
-        m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix
-        mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
+        if compute_dd: # only density density terms
+            m = normal_term_ij(v[d],dm[d2]) # get matrix
+            mf[d] = mf[d] + m # add normal term
+            if add_dagger:
+                mf[d2] = mf[d2] + dag(m) # add normal term
+        if compute_cross: # density density terms
+            m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
+            mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
+            m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix
+            mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
     return mf
 
 def get_dc_energy(v,dm):
@@ -220,7 +258,7 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,only_dd=False,
+        load_mf=True,compute_dd=True,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -254,7 +292,8 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
-      mf = get_mf(v,dm,only_dd=only_dd) # return the mean field
+      mf = get_mf(v,dm,compute_dd=compute_dd,
+              has_eh=h0.has_eh) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time
@@ -349,7 +388,8 @@ def get_array2mf(scf):
 
 def densitydensity(h,filling=0.5,**kwargs):
     """Function for density-density interactions"""
-    if h.has_eh: raise
+    if h.has_eh: 
+        if not h.has_spin: return NotImplemented # only for spinful
     h = h.get_multicell()
     h.turn_dense()
     def callback_h(h):
@@ -379,28 +419,27 @@ def densitydensity(h,filling=0.5,**kwargs):
 
 def hubbard(h,U=1.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
-    if h.has_eh: raise # not implemented
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
-    zero = h.intra*0. # initialize
     U = utilities.obj2fun(U) # redefine as a function
     if h.has_spin:
-      n = h.intra.shape[0]//2 # number of spinless sites
+      n = len(h.geometry.r) # number of spinless sites
+      zero = np.zeros((2*n,2*n),dtype=np.complex)
       for i in range(n): zero[2*i,2*i+1] = U(i) # Hubbard interaction
     else: 
-      n = h.intra.shape[0] # number of spinless sites
+      zero = np.zeros((n,n),dtype=np.complex)
+      n = len(h.geometry.r) # number of spinless sites
       for i in range(n): zero[i,i] = U(i) # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
     if h.has_spin:
       return densitydensity(h,v=v,**kwargs)
     else:
-      return densitydensity(h,v=v,only_dd=True,**kwargs)
+      return densitydensity(h,v=v,compute_dd=False,**kwargs)
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
-    if h.has_eh: raise # not implemented
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
     # define the function

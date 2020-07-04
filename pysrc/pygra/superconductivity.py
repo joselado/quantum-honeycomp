@@ -2,13 +2,13 @@ from __future__ import print_function
 import numpy as np
 from scipy.sparse import coo_matrix, bmat, csc_matrix
 import scipy.sparse as sp
+from scipy.sparse import issparse
 
 
 
 def get_eh_sector_odd_even(m,i=0,j=0):
-  """ Return the electron hole sector of a matrix, 
-  assuming the form is even index for electrons and odd for holes"""
-  if i>1 or j>1: raise # meaningless
+  """ Return the electron hole sector of a matrix""" 
+  if i>1 or j>1: return NotImplemented # meaningless
   n = m.shape[0]//2 # dimension of the output
   nat = m.shape[0]//4 # number of sites
   mout = np.matrix(np.zeros((n,n)),dtype=np.complex) # define matrix
@@ -26,6 +26,22 @@ def get_eh_sector_odd_even(m,i=0,j=0):
       mout[2*ii+1,2*jj+1] = m[indi,indj] # assign
   return mout # return matrix
 
+
+get_eh_sector = get_eh_sector_odd_even
+
+def get_electron_sector(m):
+    """Return the electron sector"""
+    return get_eh_sector_odd_even(m,i=0,j=0)
+
+
+def get_anomalous_sector(m):
+    """Return the anomalous electron-hole sector"""
+    return get_eh_sector_odd_even(m,i=0,j=1)
+
+
+def get_second_anomalous_sector(m):
+    """Return the anomalous electron-hole sector"""
+    return get_eh_sector_odd_even(m,i=1,j=0)
 
 
 def get_nambu_tauz(m,has_eh=False):
@@ -149,39 +165,26 @@ def time_reversal(m):
 def build_eh(hin,coupling=None,is_sparse=True):
   if coupling is not None:
     c12 = coupling
-    c21 = coupling.H
+    c21 = np.conjugate(coupling).T
   else:
     c12 = None
     c21 = None
   return build_nambu_matrix(hin,is_sparse=is_sparse,c12=c12,c21=c21)
 
-#  n = hin.shape[0]  # dimension of input
-#  bout = [[None,None],[None,None]] # initialize None matrix
-#  bout[0][0] = csc_matrix(hin) # electron part
-#  bout[1][1] = -time_reversal(csc_matrix(hin)) # hole part
-#  if coupling is not None:
-#    bout[0][1] = csc_matrix(coupling) # pairing part
-#    bout[1][0] = csc_matrix(coupling).H # pairing part
-#  bout = bmat(bout) # return matrix
-#  out = reorder(bout) # reorder matrix
-#  if is_sparse: return out
-#  else: return out.todense()
-
-
 
 def build_nambu_matrix(hin,c12=None,c21=None,is_sparse=True):
-  n = hin.shape[0]  # dimension of input
-  bout = [[None,None],[None,None]] # initialize None matrix
-  bout[0][0] = csc_matrix(hin) # electron part
-  bout[1][1] = -time_reversal(csc_matrix(hin)) # hole part
-  if c12 is not None:
-    bout[0][1] = csc_matrix(c12) # pairing part
-  if c21 is not None:
-    bout[1][0] = csc_matrix(c21) # pairing part
-  bout = bmat(bout) # return matrix
-  out = reorder(bout) # reorder matrix
-  if is_sparse: return out
-  else: return out.todense()
+    n = hin.shape[0]  # dimension of input
+    bout = [[None,None],[None,None]] # initialize None matrix
+    bout[0][0] = csc_matrix(hin) # electron part
+    bout[1][1] = -time_reversal(csc_matrix(hin)) # hole part
+    if c12 is not None:
+      bout[0][1] = csc_matrix(c12) # pairing part
+    if c21 is not None:
+      bout[1][0] = csc_matrix(c21) # pairing part
+    bout = bmat(bout) # return matrix
+    out = reorder(bout) # reorder matrix
+    if issparse(hin): return out
+    else: return out.todense()
 
 
 
@@ -504,6 +507,22 @@ def superconductivity_type(h):
         print("Even pairing")
     elif np.max(np.abs(m1+m2))<1e-5:
         print("Odd pairing")
+
+
+def get_nambu2signless(m):
+    """Get the matrix that transforms a SC matrix (with the - sign in the
+    spinor), so a basis without - sign"""
+    n = m.shape[0]//4 # number of sites
+    dd = []
+    for i in range(n):
+        dd.append(1.)
+        dd.append(1.)
+        dd.append(1.)
+        dd.append(-1.)
+    from scipy.sparse import diags
+    return diags([dd],[0],shape=(4*n,4*n),dtype=np.complex) # create matrix
+
+
 
 
 
