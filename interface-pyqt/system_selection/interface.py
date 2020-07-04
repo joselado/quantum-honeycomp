@@ -106,7 +106,7 @@ class Ui_MainWindow(object):
         self.islands_pyqt.setText(_translate("MainWindow", "Islands"))
         self.ribbons_pyqt.setText(_translate("MainWindow", "Ribbons"))
         self.heterostructure.setText(_translate("MainWindow", "Hybrid films"))
-        self.hofstader_pyqt.setText(_translate("MainWindow", "Hofstader butterflies"))
+        self.hofstader_pyqt.setText(_translate("MainWindow", "Hofstadter butterflies"))
         self.film2d_pyqt.setText(_translate("MainWindow", "Films"))
         self.huge0d_pyqt.setText(_translate("MainWindow", "Huge islands"))
         self.crystal3d_pyqt.setText(_translate("MainWindow", "3D crystals"))

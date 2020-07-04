@@ -67,21 +67,19 @@ def initialize():
   """ Initialize the calculation"""
   g = get_geometry() # get the geometry
   fun = multilayers.multilayer_hopping(ti=get("ti"))
-  h = g.get_hamiltonian(has_spin=False,fun=fun)
+  h = g.get_hamiltonian(fun=fun)
   h.add_peierls(get("peierls")) # magnetic field
-#  h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
+  h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
-#  if abs(get("rashba")) > 0.0: h.add_rashba(get("rashba"))  # Rashba field
-#  h.add_antiferromagnetism(get("mAF"))  # AF order
+  h.add_rashba(get("rashba"))  # Rashba field
+  h.add_antiferromagnetism(get("mAF"))  # AF order
   h.shift_fermi(get("fermi")) # shift fermi energy
-  bias = get("bias")
-  def fer(r): return r[2]*bias # interlayer bias
-  h.shift_fermi(fer) # interlayer bias
-#  if abs(get("kanemele"))>0.0:  h.add_kane_mele(get("kanemele")) # intrinsic SOC
-  if abs(get("haldane"))>0.0:  h.add_haldane(get("haldane")) # intrinsic SOC
-  if abs(get("antihaldane"))>0.0:  h.add_antihaldane(get("antihaldane")) 
+  h.add_kane_mele(get("kanemele")) # intrinsic SOC
+  h.add_haldane(get("haldane")) # intrinsic SOC
+  h.add_antihaldane(get("antihaldane")) 
 #  if abs(get("swave"))>0.0:  h.add_swave(get("swave")) 
 #  h.add_peierls(get("peierls")) # shift fermi energy
+  h = h.reduce()
   return h
 
 

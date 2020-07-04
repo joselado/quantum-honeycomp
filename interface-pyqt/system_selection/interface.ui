@@ -95,7 +95,7 @@
           <item row="10" column="0">
            <widget class="QPushButton" name="hofstader_pyqt">
             <property name="text">
-             <string>Hofstader butterflies</string>
+             <string>Hofstadter butterflies</string>
             </property>
            </widget>
           </item>
