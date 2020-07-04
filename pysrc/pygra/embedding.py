@@ -42,8 +42,11 @@ class Embedding():
         os.system("mkdir MULTILDOS")
         ds = [] # total DOS
         fo = open("MULTILDOS/MULTILDOS.TXT","w")
-        for e in es:
-            (x,y,d) = self.ldos(e=e,**kwargs) # compute LDOS
+        # parallel execution
+        out = parallel.pcall(lambda x: self.ldos(e=x,**kwargs),es) 
+        for (e,o) in zip(es,out):
+            (x,y,d) = o # extract
+#            (x,y,d) = self.ldos(e=e,**kwargs) # compute LDOS
             ds.append(np.mean(d)) # total DOS
             name0 = "LDOS_"+str(e)+"_.OUT" # name
             name = "MULTILDOS/"+name0
@@ -119,13 +122,27 @@ def onsite_defective_central(h,m,nsuper):
 
 
 def onsite_supercell(h,nsuper,mc=None):
-    if h.dimensionality!=2: return NotImplemented
+    if h.is_multicell: h = h.get_no_multicell() # redefine
+    from .checkclass import is_iterable
+    if not is_iterable(nsuper): # just a number 
+        if h.dimensionality==1: nsuper = [nsuper,1]
+        elif h.dimensionality==2: nsuper = [nsuper,nsuper]
+        else: raise
+    if h.dimensionality>2: raise
+    #### this is a dirty workaround ####
+    if h.dimensionality==1:
+        h = h.copy()
+        h.tx = h.inter
+        h.ty = h.intra*0.0
+        h.txy = h.intra*0.0
+        h.txmy = h.intra*0.0
+    #### end of the dirty trick ###
     inds = []
     k = 0
-    n = nsuper*nsuper # number of cells
+    n = nsuper[0]*nsuper[1] # number of cells
     intrasuper = [[None for j in range(n)] for i in range(n)]
-    for i in range(nsuper):
-      for j in range(nsuper):
+    for i in range(nsuper[0]):
+      for j in range(nsuper[1]):
         inds += [(i,j)]
         k += 1
     from scipy.sparse import bmat
@@ -152,12 +169,12 @@ def onsite_supercell(h,nsuper,mc=None):
         if dx==-1 and dy==-1: intrasuper[i][j] = txy.H
         if dx==1 and  dy==-1: intrasuper[i][j] = txmy
         if dx==-1 and dy==1: intrasuper[i][j] = txmy.H
-    if nsuper%2==1: # central cell
+    if nsuper[0]%2==1: # central cell
         ii=int(n/2)
         intrasuper[ii][ii] = mc # central onsite
     else:
         ii=int(n/2)
-        ii = ii - int(nsuper/2)
+        ii = ii - int(nsuper[0]/2)
         intrasuper[ii][ii] = mc # central onsite
     intrasuper = bmat(intrasuper).todense() # supercell
     return intrasuper

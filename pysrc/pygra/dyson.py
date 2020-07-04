@@ -12,6 +12,18 @@ except:
 
 #use_fortran = False
 
+def dyson(h,nsuper,nk,ez):
+    if h.is_multicell: h = h.get_no_multicell()
+    if h.dimensionality==0: raise
+    elif h.dimensionality==1: 
+        return dyson1d(h.intra,h.inter,nsuper[0],nk,ez)
+    elif h.dimensionality==2: 
+        return dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper[0],nsuper[1],nk,ez)
+    else: raise
+
+
+
+
 def dyson2d(intra,tx,ty,txy,txmy,nx,ny,nk,ez):
     if use_fortran:
         from . import dyson2df90
@@ -19,25 +31,35 @@ def dyson2d(intra,tx,ty,txy,txmy,nx,ny,nk,ez):
     else:
         ns = intra.shape[0]*nx*ny
         g = np.zeros((ns,ns),dtype=np.complex)
-        return dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,g)
+        nkx,nky = nk,nk
+        return dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nkx,nky,ez,g)
+
+def dyson1d(intra,inter,nx,nkx,ez):
+    """Workaround for 1D"""
+    zero = intra*0.0 # zero matrix
+    ns = intra.shape[0]*nx
+    g = np.zeros((ns,ns),dtype=np.complex)
+    return dyson2d_jit(intra,inter,zero,zero,zero,nx,1,nkx,1,ez,g)
+
+
 
 
 @jit(nopython=True)
-def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,g):
+def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nkx,nky,ez,g):
     """jit version of the function"""
     n = intra.shape[0] # size of the matrix
-    gs = np.zeros((nk*nk,n,n),dtype=np.complex_) # GF in k-points
+    gs = np.zeros((nkx*nky,n,n),dtype=np.complex_) # GF in k-points
     gm = np.zeros((nx*2-1,ny*2-1,n,n),dtype=np.complex_) # GF in minicells
-    ks = np.zeros((nk*nk,2)) # kpoints
+    ks = np.zeros((nkx*nky,2)) # kpoints
     em = np.identity(n) # identity times energy
     em = em*ez # identity times energy
     ik = 0
-    nk2 = nk*nk # total number of kpoints
+    nk2 = nkx*nky # total number of kpoints
     # Compute all the GF
-    for i in range(nk):
-        kx = 1./nk*np.pi*2*i # kpoint
-        for j in range(nk):
-            ky = 1./nk*np.pi*2*j # kpoint
+    for i in range(nkx):
+        kx = 1./nkx*np.pi*2*i # kpoint
+        for j in range(nky):
+            ky = 1./nky*np.pi*2*j # kpoint
             m = np.exp(1j*kx)*tx + np.exp(1j*ky)*ty
             m = m + np.exp(1j*(kx+ky))*txy + np.exp(1j*(kx-ky))*txmy
             m = m + np.conjugate(m.T) + intra # Bloch Hamiltonian
@@ -75,7 +97,6 @@ def dyson2d_jit(intra,tx,ty,txy,txmy,nx,ny,nk,ez,g):
             jj0 = n*j
             jj1 = n*(j+1)
             g[ii0:ii1,jj0:jj1] = m[:,:] # store all this data
-        #    g[jj0:jj1,ii0:ii1] = m[:,:] # store all this data
     return g
 
 

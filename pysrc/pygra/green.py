@@ -614,7 +614,7 @@ def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
 
 def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   """Calculates the selfenergy of a certain supercell """
-  if h.dimensionality!=2: return NotImplemented
+  if h.dimensionality>2: return NotImplemented
   try:   # if two number given
     nsuper1 = nsuper[0]
     nsuper2 = nsuper[1]
@@ -624,7 +624,7 @@ def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   print("Supercell",nsuper1,"x",nsuper2)
   ez = e + 1j*delta # create complex energy
   from . import dyson
-  g = dyson.dyson2d(h.intra,h.tx,h.ty,h.txy,h.txmy,nsuper1,nsuper2,nk,ez)
+  g = dyson.dyson(h,[nsuper1,nsuper2],nk,ez)
   g = np.matrix(g) # convert to matrix
   # create hamiltonian of the supercell
   from .embedding import onsite_supercell
