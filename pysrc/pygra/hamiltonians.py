@@ -27,6 +27,7 @@ from .increase_hilbert import get_spinless2full,get_spinful2full
 from . import tails
 from scipy.sparse import diags as sparse_diag
 import pickle
+from .htk import mode as hamiltonianmode
 
 #import data
 
@@ -57,6 +58,8 @@ class hamiltonian():
   def get_filling(self,**kwargs):
     """Get the filling of a Hamiltonian at this energy"""
     return spectrum.get_filling(self,**kwargs) # eigenvalues
+  def reduce(self):
+      return hamiltonianmode.reduce_hamiltonian(self)
   def full2profile(self,x):
       """Transform a 1D array in the full space to the spatial basis"""
       from .increase_hilbert import full2profile
@@ -125,8 +128,7 @@ class hamiltonian():
     print_hamiltonian(self)
   def check_mode(self,n):
       """Verify the type of Hamiltonian"""
-      from .htk.mode import check_mode
-      return check_mode(self,n)
+      return hamiltonianmode.check_mode(self,n)
   def diagonalize(self,nkpoints=100):
     """Return eigenvalues"""
     return diagonalize(self,nkpoints=nkpoints)
@@ -139,43 +141,33 @@ class hamiltonian():
   def get_bands(self,**kwargs):
     """ Returns a figure with teh bandstructure"""
     return get_bands_nd(self,**kwargs)
-  def plot_bands(self,nkpoints=100,use_lines=False):
-    """Dummy function"""
-    self.get_bands()
   def add_sublattice_imbalance(self,mass):
     """ Adds a sublattice imbalance """
     if self.geometry.has_sublattice and self.geometry.sublattice_number==2:
       add_sublattice_imbalance(self,mass)
-    else:
-        print("WARNING, no sublattice present, skipping")
+    else: pass
   def add_antiferromagnetism(self,mass):
-    """ Adds antiferromagnetic imbalanc """
-    if self.geometry.has_sublattice:
-      if self.geometry.sublattice_number==2:
-        magnetism.add_antiferromagnetism(self,mass)
-      elif self.geometry.sublattice_number>2:
-        magnetism.add_frustrated_antiferromagnetism(self,mass)
-      else: raise
+      """ Adds antiferromagnetic imbalanc """
+      if self.geometry.has_sublattice:
+          if self.geometry.sublattice_number==2:
+              magnetism.add_antiferromagnetism(self,mass)
+          elif self.geometry.sublattice_number>2:
+              magnetism.add_frustrated_antiferromagnetism(self,mass)
+          else: raise
+      else: return 
   def turn_nambu(self):
-    """Add electron hole degree of freedom"""
-    self.get_eh_sector = get_eh_sector_odd_even # assign function
-    turn_nambu(self)
+      """Add electron hole degree of freedom"""
+      self.get_eh_sector = get_eh_sector_odd_even # assign function
+      turn_nambu(self)
   def add_swave(self,*args,**kwargs):
     """ Adds swave superconducting pairing"""
     superconductivity.add_swave_to_hamiltonian(self,*args,**kwargs)
   def add_pairing(self,delta=0.0,**kwargs):
     """ Add a general pairing matrix, uu,dd,ud"""
     superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)
-  def same_hamiltonian(self,h,ntries=10):
+  def same_hamiltonian(self,*args,**kwargs):
       """Check if two hamiltonians are the same"""
-      hk1 = self.get_hk_gen()
-      hk2 = h.get_hk_gen()
-      for i in range(ntries):
-        k = np.random.random(3)
-        m = hk1(k) - hk2(k)
-        if np.max(np.abs(m))>0.000001: return False
-      return True
-      
+      return hamiltonianmode.same_hamiltonian(self,*args,**kwargs)
   def supercell(self,nsuper):
     """ Creates a supercell of a one dimensional system"""
     if nsuper==1: return self
@@ -725,8 +717,6 @@ def set_finite_system(hin,periodic=True):
   return h
   
 
-
-
 def des_spin(m,component=0):
   """Removes the spin degree of freedom"""
   from scipy.sparse import issparse
@@ -741,17 +731,8 @@ def des_spin(m,component=0):
           r1.append(r0[i]//2)
           c1.append(c0[i]//2)
   mo = csc_matrix((d1,(r1,c1)),shape=(n,n),dtype=np.complex)
-  if sparse: return mo.todense()
+  if not sparse: return mo.todense()
   else: return mo
-#  d = len(m) # dimension of the matrix
-#  if d%2==1: # if the hamiltonian doesn't have the correct dimension
-#    print("Hamiltonian dimension is odd")
-#    raise
-#  mout = np.matrix([[0.0j for i in range(d//2)] for j in range(d//2)])
-#  for i in range(d//2):
-#    for j in range(d//2):
-#      mout[i,j] = m[2*i+component,2*j+component]  # assign spin up part
-#  return mout
 
 
 def shift_fermi(h,fermi):

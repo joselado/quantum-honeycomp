@@ -8,6 +8,9 @@ from . import timing
 import numpy as np
 import scipy.linalg as lg
 import os
+from .increase_hilbert import full2profile
+
+
 
 class Embedding():
     """Define an embedding object"""
@@ -28,6 +31,7 @@ class Embedding():
         emat = iden*(e + delta*1j) # energy matrix
         gv = algebra.inv(emat - ms -selfe)   # Defective Green function 
         ds = [-gv[i,i].imag for i in range(ns)] # LDOS
+        ds = full2profile(h,ds,check=False) # resum if necessary
         ds = np.array(ds) # convert to array
         gs = self.h0.geometry.supercell(nsuper)
         x,y = gs.x,gs.y
