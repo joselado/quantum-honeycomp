@@ -452,6 +452,16 @@
               <string>IPR</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Bulk</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Edge</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
@@ -944,7 +954,7 @@
      <x>0</x>
      <y>0</y>
      <width>1041</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
