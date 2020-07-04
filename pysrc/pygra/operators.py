@@ -235,25 +235,29 @@ def get_hole(h):
   return bmat(out)
 
 
-
+def get_bulk(h,fac=0.2):
+    """Return the bulk operator"""
+    r = h.geometry.r # positions
+    g = h.geometry
+    g.center() # center the geometry
+    out = np.array([1. for ir in r]) # initialize
+    if h.dimensionality==1:
+        dr = r[:,1] # y positions
+    elif h.dimensionality==2:
+        dr = r[:,2] # z positions
+    else: return NotImplemented
+    dr = dr - np.min(dr)
+    dr = dr/np.max(dr) # to interval 0,1
+    out[fac>dr] = 0.0 # set to zero
+    out[(1.-fac)<dr] = 0.0 # set to zero
+    from scipy.sparse import diags
+    n = len(r) # number of sites
+    out = diags([out],[0],shape=(n,n),dtype=np.complex) # create matrix
+    return h.spinless2full(out) # return this matrix
 
 
 def bulk1d(h,p = 0.5):
-  dind = 1 # index to which divide the positions
-  if h.has_spin:  dind *= 2 # duplicate for spin
-  if h.has_eh:  dind *= 2  # duplicate for eh
-  n = h.intra.shape[0] # number of elments of the hamiltonian
-  data = [] # epmty list
-  cut = np.max(h.geometry.y)*p
-  for i in range(n): # loop over elements
-    y = h.geometry.y[i//dind]
-    if y < -cut:  data.append(-1.)
-    elif y > cut: data.append(1.)
-    else: data.append(0.)
-  row, col = range(n),range(n)
-  m = csc((data,(row,col)),shape=(n,n),dtype=np.complex)
-  return m # return the operator
-
+    return get_bulk(h,fac=1.-p/2.)
 
 def get_xposition(h):  return get_position(h,mode="x")
 def get_yposition(h):  return get_position(h,mode="y")

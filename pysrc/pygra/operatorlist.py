@@ -16,6 +16,7 @@ def get_operator(self,name,**kwargs):
       elif name in ["sy","Sy"]: return operators.get_sy(self)
       elif name in ["sz","Sz"]: return operators.get_sz(self)
       elif name=="current": return operators.get_current(self)
+      elif name=="bulk": return operators.get_bulk(self,**kwargs)
       elif name=="velocity": return operators.get_velocity(self)
       elif name=="sublattice": return operators.get_sublattice(self,mode="both")
       elif name=="sublatticeA": return operators.get_sublattice(self,mode="A")

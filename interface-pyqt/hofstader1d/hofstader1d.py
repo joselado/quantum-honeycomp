@@ -168,11 +168,15 @@ def show_hofstader():
   if mode=="All":
     fun = None # no function
   elif mode=="Bulk":
-    inds = indexing.bulk1d(h.geometry)
-    def fun(): return (np.random.random(inds.shape[0])-0.5)*inds
+    op = h.get_operator("bulk").get_matrix() # get the matrix
+    def fun(): 
+        return op@(np.random.random(op.shape[0])-0.5)
   elif mode=="Edge":
-    inds = indexing.bulk1d(h.geometry)
-    def fun(): return (np.random.random(inds.shape[0])-0.5)*(inds-1.0)
+    op = h.get_operator("bulk").get_matrix() # get the matrix
+    def fun(): 
+        v = np.random.random(op.shape[0])-0.5
+        return v - op@v # return the edge
+  else: raise
   f = open("HOFSTADER.OUT","w")
   for b in bs:
     modify("peierls",str(round(b,4)))
@@ -210,7 +214,7 @@ signals["show_interactive_ldos"] = show_interactive_ldos  # show DOS
 
 
 
-window.connect_clicks(signals)
+window.connect_clicks(signals,robust=False)
 folder = create_folder()
 tmppath = os.getcwd() # get the initial directory
 window.run()
