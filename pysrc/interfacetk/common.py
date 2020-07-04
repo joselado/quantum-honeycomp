@@ -36,8 +36,6 @@ def get_bands(h,window):
     h.get_bands(operator=op,kpath=kpath,num_bands=num_bands)
     command = "qh-bands --dim "+str(h.dimensionality) 
     if op is not None: command += " --cblabel "+opname
-#    if window.getbox("bands_colormap") is not None: 
-#        command += " --cmap "+window.getbox("bands_colormap")
     execute_script(command) # execute the command
 
 
@@ -64,15 +62,16 @@ def show_exchange(h,window):
 
 
 def get_dos(h,window,silent=False):
-  nk = max([int(window.get("dos_nk")),1])
-  delta = window.get("dos_delta")
-  ewindow = abs(window.get("dos_ewindow"))
-  energies = np.linspace(-ewindow,ewindow,int(ewindow/delta*5)) # get the energies
-  if window.getbox("dos_mode")=="Green":
-    dos.dos(h,delta=delta,nk=nk,energies=energies,mode="Green") # compute DOS
-  else:
-    dos.dos(h,delta=delta,nk=nk,energies=energies) # compute DOS
-  if not silent: execute_script("qh-dos --input DOS.OUT")
+    nk = max([int(window.get("dos_nk")),1])
+    delta = window.get("dos_delta")
+    ewindow = abs(window.get("dos_ewindow"))
+    energies = np.linspace(-ewindow,ewindow,int(ewindow/delta*5)) # get the energies
+    h = h.reduce() # reduce dimensionality of possible
+    if window.getbox("dos_mode")=="Green":
+      dos.dos(h,delta=delta,nk=nk,energies=energies,mode="Green") # compute DOS
+    else:
+      dos.dos(h,delta=delta,nk=nk,energies=energies) # compute DOS
+    if not silent: execute_script("qh-dos --input DOS.OUT")
 
 
 

@@ -101,9 +101,6 @@ window.add_combobox(["blue","red","green","black"],label="Color ycut",key="cy")
 window.add_combobox(["inferno","hot","plasma","viridis","cool","rainbow"],label="Color map",key="cmap")
 window.add_combobox(["bicubic","none"],label="Interpolation")
 window.setWindowTitle(args.title)
-#window.add_slider(label="Lattice size",key="Size") # Slider for the dots
-#window.add_slider(label="DOS size",key="DOSSize",v0=20) # Slider for the dots
-#window.add_slider(label="Saturation",v0=50) # Saturation
 
 window.plot()
 window.show()
