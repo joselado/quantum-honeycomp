@@ -202,6 +202,9 @@ def get_mf(v,dm,has_eh=False,**kwargs):
                     )
             m = op.T@m@op # undo the transformation
             mf[key] = m # store this matrix
+        m0 = mf[(0,0,0)]
+        diff = np.max(np.abs(m0-np.conjugate(m0).T))
+        print("Non-hermiticity",diff)
         return mf # return mean field matrix
     else: return get_mf_normal(v,dm,**kwargs) # no BdG Hamiltonian
 
@@ -221,12 +224,12 @@ def get_mf_normal(v,dm,compute_dd=True,add_dagger=True,
     for d in v: # loop over directions
         d2 = (-d[0],-d[1],-d[2]) # minus this direction
         # add the normal terms
-        if compute_dd: # only density density terms
+        if compute_cross: # only density density terms
             m = normal_term_ij(v[d],dm[d2]) # get matrix
             mf[d] = mf[d] + m # add normal term
             if add_dagger:
                 mf[d2] = mf[d2] + dag(m) # add normal term
-        if compute_cross: # density density terms
+        if compute_dd: # density density terms
             m = normal_term_ii(v[d],dm[(0,0,0)]) # get matrix
             mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
             m = normal_term_jj(v[d2],dm[(0,0,0)]) # get matrix

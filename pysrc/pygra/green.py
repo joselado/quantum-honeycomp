@@ -621,7 +621,7 @@ def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   except: # if only one number given
     nsuper1 = nsuper
     nsuper2 = nsuper
-  print("Supercell",nsuper1,"x",nsuper2)
+#  print("Supercell",nsuper1,"x",nsuper2)
   ez = e + 1j*delta # create complex energy
   from . import dyson
   g = dyson.dyson(h,[nsuper1,nsuper2],nk,ez)

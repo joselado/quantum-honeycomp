@@ -255,26 +255,26 @@ class Geometry:
       kt = np.array(k)[0:3]
       return np.exp(1j*dt.dot(kt)*np.pi*2.) 
   def remove(self,i=0):
-    """
-    Remove one site
-    """
-    return sculpt.remove(self,[i])
+      """
+      Remove one site
+      """
+      return sculpt.remove(self,[i])
   def center_in_atom(self,n0=None):
-    """
-    Center the geometry in an atom
-    """
-    if n0 is None: n0 = sculpt.get_central(self)[0] # get the index
-    sculpt.shift(self,r=self.r[n0]) # shift the geometry
+      """
+      Center the geometry in an atom
+      """
+      if n0 is None: n0 = sculpt.get_central(self)[0] # get the index
+      sculpt.shift(self,r=self.r[n0]) # shift the geometry
   def get_central(self,n=1):
       """
       Return a list of central atoms
       """
       return sculpt.get_central(self,n=n) # get the index
   def update_reciprocal(self):
-    """
-    Update reciprocal lattice vectors
-    """
-    self.b1,self.b2,self.b3 = get_reciprocal(self.a1,self.a2,self.a3)
+      """
+      Update reciprocal lattice vectors
+      """
+      self.b1,self.b2,self.b3 = get_reciprocal(self.a1,self.a2,self.a3)
   def get_k2K_generator(self,toreal=False):
     """
     Function to turn a reciprocal lattice vector to natural units

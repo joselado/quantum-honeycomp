@@ -245,6 +245,10 @@ def guess(h,mode="ferro",fun=0.1):
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = 1j*(m - m.T.conjugate())
     return m
+  elif mode=="kekule":
+      h.turn_multicell()
+      h = h.copy() ; h.clean() ; h.add_kekule(fun) # Haldane coupling
+      return h.get_hopping_dict()
   elif mode=="Haldane":
       h = h.copy() ; h.clean() ; h.add_haldane(fun) # Haldane coupling
       return h.get_hopping_dict()
