@@ -119,7 +119,7 @@ def dos_infinite(intra,inter,energies=[0.0],num_rep=100,
      selfr = inter@gr@inter.H # right selfenergy
      gc = energy*iden -intra -selfl -selfr # dyson equation for the center
      gc = gc.I # calculate inverse
-     dos.append(-gc.trace()[0,0].imag)  # calculate the trace of the Green function
+     dos.append(-algebra.trace(gc).imag)  # calculate the trace of the Green function
    return dos
 
 
@@ -133,7 +133,7 @@ def dos_semiinfinite(intra,inter,energies=np.linspace(-1.0,1.0,100),num_rep=100,
    for energy in energies: # loop over energies
 #     gf = dyson(intra,inter,energy=energy,num_rep=num_rep,mixing=mixing,
      gb,gf = green_renormalization(intra,inter,energy=energy,delta=delta)
-     dos.append(-gf.trace()[0,0].imag)  # calculate the trace of the Green function
+     dos.append(-algebra.trace(gf).imag)  # calculate the trace of the Green function
    return energies,dos
 
 
@@ -167,7 +167,7 @@ def dos_heterostructure(hetero,energies=[0.0],num_rep=100,
      selfr = inter@gr@inter.H # right selfenergy
      gc = energy*iden -intra -selfl -selfr # dyson equation for the center
      gc = gc.I # calculate inverse
-     dos.append(-gc.trace()[0,0].imag)  # calculate the trace of the Green function
+     dos.append(-algebra.trace(gc).imag)  # calculate the trace of the Green function
    return dos
 
 
@@ -343,7 +343,7 @@ def green_renormalization(intra,inter,energy=0.0,nite=None,
     epsilon = intra.copy()
     epsilon_s = intra.copy()
     while True: # implementation of Eq 11
-      einv = (e - epsilon).I # inverse
+      einv = algebra.inv(e - epsilon) # inverse
       epsilon_s = epsilon_s + alpha @ einv @ beta
       epsilon = epsilon + alpha * einv @ beta + beta @ einv @ alpha
       alpha = alpha @ einv @ alpha  # new alpha
@@ -356,8 +356,8 @@ def green_renormalization(intra,inter,energy=0.0,nite=None,
         if np.max(np.abs(alpha))<error and np.max(np.abs(beta))<error: break
     if info:
       print("Converged in ",ite,"iterations")
-    g_surf = (e - epsilon_s).I # surface green function
-    g_bulk = (e - epsilon).I  # bulk green function 
+    g_surf = algebra.inv(e - epsilon_s) # surface green function
+    g_bulk = algebra.inv(e - epsilon)  # bulk green function 
     return g_bulk,g_surf
 
 

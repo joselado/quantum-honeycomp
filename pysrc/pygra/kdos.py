@@ -9,6 +9,7 @@ from . import multicell
 from . import kpm
 from . import sculpt
 from . import parallel
+from . import algebra
 
 def write_kdos(k=0.,es=[],ds=[],new=True):
   """ Write KDOS in a file"""
@@ -94,8 +95,8 @@ def write_surface_1d(h,energies=None,delta=None,
       if operator is None: op = np.identity(h.intra.shape[0]) # identity matrix
       elif callable(operator): op = callable(op)
       else: op = operator # assume a matrix
-      db = -(gs*op).trace()[0,0].imag # bulk
-      ds = -(sf*op).trace()[0,0].imag # surface
+      db = -algebra.trace(gs*op).imag # bulk
+      ds = -algebra.trace(sf*op).imag # surface
       fo.write(str(energy)+"   "+str(ds)+"   "+str(db)+"\n")
       fo.flush()
   fo.close()
@@ -119,8 +120,8 @@ def write_surface_2d(h,energies=None,klist=None,delta=0.01,
       if operator is None: op = np.identity(h.intra.shape[0]) # identity matrix
       elif callable(operator): op = callable(op)
       else: op = operator # assume a matrix
-      db = -(gs*op).trace()[0,0].imag # bulk
-      ds = -(sf*op).trace()[0,0].imag # surface
+      db = -algebra.trace(gs*op).imag # bulk
+      ds = -algebra.trace(sf*op).imag # surface
       fo.write(str(k)+"   "+str(energy)+"   "+str(ds)+"   "+str(db)+"\n")
       fo.flush()
   fo.close()
@@ -139,8 +140,8 @@ def write_surface_3d(h,energies=None,klist=None,delta=0.01):
   for k in klist:
     for energy in energies:
       gs,sf = green.green_kchain(h,k=k,energy=energy,delta=delta,only_bulk=False) 
-      db = -gs.trace()[0,0].imag # bulk
-      ds = -sf.trace()[0,0].imag # surface
+      db = -algebra.trace(gs).imag # bulk
+      ds = -algebra.trace(sf).imag # surface
       fo.write(str(k)+"   "+str(energy)+"   "+str(ds)+"   "+str(db)+"\n")
 
 
@@ -163,7 +164,7 @@ def kdos_bands(h,use_kpm=False,kpath=None,scale=10.0,frand=None,
         def gfun(e):
             m = f(k=k,e=e) # Green's function
             m = green.GtimesO(m,operator,k=k)
-            return -np.trace(m).imag # return DOS
+            return -algebra.trace(m).imag # return DOS
         return energies,np.array([gfun(e) for e in energies])
   elif mode=="KPM": # KPM method
     if operator is not None: return NotImplemented # not implemented
@@ -277,8 +278,8 @@ def interface(h1,h2,energies=np.linspace(-1.,1.,100),operator=None,
       # write everything
       outstr += str(ik)+"   "+str(energy)+"   "
       for g in out: # loop
-        if g.shape[0]==op.shape[0]: d = -(g@op).trace()[0,0].imag # bulk
-        else: d = -(g@ops).trace()[0,0].imag # interface
+        if g.shape[0]==op.shape[0]: d = -algebra.trace(g@op).imag # bulk
+        else: d = -algebra.trace(g@ops).imag # interface
         outstr += str(d)+"   "
       outstr += "\n"
     return outstr
@@ -322,9 +323,9 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
       # write everything
       fo.write(str(ik)+"   "+str(energy)+"   ")
       for g in out: # loop
-        if operator is None: d = -g.trace()[0,0].imag # only the trace 
+        if operator is None: d = -algebra.trace(g).imag # only the trace 
         elif callable(operator): d = operator(g,k=k) # call the operator
-        else:  d = -(g@operator).trace()[0,0].imag # assume it is a matrix
+        else:  d = -algebra.trace(g@operator).imag # assume it is a matrix
         fo.write(str(d)+"   ") # write in a file
       fo.write("\n") # next line
       fo.flush() # flush
