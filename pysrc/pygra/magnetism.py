@@ -51,6 +51,7 @@ def add_zeeman(h,zeeman=[0.0,0.0,0.0]):
 
 def add_antiferromagnetism(h,m):
   """ Adds to the intracell matrix an antiferromagnetic imbalance """
+  if not h.has_spin: h.turn_spinful()
   intra = h.intra # intracell hopping
   if h.geometry.has_sublattice: pass  # if has sublattice
   else: # if does not have sublattice

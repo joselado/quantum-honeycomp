@@ -10,7 +10,10 @@ def add_rashba(self,c):
     from .operators import isnumber
     if isnumber(c):
         if c==0.0: return
-    if not self.has_spin: raise # not implemented
+    if not self.has_spin: # not implemented
+        self.turn_spinful() # spinful hamiltonian
+    def rashba(*args,**kwargs):
+        return self.spinful2full(rashba_matrix(*args,**kwargs))
     g = self.geometry
     is_sparse = self.is_sparse # saprse Hamiltonian
     self.intra = self.intra + rashba(g.r,c=c,is_sparse=is_sparse)
@@ -43,7 +46,7 @@ def add_rashba(self,c):
 
 
 
-def rashba(r1,r2=None,c=0.,d=[0.,0.,1.],is_sparse=False):
+def rashba_matrix(r1,r2=None,c=0.,d=[0.,0.,1.],is_sparse=False):
   """
   Add Rashba coupling, returns a spin polarized matrix
   This will assume only Rashba between first neighbors
@@ -65,7 +68,7 @@ def rashba(r1,r2=None,c=0.,d=[0.,0.,1.],is_sparse=False):
       s = 0.0*ms
       if 0.9<(rij.dot(rij))<1.1: # if nearest neighbor
         if callable(c): s = ms*c((r1[i]+r2[j])/2.) # function
-        else:s = ms*c # multiply
+        else: s = ms*c # multiply
       m[i][j] = s # rashba term
   if not is_sparse: m = bmat(m).todense()  # to normal matrix
   else: m = bmat(m) # sparse matrix

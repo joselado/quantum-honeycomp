@@ -125,18 +125,6 @@ def hopping_spinless(m,cutoff=0.001):
   col = col[absd>cutoff]
   data = data[absd>cutoff]
   return row,col,data
-#  n = m.shape[0] # number of sites
-#  ii = []
-#  jj = []
-#  ts = []
-#  for i in range(n):
-#    for j in range(i,n):
-#      t = np.abs(m[i,j]) 
-#      if t>cutoff:
-#        ii.append(i)
-#        jj.append(j)
-#        ts.append(t)
-#  return ii,jj,np.array(ts) # return pairs
 
 
 

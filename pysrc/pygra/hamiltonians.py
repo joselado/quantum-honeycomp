@@ -462,29 +462,24 @@ class hamiltonian():
       """Extract something from the Hamiltonian"""
       return extract.extract_from_hamiltonian(self,name)
   def write_magnetization(self,nrep=5):
-    """Extract the magnetization and write it in a file"""
-    if not self.has_eh: # without electron hole
-      if self.has_spin: # for spinful
-        mx = extract.mx(self.intra)
-        my = extract.my(self.intra)
-        mz = extract.mz(self.intra)
-        g = self.geometry
-        g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
-        g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
-        g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
-        # this is just a workaround
-        m = np.genfromtxt("MX.OUT").transpose()
-        (x,y,z,mx) = m[0],m[1],m[2],m[3]
-        my = np.genfromtxt("MY.OUT").transpose()[3]
-        mz = np.genfromtxt("MZ.OUT").transpose()[3]
-        np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
-        return np.array([mx,my,mz])
-    else: raise
-#    return np.array([mx,my,mz]).transpose()
+      """Extract the magnetization and write it in a file"""
+      mx = self.extract("mx")
+      my = self.extract("my")
+      mz = self.extract("mz")
+      g = self.geometry
+      g.write_profile(mx,name="MX.OUT",normal_order=True,nrep=nrep)
+      g.write_profile(my,name="MY.OUT",normal_order=True,nrep=nrep)
+      g.write_profile(mz,name="MZ.OUT",normal_order=True,nrep=nrep)
+      # this is just a workaround
+      m = np.genfromtxt("MX.OUT").transpose()
+      (x,y,z,mx) = m[0],m[1],m[2],m[3]
+      my = np.genfromtxt("MY.OUT").transpose()[3]
+      mz = np.genfromtxt("MZ.OUT").transpose()[3]
+      np.savetxt("MAGNETISM.OUT",np.array([x,y,z,mx,my,mz]).T)
+      return np.array([mx,my,mz])
   def write_onsite(self,nrep=5,normal_order=False):
       """Extract onsite energy"""
-      if self.has_eh: raise
-      d = extract.onsite(self.intra,has_spin=self.has_spin)
+      d = self.extract("density")
       d = d - np.mean(d)
       self.geometry.write_profile(d,name="ONSITE.OUT",
               normal_order=normal_order,nrep=nrep)

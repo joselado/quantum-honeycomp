@@ -41,9 +41,10 @@ class Operator():
         """Define the multiply method"""
         if type(a)==Operator:
             out = Operator(self)
-            out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
             if self.matrix is not None and a.matrix is not None:
                 out.matrix = self.matrix@a.matrix
+                out.m = lambda v,k=None: out.matrix@v # create dummy function
+            else: out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
             out.linear = self.linear and a.linear
             return out
         else:

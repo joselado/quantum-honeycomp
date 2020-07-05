@@ -67,17 +67,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input",default="POTENTIAL.OUT",help='Input file')
 parser.add_argument("--colorbar",default="true",help='Use a colorbar')
 parser.add_argument("--cmap",default="bwr",help='Colormap')
-parser.add_argument("--zoom",default="0",help='Initial zoom')
-parser.add_argument("--size",default="30",help='Initial zoom')
+parser.add_argument("--zoom",default="1.1",help='Initial zoom')
+parser.add_argument("--size",default="0.8",help='Initial zoom')
 args = parser.parse_args() # get the arguments
 
 minput = np.genfromtxt(args.input).transpose() # read file
 
 app,main = plotpyqt.get_interface(getfig)
 main.add_slider(label="Size",vs=np.linspace(0.,2,100),
-        v0=int(args.size))
+        v0=float(args.size))
 main.add_slider(label="Zoom",vs=np.linspace(1.1,0.01,100),
-        v0=int(args.zoom))
+        v0=float(args.zoom))
 main.add_slider(label="Saturation",vs=np.linspace(0.0,1.0,100),
         v0=0)
 main.add_combobox(["Default","Symmetric","Sign"],label="Range")
