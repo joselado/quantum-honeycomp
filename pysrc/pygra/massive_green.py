@@ -2,6 +2,8 @@
 import os
 import numpy as np
 
+from . import filesystem as fs
+
 prec = 4
 
 
@@ -9,8 +11,8 @@ prec = 4
 def round_folder(input_folder,output_folder,prec=prec):
   """Round the names of files in a certain folder"""
   names = os.listdir(os.getcwd()+"/"+input_folder)
-  os.system("rm -r "+output_folder)
-  os.system("mkdir "+output_folder)
+  fs.rmdir(output_folder)
+  fs.mkdir(output_folder)
   for ni in names:
     n = ni.split("_")
     pre = n[0]
@@ -34,7 +36,7 @@ def get_green(fun_gf,name="",energy=0.0,prec=prec):
   foldername = "green_storage_"+name # name of the foler
   dirname = os.getcwd()+"/"+foldername # name of the foler
   if not foldername in os.listdir(os.getcwd()):
-    os.system("mkdir "+foldername) # create the folder if nonexistent
+    fs.mkdir(foldername) # create the folder if nonexistent
   er = round(energy,prec) # round the energy value
   namefile = "green_"+str(er)+".npy" # name of the file
   files = os.listdir(dirname) # files in the directory
@@ -54,7 +56,7 @@ def get_pdos(fun_pd,name="",energy=0.0,prec=6):
   foldername = "pdos_storage_"+name # name of the foler
   dirname = os.getcwd()+"/"+foldername # name of the foler
   if not foldername in os.listdir(os.getcwd()):
-    os.system("mkdir "+foldername) # create the folder if nonexistent
+    fs.mkdir(foldername) # create the folder if nonexistent
   er = round(energy,prec) # round the energy value
   namefile = "pdos_"+str(er)+".dat" # name of the file
   files = os.listdir(dirname) # files in the directory

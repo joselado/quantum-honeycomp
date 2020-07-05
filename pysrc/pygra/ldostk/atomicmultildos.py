@@ -1,6 +1,7 @@
 import numpy as np
 from numba import jit
 import os
+from .. import filesystem as fs
 
 def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
         ratomic=1.5,dr=0.2,**kwargs):
@@ -49,8 +50,8 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
         d = get_real_space_density(w,k,dl,lodict,h.geometry)
         ds[i] = d # store in the list
     # now compute all the LDOS
-    os.system("rm -rf MULTILDOS")
-    os.system("mkdir MULTILDOS")
+    fs.rmdir("MULTILDOS")
+    fs.mkdir("MULTILDOS")
     fo = open("MULTILDOS/MULTILDOS.TXT","w") # files with the names
     for e in es: # loop over energies
         name0 = "LDOS_"+str(e)+"_.OUT" # name of the output

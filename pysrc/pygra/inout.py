@@ -2,6 +2,7 @@ import numpy as np
 import os
 from scipy.sparse import csr_matrix
 import pickle
+from . import filesystem as fs
 
 def save_sparse_csr(filename,array):
     array = csr_matrix(array)
@@ -28,8 +29,8 @@ def write(x,y,output_file="DATA.OUT",comment=None):
 
 def save_sparse_pairs(filename,pairs):
   """Saves pairs of tuple and sparse matrix in a folder"""
-  os.system("rm -rf "+filename) # remove folder
-  os.system("mkdir "+filename) # create folder
+  fs.rmdir(filename) # remove folder
+  fs.mkdir(filename) # create folder
   fo = open(filename+"/files.txt","w") # names of the files
   for (p,m) in pairs: # loop over the pairs
     name = ""

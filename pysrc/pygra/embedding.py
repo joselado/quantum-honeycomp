@@ -9,6 +9,7 @@ import numpy as np
 import scipy.linalg as lg
 import os
 from .increase_hilbert import full2profile
+from . import filesystem as fs
 
 
 
@@ -38,8 +39,8 @@ class Embedding():
         return x,y,ds
     def multildos(self,es=np.linspace(-2.,2.,20),**kwargs):
         """Compute the ldos at different energies"""
-        os.system("rm -rf MULTILDOS")
-        os.system("mkdir MULTILDOS")
+        fs.rmdir("MULTILDOS")
+        fs.mkdir("MULTILDOS")
         ds = [] # total DOS
         fo = open("MULTILDOS/MULTILDOS.TXT","w")
         # parallel execution

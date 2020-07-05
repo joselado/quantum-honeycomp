@@ -33,6 +33,7 @@ from pygra import specialgeometry
 from pygra import specialhopping
 from pygra import timeevolution
 from pygra import embedding
+from pygra import filesystem as fs
 
 import platform
 
@@ -71,8 +72,8 @@ def create_folder():
     if not folder in folders:
       break # stop if folder doesn't exist
     i += 1 # increase the number
-  os.system("mkdir "+folder)  # create the temporal folder
-  os.chdir(folder)  # go to the temporal folder
+  fs.mkdir(folder)  # create the temporal folder
+  fs.chdir(folder)  # go to the temporal folder
   return folder  # return the name of the folder
 
 
@@ -84,8 +85,8 @@ def save_outputs(inipath,tmppath):
   """Save all the results in the original folder"""
   savepath = inipath+"/QH_save" # name of the fodler where ot save
   print("Saving results in",savepath)
-  os.system("rm -rf "+savepath) # remove the folder
-  os.system("cp -r "+tmppath+"  "+savepath) # remove the folder
+  fs.rmdir(savepath) # remove the folder
+  fs.cpdir(tmppath,savepath) # copy folder
 
 
 
@@ -93,7 +94,7 @@ def execute_script(name,background=True,mayavi=False):
   """Executes a certain script from the folder utilities"""
   try: qhpath = get_qhroot() # get the main path
   except: qhpath = "" 
-  print("Root path",qhpath)
+#  print("Root path",qhpath)
   scriptpath = qhpath+"utilities/"+name # name of the script
   try:
     python = get_anaconda_command("python") # get the anaconda python

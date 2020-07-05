@@ -3,6 +3,7 @@ import scipy.linalg as lg
 from . import algebra
 from .ldos import spatial_dos,write_ldos
 import os
+from . import filesystem as fs
 from . import parallel
 
 def evolve_local_state(h,i=0,ts=np.linspace(0.,20.,300),
@@ -15,8 +16,8 @@ def evolve_local_state(h,i=0,ts=np.linspace(0.,20.,300),
     if mode=="green": evol = evolve_green(h,i=i)
     elif mode=="chi": evol = evolve_chi(h,i=i,ts=ts)
     g = h.geometry
-    os.system("rm -rf MULTITIMEEVOLUTION") # remove folder
-    os.system("mkdir MULTITIMEEVOLUTION") # create folder
+    fs.rmdir("MULTITIMEEVOLUTION") # remove folder
+    fs.mkdir("MULTITIMEEVOLUTION") # create folder
     fo = open("MULTITIMEEVOLUTION/MULTITIMEEVOLUTION.TXT","w")
     for t in ts: # loop over ts
         out = evol(t) # do the evolution

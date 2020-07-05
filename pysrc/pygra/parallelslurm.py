@@ -2,7 +2,7 @@
 
 import dill as pickle
 import os
-
+from . import filesystem as fs
 
 def pcall(fin,xs,time=10):
     """Run a parallel calculation with slurm"""
@@ -26,8 +26,8 @@ def pcall(fin,xs,time=10):
     main += "pickle.dump(out,open('out.obj','wb'))\n"
     main += "os.system('touch DONE')\n"
     pfolder = ".parallel"
-    os.system("rm -rf "+pfolder) # create directory
-    os.system("mkdir "+pfolder) # create directory
+    fs.rmdir(pfolder) # create directory
+    fs.mkdir(pfolder) # create directory
 
     pickle.dump(f,open(pfolder+"/function.obj","wb")) # write function
     pickle.dump(xs,open(pfolder+"/array.obj","wb")) # write object

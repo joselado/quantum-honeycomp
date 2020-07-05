@@ -11,13 +11,14 @@ from . import angular
 import scipy.linalg as lg
 from copy import deepcopy
 import os
+from . import filesystem as fs
 
 
 def convert(inname="wannier.win",name="wannier"):
   """Read a wannier.win file, and create a folder with
   all the necessary files that characterize the Hamiltonian"""
-  os.system("rm -rf "+name) # remove folder
-  os.system("mkdir "+name) # create folder
+  fs.rmdir(name) # remove folder
+  fs.mkdir(name) # create folder
 
 
 

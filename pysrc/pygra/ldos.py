@@ -13,6 +13,7 @@ from . import timing
 from . import parallel
 from . import algebra
 from .increase_hilbert import full2profile as spatial_dos
+from . import filesystem as fs
 
 def ldos0d(h,e=0.0,delta=0.01,write=True):
   """Calculates the local density of states of a Hamiltonian and
@@ -351,8 +352,8 @@ def multi_ldos_tb(h,es=np.linspace(-1.0,1.0,100),delta=0.01,
 #      ws = np.concatenate([ws,w]) # store
   ds = [(np.conjugate(v)*v).real for v in ws] # calculate densities
   del ws # remove the wavefunctions
-  os.system("rm -rf MULTILDOS") # remove folder
-  os.system("mkdir MULTILDOS") # create folder
+  fs.rmdir("MULTILDOS") # remove folder
+  fs.mkdir("MULTILDOS") # create folder
   go = h.geometry.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   fo = open("MULTILDOS/MULTILDOS.TXT","w") # files with the names

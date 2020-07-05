@@ -8,6 +8,7 @@ from . import parallel
 from . import kpm
 from . import timing
 from . import algebra
+from . import filesystem as fs
 
 arpack_tol = 1e-5
 arpack_maxiter = 10000
@@ -60,8 +61,8 @@ def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
   else: # parallel execution
       kdos = parallel.pcall(getf,rs) # compute all
   kdos = np.array(kdos) # transform into an array
-  os.system("rm -rf "+output_folder) # remove folder
-  os.system("mkdir "+output_folder) # remove folder
+  fs.rmdir(output_folder) # remove folder
+  fs.mkdir(output_folder) # create folder
   fo = open(output_folder+"/"+output_folder+".TXT","w")
   for i in range(len(energies)): # loop over energies
       filename = output_folder+"_"+str(energies[i])+"_.OUT" # name
