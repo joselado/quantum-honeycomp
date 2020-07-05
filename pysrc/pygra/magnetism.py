@@ -55,7 +55,7 @@ def add_antiferromagnetism(h,m):
   intra = h.intra # intracell hopping
   if h.geometry.has_sublattice: pass  # if has sublattice
   else: # if does not have sublattice
-    print("WARNING, no sublattice present")
+#    print("WARNING, no sublattice present")
     return 0. # if does not have sublattice
   if h.has_spin:
     natoms = len(h.geometry.x) # number of atoms
