@@ -16,9 +16,9 @@ def fullsc2minsc(hin):
         t[j+n,i] = np.conjugate(t[i,j+n])  # coupling 
     return t
   h.intra = reduce_eh(h.intra) # apply the operator
-  if h.dimensionality==1
+  if h.dimensionality==1:
     h.inter = reduce_eh(h.inter)
-  if h.dimensionality==2
+  if h.dimensionality==2:
     h.tx = reduce_eh(h.tx)
     h.ty = reduce_eh(h.ty)
     h.txy = reduce_eh(h.txy)

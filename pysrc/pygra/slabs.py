@@ -1,4 +1,4 @@
-import multicell
+from . import multicell
 import numpy as np
 
 def slab(h,nz=1,nx=1,ny=1,sparse=False,ncut=3):

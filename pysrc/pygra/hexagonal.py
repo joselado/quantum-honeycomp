@@ -3,7 +3,7 @@ from copy import deepcopy
 from scipy.sparse import bmat
 from scipy.sparse import csc_matrix as csc
 import numpy as np
-import sculpt
+from . import sculpt
 
 def honeycomb2square(h):
   """Transforms a honeycomb lattice into a square lattice"""
