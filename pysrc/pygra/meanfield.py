@@ -221,14 +221,13 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
 
 
 
-symmetry_breaking = ["antiferro","ferroX","ferroY","ferroZ","CDW","Haldane",
+symmetry_breaking = ["magnetic","antiferro","ferroX","ferroY",
+        "ferroZ","CDW","Haldane",
         "kanemele","rashba"]
 
-spinful_guesses = ["Fully random","ferro","antiferro",
-        "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane",
-        "kanemele","rashba"]
+spinful_guesses = ["Fully random","dimerization"]
 
-
+spinful_guesses += symmetry_breaking
 
 
 def guess(h,mode="ferro",fun=0.1):
@@ -239,6 +238,8 @@ def guess(h,mode="ferro",fun=0.1):
   h0.clean() # clean the Hamiltonian
   if mode=="ferro":
       if h.has_spin: h0.add_zeeman(fun)
+  elif mode=="magnetic":
+      if h.has_spin: h0.add_zeeman(lambda x: np.random.random(3)*fun)
   elif mode=="ferroX":
       if h.has_spin: h0.add_zeeman([fun,0.,0.])
   elif mode=="ferroY":
@@ -246,9 +247,13 @@ def guess(h,mode="ferro",fun=0.1):
   elif mode=="ferroZ":
       if h.has_spin: h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
-    n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
-    m = m + m.T.conjugate()
-    return m
+      dd = h.get_dict()
+      for key in dd:
+          n = dd[key].shape[0]
+          dd[key] = np.random.random(n) + 1j*np.random.random(n)
+      dd = MultiHopping(dd)
+      dd = dd + dd + dd.get_dagger()
+      return dd.get_dict()
   elif mode=="dimerization":
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = 1j*(m - m.T.conjugate())
@@ -438,18 +443,14 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
 def identify_symmetry_breaking(h0,h):
     """Given two Hamiltonians, identify what is the symmetry
     breaking between them"""
-    print(h0.intra.shape)
-    print(h.intra.shape)
     dt0 = h0.get_multihopping() # first multihopping
     dt = h.get_multihopping() # second multihopping
     dd = dt0 - dt # difference between Hamiltonians
     out = [] # empty list
     for s in symmetry_breaking: # loop over contributions
-        print(s)
         d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
         proj = dd.dot(d0) # compute the projection
-        print(proj)
-        if proj>1e-5: out.append(s)
+        if np.abs(proj)>1e-5: out.append(s)
     return out
 
 
