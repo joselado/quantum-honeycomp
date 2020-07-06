@@ -151,15 +151,16 @@ def get_impurity_matrix(h):
     """Get the impurity matrix"""
     n = int(window.get("nsuper_impurity")) # supercell for the impurities
     if n>1: h = h.supercell(n) # create the supercell
-    vintra = h.intra.copy() 
+    h = h.copy() # copy matrix
     v = get("impurity_potential") # potential in this site
+    ons = [0. for ir in h.geometry.r] # zero onsite
     try:
         inds = np.genfromtxt("IMPURITY_SITES.OUT") # read the indexes
-        inds = [int(i) for i in inds] # transform to integer
+        for i in inds: ons[int(i)] += v # add onsite energy
     except:
-        inds = [0] # just the first site
-    for i in inds: vintra[i,i] = v # put this onsite energy
-    return vintra
+        ons[0] = v
+    h.add_onsite(ons)
+    return h.intra
 
 
 
