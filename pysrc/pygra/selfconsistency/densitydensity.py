@@ -179,7 +179,7 @@ def get_dm(h,v,nk=1):
 
 
 
-def get_mf(v,dm,has_eh=False,**kwargs):
+def get_mf(v,dm,has_eh=False,compute_anomalous=False,**kwargs):
     """Get the mean field matrix"""
     if has_eh:
         # let us assume that it is a full Nambu spinor
@@ -190,7 +190,8 @@ def get_mf(v,dm,has_eh=False,**kwargs):
         dma10 = dict() # dictionary
         op = superconductivity.get_nambu2signless(dm[(0,0,0)]) # transform
         for key in dm: # extract the electron part 
-            m = op.T@dm[key]@op # transform to the new basis
+#            m = op.T@dm[key]@op # transform to the new basis
+            m = dm[key] # transform to the new basis
             dme[key] = superconductivity.get_eh_sector(m,i=0,j=0)
             dma01[key] = superconductivity.get_eh_sector(m,i=0,j=1)
             dma10[key] = superconductivity.get_eh_sector(m,i=1,j=0)
@@ -201,10 +202,12 @@ def get_mf(v,dm,has_eh=False,**kwargs):
         # now rebuild the Hamiltonian
         mf = dict()
         for key in v:
-            m = superconductivity.build_nambu_matrix(mfe[key],
-                    c12 = -mfa10[key],c21=-mfa01[key]
-                    )
-            m = op.T@m@op # undo the transformation
+            if compute_anomalous:
+                m = superconductivity.build_nambu_matrix(mfe[key],
+                    c12 = -mfa10[key],c21=-mfa01[key])
+            else:
+                m = superconductivity.build_nambu_matrix(mfe[key])
+#            m = op.T@m@op # undo the transformation
             mf[key] = m # store this matrix
         m0 = mf[(0,0,0)]
         diff = np.max(np.abs(m0-np.conjugate(m0).T))
