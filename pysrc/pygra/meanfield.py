@@ -223,7 +223,7 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
 
 symmetry_breaking = ["magnetic","antiferro","ferroX","ferroY",
         "ferroZ","Charge density wave","Haldane",
-        "kanemele","rashba"]
+        "kanemele","rashba","s-wave superconductivity"]
 
 spinful_guesses = ["Fully random","dimerization"]
 
@@ -281,7 +281,7 @@ def guess(h,mode="ferro",fun=0.1):
       if h.has_spin: h0.add_antiferromagnetism(fun)
   elif mode=="imbalance":
       h0.add_sublattice_imbalance(fun)
-  elif mode=="swave":
+  elif mode in ["swave","s-wave superconductivity"]:
       if h.has_eh: h0.add_swave(fun)
   elif mode=="pwave":
     for t in h0.hopping: t.m *= 0. # clean
@@ -438,23 +438,24 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
     return interactions
 
 
-def identify_symmetry_breaking(h0,h,as_string=False):
+def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-5):
     """Given two Hamiltonians, identify what is the symmetry
     breaking between them"""
     dt0 = h0.get_multihopping() # first multihopping
     dt = h.get_multihopping() # second multihopping
     dd = dt0 - dt # difference between Hamiltonians
     out = [] # empty list
-    for s in symmetry_breaking: # loop over contributions
-        d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
-        proj = dd.dot(d0) # compute the projection
-        if np.abs(proj)>1e-5: out.append(s)
+    if dd.norm()>tol: # non-zero
+        for s in symmetry_breaking: # loop over contributions
+            d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
+            proj = dd.dot(d0) # compute the projection
+            if np.abs(proj)>tol: out.append(s)
+    else: out = ["No symmetry breaking"]
+    if len(out)==0: out = ["Unidentified symmetry breaking"]
     if as_string: # return as a string
-        if len(out)==0: return ""
-        else:
-            out2 = ""
-            for o in out: out2 += o + ", "
-            return out2
+        out2 = ""
+        for o in out: out2 += o + ", "
+        return out2
     return out
 
 

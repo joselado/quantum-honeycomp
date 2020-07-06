@@ -213,8 +213,8 @@ def show_fermi_surface():
 
 def solve_scf():
   """Perform a selfconsistent calculation"""
-  comp = computing() # create the computing window
-  scfin = getbox("scf_initialization")
+#  comp = computing() # create the computing window
+  scfin = window.getbox("scf_initialization")
   h = initialize() # initialize the Hamiltonian
   mf = scftypes.guess(h,mode=scfin)
   nk = int(get("nk_scf"))
@@ -224,20 +224,25 @@ def solve_scf():
   filling = get("filling_scf")
   filling = filling%1.
   # flavor of the mean field
-  compute_dd = qtwrap.is_checked("compute_dd",default=True)
-  compute_anomalous = qtwrap.is_checked("compute_anomalous",default=False)
-  compute_cross = qtwrap.is_checked("compute_cross",default=True)
+  compute_dd = window.is_checked("compute_dd",default=True)
+  compute_anomalous = window.is_checked("compute_anomalous",default=False)
+  compute_cross = window.is_checked("compute_cross",default=True)
+  compute_normal = window.is_checked("compute_normal",default=True)
+  error = window.get("scf_error",default=1e-5) # error in the mean field
+  if compute_anomalous: h.add_swave(0.)
   scf = meanfield.Vinteraction(h,nk=nk,filling=filling,U=U,V1=V1,V2=V2,
                 mf=mf,load_mf=False,#T=get("smearing_scf"),
                 mix = get("mix_scf"),
                 compute_dd=compute_dd,
                 compute_anomalous=compute_anomalous,
-                compute_cross=compute_cross
+                compute_cross=compute_cross,
+                compute_normal=compute_normal,
+                maxerror=error
                 )
-  mfname = scf.identify_symmetry_breaking(as_string=True)
+  mfname = scf.identify_symmetry_breaking(as_string=True,tol=error*100)
   window.set("identified_mean_field",mfname)  
   scf.hamiltonian.save() # save in a file
-  comp.kill()
+#  comp.kill()
 
 
 

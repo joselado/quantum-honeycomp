@@ -200,6 +200,12 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
         # anomalous part
         mfa01 = get_mf_normal(v,dma01,compute_dd=False,add_dagger=False) 
         mfa10 = get_mf_normal(v,dma10,compute_dd=False,add_dagger=False) 
+        mfA01 = MultiHopping(mfa01) # to Multihopping
+        mfA10 = MultiHopping(mfa10) # to Multihopping
+        # the anomalous terms need to be reorganized
+        mfa01 = (mfA01 + mfA10.get_dagger()).get_dict()
+        mfa10 = (mfA10 + mfA01.get_dagger()).get_dict()
+        ##############################################
         # now rebuild the Hamiltonian
         mf = dict()
         for key in v:
@@ -207,13 +213,14 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
             if compute_anomalous:
                 m = superconductivity.build_nambu_matrix(mfe[key],
                     c12 = -mfa10[key],c21=-mfa01[key])
+                    #c12 = -mfa10[key],c21=-np.conjugate(mfa10[key]).T)
             else:
                 m = superconductivity.build_nambu_matrix(mfe[key])
 #            m = op.T@m@op # undo the transformation
             mf[key] = m # store this matrix
-        m0 = mf[(0,0,0)]
-        diff = np.max(np.abs(m0-np.conjugate(m0).T))
-        print("Non-hermiticity",diff)
+        if not MultiHopping(mf).is_hermitian(): # just a sanity check
+            print("Non-Hermitian mean field")
+            exit()
         return mf # return mean field matrix
     else: return get_mf_normal(v,dm,**kwargs) # no BdG Hamiltonian
 
@@ -268,9 +275,10 @@ def obj2mf(a):
 
 mf_file = "MF.pkl" 
 
-def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
+def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
         load_mf=True,compute_cross=True,compute_dd=True,
+        compute_anomalous=False,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -304,8 +312,9 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
+      # return the mean field
       mf = get_mf(v,dm,compute_cross=compute_cross,compute_dd=compute_dd,
-              has_eh=h0.has_eh) # return the mean field
+              has_eh=h0.has_eh,compute_anomalous=compute_anomalous) 
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time

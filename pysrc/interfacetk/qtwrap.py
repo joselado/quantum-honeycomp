@@ -53,6 +53,8 @@ class App(QtGui.QMainWindow, interface.Ui_MainWindow):
         set_value(*args)
     def is_checked(self,*args,**kwargs):
         return is_checked(*args,**kwargs)
+    def getbox(self,*args,**kwargs):
+        return getbox(*args,**kwargs)
     def connect_clicks(self,ds,robust=True):
       """Connect the different functions"""
       ds2 = dict()
@@ -70,7 +72,7 @@ def main():
     return form
 
 
-def get(name,string=False):
+def get(name,string=False,default=0.0):
   """Return a certain value"""
   try:
     obj = getattr(form,name) # get the object
@@ -90,9 +92,9 @@ def get(name,string=False):
             modify(name,0)
             return 0.0
   except:
-    print(name,"not found, set to zero")
-    modify(name,0) # set this value
-    return 0
+    print(name,"not found, set to ",default)
+    modify(name,default) # set this value
+    return default
 
 
 

@@ -44,6 +44,13 @@ class MultiHopping():
         """Compute the dot product"""
         a = MultiHopping(a) # as Multihopping
         return dot_hopping_dict(self.dict,a.dict) # dictionary
+    def norm(self):
+        """Norm of the MultiHopping"""
+        return np.sqrt((self.dot(self)).real)
+    def is_hermitian(self):
+        dd = self - self.get_dagger()
+        if dd.norm()>1e-7: return False
+        else: return True
     def get_dagger(self):
         out = dict()
         for key in self.dict:
