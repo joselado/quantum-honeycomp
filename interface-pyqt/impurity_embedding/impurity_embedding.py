@@ -135,7 +135,8 @@ def show_structure_3d():
 def show_embedding_ldos():
     h = pickup_hamiltonian()
     vintra = get_impurity_matrix(h)
-    eb = embedding.Embedding(h,m=vintra)
+    ns0 = int(window.get("nsuper_impurity")) # supercell of the impurity
+    eb = embedding.Embedding(h,m=vintra,nsuper=ns0)
     e = get("energy_embedding_ldos") # energy
     delta = get("delta_embedding_ldos") # energy
     ns = int(get("ncells_embedding_ldos"))
@@ -148,6 +149,8 @@ def show_embedding_ldos():
 
 def get_impurity_matrix(h):
     """Get the impurity matrix"""
+    n = int(window.get("nsuper_impurity")) # supercell for the impurities
+    if n>1: h = h.supercell(n) # create the supercell
     vintra = h.intra.copy() 
     v = get("impurity_potential") # potential in this site
     try:
@@ -165,7 +168,8 @@ def get_impurity_matrix(h):
 def show_embedding_ldos_sweep():
     h = pickup_hamiltonian()
     vintra = get_impurity_matrix(h)
-    eb = embedding.Embedding(h,m=vintra)
+    ns0 = int(window.get("nsuper_impurity")) # supercell of the impurity
+    eb = embedding.Embedding(h,m=vintra,nsuper=ns0)
     ewin = get("energy_window_embedding_ldos_sweep") # energy
     ne = int(get("num_energies_embedding_ldos_sweep")) # energy
     es = np.linspace(-ewin,ewin,ne,endpoint=True) # number of energies
@@ -181,6 +185,8 @@ def show_embedding_ldos_sweep():
 
 def select_impurity_sites():
     g = get_geometry() # get the geometry
+    n = int(window.get("nsuper_impurity")) # supercell for the impurities
+    g = g.supercell(n) # supercell
     np.savetxt("POSITIONS_PP.OUT",np.array(g.r)) # write in file
     # select the sites
     execute_script("qh-select-atoms-geometry  --input POSITIONS_PP.OUT --output IMPURITY_SITES.OUT --initially_selected \"0\"  --caption \" Sites with impurities\"")

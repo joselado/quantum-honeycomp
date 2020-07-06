@@ -15,15 +15,35 @@ from . import filesystem as fs
 
 class Embedding():
     """Define an embedding object"""
-    def __init__(self,h,m=None):
+    def __init__(self,h,m=None,nsuper=None):
         self.h0 = h.copy() # Pristine Hamiltonian
-        if m is not None: self.m = m # provided matrix
+        self.nsuper = None # supercell between original Hamiltonian
+        if m is not None: 
+            self.m = m # provided matrix
+            if m.shape[0]!=h.intra.shape[0]: 
+                if nsuper is None:
+                    print("Dimensions do not match in embedding")
+                    raise
+                else: 
+                    self.nsuper = nsuper # store the supercell
+                    hs = h.supercell(nsuper)
+                    if m.shape[0]!=hs.intra.shape[0]: 
+                        print("Dimensions do not match after supercell")
+                        print(m.shape[0],hs.intra.shape[0])
+                        raise
+            else: pass
         else: self.m = h.intra.copy() # pristine one
     def ldos(self,e=0.0,delta=1e-2,nsuper=3,nk=100,**kwargs):
         """Compute the local density of states"""
         h = self.h0
-        g,selfe = green.supercell_selfenergy(h,e=e,delta=delta,nk=nk,
-                nsuper=nsuper)
+        if self.nsuper is None: # old way
+            g,selfe = green.supercell_selfenergy(h,e=e,delta=delta,nk=nk,
+                    nsuper=nsuper)
+        else: # workaround for supercells
+            raise # this does not work yet
+            g,selfe = green.supercell_selfenergy(h,e=e,delta=delta,nk=nk,
+                    nsuper=nsuper*self.nsuper) # compute Green's function
+            h = h.supercell(self.nsuper) # and redefine with a supercell
         ms = onsite_supercell(h,nsuper)
         n = self.m.shape[0]
         ms = onsite_defective_central(h,self.m,nsuper)
@@ -34,7 +54,7 @@ class Embedding():
         ds = [-gv[i,i].imag for i in range(ns)] # LDOS
         ds = full2profile(h,ds,check=False) # resum if necessary
         ds = np.array(ds) # convert to array
-        gs = self.h0.geometry.supercell(nsuper)
+        gs = h.geometry.supercell(nsuper)
         x,y = gs.x,gs.y
         return x,y,ds
     def multildos(self,es=np.linspace(-2.,2.,20),**kwargs):

@@ -14,6 +14,7 @@ except:
 
 def dyson(h,nsuper,nk,ez):
     if h.is_multicell: h = h.get_no_multicell()
+    h.turn_dense() # dense matrices
     if h.dimensionality==0: raise
     elif h.dimensionality==1: 
         return dyson1d(h.intra,h.inter,nsuper[0],nk,ez)
