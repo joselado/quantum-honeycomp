@@ -179,7 +179,8 @@ def get_dm(h,v,nk=1):
 
 
 
-def get_mf(v,dm,has_eh=False,compute_anomalous=False,**kwargs):
+def get_mf(v,dm,has_eh=False,compute_anomalous=False,
+        compute_normal=True,**kwargs):
     """Get the mean field matrix"""
     if has_eh:
         # let us assume that it is a full Nambu spinor
@@ -202,6 +203,7 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,**kwargs):
         # now rebuild the Hamiltonian
         mf = dict()
         for key in v:
+            if not compute_normal: mfe[key] = mfe[key]*0.0
             if compute_anomalous:
                 m = superconductivity.build_nambu_matrix(mfe[key],
                     c12 = -mfa10[key],c21=-mfa01[key])
@@ -311,6 +313,7 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
       scf.hamiltonian = h # store
+      scf.hamiltonian0 = h0 # store
       scf.mf = mf # store mean field
       if os.path.exists("STOP"): scf.mf = mf0 # use the guess
       scf.dm = dm # store density matrix
@@ -485,7 +488,9 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
 
 
 
+from ..meanfield import identify_symmetry_breaking
 
-
-class SCF(): pass
+class SCF():
+    def identify_symmetry_breaking(self):
+        return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0)
 

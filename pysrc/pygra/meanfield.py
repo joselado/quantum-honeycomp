@@ -1,6 +1,7 @@
 from __future__ import print_function
 from scipy.sparse import csc_matrix,bmat
 import numpy as np
+from .multihopping import MultiHopping
 #from .scftypes import selfconsistency
 
 dup = csc_matrix(([1.0],[[0],[0]]),shape=(2,2),dtype=np.complex)
@@ -219,9 +220,15 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
   return v_ij_fast_coulomb(ii,jvs2,2*n)
 
 
+
+symmetry_breaking = ["antiferro","ferroX","ferroY","ferroZ","CDW","Haldane",
+        "kanemele","rashba"]
+
 spinful_guesses = ["Fully random","ferro","antiferro",
         "ferroX","ferroY","ferroZ","CDW","dimerization","Haldane",
         "kanemele","rashba"]
+
+
 
 
 def guess(h,mode="ferro",fun=0.1):
@@ -231,13 +238,13 @@ def guess(h,mode="ferro",fun=0.1):
 #  h0.intra *= 0. # initialize
   h0.clean() # clean the Hamiltonian
   if mode=="ferro":
-    h0.add_zeeman(fun)
+      if h.has_spin: h0.add_zeeman(fun)
   elif mode=="ferroX":
-    h0.add_zeeman([fun,0.,0.])
+      if h.has_spin: h0.add_zeeman([fun,0.,0.])
   elif mode=="ferroY":
-    h0.add_zeeman([0.,fun,0.])
+      if h.has_spin: h0.add_zeeman([0.,fun,0.])
   elif mode=="ferroZ":
-    h0.add_zeeman([0.,0.,fun])
+      if h.has_spin: h0.add_zeeman([0.,0.,fun])
   elif mode=="random":
     n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
     m = m + m.T.conjugate()
@@ -254,25 +261,25 @@ def guess(h,mode="ferro",fun=0.1):
       h0.add_haldane(fun) # Haldane coupling
       return h0.get_hopping_dict()
   elif mode=="rashba":
-      h0.add_rashba(fun) # Haldane coupling
+      if h.has_spin: h0.add_rashba(fun) # Haldane coupling
       return h0.get_hopping_dict()
   elif mode=="kanemele":
-      h0.add_kane_mele(fun) # Haldane coupling
+      if h.has_spin: h0.add_kane_mele(fun) # Haldane coupling
       return h0.get_hopping_dict()
   elif mode in ["antihaldane","valley"]:
       h = h.copy() ; h.clean() ; h.add_antihaldane(fun) # Haldane coupling
       return h.get_hopping_dict()
   elif mode=="Fully random": return None
   elif mode=="CDW":
-    h0.add_onsite(h.geometry.sublattice)
+      h0.add_onsite(h.geometry.sublattice)
   elif mode=="potential":
-    h0.add_onsite(fun)
+      h0.add_onsite(fun)
   elif mode=="antiferro":
-    h0.add_antiferromagnetism(fun)
+      if h.has_spin: h0.add_antiferromagnetism(fun)
   elif mode=="imbalance":
-    h0.add_sublattice_imbalance(fun)
+      h0.add_sublattice_imbalance(fun)
   elif mode=="swave":
-    h0.add_swave(fun)
+      if h.has_eh: h0.add_swave(fun)
   elif mode=="pwave":
     for t in h0.hopping: t.m *= 0. # clean
     h0.add_pwave(fun)
@@ -426,6 +433,25 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
                   )
         else: raise
     return interactions
+
+
+def identify_symmetry_breaking(h0,h):
+    """Given two Hamiltonians, identify what is the symmetry
+    breaking between them"""
+    print(h0.intra.shape)
+    print(h.intra.shape)
+    dt0 = h0.get_multihopping() # first multihopping
+    dt = h.get_multihopping() # second multihopping
+    dd = dt0 - dt # difference between Hamiltonians
+    out = [] # empty list
+    for s in symmetry_breaking: # loop over contributions
+        print(s)
+        d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
+        proj = dd.dot(d0) # compute the projection
+        print(proj)
+        if proj>1e-5: out.append(s)
+    return out
+
 
 
 

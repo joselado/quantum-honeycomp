@@ -2,6 +2,7 @@
 from __future__ import division
 import numpy as np
 from . import algebra
+from .htk.matrixcomponent import spin_mixing_part
 
 def spin_channel(m,spin_column=None,spin_row=None,has_spin=True):
   """Extract a channel from a matrix"""
@@ -158,6 +159,8 @@ def extract_from_hamiltonian(self,name):
       return mz(h0.intra)
     elif name=="spin_mixing":
         return extract_spin_mixing(self)
+    elif name=="hopping_spin_mixing":
+        return extract_hopping_spin_mixing(self)
     else: raise
 
 
@@ -202,14 +205,35 @@ def extract_spin_mixing(h):
     h.remove_nambu() # remove nambu
     if not h.has_spin: raise
     dt = h.get_dict() # get the multihopping object
-    from .htk.matrixcomponent import spin_mixing_part
     out = 0 # output
     for key in dt: # loop
         m = dt[key] # get the matrix
         m = spin_mixing_part(m) # spin mixing part
-        m = np.abs(algebra.todense(m)) # absolute value
+        m = np.abs(np.array(algebra.todense(m))) # absolute value
         m = m*m # square value
         m = np.mean(m,axis=0) # sum over the first axis
         out = out + m # add to the output
     return out # return the mixing
+
+
+def extract_hopping_spin_mixing(h):
+    """Extract the spin mixing part of a Hamiltonian"""
+    h = h.copy()
+    h.remove_nambu() # remove nambu
+    if not h.has_spin: raise
+    dt = h.get_dict() # get the multihopping object
+    out = 0 # output
+    for key in dt: # loop
+        m = dt[key] # get the matrix
+        m = spin_mixing_part(m) # spin mixing part
+        if key==(0,0,0): # discard onsite terms
+            for i in range(m.shape[0]): m[i,i] = 0.0 # set to zero
+        m = np.abs(np.array(algebra.todense(m))) # absolute value
+        m = m*m # square value
+        m = np.mean(m,axis=0) # sum over the first axis
+        out = out + m # add to the output
+    return out # return the mixing
+
+
+
 

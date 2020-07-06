@@ -242,6 +242,11 @@ class hamiltonian():
   def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
+  def get_topological_invariant(self):
+      """Return a topological invariant"""
+      if self.dimensionality==0: pass
+      elif self.dimensionality==1: pass
+      elif self.dimensionality==2: pass
   def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
