@@ -215,7 +215,7 @@ signals["save_results"] = save_results
 window.set("info_tab","Results will be saved to "+inipath)
 
 
-window.connect_clicks(signals,robust=False)
+window.connect_clicks(signals)
 folder = create_folder()
 tmppath = os.getcwd() # get the initial directory
 window.run()
