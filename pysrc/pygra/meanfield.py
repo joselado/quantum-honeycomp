@@ -255,9 +255,7 @@ def guess(h,mode="ferro",fun=0.1):
       dd = dd + dd + dd.get_dagger()
       return dd.get_dict()
   elif mode=="dimerization":
-    n = h.intra.shape ; m = np.random.random(n) + 1j*np.random.random(n)
-    m = 1j*(m - m.T.conjugate())
-    return m
+      return guess(h,mode="random",fun=fun)
   elif mode=="kekule":
       h0.turn_multicell()
       h0.add_kekule(fun) # Haldane coupling
@@ -440,7 +438,7 @@ def fast_coulomb_interaction(g,vc=1.0,vcut=1e-4,vfun=None,has_spin=False,**kwarg
     return interactions
 
 
-def identify_symmetry_breaking(h0,h):
+def identify_symmetry_breaking(h0,h,as_string=False):
     """Given two Hamiltonians, identify what is the symmetry
     breaking between them"""
     dt0 = h0.get_multihopping() # first multihopping
@@ -451,6 +449,12 @@ def identify_symmetry_breaking(h0,h):
         d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
         proj = dd.dot(d0) # compute the projection
         if np.abs(proj)>1e-5: out.append(s)
+    if as_string: # return as a string
+        if len(out)==0: return ""
+        else:
+            out2 = ""
+            for o in out: out2 += o + ", "
+            return out2
     return out
 
 

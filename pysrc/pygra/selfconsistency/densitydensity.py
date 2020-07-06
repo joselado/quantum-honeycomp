@@ -491,6 +491,7 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
 from ..meanfield import identify_symmetry_breaking
 
 class SCF():
-    def identify_symmetry_breaking(self):
-        return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0)
+    def identify_symmetry_breaking(self,**kwargs):
+        return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0,
+                **kwargs)
 
