@@ -51,6 +51,8 @@ class App(QtGui.QMainWindow, interface.Ui_MainWindow):
         return get(*args,**kwargs)
     def set(self,*args):
         set_value(*args)
+    def is_checked(self,*args,**kwargs):
+        return is_checked(*args,**kwargs)
     def connect_clicks(self,ds,robust=True):
       """Connect the different functions"""
       ds2 = dict()
@@ -123,9 +125,11 @@ def modify(name,text):
 
 set_value = modify
 
-def is_checked(name):
-  obj = getattr(form,name) # get the object
-  return obj.isChecked()
+def is_checked(name,default=False):
+    try:
+        obj = getattr(form,name) # get the object
+        return obj.isChecked()
+    except: return default
 
 
 

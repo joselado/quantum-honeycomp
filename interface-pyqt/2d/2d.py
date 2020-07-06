@@ -223,9 +223,17 @@ def solve_scf():
   V2 = get("V2")
   filling = get("filling_scf")
   filling = filling%1.
+  # flavor of the mean field
+  compute_dd = qtwrap.is_checked("compute_dd",default=True)
+  compute_anomalous = qtwrap.is_checked("compute_anomalous",default=False)
+  compute_cross = qtwrap.is_checked("compute_cross",default=True)
   scf = meanfield.Vinteraction(h,nk=nk,filling=filling,U=U,V1=V1,V2=V2,
                 mf=mf,load_mf=False,#T=get("smearing_scf"),
-                mix = get("mix_scf"))
+                mix = get("mix_scf"),
+                compute_dd=compute_dd,
+                compute_anomalous=compute_anomalous,
+                compute_cross=compute_cross
+                )
   mfname = scf.identify_symmetry_breaking(as_string=True)
   window.set("identified_mean_field",mfname)  
   scf.hamiltonian.save() # save in a file
