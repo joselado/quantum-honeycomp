@@ -756,7 +756,7 @@ class Ui_MainWindow(object):
         self.label_32.setText(_translate("MainWindow", "Mixing"))
         self.label_2.setText(_translate("MainWindow", "# of kpoints"))
         self.nk_scf.setText(_translate("MainWindow", "10"))
-        self.mix_scf.setText(_translate("MainWindow", "0.9"))
+        self.mix_scf.setText(_translate("MainWindow", "0.1"))
         self.label_33.setText(_translate("MainWindow", "Smearing"))
         self.smearing_scf.setText(_translate("MainWindow", "0.01"))
         self.tabWidget_4.setTabText(self.tabWidget_4.indexOf(self.tab_11), _translate("MainWindow", "Convergence"))

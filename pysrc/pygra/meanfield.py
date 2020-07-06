@@ -222,7 +222,7 @@ def v_ij_fast_coulomb_spinful(i,jvs,n,channel="up"):
 
 
 symmetry_breaking = ["magnetic","antiferro","ferroX","ferroY",
-        "ferroZ","CDW","Haldane",
+        "ferroZ","Charge density wave","Haldane",
         "kanemele","rashba"]
 
 spinful_guesses = ["Fully random","dimerization"]
@@ -273,7 +273,7 @@ def guess(h,mode="ferro",fun=0.1):
       h = h.copy() ; h.clean() ; h.add_antihaldane(fun) # Haldane coupling
       return h.get_hopping_dict()
   elif mode=="Fully random": return None
-  elif mode=="CDW":
+  elif mode in ["CDW","Charge density wave"]:
       h0.add_onsite(h.geometry.sublattice)
   elif mode=="potential":
       h0.add_onsite(fun)

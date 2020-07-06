@@ -227,7 +227,6 @@ def solve_scf():
                 mf=mf,load_mf=False,#T=get("smearing_scf"),
                 mix = get("mix_scf"))
   mfname = scf.identify_symmetry_breaking(as_string=True)
-  print(mfname)
   window.set("identified_mean_field",mfname)  
   scf.hamiltonian.save() # save in a file
   comp.kill()

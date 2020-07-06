@@ -82,7 +82,7 @@ def dot_hopping_dict(hop1,hop2):
             m1 = np.array(algebra.todense(hop1[key]))
         if key in hop2: 
             m2 = np.array(algebra.todense(hop2[key]))
-        m = np.sum(m1*m2)
+        m = np.sum(np.conjugate(m1)*m2)
         out = out + m # add this contribution
     return out
 

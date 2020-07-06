@@ -29,6 +29,7 @@ from . import tails
 from scipy.sparse import diags as sparse_diag
 import pickle
 from .htk import mode as hamiltonianmode
+from .htk import symmetry
 
 #import data
 
@@ -94,9 +95,12 @@ class hamiltonian():
       self.geometry = geometry # add geometry object
       self.num_orbitals = len(geometry.x)
   def get_hk_gen(self):
-    """ Generate kdependent hamiltonian"""
-    if self.is_multicell: return multicell.hk_gen(self) # for multicell
-    else: return hk_gen(self) # for normal cells
+      """ Generate kdependent hamiltonian"""
+      if self.is_multicell: return multicell.hk_gen(self) # for multicell
+      else: return hk_gen(self) # for normal cells
+  def has_time_reversal_symmetry(self):
+      """Check if a Hamiltonian has time reversal symmetry"""
+      return symmetry.has_time_reversal_symmetry(self)
   def get_ldos(self,**kwargs):
       from . import ldos
       return ldos.ldos(self,**kwargs)
@@ -242,11 +246,17 @@ class hamiltonian():
   def add_onsite(self,fermi):
     """ Move the Fermi energy of the system"""
     shift_fermi(self,fermi)
-  def get_topological_invariant(self):
+  def get_topological_invariant(self,**kwargs):
       """Return a topological invariant"""
       if self.dimensionality==0: pass
       elif self.dimensionality==1: pass
-      elif self.dimensionality==2: pass
+      elif self.dimensionality==2: 
+          if self.has_time_reversal_symmetry():
+              return topology.z2_invariant(self,**kwargs)
+          else:
+              print("Computing Chern")
+              return topology.chern(self,**kwargs)
+      else: raise
   def shift_fermi(self,fermi): self.add_onsite(fermi)  
   def first_neighbors(self):
     """ Create first neighbor hopping"""
