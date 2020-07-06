@@ -9,6 +9,7 @@ from .. import densitymatrix
 from copy import deepcopy
 from numba import jit
 from .. import utilities
+from ..multihopping import MultiHopping
 
 class Interaction():
     def __init__(self,h=None):
@@ -108,24 +109,27 @@ def normal_term_ji_jit(v,dm,out):
 
 def update_hamiltonian(tdict,mf):
     """Update the hoppings with the mean field"""
-    out = deepcopy(tdict) # copy
-    for key in mf:
-        out[key] = tdict[key] + mf[key] # add contribution
-    return out # return dictionary
+    return (MultiHopping(tdict) + MultiHopping(mf)).get_dict()
+#    out = deepcopy(tdict) # copy
+#    for key in mf:
+#        if key in tdict: out[key] = tdict[key] + mf[key] # add contribution
+#        else: out[key] = mf[key]
+#    return out # return dictionary
 
 
 def mix_mf(mf,mf0,mix=0.8):
     """Mix mean fields"""
-    out = dict() # initialize
-    for key in mf: # loop
-        if key not in mf0: out[key] = mf[key]
-        else:
-            #v0 = np.tanh(mf0[key]/mix)
-            #v1 = np.tanh(mf[key]/mix)
-            #out[key] = np.arctanh((v0+v1)/2.)*mix
-            out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
-        #out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
-    return out
+    return ((1-mix)*MultiHopping(mf0) + mix*MultiHopping(mf)).get_dict()
+#    out = dict() # initialize
+#    for key in mf: # loop
+#        if key not in mf0: out[key] = mf[key]
+#        else:
+#            #v0 = np.tanh(mf0[key]/mix)
+#            #v1 = np.tanh(mf[key]/mix)
+#            #out[key] = np.arctanh((v0+v1)/2.)*mix
+#            out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
+#        #out[key] = mf0[key]*(1.-mix) + mf[key]*mix # add contribution
+#    return out
 
 
 
@@ -162,11 +166,11 @@ def set_hoppings(h,hop):
         hopping.append(t) # store
     h.hopping = hopping # store
 
-def get_dm(h,nk=1):
+def get_dm(h,v,nk=1):
     """Get the density matrix"""
     ds = [(0,0,0)] # directions
     if h.dimensionality>0:
-      for t in h.hopping: ds.append(tuple(t.dir)) # store
+        for key in v: ds.append(key) # store
     dms = densitymatrix.full_dm(h,ds=ds,nk=nk) # get all the density matrices
     dm = dict()
     for i in range(len(ds)): 
@@ -261,7 +265,7 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,compute_cross=True,
+        load_mf=True,compute_cross=True,compute_dd=True,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -291,11 +295,11 @@ def generic_densitydensity(h0,mf=None,mix=0.9,v=None,nk=8,solver="plain",
       if callback_h is not None:
           h = callback_h(h) # callback for the Hamiltonian
       t0 = time.perf_counter() # time
-      dm = get_dm(h,nk=nk) # get the density matrix
+      dm = get_dm(h,v,nk=nk) # get the density matrix
       if callback_dm is not None:
           dm = callback_dm(dm) # callback for the density matrix
       t1 = time.perf_counter() # time
-      mf = get_mf(v,dm,compute_cross=compute_cross,
+      mf = get_mf(v,dm,compute_cross=compute_cross,compute_dd=compute_dd,
               has_eh=h0.has_eh) # return the mean field
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
@@ -441,7 +445,7 @@ def hubbard(h,U=1.0,**kwargs):
       return densitydensity(h,v=v,compute_cross=False,**kwargs)
 
 
-def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
+def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
@@ -454,7 +458,7 @@ def Vinteraction(h,V1=0.0,V2=0.0,U=0.0,**kwargs):
  #       if abs(dr-nd[1])<1e-6: return V2/2.
  #       return 0.0
     from .. import specialhopping
-    mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.],nd[0:2])
+    mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.,V3/2.],nd[0:3])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             mgenerator=mgenerator) 
  #   hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,

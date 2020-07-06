@@ -8,7 +8,7 @@ try:
   use_fortran = True
 except:
   use_fortran = False
-  print("Fortran routines not working in densitymatrix.py")
+#  print("Fortran routines not working in densitymatrix.py")
  
 use_fortran = False
 

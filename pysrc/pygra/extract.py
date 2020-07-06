@@ -1,6 +1,7 @@
 # routines to extract channels from a matrix
 from __future__ import division
 import numpy as np
+from . import algebra
 
 def spin_channel(m,spin_column=None,spin_row=None,has_spin=True):
   """Extract a channel from a matrix"""
@@ -155,6 +156,8 @@ def extract_from_hamiltonian(self,name):
     elif name=="mz" and self.has_spin:
       if self.has_eh: h0.remove_nambu() # not implemented
       return mz(h0.intra)
+    elif name=="spin_mixing":
+        return extract_spin_mixing(self)
     else: raise
 
 
@@ -193,5 +196,20 @@ def extract_onsite_function(h,**kwargs):
     return f # return function
 
 
-
+def extract_spin_mixing(h):
+    """Extract the spin mixing part of a Hamiltonian"""
+    h = h.copy()
+    h.remove_nambu() # remove nambu
+    if not h.has_spin: raise
+    dt = h.get_dict() # get the multihopping object
+    from .htk.matrixcomponent import spin_mixing_part
+    out = 0 # output
+    for key in dt: # loop
+        m = dt[key] # get the matrix
+        m = spin_mixing_part(m) # spin mixing part
+        m = np.abs(algebra.todense(m)) # absolute value
+        m = m*m # square value
+        m = np.mean(m,axis=0) # sum over the first axis
+        out = out + m # add to the output
+    return out # return the mixing
 

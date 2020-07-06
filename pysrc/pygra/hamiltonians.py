@@ -61,10 +61,10 @@ class hamiltonian():
     return spectrum.get_filling(self,**kwargs) # eigenvalues
   def reduce(self):
       return hamiltonianmode.reduce_hamiltonian(self)
-  def full2profile(self,x):
+  def full2profile(self,x,**kwargs):
       """Transform a 1D array in the full space to the spatial basis"""
-      from .increase_hilbert import full2profile
-      return full2profile(self,x)
+      from .htk.matrixcomponent import full2profile
+      return full2profile(self,x,**kwargs)
   def get_hopping_dict(self):
       """Return the dictionary with the hoppings"""
       return multicell.get_hopping_dict(self)
@@ -275,72 +275,43 @@ class hamiltonian():
       """
       Return the dictionary that yields the hoppings
       """
-      if not self.is_multicell: raise # not implemented
+      if not self.is_multicell: # not implemented
+          self = self.get_multicell()
       hop = dict()
       hop[(0,0,0)] = self.intra
       for t in self.hopping: hop[tuple(t.dir)] = t.m
       return hop # return dictionary
+  def get_multihopping(self):
+      """Return a multihopping object"""
+      from .multihopping import MultiHopping
+      return MultiHopping(self.get_dict())
   def copy(self):
-    """
-    Return a copy of the hamiltonian
-    """
-    from copy import deepcopy
-    return deepcopy(self)
+      """
+      Return a copy of the hamiltonian
+      """
+      from copy import deepcopy
+      return deepcopy(self)
   def check(self):
-    """
-    Check if the Hamiltonian is OK
-    """
-    from . import check
-    check.check_hamiltonian(self) # check the Hamiltonian
+      """
+      Check if the Hamiltonian is OK
+      """
+      from . import check
+      check.check_hamiltonian(self) # check the Hamiltonian
   def turn_sparse(self):
     """
     Transforms the hamiltonian into a sparse hamiltonian
     """
     from scipy.sparse import csc_matrix
-#    if self.is_sparse: return # if it is sparse return
+    def f(m):
+        return csc_matrix(m)
+    self.modify_hamiltonian_matrices(f) # modify the matrices
     self.is_sparse = True # sparse flag to true
-    self.intra = csc_matrix(self.intra)
-    if self.is_multicell: # multicell Hamiltonian 
-      for i in range(len(self.hopping)): # loop
-        self.hopping[i].m = csc_matrix(self.hopping[i].m)
-      return
-    else:  # no multicell
-      if self.dimensionality == 1: # for one dimensional
-        self.inter = csc_matrix(self.inter)
-      if self.dimensionality == 2: # for one dimensional
-        self.tx = csc_matrix(self.tx)
-        self.ty = csc_matrix(self.ty)
-        self.txy = csc_matrix(self.txy)
-        self.txmy = csc_matrix(self.txmy)
-      if self.dimensionality > 2: raise # for one dimensional
   def turn_dense(self):
     """ Transforms the hamiltonian into a sparse hamiltonian"""
-#    if not self.is_sparse: return
-    from scipy.sparse import csc_matrix
-#    if not self.is_sparse: return # if it is sparse return
-    if self.intra.shape[0]>maxmatrix: raise
-    self.is_sparse = False # sparse flag to false
-    from scipy.sparse import issparse
-    def densify(m):
-        if issparse(m): return m.todense()
-        else: return m
-
-    self.intra = densify(self.intra)
-    if self.is_multicell: # multicell Hamiltonian 
-      for i in range(len(self.hopping)): # loop
-        self.hopping[i].m = densify(self.hopping[i].m)
-      return
-    else:  # no multicell
-      if self.dimensionality == 0: pass # for one dimensional
-      elif self.dimensionality == 1: # for one dimensional
-        self.inter = densify(self.inter)
-      elif self.dimensionality == 2: # for one dimensional
-        self.tx = densify(self.tx)
-        self.ty = densify(self.ty)
-        self.txy = densify(self.txy)
-        self.txmy = densify(self.txmy)
-      else: raise
-
+    def f(m):
+        return algebra.todense(m)
+    self.modify_hamiltonian_matrices(f) # modify the matrices
+    self.is_sparse = False # sparse flag to true
   def add_rashba(self,c):
     """Adds Rashba coupling"""
     from . import rashba
@@ -429,7 +400,8 @@ class hamiltonian():
       return spectrum.ev(self,operator=ops,**kwargs).real
   def get_1dh(self,k=0.0):
       """Return a 1d Hamiltonian"""
-      if self.is_multicell: raise # not implemented
+      if self.is_multicell: # not implemented
+          self = self.get_no_multicell() # return the no multicell Hamiltonian
       if not self.dimensionality==2: raise # not implemented
       intra,inter = kchain(self,k) # generate intra and inter
       hout = self.copy() # copy the Hamiltonian

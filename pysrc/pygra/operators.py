@@ -16,8 +16,9 @@ from . import superconductivity
 from .algebra import braket_wAw
 
 import numbers
-def isnumber(s):
-    return isinstance(s, numbers.Number)
+
+isnumber = algebra.isnumber
+
 
 class Operator():
     def __init__(self,m,linear=True):

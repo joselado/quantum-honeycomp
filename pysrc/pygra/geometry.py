@@ -258,7 +258,9 @@ class Geometry:
       """
       Remove one site
       """
-      return sculpt.remove(self,[i])
+      if type(i)==list: pass
+      else: i = [i]
+      return sculpt.remove(self,i)
   def center_in_atom(self,n0=None):
       """
       Center the geometry in an atom

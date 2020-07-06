@@ -8,6 +8,15 @@ from .algebratk import sparsetensor
 from numba import jit
 from . import parallel
 
+
+
+
+import numbers
+def isnumber(s):
+    return isinstance(s, numbers.Number)
+
+
+
 maxsize = 10000
 
 
@@ -15,8 +24,8 @@ def hermitian(m):
     return np.transpose(np.conjugate(m))
 
 H = hermitian # alias
-
-
+get_dagger = hermitian
+dagger = hermitian
 
 def inv(m):
     return dlg.inv(todense(m))
@@ -25,9 +34,6 @@ def inv(m):
 def trace(m):
     return np.trace(m)
 
-def dagger(m):
-    return np.conjugate(np.transpose(m))
-
 
 def densebmat(ms):
     """Turn a block matrix dense"""
@@ -35,6 +41,9 @@ def densebmat(ms):
     return todense(bmat(ms)) # return block matrix
 
 
+def dot(a,b):
+    """Compute the scalar product"""
+    return np.dot(np.conjugate(a),b)
 
 def braket_wAw(w,A,wi=None):
   """

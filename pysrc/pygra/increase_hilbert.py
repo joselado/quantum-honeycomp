@@ -82,22 +82,6 @@ def get_spinful2full(h):
 
 
 
-def full2profile(h,profile,check=True):
-  """Resums a certain profile to show only the spatial dependence"""
-  n = len(profile)
-  if check:
-    if len(profile)!=h.intra.shape[0]: raise # inconsistency
-  if h.has_spin == False and h.has_eh==False: out = np.array(profile)
-  elif h.has_spin == True and h.has_eh==False:
-    out = np.array([profile[2*i]+profile[2*i+1] for i in range(n//2)])
-  elif h.has_spin == False and h.has_eh==True:
-    out = np.array([profile[2*i]+profile[2*i+1] for i in range(n//2)])
-  elif h.has_spin == True and h.has_eh==True:
-    out = np.array([profile[4*i]+profile[4*i+1]+profile[4*i+2]+profile[4*i+3] for i in range(n//4)])
-  else: raise # unknown
-  if check:
-    if len(out)!=len(h.geometry.r): raise # mistmach in the dimensions
-  return out
 
 
 
@@ -118,5 +102,7 @@ def des_spin(m,component=0):
     if not sparse: return mo.todense()
     else: return mo
 
+from .htk.matrixcomponent import spin_mixing_part
+from .htk.matrixcomponent import full2profile
 
 

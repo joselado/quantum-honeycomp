@@ -231,13 +231,18 @@ def solve_scf():
 
 
 
-def show_magnetism():
+def show_magnetism_3d():
   """Show the magnetism of the system"""
   h = pickup_hamiltonian() # get the Hamiltonian
   h.write_magnetization(nrep=int(get("magnetization_nrep"))) 
   execute_script("qh-moments",mayavi=True)
 
 
+def show_magnetism():
+  """Show the magnetism of the system"""
+  h = pickup_hamiltonian() # get the Hamiltonian
+  h.write_magnetization(nrep=int(get("magnetization_nrep"))) 
+  execute_script("qh-quiver")
 
 
 def show_structure_3d():
@@ -329,6 +334,7 @@ signals["show_fermi_surface"] = show_fermi_surface
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism
+signals["show_magnetism_3d"] = show_magnetism_3d  # show magnetism
 signals["compute_sweep"] = sweep_parameter  
 signals["show_structure_3d"] = show_structure_3d
 signals["select_atoms_removal"] = select_atoms_removal
