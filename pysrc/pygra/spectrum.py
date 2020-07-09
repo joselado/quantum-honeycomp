@@ -409,7 +409,10 @@ def singlet_map(h,nk=40,nsuper=3,mode="abs"):
 
 def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
     """Set the filling of a Hamiltonian"""
-    if h.has_eh: raise
+    if h.has_eh: # quick workaround
+        ef = h.get_fermi4filling(filling,nk=nk) # fermi energy
+        h.add_onsite(-ef)
+        return
     fill = filling + extrae/h.intra.shape[0] # filling
     n = h.intra.shape[0]
     use_kpm = False

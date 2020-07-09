@@ -391,7 +391,7 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
       ks = np.array(ks)  # all the kpoints
     else: raise # raise error
     for k in ks:  # loop in BZ
-      g += (e - hk_gen(k)).I  # add green function  
+      g += algebra.inv(e - hk_gen(k))  # add green function  
     g = g/len(ks)  # normalize
   #####################################################
   #####################################################
@@ -423,7 +423,7 @@ def bloch_selfenergy(h,nk=100,energy = 0.0, delta = 0.01,mode="full",
         # chain in the y direction
     else: raise
   # now calculate selfenergy
-  selfenergy = e - h.intra - g.I
+  selfenergy = e - h.intra - algebra.inv(g)
   return g,selfenergy
 
 
@@ -614,6 +614,9 @@ def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
 
 def supercell_selfenergy(h,e=0.0,delta=0.001,nk=100,nsuper=[1,1]):
   """Calculates the selfenergy of a certain supercell """
+  if nsuper==1:
+      return bloch_selfenergy(h,energy=e,delta=delta,nk=nk,
+              mode="renormalization")
   if h.dimensionality>2: return NotImplemented
   try:   # if two number given
     nsuper1 = nsuper[0]

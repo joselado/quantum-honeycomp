@@ -2,6 +2,7 @@ from __future__ import print_function
 from scipy.sparse import csc_matrix,bmat
 import numpy as np
 from .multihopping import MultiHopping
+from. import superconductivity
 #from .scftypes import selfconsistency
 
 dup = csc_matrix(([1.0],[[0],[0]]),shape=(2,2),dtype=np.complex)
@@ -250,9 +251,10 @@ def guess(h,mode="ferro",fun=0.1):
       dd = h.get_dict()
       for key in dd:
           n = dd[key].shape[0]
-          dd[key] = np.random.random(n) + 1j*np.random.random(n)
+          dd[key] = np.random.random((n,n))-.5 + 1j*(np.random.random((n,n))-.5)
       dd = MultiHopping(dd)
-      dd = dd + dd + dd.get_dagger()
+      dd = dd + dd.get_dagger()
+#      print(dd.get_dict()[(0,0,0)]); exit()
       return dd.get_dict()
   elif mode=="dimerization":
       return guess(h,mode="random",fun=fun)
@@ -274,7 +276,9 @@ def guess(h,mode="ferro",fun=0.1):
       return h.get_hopping_dict()
   elif mode=="Fully random": return None
   elif mode in ["CDW","Charge density wave"]:
-      h0.add_onsite(h.geometry.sublattice)
+      if h.geometry.has_sublattice:
+        h0.add_onsite(h.geometry.sublattice)
+      else: guess(h,mode="random",fun=0.0)
   elif mode=="potential":
       h0.add_onsite(fun)
   elif mode=="antiferro":
@@ -450,6 +454,7 @@ def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-5):
             d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
             proj = dd.dot(d0) # compute the projection
             if np.abs(proj)>tol: out.append(s)
+        out += superconductivity.identify_superconductivity(h0,tol=tol) # check SC
     else: out = ["No symmetry breaking"]
     if len(out)==0: out = ["Unidentified symmetry breaking"]
     if as_string: # return as a string

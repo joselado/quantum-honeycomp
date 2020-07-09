@@ -203,13 +203,13 @@ class hamiltonian():
     return total_energy(self,**kwargs)
   def total_energy(self,**kwargs): return self.get_total_energy(**kwargs)
   def add_zeeman(self,zeeman):
-    """Adds zeeman to the matrix """
-    if self.has_spin:  # if it has spin degree of freedom
+      """Adds zeeman to the matrix """
+      self.turn_spinful()
       from .magnetism import add_zeeman
       add_zeeman(self,zeeman=zeeman)
   def add_magnetism(self,m):
-    """Adds magnetism, new version of zeeman"""
-    if self.has_spin:  # if it has spin degree of freedom
+      """Adds magnetism, new version of zeeman"""
+      self.turn_spinful()
       from .magnetism import add_magnetism
       add_magnetism(self,m)
   def turn_spinful(self,enforce_tr=False):
@@ -306,12 +306,18 @@ class hamiltonian():
       """
       from copy import deepcopy
       return deepcopy(self)
-  def check(self):
+  def check(self,**kwargs):
       """
       Check if the Hamiltonian is OK
       """
       from . import check
-      check.check_hamiltonian(self) # check the Hamiltonian
+      check.check_hamiltonian(self,**kwargs) # check the Hamiltonian
+  def enforce_eh(self):
+      """Enforce electron-hole symmetry in the Hamiltonian"""
+      self.turn_multicell() # turn to multicell mode
+      from superconductivity import eh_operator
+      f = eh_operator(self.intra) # electron hole operator
+      raise # not implemented
   def turn_sparse(self):
     """
     Transforms the hamiltonian into a sparse hamiltonian
@@ -435,7 +441,13 @@ class hamiltonian():
       self.hopping = h.hopping # assign hopping
   def get_no_multicell(self):
       """Return a multicell Hamiltonian"""
-      return multicell.turn_no_multicell(self)
+      h1 = multicell.turn_no_multicell(self)
+      h0 = h1.get_multicell() # turn multicell again
+      diff = (self.get_multihopping() - h0.get_multihopping()).norm()
+      if diff>1e-6: 
+          print("Hamiltonain cannot be made o multicell")
+          raise
+      else: return h1 # return the Hamiltonian
   def clean(self):
       """Clean a Hamiltonian"""
       from .clean import clean_hamiltonian
@@ -472,6 +484,8 @@ class hamiltonian():
               normal_order=normal_order,nrep=nrep)
   def write_hopping(self,**kwargs):
       groundstate.hopping(self,**kwargs)
+  def write_anomalous_hopping(self,**kwargs):
+      groundstate.anomalous_hopping(self,**kwargs)
   def write_swave(self,**kwargs):
       """Write the swave pairing"""
       groundstate.swave(self,**kwargs)

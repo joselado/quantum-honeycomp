@@ -54,7 +54,8 @@ class MultiHopping():
     def get_dagger(self):
         out = dict()
         for key in self.dict:
-            out[key] = np.conjugate(self.dict[key]).T
+            key2 = tuple(-np.array(key,dtype=int))
+            out[key] = np.conjugate(self.dict[key2].T)
         out = MultiHopping(out) # create a new object
         return out
 

@@ -33,7 +33,7 @@ class Embedding():
                         raise
             else: pass
         else: self.m = h.intra.copy() # pristine one
-    def ldos(self,e=0.0,delta=1e-2,nsuper=3,nk=100,**kwargs):
+    def ldos(self,e=0.0,delta=1e-2,nsuper=1,nk=100,operator=None,**kwargs):
         """Compute the local density of states"""
         h = self.h0
         if self.nsuper is None: # old way
@@ -51,12 +51,20 @@ class Embedding():
         iden = np.identity(ns,dtype=np.complex) # identity
         emat = iden*(e + delta*1j) # energy matrix
         gv = algebra.inv(emat - ms -selfe)   # Defective Green function 
+        if operator is not None: 
+            gv = operator*gv # multiply
         ds = [-gv[i,i].imag for i in range(ns)] # LDOS
         ds = full2profile(h,ds,check=False) # resum if necessary
         ds = np.array(ds) # convert to array
         gs = h.geometry.supercell(nsuper)
         x,y = gs.x,gs.y
         return x,y,ds
+    def dos(self,**kwargs):
+        (x,y,d) = self.ldos(**kwargs)
+        return np.sum(d) # sum the DOS
+    def multidos(self,es=np.linspace(-1.0,1.0,30),**kwargs):
+        ds = parallel.pcall(lambda e: self.dos(e=e,**kwargs),es)
+        return (es,np.array(ds))
     def multildos(self,es=np.linspace(-2.,2.,20),**kwargs):
         """Compute the ldos at different energies"""
         fs.rmdir("MULTILDOS")

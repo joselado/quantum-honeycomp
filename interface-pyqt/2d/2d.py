@@ -239,7 +239,7 @@ def solve_scf():
                 compute_normal=compute_normal,
                 maxerror=error
                 )
-  mfname = scf.identify_symmetry_breaking(as_string=True,tol=error*100)
+  mfname = scf.identify_symmetry_breaking(as_string=True)
   window.set("identified_mean_field",mfname)  
   scf.hamiltonian.save() # save in a file
 #  comp.kill()

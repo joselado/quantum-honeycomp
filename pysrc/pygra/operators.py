@@ -25,7 +25,7 @@ class Operator():
         """Initialization"""
         self.linear = linear
         self.matrix = None
-        if type(m)==np.ndarray or issparse(m) or type(m)==np.matrix:
+        if algebra.ismatrix(m):
             self.m = lambda v,k=None: m@v # create dummy function
             self.matrix = m
         elif type(m)==Operator: 
@@ -48,6 +48,11 @@ class Operator():
             else: out.m = lambda v,k=None: self.m(a.m(v,k=k),k=k)
             out.linear = self.linear and a.linear
             return out
+        elif algebra.ismatrix(a): # matrix type
+            if self.matrix is not None: # return a matrix
+                return self.matrix@a # multiply matrices
+            else:
+                return self*Operator(a) # convert to operator
         else:
             return self*Operator(a) # convert to operator
     def __add__(self,a):
@@ -643,6 +648,16 @@ def get_layer(self,n=0):
 
 
 
+def get_up(self):
+    """Return up sector"""
+    op = get_sz(self)
+    return (op@op + op)/2.
+
+
+def get_dn(self):
+    """Return up sector"""
+    op = get_sz(self)
+    return (op@op - op)/2.
 
 
 

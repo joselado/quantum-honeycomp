@@ -189,22 +189,26 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
         dme = dict() # dictionary
         dma01 = dict() # dictionary
         dma10 = dict() # dictionary
-        op = superconductivity.get_nambu2signless(dm[(0,0,0)]) # transform
+        ns = v[(0,0,0)].shape[0]//2 # number of spinless sites
+#        op = superconductivity.nambu_anomalous_reordering(ns)
+#        op = op@op # comment this to go back to the previous version
         for key in dm: # extract the electron part 
 #            m = op.T@dm[key]@op # transform to the new basis
             m = dm[key] # transform to the new basis
             dme[key] = superconductivity.get_eh_sector(m,i=0,j=0)
-            dma01[key] = superconductivity.get_eh_sector(m,i=0,j=1)
-            dma10[key] = superconductivity.get_eh_sector(m,i=1,j=0)
+            # this is a workaround for the reordering of Nambu spinors
+           # dma10[key] = superconductivity.get_eh_sector(m,i=1,j=0)
+            dma10[key] = superconductivity.get_eh_sector(m,i=0,j=1)
         mfe = get_mf_normal(v,dme,**kwargs) # electron part of the mean field
         # anomalous part
-        mfa01 = get_mf_normal(v,dma01,compute_dd=False,add_dagger=False) 
-        mfa10 = get_mf_normal(v,dma10,compute_dd=False,add_dagger=False) 
-        mfA01 = MultiHopping(mfa01) # to Multihopping
-        mfA10 = MultiHopping(mfa10) # to Multihopping
-        # the anomalous terms need to be reorganized
-        mfa01 = (mfA01 + mfA10.get_dagger()).get_dict()
-        mfa10 = (mfA10 + mfA01.get_dagger()).get_dict()
+        #dma01,dma10 = enforce_eh_symmetry_anomalous(dma01,dma10)
+        mfa01 = get_mf_anomalous(v,dma10) 
+        mfa01,mfa10 = enforce_eh_symmetry_anomalous(mfa01)
+ #       print(np.round(mfa10[(1,0,0)],2))
+ #       print(np.round(mfa10[(-1,0,0)],2))
+ #       print(np.round(mfa01[(1,0,0)],2))
+ #       print(np.round(mfa01[(-1,0,0)],2))
+ #       exit()
         ##############################################
         # now rebuild the Hamiltonian
         mf = dict()
@@ -212,15 +216,20 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
             if not compute_normal: mfe[key] = mfe[key]*0.0
             if compute_anomalous:
                 m = superconductivity.build_nambu_matrix(mfe[key],
-                    c12 = -mfa10[key],c21=-mfa01[key])
-                    #c12 = -mfa10[key],c21=-np.conjugate(mfa10[key]).T)
+                    c12 = mfa10[key],c21=mfa01[key])
             else:
                 m = superconductivity.build_nambu_matrix(mfe[key])
-#            m = op.T@m@op # undo the transformation
             mf[key] = m # store this matrix
+    #        print(key)
+            #print(np.round(m,2))
+     #       print(np.unique(np.round(m,2)))
         if not MultiHopping(mf).is_hermitian(): # just a sanity check
             print("Non-Hermitian mean field")
+            print(np.round(mf[(0,0,0)],2))
             exit()
+   #     exit()
+        # enforce electron-hole symmetry
+   #     mf = superconductivity.enforce_eh_symmetry(mf)
         return mf # return mean field matrix
     else: return get_mf_normal(v,dm,**kwargs) # no BdG Hamiltonian
 
@@ -252,6 +261,17 @@ def get_mf_normal(v,dm,compute_dd=True,add_dagger=True,
             mf[(0,0,0)] = mf[(0,0,0)] + m # add normal term
     return mf
 
+
+
+# anomalous part of the mean field
+from .superscf import get_mf_anomalous
+from .superscf import enforce_eh_symmetry_anomalous
+
+
+
+
+
+
 def get_dc_energy(v,dm):
     """Compute double counting energy"""
     out = 0.0
@@ -263,7 +283,7 @@ def get_dc_energy(v,dm):
               out -= v[d][i,j]*dm[(0,0,0)][i,i]*dm[(0,0,0)][j,j]
               c = dm[d][i,j] # cross term
               out += v[d][i,j]*c*np.conjugate(c) # add contribution
-    print("DC energy",out.real)
+#    print("DC energy",out.real)
     return out.real
 
 
@@ -278,7 +298,7 @@ mf_file = "MF.pkl"
 def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
         load_mf=True,compute_cross=True,compute_dd=True,
-        compute_anomalous=False,
+        compute_anomalous=True,compute_normal=True,info=False,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
 #    if not h0.check_mode("spinless"): raise # sanity check
@@ -314,19 +334,22 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       t1 = time.perf_counter() # time
       # return the mean field
       mf = get_mf(v,dm,compute_cross=compute_cross,compute_dd=compute_dd,
-              has_eh=h0.has_eh,compute_anomalous=compute_anomalous) 
+              has_eh=h0.has_eh,compute_anomalous=compute_anomalous,
+              compute_normal=compute_normal) 
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time
-      print("Time in density matrix = ",t1-t0) # Difference
-      print("Time in the normal term = ",t2-t1) # Difference
+      if info: print("Time in density matrix = ",t1-t0) # Difference
+      if info: print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
       scf.hamiltonian = h # store
+   #   h.check() # check the Hamiltonian
       scf.hamiltonian0 = h0 # store
       scf.mf = mf # store mean field
       if os.path.exists("STOP"): scf.mf = mf0 # use the guess
       scf.dm = dm # store density matrix
       scf.v = v # store interaction
+      scf.tol = maxerror # maximum error
       return scf
     if solver=="plain":
       do_scf = True
@@ -337,12 +360,14 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
         t1 = time.clock() # time
-        print("Time in mixing",t1-t0)
-        print("ERROR",diff)
+        if info: print("Time in mixing",t1-t0)
+        print("ERROR in the SCF cycle",diff)
         #print("Mixing",dmix)
-        print()
+        if info: print()
         if diff<maxerror: 
+            scf = f(mfnew) # last iteration, with the unmixed mean field
             inout.save(scf.mf,mf_file) # save the mean field
+         #   scf.hamiltonian.check(tol=100*maxerror) # perform some sanity checks
             return scf
     else: # use different solvers
         scf = f(mf) # perform one iteration
@@ -373,6 +398,7 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         else: raise # unrecognised solver
         mf = fa2mf(x) # transform to MF
         scf = f(mf) # compute the SCF with the solution
+        scf.error = maxerror # store the error
         inout.save(scf.mf,mf_file) # save the mean field
         return scf # return the mean field
 
@@ -382,11 +408,11 @@ def get_mf2array(scf):
     nt = len(scf.mf) # number of terms in the dictionary
     n = scf.mf[(0,0,0)].shape[0]
     def fmf2a(mf):
-        print(mf[(0,0,0)].real)
+        #print(mf[(0,0,0)].real)
         out = [mf[key].real for key in mf] # to plain array
         out += [mf[key].imag for key in mf] # to plain array
         out = np.array(out)
-        print(out.shape)
+#        print(out.shape)
         out = out.reshape(nt*n*n*2) # reshape
         return out
     return fmf2a # return function
@@ -399,7 +425,7 @@ def get_array2mf(scf):
     def fa2mf(a):
         a = a.copy().reshape((2*nt,n*n)) # reshape array
         mf =  dict()
-        print(a.shape)
+        #print(a.shape)
         for i in range(len(ds)):
             d = ds[i]
             m = a[i,:] + 1j*a[i+nt,:] # get matrix
@@ -408,7 +434,7 @@ def get_array2mf(scf):
     return fa2mf # return function
 
 
-def densitydensity(h,filling=0.5,**kwargs):
+def densitydensity(h,filling=0.5,info=False,**kwargs):
     """Function for density-density interactions"""
     if h.has_eh: 
         if not h.has_spin: return NotImplemented # only for spinful
@@ -417,23 +443,24 @@ def densitydensity(h,filling=0.5,**kwargs):
     def callback_h(h):
         """Set the filling"""
         fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
-        print("Fermi energy",fermi)
+        if info: print("Fermi energy",fermi)
         h.fermi = fermi
         h.shift_fermi(-fermi) # shift by the fermi energy
         return h
 #    callback_h = None
-    scf = generic_densitydensity(h,callback_h=callback_h,**kwargs)
+    scf = generic_densitydensity(h,callback_h=callback_h,info=info,**kwargs)
     # Now compute the total energy
     h = scf.hamiltonian
     etot = h.get_total_energy(nk=h.nk)
     etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
-    print("Occupied energies",etot)
+    #print("Occupied energies",etot)
     etot += get_dc_energy(scf.v,scf.dm) # add the double counting energy
     etot = etot.real
     scf.total_energy = etot
-    print("##################")
-    print("Total energy",etot)
-    print("##################")
+    if info:
+      print("##################")
+      print("Total energy",etot)
+      print("##################")
     return scf
 
 
@@ -491,8 +518,8 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
                   m1[2*i+1,2*j+1] = m[i,j]
             v[d] = m1 # store
         for i in range(n):
-            v[(0,0,0)][2*i,2*i+1] += U # add
-        #    v[(0,0,0)][2*i+1,2*i] += U/2. # add
+            v[(0,0,0)][2*i,2*i+1] += U/2. # add
+            v[(0,0,0)][2*i+1,2*i] += U/2. # add
     return densitydensity(h,v=v,**kwargs)
 
 
@@ -502,5 +529,5 @@ from ..meanfield import identify_symmetry_breaking
 class SCF():
     def identify_symmetry_breaking(self,**kwargs):
         return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0,
-                **kwargs)
+                tol=10*self.tol,**kwargs)
 

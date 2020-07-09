@@ -19,6 +19,10 @@ def isnumber(s):
 
 maxsize = 10000
 
+def ismatrix(m):
+    return type(m)==np.ndarray or issparse(m) or type(m)==np.matrix
+
+
 
 def hermitian(m):
     return np.transpose(np.conjugate(m))

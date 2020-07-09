@@ -31,6 +31,8 @@ def get_operator(self,name,**kwargs):
       elif name=="deltaz": return operators.get_pairing(self,ptype="deltaz")
       elif name=="electron": return operators.get_electron(self)
       elif name=="hole": return operators.get_hole(self)
+      elif name in ["up"]: return operators.get_up(self)
+      elif name in ["dn","down"]: return operators.get_dn(self)
       elif name=="zposition": return operators.get_zposition(self)
       elif name=="surface": return operators.get_surface(self)
       elif name=="ldos": 

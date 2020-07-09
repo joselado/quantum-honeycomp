@@ -89,6 +89,7 @@ def hopping_spinful(m,cutoff=0.001):
   for i in range(n):
     for j in range(i,n):
       t = (np.abs(m[2*i,2*j]) + np.abs(m[2*i+1,2*j+1]))/2.
+      t = (np.abs(m[2*i,2*j+1]) + np.abs(m[2*i+1,2*j]))/2.
       if t>cutoff:
         ii.append(i)
         jj.append(j)

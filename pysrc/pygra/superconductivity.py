@@ -3,6 +3,7 @@ import numpy as np
 from scipy.sparse import coo_matrix, bmat, csc_matrix
 import scipy.sparse as sp
 from scipy.sparse import issparse
+from . import algebra
 
 
 
@@ -82,18 +83,58 @@ def eh_operator(m):
   for i in range(n): msy[i][i] = sy # add sy
   msy = bmat(msy) # sy matrix in the electron subspace
   out = [[None,1j*msy],[-1j*msy,None]]
-#  out = [[None for i in range(n)] for j in range(n)] # output matrix
-#  tau = csc_matrix([[0.,0.,0.,-1.],[0,0,1,0],[0,1,0,0],[-1,0,0,0]])
-#  for i in range(n):
-#    out[i][i] = tau
   out = bmat(out) # sparse matrix
   out = reorder(out) # reshufle the matrix
   def ehop(inm):
     """Function that applies electron-hole symmetry to a matrix"""
-    return out*np.conjugate(inm)*out # return matrix
+    return out@np.conjugate(inm)@out # return matrix
   return ehop # return operator
     
 
+def enforce_multihopping_eh_symmetry(MH):
+    """Enforce electron-hole symmetry in a multihopping object"""
+    raise
+    from .multihopping import MultiHopping
+    dd = MH.get_dict() # get the dictionary
+    out = dict() # dictionary
+    feh = eh_operator(dd[(0,0,0)]) # eh operator
+    for key in dd: # loop
+        m = dd[key] + feh(dd[tuple(-np.array(key))])
+        m = m/2. # normalize
+        out[key] = m
+    return MultiHopping(out) # return object
+
+
+def enforce_eh_symmetry(cc,cdcd):
+    """Enforce electron-hole symmetry, given the two dictionaries
+    for the expectation values the anomalous expectation values"""
+    outcc = dict() # dictionary
+    outcdcd= dict() # dictionary
+    for key in cc: # loop over keys
+        keym = tuple(-np.array(key)) # the opposite direction
+        m = cc[key] # get this correlator (the cc one)
+        m2 = cdcd[keym] # get the other matrix
+        md = algebra.dagger(m) # get the dagger
+        m2d = algebra.dagger(m2) # get the dagger of the matrix
+ #       print("MATRICES")
+#        print(np.round(m,2))
+#        print(np.round(m2,2))
+ #       print("MATRICES")
+        # this enforces even superconductivity
+        outcc[key] = (m + m2d)/2.
+        outcdcd[keym] = (m2+md)/2.
+    return (outcc,outcdcd) # return the dictionaries
+
+
+
+
+
+#    raise # this is not ok
+#    if type(m)==dict: 
+#        from .multihopping import MultiHopping
+#        m = MultiHopping(m)
+#        return enforce_multihopping_eh_symmetry(m).get_dict()
+#    else: raise
 
 
 
@@ -526,6 +567,49 @@ def get_nambu2signless(m):
     from scipy.sparse import diags
     return diags([dd],[0],shape=(4*n,4*n),dtype=np.complex) # create matrix
 
+
+
+def nambu_anomalous_reordering(n):
+    """For a matrix of <eu,ed>, return a matrix that reorders
+    to the Nambu basis"""
+    m = np.zeros((2*n,2*n)) # initialize as zero matrix
+    for i in range(n): # loop over sites
+        m[2*i,2*i+1] = 1.0 # reorder
+        m[2*i+1,2*i] = 1.0 # reorder
+    return m # return the matrix
+
+
+
+
+def identify_superconductivity(h,tol=1e-5):
+    """Given a Hamiltonian, identify the kind of superconductivity"""
+    if not h.has_eh: return [] # empty list
+    else: # if it has superconductivity
+        k = np.random.random(3) # random k-vector
+        m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
+        m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
+        d1 = get_eh_sector(m1,i=0,j=1) # pairing matrix
+        d2 = get_eh_sector(m2,i=0,j=1) # pairing matrix
+        out = [] # output
+        # first check if there is SC
+        if np.max(np.abs(d1))>tol: out.append("Superconductivity") 
+        else: return []
+        # now check if it has some symmetry
+        if np.max(np.abs(d1+d2))<tol: out.append("Odd superconductivity")
+        if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")
+        return out
+
+
+def check_nambu():
+    n = 20
+    m00 = np.random.random((n,n)) + 1j*np.random.random((n,n))
+    m01 = np.random.random((n,n)) + 1j*np.random.random((n,n))
+    m10 = np.random.random((n,n)) + 1j*np.random.random((n,n))
+    m = build_nambu_matrix(m00,c12=m01,c21=m10) 
+    d01 = get_eh_sector(m,i=0,j=1)
+    d10 = get_eh_sector(m,i=1,j=0)
+    print(np.max(np.abs(d01-m01)))
+    print(np.max(np.abs(d10-m10)))
 
 
 
