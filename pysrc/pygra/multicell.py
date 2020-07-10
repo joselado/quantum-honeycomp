@@ -55,7 +55,7 @@ def turn_multicell(h):
     hopping.dir = d
     hoppings.append(hopping) # store
     hopping = Hopping() # create object
-    hopping.m = t.H
+    hopping.m = np.conjugate(t).T
     hopping.dir = -d
     hoppings.append(hopping) # store
   ho.hopping = hoppings # store all the hoppings

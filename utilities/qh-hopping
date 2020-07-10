@@ -34,8 +34,8 @@ def getfig(main):
   cs[minc>cs] = minc # normalize
   cs = cs-np.min(cs) ; cs = cs/np.max(cs)
   ls = cs
-  ls = np.tanh(10*ts)
-  
+  ls = np.tanh(10*ls)
+  print(max(ls)) 
   
   cmap = matplotlib.cm.get_cmap('Spectral')
   #cmap = matplotlib.cm.get_cmap('jet')
