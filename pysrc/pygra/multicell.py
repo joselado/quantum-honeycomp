@@ -63,16 +63,17 @@ def turn_multicell(h):
   return ho
 
 
-def get_tij(h,rij=np.array([0.,0.,0.]),zero=False):
-  """Get the hopping between cells with certain indexes"""
-  drij = tuple([int(round(ir)) for ir in rij]) # put as integer
-  if not h.has_hopping_dict:
-      h.hopping_dict = get_hopping_dict(h)
-      h.has_hopping_dict = True
-  if drij in h.hopping_dict: return h.hopping_dict[drij]
-  else:
-      if zero: return h.intra*0.0
-      else: return None
+def generate_get_tij(h):
+    """Get the hopping between cells with certain indexes"""
+    hdict = h.get_multihopping().get_dict() # generate the multihopping object
+    mzero = hdict[(0,0,0)]*0.
+    def fun(rij=np.array([0.,0.,0.]),zero=False):
+        drij = tuple([int(round(ir)) for ir in rij]) # put as integer
+        if drij in hdict: return hdict[tuple(drij)]
+        else:
+            if zero: return mzero
+            else: return None
+    return fun
 
 def hk_gen(h):
   """Generate a k dependent hamiltonian"""
@@ -156,7 +157,7 @@ def bulk2ribbon(hin,n=10,sparse=True,nxt=6,ncut=6):
   from . import sculpt # rotate the geometry
   hr.geometry = sculpt.rotate_a2b(hr.geometry,hr.geometry.a1,np.array([1.,0.,0.]))
   hr.geometry.celldis = hr.geometry.a1[0]
-
+  get_tij = generate_get_tij(h) # return a function to abtain the hoppings
   def superhopping(dr=[0,0,0]): 
     """ Return a matrix with the hopping of the supercell"""
     intra = [[None for i in range(n)] for j in range(n)] # intracell term
@@ -164,7 +165,7 @@ def bulk2ribbon(hin,n=10,sparse=True,nxt=6,ncut=6):
       for jj in range(n): # loop over jj
         d = np.array([dr[0],ii-jj+dr[1],dr[2]])
         if d.dot(d)>ncut*ncut: continue # skip iteration
-        m = get_tij(h,rij=d) # get the matrix
+        m = get_tij(rij=d) # get the matrix
         if m is not None: intra[ii][jj] = csc_matrix(m) # store
         else: 
           if ii==jj: intra[ii][jj] = csc_matrix(h.intra*0.)
@@ -252,6 +253,7 @@ def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
       for k in range(nsuper[2]):
         pos.append(np.array([i,j,k])) # store position inside the supercell
   zero = csc_matrix(np.zeros(h.intra.shape,dtype=np.complex)) # zero matrix
+  get_tij = generate_get_tij(h) # return a function to abtain the hoppings
   def superhopping(dr=[0,0,0]): 
     """ Return a matrix with the hopping of the supercell"""
     rs = [dr[0]*nsuper[0],dr[1]*nsuper[1],dr[2]*nsuper[2]] # supercell vector
@@ -262,7 +264,7 @@ def supercell_hamiltonian(hin,nsuper=[1,1,1],sparse=True,ncut=3):
       for jj in range(n): # loop over cells
         d = pos[jj] + np.array(rs) -pos[ii] # distance
       #  if d.dot(d)>ncut*ncut: continue # skip iteration
-        m = get_tij(h,rij=d) # get the matrix
+        m = get_tij(rij=d) # get the matrix
         if m is not None: 
           intra[ii][jj] = csc_matrix(m) # store
     intra = csc_matrix(bmat(intra)) # convert to matrix
