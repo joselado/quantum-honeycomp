@@ -5,7 +5,7 @@ from ..dos import calculate_dos
 
 # specialized routines to compute the LDOS in continuum space
 
-def ldosr_generator(h,rs=1,es=np.linspace(-1.,1.,100),
+def ldosr_generator(h,rs=0.2,es=np.linspace(-1.,1.,100),
         delta=3e-2,nn=20,**kwargs):
     """Return a function that computes the LDOS as a function of the
     position"""

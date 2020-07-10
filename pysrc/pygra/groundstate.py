@@ -53,7 +53,9 @@ def mz(h,name="MZ.OUT"):
 def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False,
         spin_imbalance=False,cutoff=1e-2):
   """Write the magnitude of the hopping in a file"""
-  if h.has_eh: raise
+  if h.has_eh: 
+      h = h.copy()
+      h.remove_nambu()
   h = h.supercell(nrep)
   if h.has_spin: 
       if spin_imbalance:

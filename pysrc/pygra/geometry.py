@@ -66,6 +66,9 @@ class Geometry:
       return supercelltk.target_angle_volume(self,angle=0.5)
   def closest_index(self,r):
       return sculpt.get_closest(self,n=1,r0=r)[0]
+  def get_closest_position(self,r):
+      ii = self.closest_index(r)
+      return self.r[ii] # return this position
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional

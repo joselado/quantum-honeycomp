@@ -76,7 +76,8 @@ def get_tij(h,rij=np.array([0.,0.,0.]),zero=False):
 
 def hk_gen(h):
   """Generate a k dependent hamiltonian"""
-  if h.is_multicell==False: raise
+  if not h.is_multicell:
+      h = h.get_multicell()
   # get the non zero hoppings
   hopping = [] # empty list
   for t in h.hopping: # loop
