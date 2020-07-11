@@ -19,7 +19,8 @@ def check_hamiltonian(h,tol=1e-5):
   if not equal(m,np.conjugate(m).T):
     print("CHECK FAILED, Hamiltonian is not Hermitian")
     print(np.round(m,2))
-    raise # not hermitian
+    exit()
+#    raise # not hermitian
   if h.has_eh: # if it has electron hole degree of freedom
     v = np.random.random(3) # random kpoint
     m1 = hk(v) # Hamiltonian
@@ -28,7 +29,7 @@ def check_hamiltonian(h,tol=1e-5):
     eh = eh_operator(m1) # get the function
     if not equal(m1,-eh(m2),tol=tol): 
       print("CHECK FAILED, Hamiltonian does not have electron-hole symmetry")
-      raise
+      exit()
     print("CHECKED that the Hamiltonian has electron-hole symmetry")
 
 

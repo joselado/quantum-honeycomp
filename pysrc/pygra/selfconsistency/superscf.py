@@ -39,6 +39,9 @@ def anomalous_term_ij_jit(v,dm,out):
           out[2*i,2*j+1] = v[2*i,2*j]*dm[2*j+1,2*i]  # up,up
           out[2*i+1,2*j+1] = v[2*i+1,2*j]*dm[2*j+1,2*i+1]  # up,down
           out[2*i+1,2*j] = v[2*i+1,2*j+1]*dm[2*j,2*i+1]  # down,down
+          # up/down sectors have a factor 1/2 given that they appear twice
+#          out[2*i+1,2*j+1] /= 2.
+#          out[2*i,2*j] /= 2.
     return np.conjugate(out) # return the density matrix
 
 
@@ -46,7 +49,6 @@ def anomalous_term_ij_jit(v,dm,out):
 def enforce_eh_symmetry_anomalous(d01):
     """Enforce electron-hole symmetry in the two sectors"""
     d01 = enforce_eh_symmetry_anomalous_sector(d01)
-#    d10 = enforce_eh_symmetry_anomalous_sector(d10)
     d10 = enforce_eh_from_sector(d01)
     return d01,d10
 
@@ -90,7 +92,7 @@ def enforce_eh_symmetry_anomalous_sector(d01):
 
 @jit(nopython=True)
 def enforce_eh_symmetry_anomalous_jit(d01,d10,o01):
-    """Enforce time-reversal ina  matrix and the opposite"""
+    """Enforce electron-hole symmetry"""
     ns = len(d01)//2 # number of spinless sites
     for i in range(ns): # loop
         for j in range(ns): # loop
@@ -99,7 +101,7 @@ def enforce_eh_symmetry_anomalous_jit(d01,d10,o01):
             # enforce the down|down sector1
             o01[2*i+1,2*j] = d01[2*i+1,2*j] - d10[2*j+1,2*i]
             # enforce the up|down sector1
-            o01[2*i,2*j] = d01[2*i,2*j] - d10[2*j+1,2*i+1]
-            o01[2*i+1,2*j+1] = d01[2*i+1,2*j+1] - d10[2*j,2*i]
+            o01[2*i,2*j] = d01[2*i,2*j] + d10[2*j+1,2*i+1]
+            o01[2*i+1,2*j+1] = d01[2*i+1,2*j+1] + d10[2*j,2*i]
     return o01/2.
 

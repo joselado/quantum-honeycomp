@@ -179,7 +179,7 @@ def get_dm(h,v,nk=1):
 
 
 
-def get_mf(v,dm,has_eh=False,compute_anomalous=False,
+def get_mf(v,dm,has_eh=False,compute_anomalous=True,
         compute_normal=True,**kwargs):
     """Get the mean field matrix"""
     if has_eh:
@@ -197,18 +197,12 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
             m = dm[key] # transform to the new basis
             dme[key] = superconductivity.get_eh_sector(m,i=0,j=0)
             # this is a workaround for the reordering of Nambu spinors
-           # dma10[key] = superconductivity.get_eh_sector(m,i=1,j=0)
             dma10[key] = superconductivity.get_eh_sector(m,i=0,j=1)
         mfe = get_mf_normal(v,dme,**kwargs) # electron part of the mean field
         # anomalous part
         #dma01,dma10 = enforce_eh_symmetry_anomalous(dma01,dma10)
         mfa01 = get_mf_anomalous(v,dma10) 
         mfa01,mfa10 = enforce_eh_symmetry_anomalous(mfa01)
- #       print(np.round(mfa10[(1,0,0)],2))
- #       print(np.round(mfa10[(-1,0,0)],2))
- #       print(np.round(mfa01[(1,0,0)],2))
- #       print(np.round(mfa01[(-1,0,0)],2))
- #       exit()
         ##############################################
         # now rebuild the Hamiltonian
         mf = dict()
@@ -221,8 +215,8 @@ def get_mf(v,dm,has_eh=False,compute_anomalous=False,
                 m = superconductivity.build_nambu_matrix(mfe[key])
             mf[key] = m # store this matrix
     #        print(key)
-            #print(np.round(m,2))
-     #       print(np.unique(np.round(m,2)))
+    #        print(np.round(m,2))
+            #print(np.unique(np.round(m,2)))
         if not MultiHopping(mf).is_hermitian(): # just a sanity check
             print("Non-Hermitian mean field")
             print(np.round(mf[(0,0,0)],2))
@@ -343,7 +337,7 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       if info: print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
       scf.hamiltonian = h # store
-   #   h.check() # check the Hamiltonian
+#      h.check() # check the Hamiltonian
       scf.hamiltonian0 = h0 # store
       scf.mf = mf # store mean field
       if os.path.exists("STOP"): scf.mf = mf0 # use the guess

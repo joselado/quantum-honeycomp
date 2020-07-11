@@ -583,6 +583,7 @@ def nambu_anomalous_reordering(n):
 
 def identify_superconductivity(h,tol=1e-5):
     """Given a Hamiltonian, identify the kind of superconductivity"""
+    tol = 0.1
     if not h.has_eh: return [] # empty list
     else: # if it has superconductivity
         k = np.random.random(3) # random k-vector
@@ -597,6 +598,7 @@ def identify_superconductivity(h,tol=1e-5):
         # now check if it has some symmetry
         if np.max(np.abs(d1+d2))<tol: out.append("Odd superconductivity")
         if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")
+#        print(np.round(d1-d2,2),tol)
         return out
 
 
@@ -610,6 +612,21 @@ def check_nambu():
     d10 = get_eh_sector(m,i=1,j=0)
     print(np.max(np.abs(d01-m01)))
     print(np.max(np.abs(d10-m10)))
+
+
+
+
+def turn_nambu(self):
+  """Turn a Hamiltonian an Nambu Hamiltonian"""
+  nambu = build_eh
+  if self.check_mode("spinful_nambu"): return # do nothing
+  if not self.check_mode("spinful"): raise # error
+  def f(m): return nambu(m,is_sparse=self.is_sparse)
+  self.modify_hamiltonian_matrices(f) # modify all the matrices
+  self.has_eh = True
+
+
+from .sctk.extract import get_anomalous_hamiltonian
 
 
 

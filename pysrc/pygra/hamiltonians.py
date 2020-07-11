@@ -58,8 +58,8 @@ class hamiltonian():
       """Modify all the matrices of a Hamiltonian"""
       modify_hamiltonian_matrices(self,f)
   def get_filling(self,**kwargs):
-    """Get the filling of a Hamiltonian at this energy"""
-    return spectrum.get_filling(self,**kwargs) # eigenvalues
+      """Get the filling of a Hamiltonian at this energy"""
+      return spectrum.get_filling(self,**kwargs) # eigenvalues
   def reduce(self):
       return hamiltonianmode.reduce_hamiltonian(self)
   def full2profile(self,x,**kwargs):
@@ -72,6 +72,9 @@ class hamiltonian():
   def get_multihopping(self):
       out = multicell.get_hopping_dict(self)
       return multicell.MultiHopping(out) # return the object
+  def set_multihopping(self,mh):
+      """Set a multihopping as the Hamiltonian"""
+      multicell.set_multihopping(self,mh)
   def set_filling(self,filling,**kwargs):
     """Set the filling of the Hamiltonian"""
     spectrum.set_filling(self,filling=filling,**kwargs)
@@ -163,10 +166,13 @@ class hamiltonian():
   def turn_nambu(self):
       """Add electron hole degree of freedom"""
       self.get_eh_sector = get_eh_sector_odd_even # assign function
-      turn_nambu(self)
+      superconductivity.turn_nambu(self)
   def add_swave(self,*args,**kwargs):
-    """ Adds swave superconducting pairing"""
-    superconductivity.add_swave_to_hamiltonian(self,*args,**kwargs)
+      """ Adds swave superconducting pairing"""
+      superconductivity.add_swave_to_hamiltonian(self,*args,**kwargs)
+  def get_anomalous_hamiltonian(self):
+      """Return a Hamiltonian only with the anomalous part"""
+      return superconductivity.get_anomalous_hamiltonian(self)
   def add_pairing(self,delta=0.0,**kwargs):
     """ Add a general pairing matrix, uu,dd,ud"""
     superconductivity.add_pairing_to_hamiltonian(self,delta=delta,**kwargs)
@@ -870,19 +876,6 @@ def kchain(h,k):
 
 # import the function written in the library
 from .kanemele import generalized_kane_mele
-
-
-
-
-def turn_nambu(self):
-  """Turn a Hamiltonian an Nambu Hamiltonian"""
-  from .superconductivity import build_eh as nambu # redefine
-  if self.check_mode("spinful_nambu"): return # do nothing
-  if not self.check_mode("spinful"): raise # error
-  def f(m): return nambu(m,is_sparse=self.is_sparse)
-  self.modify_hamiltonian_matrices(f) # modify all the matrices
-  self.has_eh = True
-
 
 
 def modify_hamiltonian_matrices(self,f):

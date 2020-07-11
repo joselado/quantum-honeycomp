@@ -27,40 +27,58 @@ class Hopping():
 
 
 def turn_multicell(h):
-  """Transform a normal hamiltonian into a multicell hamiltonian"""
-  if h.is_multicell: return h # if it is already multicell
-  ho = h.copy() # copy hamiltonian
-  hoppings = [] # list of hoppings
-  # directions
-  dirs = []
-  if h.dimensionality == 0: ts = []
-  elif h.dimensionality == 1: # one dimensional
-    dirs.append(np.array([1,0,0]))
-    ts = [h.inter.copy()]
-    ho.inter = None
-  elif h.dimensionality == 2: # two dimensional
-    dirs.append(np.array([1,0,0]))
-    dirs.append(np.array([0,1,0]))
-    dirs.append(np.array([1,1,0]))
-    dirs.append(np.array([1,-1,0]))
-    ts = [h.tx.copy(),h.ty.copy(),h.txy.copy(),h.txmy.copy()]
-    del ho.tx
-    del ho.ty
-    del ho.txy
-    del ho.txmy
-  else: raise
-  for (d,t) in zip(dirs,ts): # loop over hoppings
-    hopping = Hopping() # create object
-    hopping.m = t
-    hopping.dir = d
-    hoppings.append(hopping) # store
-    hopping = Hopping() # create object
-    hopping.m = np.conjugate(t).T
-    hopping.dir = -d
-    hoppings.append(hopping) # store
-  ho.hopping = hoppings # store all the hoppings
-  ho.is_multicell = True # multicell hamiltonian
-  return ho
+    """Transform a normal hamiltonian into a multicell hamiltonian"""
+    if h.is_multicell: return h # if it is already multicell
+    ho = h.copy() # copy hamiltonian
+    # directions
+    dirs = []
+    if h.dimensionality == 0: ts = []
+    elif h.dimensionality == 1: # one dimensional
+      dirs.append(np.array([1,0,0]))
+      ts = [h.inter.copy()]
+      ho.inter = None
+    elif h.dimensionality == 2: # two dimensional
+      dirs.append(np.array([1,0,0]))
+      dirs.append(np.array([0,1,0]))
+      dirs.append(np.array([1,1,0]))
+      dirs.append(np.array([1,-1,0]))
+      ts = [h.tx.copy(),h.ty.copy(),h.txy.copy(),h.txmy.copy()]
+      del ho.tx
+      del ho.ty
+      del ho.txy
+      del ho.txmy
+    else: raise
+    dd = dict() # dictionary
+    dd[(0,0,0)] = h.intra
+    for (d,t) in zip(dirs,ts): dd[tuple(d)] = t
+    return set_dictionary(ho,dd) # return this Hamiltonian
+
+
+def set_multihopping(ho,dd):
+    """Set a multihopping as the Hamiltonian"""
+    dd = dd.get_dict()
+    return set_dictionary(ho,dd) # return this Hamiltonian
+
+
+
+def set_dictionary(ho,dd):
+    """Set a dictionary as the Hamiltonian"""
+    ho.intra = dd[(0,0,0)] # intracell
+    hoppings = [] # list of hoppings
+    for d in dd: # loop over hoppings
+        t = dd[d] # matrix
+        if d==(0,0,0): continue
+        hopping = Hopping() # create object
+        hopping.m = t
+        hopping.dir = np.array(d)
+        hoppings.append(hopping) # store
+        hopping = Hopping() # create object
+        hopping.m = np.conjugate(t).T
+        hopping.dir = -np.array(d)
+        hoppings.append(hopping) # store
+    ho.hopping = hoppings # store all the hoppings
+    ho.is_multicell = True # multicell hamiltonian
+    return ho
 
 
 def generate_get_tij(h):
