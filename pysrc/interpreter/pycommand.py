@@ -77,6 +77,9 @@ def get_python():
   """Return the path for Anaconda Python, which has pyqt by default"""
   try:
       from .pythoninterpreter import mainpython
+      if not os.path.isfile(mainpython): # do a sanity check
+          print("Python command not found, install manually Anaconda and execute again the quantum-honeycomp installation script")
+          exit()
       return mainpython
       print("Using the interpreter",mainpython)
   except:
