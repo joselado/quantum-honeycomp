@@ -45,7 +45,7 @@ def number_neighbors_jit(r1,r2):
 
 @jit(nopython=True)
 def find_first_neighbor_jit(r1,r2,pairs):
-    """Number of neighbors"""
+    """Find the first neighbors"""
     out = 0
     for i in range(len(r1)):
       for j in range(len(r2)):

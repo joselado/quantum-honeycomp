@@ -140,7 +140,8 @@ def add_kane_mele(self,t):
   if not self.has_spin: raise  # only for spinfull
   if self.is_multicell:   # multicell Hamiltonian
     ncells = 2 # number of neighboring cells to check
-    if self.dimensionality==1:  # three dimensional
+    if self.dimensionality==0: rs = g.r # fix for zero dimensional
+    elif self.dimensionality==1:  # three dimensional
       rs = [] # all the cells
       for i in range(-ncells,ncells+1): # loop over neighbouring cells
         rtmp = [ri + i*g.a1 for ri in g.r] # new positions

@@ -10,6 +10,7 @@ from copy import deepcopy
 from numba import jit
 from .. import utilities
 from ..multihopping import MultiHopping
+from .. import algebra
 
 class Interaction():
     def __init__(self,h=None):
@@ -144,38 +145,25 @@ def diff_mf(mf0,mf):
 
 
 def hamiltonian2dict(h):
-    out = dict() # create dictionary
-    if not h.is_multicell: raise
-    out[(0,0,0)] = h.intra
-    for t in h.hopping: out[tuple(t.dir)] = t.m # store
-    return out
+    return h.get_dict() # return dictionary
+#    out = dict() # create dictionary
+#    if not h.is_multicell: raise
+#    out[(0,0,0)] = h.intra
+#    for t in h.hopping: out[tuple(t.dir)] = t.m # store
+#    return out
 
 
 def set_hoppings(h,hop):
     """Add the hoppings to the Hamiltonian"""
-    h.is_multicell = True
-    from ..multicell import Hopping as Hop
-#    h.intra = h.intra*0.0 # set to zero
-    h.intra = hop[(0,0,0)]
-    hopping = [] # empty list
-    for key in hop: # loop
-        if key==(0,0,0): continue
-        t = Hop() # generate
-        t.dir = np.array(key) # transform to array
-        t.m = hop[key] # matrix
-        hopping.append(t) # store
-    h.hopping = hopping # store
+    h.set_multihopping(MultiHopping(hop))
 
 def get_dm(h,v,nk=1):
     """Get the density matrix"""
     ds = [(0,0,0)] # directions
     if h.dimensionality>0:
         for key in v: ds.append(key) # store
-    dms = densitymatrix.full_dm(h,ds=ds,nk=nk) # get all the density matrices
-    dm = dict()
-    for i in range(len(ds)): 
-        dm[ds[i]] = dms[i] # store
-    return dm # return dictionary with the density matrix
+    dms = h.get_density_matrix(ds=ds,nk=nk) # get all the density matrices
+    return dms # return dictionary
 
 
 
@@ -291,10 +279,11 @@ mf_file = "MF.pkl"
 
 def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         maxerror=1e-5,filling=None,callback_mf=None,callback_dm=None,
-        load_mf=True,compute_cross=True,compute_dd=True,
+        load_mf=True,compute_cross=True,compute_dd=True,verbose=1,
         compute_anomalous=True,compute_normal=True,info=False,
         callback_h=None,**kwargs):
     """Perform the SCF mean field"""
+    if verbose>1: info=True
 #    if not h0.check_mode("spinless"): raise # sanity check
     mf = obj2mf(mf)
     h1 = h0.copy() # initial Hamiltonian
@@ -333,8 +322,8 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       if callback_mf is not None:
           mf = callback_mf(mf) # callback for the mean field
       t2 = time.perf_counter() # time
-      if info: print("Time in density matrix = ",t1-t0) # Difference
-      if info: print("Time in the normal term = ",t2-t1) # Difference
+      if verbose>1: print("Time in density matrix = ",t1-t0) # Difference
+      if verbose>1: print("Time in the normal term = ",t2-t1) # Difference
       scf = SCF() # create object
       scf.hamiltonian = h # store
 #      h.check() # check the Hamiltonian
@@ -350,14 +339,13 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
       while do_scf:
         scf = f(mf) # new vector
         mfnew = scf.mf # new vector
-        t0 = time.clock() # time
+        t0 = time.perf_counter() # time
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
-        t1 = time.clock() # time
-        if info: print("Time in mixing",t1-t0)
-        print("ERROR in the SCF cycle",diff)
+        t1 = time.perf_counter() # time
+        if verbose>1: print("Time in mixing",t1-t0)
+        if verbose>0: print("ERROR in the SCF cycle",diff)
         #print("Mixing",dmix)
-        if info: print()
         if diff<maxerror: 
             scf = f(mfnew) # last iteration, with the unmixed mean field
             inout.save(scf.mf,mf_file) # save the mean field
@@ -428,7 +416,7 @@ def get_array2mf(scf):
     return fa2mf # return function
 
 
-def densitydensity(h,filling=0.5,info=False,**kwargs):
+def densitydensity(h,filling=0.5,mu=None,verbose=0,**kwargs):
     """Function for density-density interactions"""
     if h.has_eh: 
         if not h.has_spin: return NotImplemented # only for spinful
@@ -436,22 +424,26 @@ def densitydensity(h,filling=0.5,info=False,**kwargs):
     h.turn_dense()
     def callback_h(h):
         """Set the filling"""
-        fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
-        if info: print("Fermi energy",fermi)
-        h.fermi = fermi
-        h.shift_fermi(-fermi) # shift by the fermi energy
+        if mu is None:
+          fermi = h.get_fermi4filling(filling,nk=h.nk) # get the filling
+          if verbose>1: print("Fermi energy",fermi)
+          h.fermi = fermi
+          h.shift_fermi(-fermi) # shift by the fermi energy
+        else: h.shift_fermi(-mu) # shift by mu
         return h
 #    callback_h = None
-    scf = generic_densitydensity(h,callback_h=callback_h,info=info,**kwargs)
+    scf = generic_densitydensity(h,callback_h=callback_h,verbose=verbose,
+            **kwargs)
     # Now compute the total energy
     h = scf.hamiltonian
     etot = h.get_total_energy(nk=h.nk)
-    etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
+    if mu is None: 
+        etot += h.fermi*h.intra.shape[0]*filling # add the Fermi energy
     #print("Occupied energies",etot)
     etot += get_dc_energy(scf.v,scf.dm) # add the double counting energy
     etot = etot.real
     scf.total_energy = etot
-    if info:
+    if verbose>1:
       print("##################")
       print("Total energy",etot)
       print("##################")
@@ -481,25 +473,19 @@ def hubbard(h,U=1.0,**kwargs):
       return densitydensity(h,v=v,compute_cross=False,**kwargs)
 
 
-def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
+def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
+        constrains=[],**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
     # define the function
     nd = h.geometry.neighbor_distances() # distance to first neighbors
- #   def fun(r1,r2):
- #       dr = r1-r2
- #       dr = np.sqrt(dr.dot(dr)) # distance
- #       if abs(dr-nd[0])<1e-6: return V1/2.
- #       if abs(dr-nd[1])<1e-6: return V2/2.
- #       return 0.0
     from .. import specialhopping
     mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.,V3/2.],nd[0:3])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             mgenerator=mgenerator) 
- #   hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
- #           fun=fun) 
     v = hv.get_hopping_dict() # hopping dictionary
+    U = obj2geometryarray(U,h.geometry) # convert to array
     if h.has_spin: #raise # not implemented
         for d in v: # loop
             m = v[d] ; n = m.shape[0]
@@ -512,9 +498,15 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,**kwargs):
                   m1[2*i+1,2*j+1] = m[i,j]
             v[d] = m1 # store
         for i in range(n):
-            v[(0,0,0)][2*i,2*i+1] += U/2. # add
-            v[(0,0,0)][2*i+1,2*i] += U/2. # add
-    return densitydensity(h,v=v,**kwargs)
+            v[(0,0,0)][2*i,2*i+1] += U[i]/2. # add
+            v[(0,0,0)][2*i+1,2*i] += U[i]/2. # add
+    # Now put the constrains if necessary
+    from . import mfconstrains
+    def callback_mf(mf):
+        """Put the constrains in the mean field if necessary"""
+        mf = mfconstrains.enforce_constrains(mf,h,constrains)
+        return mf
+    return densitydensity(h,v=v,callback_mf=callback_mf,**kwargs)
 
 
 
@@ -525,3 +517,14 @@ class SCF():
         return identify_symmetry_breaking(self.hamiltonian,self.hamiltonian0,
                 tol=10*self.tol,**kwargs)
 
+
+
+
+
+def obj2geometryarray(U,g):
+    """Convert an object to an array"""
+    if algebra.isnumber(U):
+        return np.array([U for ir in g.r]) # same for all
+    elif callable(U):
+        return np.array([U(ir) for ir in g.r]) # call for each
+    else: raise

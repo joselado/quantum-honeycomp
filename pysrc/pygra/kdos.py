@@ -307,9 +307,10 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
     if h1.dimensionality==3:
       g2d = h1.geometry.copy() # copy Hamiltonian
       g2d = sculpt.set_xy_plane(g2d)
-      kpath = klist.default(g2d,nk=100)
+      kpath = klist.default(g2d,nk=len(energies))
     elif h1.dimensionality==2:
-      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,40)]
+      kpath = [[k,0.,0.] for k in np.linspace(0.,1.,len(energies))]
+    elif h1.dimensionality==1: kpath = [[0.,0.,0.0]] # one dummy point
     else: raise
   fo = open("KDOS.OUT","w")
   fo.write("# k, E, Surface, Bulk\n")
@@ -322,7 +323,8 @@ def surface(h1,energies=np.linspace(-1.,1.,100),operator=None,
     outs = green.surface_multienergy(h1,k=k,energies=energies,delta=delta,hs=hs)
     for (energy,out) in zip(energies,outs):
       # write everything
-      fo.write(str(ik)+"   "+str(energy)+"   ")
+      if h1.dimensionality==1: fo.write(str(energy)+"   ")
+      else: fo.write(str(ik)+"   "+str(energy)+"   ")
       for g in out: # loop
         if operator is None: d = -algebra.trace(g).imag # only the trace 
         elif callable(operator): d = operator(g,k=k) # call the operator

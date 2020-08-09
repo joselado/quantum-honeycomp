@@ -37,7 +37,7 @@ from .limits import densedimension as maxmatrix
 #maxmatrix = 4000 # maximum dimension
 optimal = False
 
-class hamiltonian():
+class Hamiltonian():
   """ Class for a hamiltonian """
   def get_tails(self,discard=None):
     """Write the tails of the wavefunctions"""
@@ -300,7 +300,8 @@ class hamiltonian():
           self = self.get_multicell()
       hop = dict()
       hop[(0,0,0)] = self.intra
-      for t in self.hopping: hop[tuple(t.dir)] = t.m
+      for t in self.hopping: hop[tuple(np.array(t.dir))] = t.m
+      for t in self.hopping: hop[tuple(-np.array(t.dir))] = np.conjugate(t.m).T
       return hop # return dictionary
   def get_multihopping(self):
       """Return a multihopping object"""
@@ -451,7 +452,7 @@ class hamiltonian():
       h0 = h1.get_multicell() # turn multicell again
       diff = (self.get_multihopping() - h0.get_multihopping()).norm()
       if diff>1e-6: 
-          print("Hamiltonain cannot be made o multicell")
+          print("Hamiltonain cannot be made no multicell")
           raise
       else: return h1 # return the Hamiltonian
   def clean(self):
@@ -501,32 +502,39 @@ class hamiltonian():
       if self.dimensionality==0:
           return ipr.ipr(self.intra,**kwargs) 
       else: raise # not implemented
+  def get_density_matrix(self,**kwargs):
+      """Return the density matrix"""
+      from . import densitymatrix
+      return densitymatrix.full_dm(self,**kwargs)
+  def get_average_dvector(self,**kwargs):
+      """Return a square average of the d-vector in the BZ"""
+      return superconductivity.average_hamiltonian_dvector(self,**kwargs)
+
+
+hamiltonian = Hamiltonian
 
 
 
 
 
-
-
-
-def get_first_neighbors(r1,r2,optimal=optimal):
-  """Gets the fist neighbors, input are arrays"""
-  if optimal:
+def get_first_neighbors(r1,r2):
+    """Gets the fist neighbors, input are arrays"""
+#  if optimal:
     from . import neighbor
     pairs = neighbor.find_first_neighbor(r1,r2)
     return pairs
-  else:
-    from numpy import array
-    n=len(r1)
-    pairs = [] # pairs of neighbors
-    for i in range(n):
-      ri=r1[i]
-      for j in range(n):
-        rj=r2[j]
-        dr = ri - rj ; dr = dr.dot(dr)
-        if .9<dr<1.1 : # check if distance is 1
-          pairs.append([i,j])  # add to the list
-    return pairs # return pairs of first neighbors
+#  else:
+#    from numpy import array
+#    n=len(r1)
+#    pairs = [] # pairs of neighbors
+#    for i in range(n):
+#      ri=r1[i]
+#      for j in range(n):
+#        rj=r2[j]
+#        dr = ri - rj ; dr = dr.dot(dr)
+#        if .9<dr<1.1 : # check if distance is 1
+#          pairs.append([i,j])  # add to the list
+#    return pairs # return pairs of first neighbors
 
 
 
@@ -758,11 +766,11 @@ def is_number(s):
     return isinstance(x, numbers.Number)
 
 def is_hermitic(m):
-  mh = m.H
-  hh = m - m.H
+  mh = np.conjugate(m).T
+  hh = m - mh
   for i in range(len(hh)):
     for j in range(len(hh)):
-      if np.abs(hh[i,j]) > 0.000001:
+      if np.abs(hh[i,j]) > 1e-5:
         print("No hermitic element", i,j,m[i,j],m[j,i])
         return False
   return True
@@ -801,6 +809,7 @@ def first_neighborsnd(h):
     h.ty = gett(r,r+a2)
     h.txy = gett(r,r+a1+a2)
     h.txmy = gett(r,r+a1-a2)
+  else: raise
 
 
 
@@ -864,11 +873,12 @@ from .superconductivity import get_eh_sector_odd_even
 def kchain(h,k):
   """ Return the kchain Hamiltonian """
   if h.dimensionality != 2: raise
+  if h.is_multicell: h = h.get_no_multicell() # redefine
   tky = h.ty*np.exp(1j*np.pi*2.*k)
   tkxy = h.txy*np.exp(1j*np.pi*2.*k)
   tkxmy = h.txmy*np.exp(-1j*np.pi*2.*k)  # notice the minus sign !!!!
   # chain in the x direction
-  ons = h.intra + tky + tky.H  # intra of k dependent chain
+  ons = h.intra + tky + np.conjugate(tky).T  # intra of k dependent chain
   hop = h.tx + tkxy + tkxmy  # hopping of k-dependent chain
   return (ons,hop)
 

@@ -32,17 +32,13 @@ def anomalous_term_ij(v,dm):
 @jit(nopython=True)
 def anomalous_term_ij_jit(v,dm,out):
     ns = len(dm)//2 # number of spinless sites
-    dm = np.conjugate(dm)
     for i in range(ns): # loop over spinless sites
         for j in range(ns): # loop over spinless sites
           out[2*i,2*j] = v[2*i,2*j+1]*dm[2*j,2*i]  # down,up
           out[2*i,2*j+1] = v[2*i,2*j]*dm[2*j+1,2*i]  # up,up
           out[2*i+1,2*j+1] = v[2*i+1,2*j]*dm[2*j+1,2*i+1]  # up,down
           out[2*i+1,2*j] = v[2*i+1,2*j+1]*dm[2*j,2*i+1]  # down,down
-          # up/down sectors have a factor 1/2 given that they appear twice
-#          out[2*i+1,2*j+1] /= 2.
-#          out[2*i,2*j] /= 2.
-    return np.conjugate(out) # return the density matrix
+    return out
 
 
 
@@ -68,14 +64,15 @@ def enforce_eh_from_sector(d):
 @jit(nopython=True)
 def enforce_eh_from_sector_jit(d,o):
     """Given the ee sector, return the hh sector"""
-    ns = len(d)//2 # number of sites
-    for i in range(ns): # loop
-        for j in range(ns): # loop
-            o[2*i+1,2*j+1] = np.conjugate(d[2*j+1,2*i+1])      # ud
-            o[2*i,2*j] = np.conjugate(d[2*j,2*i])      # du
-            o[2*i,2*j+1] = np.conjugate(d[2*j+1,2*i])  # uu
-            o[2*i+1,2*j] = np.conjugate(d[2*j,2*i+1])  # dd
-    return o
+    return np.conjugate(d.T) # hermitian conjugate
+#    ns = len(d)//2 # number of sites
+#    for i in range(ns): # loop
+#        for j in range(ns): # loop
+#            o[2*i+1,2*j+1] = np.conjugate(d[2*j+1,2*i+1])      # ud
+#            o[2*i,2*j] = np.conjugate(d[2*j,2*i])      # du
+#            o[2*i,2*j+1] = np.conjugate(d[2*j+1,2*i])  # uu
+#            o[2*i+1,2*j] = np.conjugate(d[2*j,2*i+1])  # dd
+#    return o
 
 
 def enforce_eh_symmetry_anomalous_sector(d01):
@@ -100,7 +97,7 @@ def enforce_eh_symmetry_anomalous_jit(d01,d10,o01):
             o01[2*i,2*j+1] = d01[2*i,2*j+1] - d10[2*j,2*i+1]
             # enforce the down|down sector1
             o01[2*i+1,2*j] = d01[2*i+1,2*j] - d10[2*j+1,2*i]
-            # enforce the up|down sector1
+            # enforce the up|down sector1 (beware of the minus sign)
             o01[2*i,2*j] = d01[2*i,2*j] + d10[2*j+1,2*i+1]
             o01[2*i+1,2*j+1] = d01[2*i+1,2*j+1] + d10[2*j,2*i]
     return o01/2.

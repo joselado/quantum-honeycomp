@@ -147,7 +147,7 @@ def optimize_gap(h,direct=True,ntries=10):
 
 def indirect_gap(h):
   """Calculates the gap for a 2d Hamiltonian by doing
-  a kmesh sampling. It will return the positive energy with smaller value"""
+  a kmesh sampling. It will return the positive energy with smallest value"""
   from scipy.optimize import minimize
   hk_gen = h.get_hk_gen() # generator
   def gete(k): # return the energies

@@ -50,7 +50,9 @@ def turn_multicell(h):
     else: raise
     dd = dict() # dictionary
     dd[(0,0,0)] = h.intra
-    for (d,t) in zip(dirs,ts): dd[tuple(d)] = t
+    for (d,t) in zip(dirs,ts): 
+        dd[tuple(d)] = t
+        dd[tuple(-np.array(d))] = np.conjugate(t).T
     return set_dictionary(ho,dd) # return this Hamiltonian
 
 
@@ -72,10 +74,10 @@ def set_dictionary(ho,dd):
         hopping.m = t
         hopping.dir = np.array(d)
         hoppings.append(hopping) # store
-        hopping = Hopping() # create object
-        hopping.m = np.conjugate(t).T
-        hopping.dir = -np.array(d)
-        hoppings.append(hopping) # store
+#        hopping = Hopping() # create object
+#        hopping.m = np.conjugate(t).T
+#        hopping.dir = -np.array(d)
+#        hoppings.append(hopping) # store
     ho.hopping = hoppings # store all the hoppings
     ho.is_multicell = True # multicell hamiltonian
     return ho

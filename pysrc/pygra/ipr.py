@@ -1,5 +1,6 @@
 import numpy as np
 from . import klist
+from . import algebra
 import scipy.linalg as lg
 
 
@@ -33,7 +34,7 @@ def ipr2d(h,nk=10,random=True,window=[-0.1,0.1]):
 
 def ipr(m,retain=lambda x: True):
   """Calculate the inverse participation ratio"""
-  es,ws = lg.eigh(m) # diagonalize
+  es,ws = algebra.eigh(m) # diagonalize
   ws = ws.transpose() # transpose
   eout = []
   dout = []

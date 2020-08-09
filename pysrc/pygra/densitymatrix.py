@@ -33,7 +33,10 @@ def full_dm(h,use_fortran=True,nk=10,fermi=0.0,delta=1e-2,ds=None):
     n = h.intra.shape[0] # dimensionality
     out = parallel.pcall(lambda x: full_dm_python_d(n,es,vs,ks,x)*fac,ds)
 #    out = [full_dm_python_d(n,es,vs,ks,d)*fac for d in ds] # compute all the DM
-    return out # return all the density matrices
+    outd = dict() # dictionary
+    for i in range(len(ds)): outd[tuple(ds[i])] = out[i] # as dictionary
+    return outd
+#    return out # return all the density matrices
 
 
 

@@ -286,13 +286,10 @@ def add_pxipy(delta=0.0,is_sparse=False,r1=None,r2=None):
 add_pwave = add_pxipy
 
 
-def dvector2deltas(ds):
-  """Transform a certain dvector into deltauu, deltadd and deltaud"""
-  deltas = [0.,0.,0.]
-  deltas[0] = ds[0]+ds[1]
-  deltas[1] = -1j*(ds[0]-ds[1]) # this sign might not be ok
-  deltas[2] = ds[2]
-  return deltas
+# functions for d-vector computations
+from .sctk.dvector import dvector2deltas 
+from .sctk.dvector import delta2dvector 
+
 
 
 def add_pairing(deltas=[[0.,0],[0.,0.]],is_sparse=True,r1=[],r2=[]):
@@ -364,20 +361,9 @@ def nambu2block(m):
     return R@m@Rh
 
 
-def extract_pairing(m):
-  """Extract the pairing from a matrix, assuming it has the Nambu form"""
-  nr = m.shape[0]//4 # number of positions
-  uu = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  dd = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  ud = np.matrix(np.zeros((nr,nr),dtype=np.complex)) # zero matrix
-  for i in range(nr): # loop over positions
-    for j in range(nr): # loop over positions
-        ud[i,j] = m[4*i,4*j+2]
-        dd[i,j] = m[4*i+1,4*j+2]
-        uu[i,j] = m[4*i,4*j+3]
-  return (uu,dd,ud) # return the three matrices
-
-
+from .sctk.extract import extract_pairing
+from .sctk.extract import extract_singlet_pairing
+from .sctk.extract import extract_triplet_pairing
 
 
 def add_pairing_to_hamiltonian(self,delta=0.0,mode="swave"):
@@ -583,23 +569,54 @@ def nambu_anomalous_reordering(n):
 
 def identify_superconductivity(h,tol=1e-5):
     """Given a Hamiltonian, identify the kind of superconductivity"""
-    tol = 0.1
     if not h.has_eh: return [] # empty list
-    else: # if it has superconductivity
-        k = np.random.random(3) # random k-vector
-        m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
-        m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
-        d1 = get_eh_sector(m1,i=0,j=1) # pairing matrix
-        d2 = get_eh_sector(m2,i=0,j=1) # pairing matrix
-        out = [] # output
-        # first check if there is SC
-        if np.max(np.abs(d1))>tol: out.append("Superconductivity") 
-        else: return []
-        # now check if it has some symmetry
-        if np.max(np.abs(d1+d2))<tol: out.append("Odd superconductivity")
-        if np.max(np.abs(d1-d2))<tol: out.append("Even superconductivity")
-#        print(np.round(d1-d2,2),tol)
-        return out
+    dd = h.get_multihopping()
+    if dd.norm()<tol: return [] # nothing
+    out = [] # initialize the list
+    out.append("Superconductivity") # is superconducting
+    dv = h.get_average_dvector() # get the average d-vector
+    if dv[0]>tol: out.append("dx SC")
+    if dv[1]>tol: out.append("dy SC")
+    if dv[2]>tol: out.append("dz SC")
+    (uum,ddm,udm) = dict2absdeltas(dd.get_dict()) # extract absolute value of deltas
+    if np.max(uum)>tol: out.append("up-up pairing")
+    if np.max(ddm)>tol: out.append("down-down pairing")
+    if np.max(udm)>tol: out.append("up-down pairing")
+
+    if h.dimensionality==0: return out
+    k = np.random.random(3) # random k-vector
+    m1 = h.get_hk_gen()(k) # get the Bloch hamiltonian
+    m2 = h.get_hk_gen()(-k) # get the Bloch hamiltonian
+    # now check if it has some symmetry
+    singletp = np.sum(np.abs(extract_singlet_pairing(m1))) # singlet
+    tripletp = np.sum(np.abs(extract_triplet_pairing(m1))) # triplet
+    print(singletp,tripletp)
+    if singletp<tol: out.append("Odd superconductivity")
+    if tripletp<tol: out.append("Even superconductivity")
+#    print(np.round(d1-d2,2),tol)
+    return out
+
+
+
+def dict2absdeltas(mf):
+    """Given a hopping dictionary, extract the absolute value of
+    the three deltas, uu,dd and ud. This function should be used for
+    qualitative checks"""
+    for key in mf: n = mf[key].shape[0]//4 # number of sites
+    uu = np.zeros(n)
+    dd = np.zeros(n)
+    ud = np.zeros(n)
+    for key in mf: # loop over keys
+        m = mf[key]
+        (uut,ddt,udt) = extract_pairing(m) # extract the three matrices
+        uu += np.sum(np.abs(uut),axis=0)
+        dd += np.sum(np.abs(ddt),axis=0)
+        ud += np.sum(np.abs(udt),axis=0)
+    return (uu,dd,ud)
+
+
+
+
 
 
 def check_nambu():
@@ -627,6 +644,7 @@ def turn_nambu(self):
 
 
 from .sctk.extract import get_anomalous_hamiltonian
+from .sctk.dvector import average_hamiltonian_dvector
 
 
 
