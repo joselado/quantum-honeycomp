@@ -56,7 +56,7 @@ def get_numbers(name):
 
 def get_geometry0d(second_call=False):
   """ Create a 0d island"""
-  t0 = time.clock() # initial time
+  t0 = time.perf_counter() # initial time
   lattice_name = getbox("lattice")
   if lattice_name=="Honeycomb":
     geometry_builder = geometry.honeycomb_lattice
@@ -108,7 +108,7 @@ def get_geometry0d(second_call=False):
   ############################################3
 #  g = modify_geometry(g) # modify the geometry in several ways
   print("Total number of atoms =",len(g.r))
-  print("Time spent in creating the geometry =",time.clock() - t0)
+  print("Time spent in creating the geometry =",time.perf_counter() - t0)
   if getactive("clean_island"): # if it is cleaned
     g = sculpt.remove_unibonded(g,iterative=True)  # remove single bonded atoms
   return g
@@ -144,7 +144,7 @@ def modify_geometry(g):
 
 def initialize():
   """ Initialize the calculation"""
-  t0 = time.clock()
+  t0 = time.perf_counter()
   os.system("rm SELECTED_ATOMS.INFO") # remove the file for the DOS
   g = get_geometry0d() # get the geometry
   h = hamiltonians.hamiltonian(g) # get the hamiltonian
@@ -173,7 +173,7 @@ def initialize():
     h.shift_fermi(get("edge_potential")*edgesites) # add onsites
   # part for bilayer systems
   #####
-  print("Time spent in creating the Hamiltonian =",time.clock() - t0)
+  print("Time spent in creating the Hamiltonian =",time.perf_counter() - t0)
   h.geometry.write()
   h.save() # save the Hamiltonian
 
@@ -231,18 +231,18 @@ def show_dos():
   x = np.linspace(-.9,.9,int(get("num_ene_dos"))) # energies
   h.intra = h.intra/6.0 # normalize
   ntries = int(get("DOS_iterations"))
-  t0 = time.clock() # initial time
+  t0 = time.perf_counter() # initial time
   mus = kpm.random_trace(h.intra,n=points,ntries=ntries) # calculate moments
   y = kpm.generate_profile(mus,x) # calculate DOS 
   x,y = x*6.,y/6. # renormalize
   y = dos.convolve(x,y,delta=get("smearing_dos")) # add broadening
   dos.write_dos(x,y) # write dos in file
   execute_script("qh-dos")
-  print("Time spent in Kernel PM DOS calculation =",time.clock() - t0)
+  print("Time spent in Kernel PM DOS calculation =",time.perf_counter() - t0)
 
 
 def show_spatial_dos():
-  t0 = time.clock()
+  t0 = time.perf_counter()
   h = load_hamiltonian() # get the hamiltonian
   mode_stm = getbox("mode_stm") # get the way the images will be calculated
   delta = get("smearing_spatial_DOS")
@@ -259,7 +259,7 @@ def show_spatial_dos():
   if mode_dosmap=="Single shot":
     energy = get("energy_spatial_DOS") # one shot
     shot_dos(energy) # calculate
-    print("Time spent in STM calculation =",time.clock() - t0)
+    print("Time spent in STM calculation =",time.perf_counter() - t0)
     execute_script("qh-fast-ldos LDOS.OUT  ") # using matplotlib
   if mode_dosmap=="Movie": # do a sweep
     energies = np.linspace(get("mine_movie"),get("maxe_movie"),

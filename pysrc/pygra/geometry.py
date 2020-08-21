@@ -233,7 +233,7 @@ class Geometry:
           return max([1,n])
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
-      write_profile(self,d,**kwargs)
+      write_profile(self,np.array(d),**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -1699,5 +1699,23 @@ def neighbor_distances_jit(r,out):
             out[k] = dis # store
             k+=1 # increase
     return out
+
+
+def array2function(g,v):
+    r = g.r # positions
+    def f(ri):
+        return array2function_jit(r,v,ri)
+    return f # return function
+
+
+@jit(nopython=True)
+def array2function_jit(r,v,ir):
+    n = len(r)
+    for i in range(n):
+        dr = r[i] - ir # vector difference
+        dr2 = dr[0]**2 + dr[1]**2 + dr[2]**2
+        if dr2<1e-3: return v[i]
+    return 0.0
+
 
 

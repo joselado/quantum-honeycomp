@@ -1,4 +1,4 @@
-#!/home/jose/apps/anaconda3/bin/python
+#!/mnt/extradrive/apps/anaconda3/bin/python
 
 import numpy as np
 import numpy 

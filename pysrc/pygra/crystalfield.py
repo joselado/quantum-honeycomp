@@ -44,7 +44,18 @@ def hartree_onsite(g,rcut=6.0,vc=0.0):
 
 
 
-
+def bulkedge_function(g,vbulk=0.0,vedge=1.0,rcut=20.0,sharpness=None,
+        ebcut=.5):
+    """Return a function that distinguishes between bulk and edge"""
+    m = hartree_onsite(g,vc=1.0,rcut=rcut) # compute the array
+    m = m - np.min(m) # shift
+    m = m/np.max(m) # normalize
+    if not sharpness is None:  
+        m = (np.tanh(sharpness*(m-ebcut)) + 1.)/2.
+    m = vedge + (vbulk-vedge)*m # scale
+    from .geometry import array2function
+    f = array2function(g,m) 
+    return f # return function
 
 
 

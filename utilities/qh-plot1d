@@ -2,7 +2,7 @@
 
 
 import numpy as np
-import pylab as py
+import matplotlib.pyplot as py
 import sys
 
 
