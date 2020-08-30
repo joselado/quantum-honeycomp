@@ -148,7 +148,7 @@ def ldos_waves(intra,es = [0.0],delta=0.01,operator=None,
       eig,eigvec = algebra.smalleig(intra,numw=num_bands,evecs=True)
       eigvec = eigvec.T
   ds = [] # empty list
-  if operator is None: weights = es*0. + 1.0
+  if operator is None: weights = eig*0. + 1.0
   else: weights = [operator.braket(v,k=k) for v in eigvec.transpose()] # weights
   v2s = [(np.conjugate(v)*v).real for v in eigvec.transpose()]
   ds = [[0.0 for i in range(intra.shape[0])] for e in es] # initialize
