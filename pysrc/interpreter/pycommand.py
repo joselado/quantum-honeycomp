@@ -147,4 +147,25 @@ def create_icon():
 
 
 
+def set_utility_interpreter():
+    """Set the interpreter for all the utilities"""
+    executable = get_python() # get the interpreter
+    upath = os.path.dirname(os.path.realpath(__file__))+"/../../utilities"
+    from os import listdir
+    from os.path import isfile, join
+    onlyfiles = [f for f in listdir(upath) if isfile(join(upath, f))]
+    for f in onlyfiles: # loop over files
+        ls = open(upath+"/"+f).readlines() # read all the lines
+        for i in range(len(ls)):
+            if "#!/" in ls[i]: 
+                ls[i] = "#!"+get_python()+"\n" # put the right interpreter
+                break
+        fo = open(upath+"/"+f,"w")
+        for l in ls: fo.write(l)
+        fo.close()
+
+
+
+
+
 

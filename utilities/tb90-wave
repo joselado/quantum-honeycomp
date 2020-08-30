@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/mnt/extradrive/apps/anaconda3/bin/python
 
 
 # function to read the hamiltonian created by tb90

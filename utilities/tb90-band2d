@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/mnt/extradrive/apps/anaconda3/bin/python
 
 # creates the file BANDS2D.OUT and plots it
 

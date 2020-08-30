@@ -178,8 +178,8 @@ def ldos_waves_jit(es,eigvec,eig,weights,v2s,ds,delta):
 
 def ldos_diagonalization(m,e=0.0,**kwargs):
     """Compute the LDOS using exact diagonalization"""
-    if algebra.issparse(m): return ldos_arpack(m,e=e,**kwargs) # sparse
-    else: return ldos_waves(m,es=[e],**kwargs)[0] # dense
+#    if algebra.issparse(m): return ldos_arpack(m,e=e,**kwargs) # sparse
+    return ldos_waves(m,es=[e],**kwargs)[0] # dense
 
 
 

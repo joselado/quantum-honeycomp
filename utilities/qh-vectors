@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/mnt/extradrive/apps/anaconda3/bin/python
 
 # this script read mean_field.in and calculates the magnetism in the
 # different sites

@@ -62,7 +62,10 @@ def hopping(h,name="HOPPING.OUT",nrep=3,skip = lambda r1,r2: False,
           (ii,jj,ts) = extract.hopping_spinful_difference(h.intra,
                   skip_same_site=True)
       else:
-          (ii,jj,ts) = extract.hopping_spinful(h.intra)
+          h0 = h.copy()
+          h0.remove_spin()
+          (ii,jj,ts) = extract.hopping_spinless(h0.intra)
+  #        (ii,jj,ts) = extract.hopping_spinful(h.intra)
   else: (ii,jj,ts) = extract.hopping_spinless(h.intra)
   f = open(name,"w") # write file
   for (i,j,t) in zip(ii,jj,np.abs(ts)):

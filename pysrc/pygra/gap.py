@@ -7,7 +7,7 @@ from scipy.sparse import csc_matrix
 from . import algebra
 
 def minimize_gap(f,tol=0.001,bounds=(0,1.)):
-  """Miimizes the gap of the system, the argument is between 0 and 1"""
+  """Minimizes the gap of the system, the argument is between 0 and 1"""
   return f(minimize_scalar(f,method="Bounded",bounds=bounds,tol=tol).x)
 
 
@@ -145,7 +145,7 @@ def optimize_gap(h,direct=True,ntries=10):
 
 
 
-def indirect_gap(h):
+def indirect_gap(h,robust=True):
   """Calculates the gap for a 2d Hamiltonian by doing
   a kmesh sampling. It will return the positive energy with smallest value"""
   from scipy.optimize import minimize
@@ -179,8 +179,8 @@ def indirect_gap(h):
     from scipy.optimize import minimize
     bounds = [(0.,1.) for i in range(h.dimensionality)]
     x0 = np.random.random(h.dimensionality) # inital vector
-    res = differential_evolution(f,bounds=bounds)
-#    res = minimize(f,res.x,method="Powell")
+    if robust: res = differential_evolution(f,bounds=bounds)
+    else: res = minimize(f,x0,method="Powell")
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev

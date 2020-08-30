@@ -191,10 +191,10 @@ class Hamiltonian():
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""
     return set_finite_system(self,periodic=periodic) 
-  def get_gap(self):
+  def get_gap(self,**kwargs):
     """Returns the gap of the Hamiltonian"""
     from . import gap
-    return gap.indirect_gap(self) # return the gap
+    return gap.indirect_gap(self,**kwargs) # return the gap
   def save(self,output_file="hamiltonian.pkl"):
     """ Write the hamiltonian in a file"""
     inout.save(self,output_file) # write in a file

@@ -45,6 +45,13 @@ def flux2d(g,n=1,m=1):
 
 
 
-
-
+def valence_TMDC(g=None,soc=0.0):
+    """Return the Hamiltonian for the valence band of a TMDC"""
+    if g is None:
+        from . import geometry
+        g = geometry.triangular_lattice()
+    ft = specialhopping.phase_C3_matrix(g,phi=soc)
+    h = g.get_hamiltonian(mgenerator=ft,is_multicell=True,has_spin=False)
+    h.turn_spinful(enforce_tr=True)
+    return h # return the Hamiltonian
 

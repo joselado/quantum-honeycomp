@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/mnt/extradrive/apps/anaconda3/bin/python
 
 ### script for plot maximun values of CHI_R.OUT and CHI_I.OUT of tb90 ###
 

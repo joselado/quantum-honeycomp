@@ -85,12 +85,18 @@ def multilayer(ti=0.3,dz=3.0):
       return 0.0 # else
     return fhop
 
+def entry2matrix(f):
+    def fout(rs1,rs2):
+        return np.array([[f(r1,r2) for r1 in rs1] for r2 in rs2]).T
+    return fout
 
 
+def phase_C3_matrix(*args,**kwargs):
+    f = phase_C3(*args,**kwargs)
+    return entry2matrix(f) # return the matrix
 
 
-
-def phase_C3(g,phi=0.0):
+def phase_C3(g,phi=0.5,t=1.0):
     """Create a fucntion that computes hoppings that alternate
     between +\phi and -\phi every 60 degrees"""
     if len(g.r)==1:
@@ -109,14 +115,18 @@ def phase_C3(g,phi=0.0):
             zi = dr[0]+1j*dr[1]
             for zj in zs: # one of the three directions
                 d = np.abs(zi/zj-1.0)
-                print(d)
                 if d<1e-2: 
-                    return np.exp(1j*phi)
-            else: return np.exp(-1j*phi)
+                    return t*np.exp(1j*phi*np.pi)
+            else: return np.exp(-1j*phi*np.pi)
         return 0.0
     return fun
 
 
+def neighbor_hopping_matrix(g,vs):
+    """Return a hopping matrix for the N first neighbors"""
+    ds = g.neighbor_distances() # get the different distances
+    ds = ds[0:len(vs)] # take only these
+    return distance_hopping_matrix(vs,ds)
 
 
 
@@ -148,6 +158,22 @@ def distance_hopping_matrix_jit(r1,r2,vs,ds2,out):
 
 
 
+def strained_hopping(g,t=1.0,dt=0.0,f=None,**kwargs):
+    """Return first neighbor hoppings with strain"""
+    if f is None: # no function provided
+        from . import potentials
+        f = potentials.commensurate_potential(g,average=t,amplitude=dt,
+                **kwargs)
+    def fout(r1,r2):
+        dr = r1-r2
+        dr2 = dr.dot(dr)
+        if .9<dr2<1.1: return f((r1+r2)/2.)
+        else: return 0.0
+    return fout
 
+
+def strained_hopping_matrix(*args,**kwargs):
+    f = strained_hopping(*args,**kwargs)
+    return entry2matrix(f) # return the matrix
 
 
