@@ -618,7 +618,7 @@ class Ui_MainWindow(object):
         self.lattice.setItemText(1, _translate("MainWindow", "Honeycomb armchair"))
         self.lattice.setItemText(2, _translate("MainWindow", "Square"))
         self.lattice.setItemText(3, _translate("MainWindow", "Chain"))
-        self.lattice.setItemText(4, _translate("MainWindow", "Monochain"))
+        self.lattice.setItemText(4, _translate("MainWindow", "Bichain"))
         self.lattice.setItemText(5, _translate("MainWindow", "Triangular"))
         self.lattice.setItemText(6, _translate("MainWindow", "Kagome"))
         self.lattice.setItemText(7, _translate("MainWindow", "Lieb"))
