@@ -116,6 +116,9 @@
           </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="inplaneb">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>0.0</string>
             </property>
@@ -820,7 +823,7 @@
      <x>0</x>
      <y>0</y>
      <width>973</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

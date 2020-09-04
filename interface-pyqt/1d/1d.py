@@ -32,7 +32,10 @@ def get_geometry(modify=True):
 #  lattice_name = builder.get_object("lattice").get_active_text()
   if lattice_name=="Chain":
     g = geometry.chain()
-  if lattice_name=="Honeycomb":
+    print(g.r)
+  elif lattice_name=="Bichain":
+    g = geometry.bichain()
+  elif lattice_name=="Honeycomb":
     g = geometry.honeycomb_lattice()
   elif lattice_name=="Square":
     g = geometry.square_lattice()
@@ -96,7 +99,7 @@ def initialize():
   h.add_antihaldane(get("antihaldane")) 
   h.add_anti_kane_mele(get("antikanemele")) 
   h.add_peierls(get("peierls")) # magnetic field
-  h.add_swave(get("swave")) 
+  if get("swave")!=0.: h.add_swave(get("swave")) 
   return h
 
 

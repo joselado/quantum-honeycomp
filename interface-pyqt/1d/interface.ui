@@ -972,6 +972,11 @@
             </item>
             <item>
              <property name="text">
+              <string>Bichain</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>Triangular</string>
              </property>
             </item>
