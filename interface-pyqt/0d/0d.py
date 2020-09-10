@@ -121,7 +121,7 @@ def initialize():
   h.add_haldane(get("haldane")) # intrinsic SOC
   h.add_antihaldane(get("antihaldane")) 
   h.add_peierls(get("peierls")) # magnetic field
-  h.add_swave(get("swave")) 
+  if get("swave")!=0.0: h.add_swave(get("swave")) 
   return h
 
 
