@@ -1,6 +1,7 @@
 from . import specialhopping
 from . import specialgeometry
 import numpy as np
+from . import geometry
 
 
 def tbg(n=7,ti=0.12,lambi=3.0,lamb=3.0,is_sparse=True,
@@ -45,13 +46,54 @@ def flux2d(g,n=1,m=1):
 
 
 
-def valence_TMDC(g=None,soc=0.0):
+def valence_TMDC(g=None,soc=0.0,**kwargs):
     """Return the Hamiltonian for the valence band of a TMDC"""
     if g is None:
-        from . import geometry
         g = geometry.triangular_lattice()
-    ft = specialhopping.phase_C3_matrix(g,phi=soc)
+    ft = specialhopping.phase_C3_matrix(g,phi=soc,**kwargs)
     h = g.get_hamiltonian(mgenerator=ft,is_multicell=True,has_spin=False)
     h.turn_spinful(enforce_tr=True)
     return h # return the Hamiltonian
+
+
+
+def NbSe2(soc=0.0,cdw=0.0):
+    """Return the Hamiltonian of NbSe2"""
+    g = geometry.triangular_lattice()  # triangular lattice
+#    ts = np.array([86.8,139.9,29.6,3.5,3.3])
+#    ts = np.array([46.,257.5,4.4,-15,6])
+    ts = np.array([0.3,1.,0.,0.,0.])
+    t = ts[0]/np.max(ts) # 1NN 
+#    ts[0] = 0.0 # set to zero
+    ts = ts/np.max(ts) # normalize
+    fm = specialhopping.neighbor_hopping_matrix(g,ts) # function for hoppings
+    h = g.get_hamiltonian(mgenerator=fm,is_multicell=True,has_spin=False,
+            cutoff=len(ts))
+    ## Now add the SOC if necessary
+    if soc!=0.0: # add the SOC
+        h.turn_spinful() # turn spinful
+        d = g.neighbor_distances()[1]
+        d = 1.0
+        hsoc = valence_TMDC(g=h.geometry,soc=soc,d=d) # hamiltonian with SOC
+        h = h + t*hsoc # add the two Hamiltonians
+    if cdw!=0.0: # add the CDW
+        h = h.supercell(3) # create a supercell
+        from . import potentials
+        f = potentials.commensurate_potential(h.geometry,amplitude=cdw,k=3.5)
+        h.geometry.write_profile(f)
+        h.add_onsite(f)
+    h.set_filling(.5)
+#    h = h.supercell(4)
+#    m = np.array(h.intra.todense()).reshape(h.intra.shape[0]**2)
+    return h
+    
+
+
+
+
+
+
+
+
+
 

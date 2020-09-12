@@ -82,7 +82,7 @@ def getplot(obj):
     cb.set_label(args.cblabel) # set the label
   plt.xlim([min(k),max(k)])   # x axis range
   ewin = 1.01 - obj.get_slider("ewin") # energy window
-  plt.ylim([ewin*min(e),ewin*max(e)])   # y axis range
+  plt.ylim([ewin*min(e)-1.,ewin*max(e)+1.])   # y axis range
   
   # axis
   xlab = plt.xlabel("")

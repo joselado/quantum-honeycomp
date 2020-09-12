@@ -660,5 +660,13 @@ def get_dn(self):
     return (op@op - op)/2.
 
 
+def get_potential(self,**kwargs):
+    """Return the operator associated to a potential"""
+    h = self.copy()
+    h.clean() # clean the Hamiltonian
+    from . import potentials
+    f = potentials.commensurate_potential(h.geometry,amplitude=1.0,**kwargs)
+    h.add_onsite(f)
+    return Operator(h.intra) # return the operator
 
 

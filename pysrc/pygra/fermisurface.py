@@ -13,9 +13,9 @@ from . import filesystem as fs
 arpack_tol = 1e-5
 arpack_maxiter = 10000
 
-def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
+def fermi_surface_generator(h,
                     energies=[0.0],nk=50,nsuper=1,reciprocal=True,
-                    delta=None,refine_delta=1.0,operator=None,
+                    delta=1e-2,refine_delta=1.0,operator=None,
                     numw=20,info=True):
   """Calculates the Fermi surface of a 2d system"""
   energies = np.array(energies) # convert to array
@@ -61,15 +61,24 @@ def multi_fermi_surface(h,write=True,output_folder="MULTIFERMISURFACE",
   else: # parallel execution
       kdos = parallel.pcall(getf,rs) # compute all
   kdos = np.array(kdos) # transform into an array
-  fs.rmdir(output_folder) # remove folder
-  fs.mkdir(output_folder) # create folder
-  fo = open(output_folder+"/"+output_folder+".TXT","w")
-  for i in range(len(energies)): # loop over energies
-      filename = output_folder+"_"+str(energies[i])+"_.OUT" # name
-      name = output_folder+"/"+filename
-      np.savetxt(name,np.array([rs[:,0],rs[:,1],kdos[:,i]]).T)
-      fo.write(filename+"\n")
-  h.get_dos(nk=nk,delta=delta,energies=energies)
-  fo.close()
+  return energies,rs,kdos
+
+
+def multi_fermi_surface(h,nk=50,delta=1e-2,
+        output_folder="MULTIFERMISURFACE",**kwargs):
+    """Compute several fermi surfaces"""
+    energies,rs,kdos = fermi_surface_generator(h,nk=nk,delta=delta,**kwargs)
+    fs.rmdir(output_folder) # remove folder
+    fs.mkdir(output_folder) # create folder
+    fo = open(output_folder+"/"+output_folder+".TXT","w")
+    for i in range(len(energies)): # loop over energies
+        filename = output_folder+"_"+str(energies[i])+"_.OUT" # name
+        name = output_folder+"/"+filename
+        np.savetxt(name,np.array([rs[:,0],rs[:,1],kdos[:,i]]).T)
+        fo.write(filename+"\n")
+    name = output_folder+"/DOS.OUT"
+    name = "DOS.OUT"
+    np.savetxt(name,np.array([energies,np.sum(kdos,axis=0)]).T)
+    fo.close()
 
 

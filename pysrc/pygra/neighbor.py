@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 from scipy.sparse import csc_matrix,bmat
 from numba import jit
+from . import algebra
 
 
 minimum_hopping = 1e-3
@@ -164,16 +165,85 @@ def generate_parametric_hopping(h,f=None,mgenerator=None,
   else: raise
   # check that the sparse mde is set ok
   if is_sparse and type(h.intra)==type(np.matrix([[]])):
-    print("Matrices should be sparse, fixing")
     h.is_sparse = False
     h.turn_sparse() # turn the matrix sparse
   if not is_sparse and type(h.intra)!=type(np.matrix([[]])):
-    print("Matrices should be dense, fixing",type(h.intra),type(np.matrix))
     h.is_sparse = True
     h.turn_dense() # turn the matrix sparse
   if has_spin: # Hamiltonian should be spinful
-    print("Adding spin degree of freedom")
     h.has_spin = False
     h.turn_spinful()
   return h
+
+
+
+
+def neighbor_distances(g,n=4):
+    """Return distances to neighbors"""
+    nsuper = max([n//len(g.r)+3,3])
+    g = g.supercell(nsuper) # create supercell
+    r = g.r # positions
+    n = len(r)
+    out = np.zeros(n*n) # empty array
+    out = neighbor_distances_jit(r,out) # distances
+    out = np.round(out,6) # unique distances
+    out = np.unique(out) # unique distances
+    return np.array([out[i+1] for i in range(len(out)-1)]) # return
+
+
+@jit(nopython=True)
+def neighbor_distances_jit(r,out):
+    n = len(r) # number of sites
+    k = 0
+    for i in range(n):
+        for j in range(n):
+            dr = r[i]-r[j]
+            dis = dr[0]*dr[0]+dr[1]*dr[1]+dr[2]*dr[2]
+            dis = np.sqrt(dis) # square root
+            out[k] = dis # store
+            k+=1 # increase
+    return out
+
+
+
+def neighbor_cells(num,dim=3):
+  """Return indexes of neighboring cells,
+  ordered from closer to further"""
+  cells = [] # empty list
+  if dim==0: return cells
+  elif dim==1:
+    for i in range(-num,num+1): cells.append([i,0,0])
+  elif dim==2:
+    for i in range(-num,num+1):
+      for j in range(-num,num+1):
+        cells.append([i,j,0])
+  elif dim==3:
+    for i in range(-num,num+1):
+      for j in range(-num,num+1):
+        for k in range(-num,num+1):
+          cells.append([i,j,k])
+  # now order the cells
+  dis = [np.array(a).dot(np.array(a)) for a in cells] # distances
+  cells = [y for (x,y) in zip(dis,cells)] # sort
+  return cells # return the indexes
+
+
+
+def neighbor_directions(g,cutoff=3):
+  """Return the vectors pointing to neighbors"""
+  dirs = []
+  if g.dimensionality==0: return [[0.,0.,0.]] # zero dimensional
+  elif g.dimensionality==1: # one dimensional
+    for i1 in range(-cutoff,cutoff+1): dirs.append([i1,0,0])
+  elif g.dimensionality==2: # two dimensional
+    for i1 in range(-cutoff,cutoff+1):
+      for i2 in range(-cutoff,cutoff+1):
+        dirs.append([i1,i2,0])
+  elif g.dimensionality==3: # three dimensional
+    for i1 in range(-cutoff,cutoff+1):
+      for i2 in range(-cutoff,cutoff+1):
+        for i3 in range(-cutoff,cutoff+1):
+          dirs.append([i1,i2,i3])
+  dirs = [np.array(d) for d in dirs]
+  return dirs # return directions
 

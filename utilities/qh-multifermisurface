@@ -19,7 +19,12 @@ from interfacetk import plotpyqt
 
 #fig.set_facecolor("white") # white
 
-folder = "MULTIFERMISURFACE" # folder with all the stuff
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--input",default="MULTIFERMISURFACE",help='Input folder')
+parser.add_argument("--maplabel",default="Fermi surface")
+args = parser.parse_args() # get the arguments
+folder = args.input
 
 names = open(folder+"/"+folder+".TXT").readlines() # read the files
 
@@ -81,7 +86,7 @@ def plot(main):
   ax.set_xlabel("$k_x$")
   ax.set_ylabel("$k_y$")
   #ax.set_title("Fermi surface E="+str(round(float(energy),3)))
-  ax.set_title("Fermi surface")
+  ax.set_title(args.maplabel)
   ax.set_xlim([0,nx])
   ax.set_ylim([0,ny])
 #  try:

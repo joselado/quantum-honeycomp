@@ -1,5 +1,32 @@
 from __future__ import print_function, division
 import numpy as np
+from .algebra import isnumber
+
+class Potential():
+    def __init__(self,f):
+        if type(f)==Potential: self.f = f.f # store function
+        elif callable(f): self.f = f # store function
+        elif isnumber(f): self.f = lambda r: f # store function
+        else: 
+            print("Unrecognized potential",f)
+            raise
+    def __add__(self,a):
+        a = Potential(a)
+        g = lambda r: self.f(r) + a.f(r)
+        return Potential(g)
+    def __mul__(self,a):
+        a = Potential(a)
+        g = lambda r: self.f(r)*a.f(r)
+        return Potential(g)
+    def __rmul__(self,a): return self*a
+    def __neg__(self): return (-1)*self
+    def __sub__(self,a): return self + (-1)*a
+    def __rsub__(self,a): return self + (-1)*a
+    def __radd__(self,a): return self + a
+    def __call__(self,r):
+        return self.f(r)
+
+
 
 def cnpot(n=4,k=0.0,v=1.0,angle=0.):
   """Returns a function that generates a potential
@@ -17,7 +44,7 @@ def cnpot(n=4,k=0.0,v=1.0,angle=0.):
       arg = np.cos(i*np.pi*2/n)*x+np.sin(i*np.pi*2/n)*y
       acu += f(k*arg) 
     return v*acu/n
-  return fun
+  return Potential(fun)
 
 
 
@@ -38,24 +65,24 @@ def aahf1d(n0=0,beta=0.0000001,k=None,b=None,v=1.0,normalize=False):
 
 
 
-def commensurate_potential(g,k=1,amplitude=0.0,average=0.0,**kwargs):
+def commensurate_potential(g,k=1,amplitude=1.0,n=None,
+        average=0.0,minmax=None,**kwargs):
     """Return a potential that is commensurate with
     the lattice"""
     if g.dimensionality==2:
       a12 = g.a2.dot(g.a1)/(np.sqrt(g.a1.dot(g.a1))*np.sqrt(g.a1.dot(g.a1)))
-      if 0.49<abs(a12)<0.51: # angle is 60 degrees
-        angle = np.pi/3.
-        f = cnpot(n=6,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
-                angle=angle,**kwargs)
-      elif abs(a12)<0.01: # square lattice
-        f = cnpot(n=4,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),
-                angle=0.0,**kwargs)
-      else: raise
+      if n is None:
+        if 0.49<abs(a12)<0.51: n = 6
+        elif abs(a12)<0.01: n = 4
+        else: n = 3
+      f = cnpot(n=n,k=k*2.*np.pi/np.sqrt(g.a1.dot(g.a1)),**kwargs)
     elif g.dimensionality==1: 
-        raise # not imlemented
+        raise # not implemented
     else: raise
     f = enforce_amplitude(f,amplitude,g=g) # enforce the amplitude
     f = enforce_average(f,average,g=g) # enforce average
+    if minmax is not None: f = enforce_minmax(f,minmax,g=g) # enforce minmax
+    f = Potential(f)
     return f
 
 
@@ -145,6 +172,19 @@ def enforce_amplitude(f,a,g=None):
     def fout(r):
         return f(r)*a/dv # return this value
     return fout # return new function
+
+
+
+def enforce_minmax(f,a,g=None):
+    """Enforce the minimum, without changing the maximum"""
+    if g is None: raise
+    vs = [f(ri) for ri in g.r] 
+    minv = np.min(vs)
+    maxv = np.max(vs)
+    dv = maxv-minv # amplitude
+    fout = lambda r: (f(r)-minv)*a[1]/dv + a[0] # return this value
+    return fout # return new function
+
 
 
 

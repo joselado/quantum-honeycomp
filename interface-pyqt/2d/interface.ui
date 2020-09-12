@@ -768,7 +768,7 @@
           <item row="0" column="1">
            <widget class="QLineEdit" name="fs_ewindow">
             <property name="text">
-             <string>2.0</string>
+             <string>4.0</string>
             </property>
            </widget>
           </item>
@@ -782,7 +782,7 @@
           <item row="2" column="1">
            <widget class="QLineEdit" name="fs_nk">
             <property name="text">
-             <string>30</string>
+             <string>60</string>
             </property>
            </widget>
           </item>
@@ -811,6 +811,69 @@
            <widget class="QPushButton" name="show_fermi_surface">
             <property name="text">
              <string>Show Fermi surface</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_18">
+       <attribute name="title">
+        <string>QPI</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_33">
+        <item row="0" column="0">
+         <layout class="QGridLayout" name="gridLayout_32">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="qpi_ewindow">
+            <property name="text">
+             <string>4.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="qpi_delta">
+            <property name="text">
+             <string>0.05</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="qpi_nk">
+            <property name="text">
+             <string>60</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_55">
+            <property name="text">
+             <string>Energy window</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_56">
+            <property name="text">
+             <string>Smearing</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_57">
+            <property name="text">
+             <string>Number of kpoints</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QPushButton" name="show_qpi">
+            <property name="toolTip">
+             <string>Compute the quasiparticle interference</string>
+            </property>
+            <property name="text">
+             <string>Show QPI</string>
             </property>
            </widget>
           </item>

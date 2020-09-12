@@ -61,6 +61,7 @@ def get_operator(self,name,**kwargs):
       elif name=="valley_lower" or name=="valley_bottom":
         return operators.get_valley_layer(self,n=0)
       elif name in ["ipr","IPR"]: return operators.ipr
+      elif name=="potential":  return operators.get_potential(self,**kwargs)
       else: raise
 
 

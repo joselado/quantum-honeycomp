@@ -19,7 +19,9 @@ from . import algebra
 from . import groundstate
 from . import rotate_spin
 from . import topology
+from . import ldos
 from . import increase_hilbert
+from .algebratk import hamiltonianalgebra
 from .bandstructure import get_bands_nd
 
 from scipy.sparse import coo_matrix,bmat,csc_matrix
@@ -43,6 +45,10 @@ class Hamiltonian():
     """Write the tails of the wavefunctions"""
     if self.dimensionality!=0: raise
     else: return tails.matrix_tails(self.intra,discard=discard)
+  def __add__(self,h):  return hamiltonianalgebra.add(self,h)
+  def __rmul__(self,h):  return hamiltonianalgebra.rmul(self,h)
+  def __mul__(self,h):  return hamiltonianalgebra.mul(self,h)
+  def __neg__(self):  return (-1)*self
   def spinless2full(self,m,time_reversal=False):
     """Transform a spinless matrix in its full form"""
     return get_spinless2full(self,time_reversal=time_reversal)(m) # return
@@ -51,6 +57,10 @@ class Hamiltonian():
     return get_spinful2full(self)(m) # return
   def kchain(self,k=0.):
     return kchain(self,k)
+  def get_fermi_surface(self,**kwargs):
+      return spectrum.fermi_surface(self,**kwargs)
+  def get_multi_fermi_surface(self,**kwargs):
+      return spectrum.multi_fermi_surface(self,**kwargs)
   def get_eigenvectors(self,**kwargs):
       from .htk.eigenvectors import get_eigenvectors
       return get_eigenvectors(self,**kwargs)
@@ -104,6 +114,9 @@ class Hamiltonian():
   def has_time_reversal_symmetry(self):
       """Check if a Hamiltonian has time reversal symmetry"""
       return symmetry.has_time_reversal_symmetry(self)
+  def get_qpi(self,**kwargs):
+      from .chitk import qpi
+      return qpi.get_qpi(self,**kwargs)
   def get_ldos(self,**kwargs):
       from . import ldos
       return ldos.ldos(self,**kwargs)
@@ -303,6 +316,8 @@ class Hamiltonian():
       for t in self.hopping: hop[tuple(np.array(t.dir))] = t.m
       for t in self.hopping: hop[tuple(-np.array(t.dir))] = np.conjugate(t.m).T
       return hop # return dictionary
+  def get_multildos(self,**kwargs):
+      return ldos.multi_ldos(self,**kwargs)
   def get_multihopping(self):
       """Return a multihopping object"""
       from .multihopping import MultiHopping

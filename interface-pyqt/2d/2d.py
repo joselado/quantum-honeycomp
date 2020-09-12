@@ -209,6 +209,9 @@ def show_fermi_surface():
   common.get_fermi_surface(h,qtwrap)
 
 
+def show_qpi():
+  h = pickup_hamiltonian() # get hamiltonian
+  common.get_qpi(h,qtwrap)
 
 
 def solve_scf():
@@ -346,6 +349,7 @@ signals["show_chern"] = show_chern  # show the chern number
 signals["show_berry1d"] = show_berry1d  # show DOS
 signals["show_kdos"] = show_kdos  # show DOS
 signals["show_fermi_surface"] = show_fermi_surface
+signals["show_qpi"] = show_qpi
 signals["show_dosbands"] = show_dosbands  # show DOS
 signals["show_z2"] = show_z2  # show DOS
 signals["show_magnetism"] = show_magnetism  # show magnetism

@@ -121,6 +121,25 @@ def get_fermi_surface(h,window):
 
 
 
+def get_qpi(h,window):
+    check_parallel(window) # check if use parallelization
+    e = window.get("qpi_ewindow")
+    energies = np.linspace(-e,e,100)
+    nk = int(window.get("qpi_nk")) # number of kpoints
+    numw = int(window.get("qpi_numw")) # number of waves for sparse
+    delta = window.get("qpi_delta")
+    h = h.reduce() # reduce dimensionality if possible
+    h.get_qpi(nk=nk,energies=energies,delta=delta) # compute the QPI
+    execute_script("qh-multifermisurface --maplabel QPI")
+
+
+
+
+
+
+
+
+
 def solve_scf(h,window):
   """Perform a selfconsistent calculation"""
   get = window.get # redefine

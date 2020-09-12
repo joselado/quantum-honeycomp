@@ -56,10 +56,10 @@ class Geometry:
   def plot_geometry(self):
     """Plots the system"""
     return plot_geometry(self)
-  def get_kmesh(self,nk=10):
+  def get_kmesh(self,**kwargs):
       """Return the k-mesh"""
       from . import klist
-      return klist.kmesh(self.dimensionality,nk=nk)
+      return klist.kmesh(self.dimensionality,**kwargs)
   def set_finite(self,periodic=False):
     """ Transfrom the geometry into a finite system"""
     if periodic:
@@ -117,7 +117,7 @@ class Geometry:
     self.z = r[2]
   def get_hamiltonian(self,fun=None,has_spin=True,
                         is_sparse=False,spinful_generator=False,
-                        is_multicell=False,mgenerator=None):
+                        is_multicell=False,mgenerator=None,**kwargs):
     """ Create the hamiltonian for this geometry"""
     if self.dimensionality==3: is_multicell=True
     from .hamiltonians import hamiltonian
@@ -143,7 +143,7 @@ class Geometry:
       elif h.dimensionality==3:
         if mgenerator is not None: raise # not implemented
         from .multicell import parametric_hopping_hamiltonian
-        h = parametric_hopping_hamiltonian(h,fc=fun) # add hopping
+        h = parametric_hopping_hamiltonian(h,fc=fun,**kwargs) # add hopping
     if not is_sparse: h.turn_dense() # dense Hamiltonian
     return h # return the object
   def write(self,**kwargs):
@@ -158,12 +158,18 @@ class Geometry:
   def copy(self):
       """Copy the geometry"""
       return deepcopy(self)
+  def set_origin(self,r=None):
+      if r is None: r = self.r[self.get_central()[0]]
+      self.x = self.x - r[0]
+      self.y = self.y - r[1]
+      self.z = self.z - r[2]
+      self.xyz2r() # update r
   def center(self):
-    """ Centers the geometry in (0,0,0)"""
-    self.x = self.x - sum(self.x)/len(self.x)
-    self.y = self.y - sum(self.y)/len(self.y)
-    self.z = self.z - sum(self.z)/len(self.z)
-    self.xyz2r() # update r
+      """ Centers the geometry in (0,0,0)"""
+      self.x = self.x - sum(self.x)/len(self.x)
+      self.y = self.y - sum(self.y)/len(self.y)
+      self.z = self.z - sum(self.z)/len(self.z)
+      self.xyz2r() # update r
   def get_lattice_name(self):
     if self.dimensionality==2:
       if np.abs(self.a1.dot(self.a2))<0.0001:        
@@ -233,7 +239,7 @@ class Geometry:
           return max([1,n])
   def write_profile(self,d,**kwargs):
       """Write a profile in a file"""
-      write_profile(self,np.array(d),**kwargs)
+      write_profile(self,d,**kwargs)
   def replicas(self,d=[0.,0.,0.]):
     """Return replicas of the atoms in the unit cell"""
     return [ri + self.a1*d[0] + self.a2*d[1] + self.a3*d[2] for ri in self.r]
@@ -1487,51 +1493,8 @@ def get_sublattice(rs):
   return sublattice
 
 
-
-def neighbor_directions(g,cutoff=3):
-  """Return the vectors pointing to neighbors"""
-  dirs = []
-  if g.dimensionality==0: return [[0.,0.,0.]] # zero dimensional
-  elif g.dimensionality==1: # one dimensional
-    for i1 in range(-cutoff,cutoff+1): dirs.append([i1,0,0])
-  elif g.dimensionality==2: # two dimensional
-    for i1 in range(-cutoff,cutoff+1):
-      for i2 in range(-cutoff,cutoff+1):
-        dirs.append([i1,i2,0])
-  elif g.dimensionality==3: # three dimensional
-    for i1 in range(-cutoff,cutoff+1):
-      for i2 in range(-cutoff,cutoff+1):
-        for i3 in range(-cutoff,cutoff+1):
-          dirs.append([i1,i2,i3])
-  dirs = [np.array(d) for d in dirs]
-  return dirs # return directions
-
-
-
-
-def neighbor_cells(num,dim=3):
-  """Return indexes of neighboring cells,
-  ordered from closer to further"""
-  cells = [] # empty list
-  if dim==0: return cells
-  elif dim==1:
-    for i in range(-num,num+1): cells.append([i,0,0])
-  elif dim==2:
-    for i in range(-num,num+1): 
-      for j in range(-num,num+1): 
-        cells.append([i,j,0])
-  elif dim==3:
-    for i in range(-num,num+1): 
-      for j in range(-num,num+1): 
-        for k in range(-num,num+1): 
-          cells.append([i,j,k])
-  # now order the cells
-  dis = [np.array(a).dot(np.array(a)) for a in cells] # distances
-  cells = [y for (x,y) in zip(dis,cells)] # sort
-  return cells # return the indexes
-
-
-
+from .neighbor import neighbor_directions
+from .neighbor import neighbor_cells
 
 
 
@@ -1539,6 +1502,7 @@ def write_profile(g,d,name="PROFILE.OUT",nrep=3,normal_order=False):
   """Write a certain profile in a file"""
   if g.dimensionality == 0: nrep = 1
   if callable(d): d = np.array([d(ri) for ri in g.r]) # call
+  else: d = np.array(d)
   go = g.copy() # copy geometry
   go = go.supercell(nrep) # create supercell
   if normal_order:
@@ -1674,31 +1638,7 @@ def sum_geometries(g1,g2):
         print(type(g2))
         raise
 
-
-def neighbor_distances(g,nsuper=2):
-    """Return distances to neighbors"""
-    g = g.supercell(nsuper) # create supercell
-    r = g.r # positions
-    n = len(r)
-    out = np.zeros(n*n) # empty array
-    out = neighbor_distances_jit(r,out) # distances
-    out = np.round(out,6) # unique distances
-    out = np.unique(out) # unique distances
-    return np.array([out[i+1] for i in range(len(out)-1)]) # return
-    
-
-@jit(nopython=True)
-def neighbor_distances_jit(r,out):
-    n = len(r) # number of sites
-    k = 0
-    for i in range(n):
-        for j in range(n):
-            dr = r[i]-r[j]
-            dis = dr[0]*dr[0]+dr[1]*dr[1]+dr[2]*dr[2]
-            dis = np.sqrt(dis) # square root
-            out[k] = dis # store
-            k+=1 # increase
-    return out
+from .neighbor import neighbor_distances
 
 
 def array2function(g,v):
@@ -1718,4 +1658,4 @@ def array2function_jit(r,v,ir):
     return 0.0
 
 
-
+from .sculpt import image2island
