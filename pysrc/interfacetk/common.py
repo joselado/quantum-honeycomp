@@ -130,7 +130,7 @@ def get_qpi(h,window):
     delta = window.get("qpi_delta")
     h = h.reduce() # reduce dimensionality if possible
     h.get_qpi(nk=nk,energies=energies,delta=delta) # compute the QPI
-    execute_script("qh-multifermisurface --maplabel QPI")
+    execute_script("qh-multiqpi")
 
 
 
