@@ -119,7 +119,7 @@ class Hamiltonian():
       return qpi.get_qpi(self,**kwargs)
   def get_ldos(self,**kwargs):
       from . import ldos
-      return ldos.ldos(self,**kwargs)
+      return ldos.get_ldos(self,**kwargs)
   def get_gk_gen(self,delta=0.05,operator=None,canonical_phase=False):
     """Return the Green function generator"""
     hkgen = self.get_hk_gen() # Hamiltonian generator

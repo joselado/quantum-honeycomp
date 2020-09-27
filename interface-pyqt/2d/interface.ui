@@ -713,7 +713,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="6" column="0" colspan="2">
            <widget class="QPushButton" name="show_multildos">
             <property name="text">
              <string>Show LDOS</string>
@@ -751,6 +751,41 @@
             </property>
             <property name="text">
              <string>5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QComboBox" name="basis_ldos">
+            <item>
+             <property name="text">
+              <string>TB</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Real space atomic orbitals</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_58">
+            <property name="text">
+             <string>Basis for the LDOS</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLineEdit" name="ratomic_ldos">
+            <property name="text">
+             <string>1.5</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_59">
+            <property name="text">
+             <string>Atomic radii</string>
             </property>
            </widget>
           </item>

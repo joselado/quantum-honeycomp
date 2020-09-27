@@ -2,21 +2,32 @@ import numpy as np
 from numba import jit
 import os
 from .. import filesystem as fs
+from numba import jit
 
-def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
-        ratomic=1.5,dr=0.2,**kwargs):
+
+@jit(nopython=True)
+def jit_get_orbital(r0,rs,ratomic): 
+    """Atomic orbital"""
+    dr = rs-r0
+    dr2 = np.sum(dr*dr,axis=1) # sum
+    return np.exp(-np.sqrt(dr2)/ratomic)
+
+
+
+
+def ldos_generator(h,delta=0.05,nrep=1,nk=20,dl=None,
+        ratomic=1.5,dr=0.2,num_bands=None,**kwargs):
     """Compute the LDOS at different eenrgies, and add an envelop atomic
     orbital"""
     h = h.copy() # copy the Hamiltonian
     h.turn_dense() # dense hamiltonian
-    def get_orbital(r0): # get a localized atomic orbital centered in r0
-        def f(r):
-            dr = r-r0
-            dr2 = np.sum(dr*dr,axis=1) # sum
-            return np.exp(-np.sqrt(dr2)/ratomic)
-        return f # return the wavefunction
-    evals,vs,ks = h.get_eigenvectors(nk=nk,kpoints=True) # compute wavefunctions
-    dl = h.geometry.neighbor_directions(nrep+int(ratomic)*10) # directions of the neighbors
+    evals,vs,ks = h.get_eigenvectors(nk=nk,kpoints=True,
+            numw=num_bands) # compute wavefunctions
+    if dl is None: 
+        if h.dimensionality==0: nrepdl = int(ratomic)*10
+        dl = h.geometry.neighbor_directions(nrep+int(ratomic)*10) # directions of the neighbors
+    def get_orbital(r0,r):
+        return jit_get_orbital(r0,r,ratomic)
     # generate a dictionary with all the real space local orbitals
     ##########################################################
     lodict = dict() # dictionary for the local orbitals
@@ -24,31 +35,59 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
     x,y = get_grids(h.geometry,nrep=nrep,dr=dr,
             deltax=ratomic*3,deltay=ratomic*3)
     r = np.zeros((len(x),3)) ; r[:,0] = x ; r[:,1] = y
+    # now chack which centers to accept
+    xmin,xmax = np.min(x),np.max(x)
+    ymin,ymax = np.min(y),np.max(y)
+    def accept_center(r):
+        """Check if this center is close enough"""
+        if r[0]-xmin<-3*ratomic: return False # too left
+        if r[0]-xmax>3*ratomic: return False # too right
+        if r[1]-ymin<-3*ratomic: return False # too down
+        if r[1]-ymax>3*ratomic: return False # too right
+        return True
     for d in dl: # loop over directions
           rrep = h.geometry.replicas(d) # replicas in this direction
           for i in range(len(rrep)): # loop over the atoms
               r0 = rrep[i] # get this center
+              if not accept_center(r0): continue # skip this iteration
               if h.has_eh:
                 if h.has_spin: # spinful
-                  lodict[(tuple(d),4*i)] = get_orbital(r0)(r) # store 
-                  lodict[(tuple(d),4*i+1)] = get_orbital(r0)(r) # store 
-                  lodict[(tuple(d),4*i+2)] = 0. # store 
-                  lodict[(tuple(d),4*i+3)] = 0. # store 
+                  lodict[(tuple(d),4*i)] = get_orbital(r0,r) # store 
+                  lodict[(tuple(d),4*i+1)] = get_orbital(r0,r) # store 
+           #       lodict[(tuple(d),4*i+2)] = 0. # store 
+           #       lodict[(tuple(d),4*i+3)] = 0. # store 
                 else: raise
               else:
                 if h.has_spin: # spinful
-                  lodict[(tuple(d),2*i)] = get_orbital(r0)(r) # store 
-                  lodict[(tuple(d),2*i+1)] = get_orbital(r0)(r) # store 
+                  lodict[(tuple(d),2*i)] = get_orbital(r0,r) # store 
+                  lodict[(tuple(d),2*i+1)] = get_orbital(r0,r) # store 
                 else: # spinless
-                  lodict[(tuple(d),i)] = get_orbital(r0)(r) # store 
+                  lodict[(tuple(d),i)] = get_orbital(r0,r) # store 
     ##########################################################
     # now compute the real-space wavefunctions including the Bloch phase
     ds = np.zeros((len(vs),len(x))) # zero array
     for i in range(len(vs)): # loop over wavefunctions
         w = vs[i] # get the current Bloch wavefunction
         k = ks[i] # get the current bloch wavevector
-        d = get_real_space_density(w,k,dl,lodict,h.geometry)
+        d = get_real_space_density(w,k,lodict,h.geometry)
         ds[i] = d # store in the list
+    def f(e):
+        return ldos_at_energy(evals,ds,e,delta) # compute the LDOS
+    return f,evals,x,y # return generator
+
+
+def get_ldos(h,e=0.0,delta=0.05,**kwargs):
+    """Compute a single LDOS"""
+    ldos_gen,evals,x,y = ldos_generator(h,delta=delta,**kwargs) 
+    out = ldos_gen(e) # compute the LDOS
+    np.savetxt("LDOS.OUT",np.array([x,y,out]).T) # save
+    return x,y,out
+
+
+def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,**kwargs):
+    """Compute the LDOS at different eenrgies, and add an envelop atomic
+    orbital"""
+    ldos_gen,evals,x,y = ldos_generator(h,delta=delta,**kwargs) # get the generator
     # now compute all the LDOS
     fs.rmdir("MULTILDOS")
     fs.mkdir("MULTILDOS")
@@ -56,7 +95,7 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
     for e in es: # loop over energies
         name0 = "LDOS_"+str(e)+"_.OUT" # name of the output
         name = "MULTILDOS/" + name0
-        out = ldos_at_energy(evals,ds,e,delta) # compute the LDOS
+        out = ldos_gen(e) # compute the LDOS
         np.savetxt(name,np.array([x,y,out]).T) # save
         fo.write(name0+"\n") # name of the file
     fo.close()
@@ -67,15 +106,15 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,nrep=1,nk=20,
 
 
 
-def get_real_space_density(w,k,dl,lodict,g):
+def get_real_space_density(w,k,lodict,g):
     """Compute the orbital in real space"""
     nc = len(w) # number of components of the Bloch wavefunction
-    nd = len(dl) # number of unit cells to consider
     out = 0. # wavefunction in real space
-    for d in dl:
+    for key in lodict: # loop over keys
+        d = np.array(key[0]) # direction of the replica
+        i = key[1] # index of the orbital
         phi = g.bloch_phase(d,k) # get the Bloch phase
-        for i in range(nc):
-            out = out + w[i]*phi*lodict[(tuple(d),i)] # add contribution
+        out = out + w[i]*phi*lodict[key] # add contribution
     return (out*np.conjugate(out)).real # return 
 
 

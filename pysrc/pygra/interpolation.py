@@ -60,4 +60,12 @@ def interpolator2d(x,y,z,mode=None):
 
 
 
+def periodic_grid2mesh(ds,qs):
+    """Given a certain data in a (periodic) grid, return in the input mesh"""
+    nx = ds.shape[0]
+    ny = ds.shape[1]
+    grid_kx, grid_ky = np.mgrid[0:1:nx*1j, 0:1:ny*1j] # kx and ky
+    ksg = np.array([grid_kx, grid_ky]).reshape((2,nx*ny)).T # create points
+    return interpolator2d(ksg[:,0],ksg[:,1],ds.reshape((nx*ny)),mode="periodic")(qs[:,0:2])
+
 

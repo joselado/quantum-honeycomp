@@ -465,3 +465,24 @@ def get_filling(h,**kwargs):
         esf = es[es<0.0]
         return len(esf)/len(es) # return filling
 
+
+
+
+
+def eigenvalues_kmesh(h,nk=20):
+    """Get the eigenvalues in a kmesh"""
+    if h.dimensionality!=2: raise # only for 2d
+    ne = h.intra.shape[0] # number of energies per k-point
+    es = np.zeros((nk,nk,ne)) # array for the energies 
+    hkgen = h.get_hk_gen() # get the generator
+    kx = np.linspace(0.,1.,nk,endpoint=False)
+    ky = np.linspace(0.,1.,nk,endpoint=False)
+    for i in range(nk):
+      ik = kx[i] # kx point   
+      for j in range(nk):
+        jk = ky[j] # ky point
+        hk = hkgen([ik,jk]) # get the matrix
+        ei = algebra.eigvalsh(hk) # get the energies
+        es[i,j,:] = ei # store energies
+    return es # return all the energies
+

@@ -262,9 +262,18 @@ def ldos_projector(h,e=0.0,**kwargs):
     return operators.Operator(m) # convert to operator
 
 
-def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
+def get_ldos(h,projection="TB",**kwargs):
+    """ Calculate LDOS"""
+    if projection=="TB": return get_ldos_tb(h,**kwargs)
+    elif projection=="atomic": 
+        from .ldostk import atomicmultildos
+        return atomicmultildos.get_ldos(h,**kwargs)
+    else: raise
+
+
+def get_ldos_tb(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
              random=True,silent=False,write=True,**kwargs):
-  """ Calculate DOS for a 2d system"""
+  """ Calculate LDOS in a tight binding basis"""
   if ks is not None and mode=="green": raise
   if mode=="green":
     from . import green
@@ -305,6 +314,7 @@ def ldos(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
   return (x,y,d) # return LDOS
 
 
+ldos = get_ldos # for backcompatibility
 
 def multi_ldos(h,projection="TB",**kwargs):
     """Compute the LDOS at different energies, and save everything in a file"""

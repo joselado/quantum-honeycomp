@@ -273,7 +273,8 @@ def build_ribbon(g,n):
     return gout
 
 
-def image2island(impath,g,nsuper=4,size=10,color="black"):
+def image2island(impath,g,nsuper=4,size=10,color="black",
+        npristine=1,periodic=False):
   """Build an island using a certain image"""
   from PIL import Image
   im = Image.open(impath)
@@ -314,12 +315,18 @@ def image2island(impath,g,nsuper=4,size=10,color="black"):
     xi = (nx-1)*x # normalized
     yi = (ny-1)*y # normalized
     xi,yi = int(round(xi)),int(round(yi)) # integer
-    if not 0<xi<bw.shape[0]: return False
-    if not 0<yi<bw.shape[1]: return False
+    if not 0<xi<bw.shape[0]: 
+        if periodic: return True
+        else: return False
+    if not 0<yi<bw.shape[1]:
+        if periodic: return True
+        else: return False
     if bw[xi,yi]==0: return True
     else: return False
+  if periodic: 
+      go = go.supercell(npristine) # pristine supercell
   go = intersec(go,finter)
-  go.dimensionality = 0 # zero dimensional
+  if not periodic: go.dimensionality = 0 # zero dimensional
   go.celldis = None
   return go 
 
