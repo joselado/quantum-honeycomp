@@ -1562,6 +1562,7 @@ def multireplicas(self,n):
     to supercell but without the shift of the center and going to positive
     and negative positions
     """
+    if n==0: return self.r # return positions
     out = [] # empty list with positions
     dl = self.neighbor_directions(n) # list with neighboring cells to take
     if self.dimensionality==0: return self.r

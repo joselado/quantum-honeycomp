@@ -33,7 +33,7 @@ def ldos_generator(h,delta=0.05,nrep=1,nk=20,dl=None,
     lodict = dict() # dictionary for the local orbitals
     # get the grids
     x,y = get_grids(h.geometry,nrep=nrep,dr=dr,
-            deltax=ratomic*3,deltay=ratomic*3)
+            deltax=ratomic,deltay=ratomic)
     r = np.zeros((len(x),3)) ; r[:,0] = x ; r[:,1] = y
     # now chack which centers to accept
     xmin,xmax = np.min(x),np.max(x)
@@ -119,9 +119,9 @@ def get_real_space_density(w,k,lodict,g):
 
 
 
-def get_grids(g,nrep=0,dr=0.1,deltax=1.0,deltay=1.0):
+def get_grids(g,nrep=1,dr=0.1,deltax=1.0,deltay=1.0):
     """Return the grids to plot the real space wavefunctions"""
-    r = g.multireplicas(nrep) # get all the position
+    r = g.multireplicas(nrep-1) # get all the position
     xmin = np.min(r[:,0])
     xmax = np.max(r[:,0])
     ymin = np.min(r[:,1])
@@ -135,7 +135,7 @@ def get_grids(g,nrep=0,dr=0.1,deltax=1.0,deltay=1.0):
     gridx,gridy = get_grids_jit(xp,yp,gridx,gridy)
     return gridx,gridy # return the grids
 
-#@jit
+@jit(nopython=True)
 def get_grids_jit(x,y,gridx,gridy):
     nx = len(x)
     ny = len(y)
