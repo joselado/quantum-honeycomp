@@ -272,7 +272,8 @@ def get_ldos(h,projection="TB",**kwargs):
 
 
 def get_ldos_tb(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
-             random=True,silent=False,write=True,**kwargs):
+             random=True,silent=False,interpolate=False,
+             write=True,**kwargs):
   """ Calculate LDOS in a tight binding basis"""
   if ks is not None and mode=="green": raise
   if mode=="green":
@@ -308,9 +309,15 @@ def get_ldos_tb(h,e=0.0,delta=0.001,nrep=5,nk=None,ks=None,mode="arpack",
   g = h.geometry  # store geometry
   x,y = g.x,g.y # get the coordinates
   if write: 
+      from .interpolation import atomic_interpolation
       go = h.geometry.copy() # copy geometry
       go = go.supercell(nrep) # create supercell
-      write_ldos(go.x,go.y,d.tolist()*(nrep**2),z=go.z) # write in file
+      do = d.tolist()*(nrep**g.dimensionality) # replicate
+      xo = go.x
+      yo = go.y
+      if interpolate:
+        xo,yo,do = atomic_interpolation(xo,yo,do)
+      write_ldos(xo,yo,do) # write in file
   return (x,y,d) # return LDOS
 
 

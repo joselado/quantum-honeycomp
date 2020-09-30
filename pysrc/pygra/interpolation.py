@@ -69,3 +69,7 @@ def periodic_grid2mesh(ds,qs):
     return interpolator2d(ksg[:,0],ksg[:,1],ds.reshape((nx*ny)),mode="periodic")(qs[:,0:2])
 
 
+
+from .interpolatetk.atomicinterpolation import atomic_interpolation
+
+

@@ -4,7 +4,8 @@ from ..klist import kmesh
 import numpy as np
 import scipy.sparse.linalg as slg
 
-def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
+def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,
+        numw=None,energy=0.0):
   from scipy.sparse import csc_matrix as csc
   shape = h.intra.shape
   if numw is not None: sparse = True
@@ -21,7 +22,7 @@ def get_eigenvectors(h,nk=10,kpoints=False,k=None,sparse=False,numw=None):
 #    vvs = [lg.eigh(f(k)) for k in kp] # diagonalize k hamiltonian
     nkp = len(kp) # total number of k-points
     if sparse: # sparse Hamiltonians
-        fk = lambda k: slg.eigsh(csc(f(k)),k=numw,which="LM",sigma=0.0,tol=1e-5)
+        fk = lambda k: slg.eigsh(csc(f(k)),k=numw,which="LM",sigma=energy,tol=1e-5)
         vvs = parallel.pcall(fk,kp)
     else: # dense Hamiltonians
       if parallel.cores>1: # in parallel

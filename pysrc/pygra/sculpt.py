@@ -327,7 +327,7 @@ def image2island(impath,g,nsuper=4,size=10,color="black",
       go = go.supercell(npristine) # pristine supercell
   go = intersec(go,finter)
   if not periodic: go.dimensionality = 0 # zero dimensional
-  go.celldis = None
+  else: go.celldis = None
   return go 
 
 

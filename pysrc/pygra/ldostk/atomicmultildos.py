@@ -66,10 +66,12 @@ def ldos_generator(h,delta=0.05,nrep=1,nk=20,dl=None,
     ##########################################################
     # now compute the real-space wavefunctions including the Bloch phase
     ds = np.zeros((len(vs),len(x))) # zero array
+    # get the generator
+    density_generator = get_real_space_density_generator(lodict,h.geometry)
     for i in range(len(vs)): # loop over wavefunctions
         w = vs[i] # get the current Bloch wavefunction
         k = ks[i] # get the current bloch wavevector
-        d = get_real_space_density(w,k,lodict,h.geometry)
+        d = density_generator(w,k)
         ds[i] = d # store in the list
     def f(e):
         return ldos_at_energy(evals,ds,e,delta) # compute the LDOS
@@ -78,7 +80,7 @@ def ldos_generator(h,delta=0.05,nrep=1,nk=20,dl=None,
 
 def get_ldos(h,e=0.0,delta=0.05,**kwargs):
     """Compute a single LDOS"""
-    ldos_gen,evals,x,y = ldos_generator(h,delta=delta,**kwargs) 
+    ldos_gen,evals,x,y = ldos_generator(h,e=e,delta=delta,**kwargs) 
     out = ldos_gen(e) # compute the LDOS
     np.savetxt("LDOS.OUT",np.array([x,y,out]).T) # save
     return x,y,out
@@ -106,16 +108,28 @@ def multi_ldos(h,es=np.linspace(-2.0,2.0,100),delta=0.05,**kwargs):
 
 
 
-def get_real_space_density(w,k,lodict,g):
+def get_real_space_density_generator(lodict,g):
     """Compute the orbital in real space"""
-    nc = len(w) # number of components of the Bloch wavefunction
     out = 0. # wavefunction in real space
-    for key in lodict: # loop over keys
-        d = np.array(key[0]) # direction of the replica
-        i = key[1] # index of the orbital
-        phi = g.bloch_phase(d,k) # get the Bloch phase
-        out = out + w[i]*phi*lodict[key] # add contribution
-    return (out*np.conjugate(out)).real # return 
+    orbs = np.array([lodict[key] for key in lodict]) # orbitals
+    inds = np.array([key[1] for key in lodict],dtype=int) # indexes
+    ds = [key[0] for key in lodict]
+    def fout(w,k):
+        """Function that return the real space density"""
+        nc = len(w) # number of components of the Bloch wavefunction
+        phis = np.array([g.bloch_phase(d,k) for d in ds]) # phases
+        out = np.zeros(orbs[0].shape[0],dtype=np.complex)
+        return get_real_space_density_jit(w,phis,inds,orbs,out).real
+    return fout # return function
+
+@jit(nopython=True)
+def get_real_space_density_jit(w,phis,inds,orbs,out):
+    """Return the real space wavefunction"""
+    for ii in range(len(inds)):
+        iorb = int(inds[ii]) # integer
+        out = out + w[iorb]*phis[ii]*orbs[ii] # add contribution
+    return out*np.conjugate(out)
+
 
 
 
