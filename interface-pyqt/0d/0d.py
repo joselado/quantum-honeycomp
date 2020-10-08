@@ -110,7 +110,13 @@ def modify_geometry(g):
 def initialize():
   """ Initialize the calculation"""
   g = get_geometry() # get the geometry
-  h = g.get_hamiltonian(has_spin=True)
+  t2,t3 = get("t2"),get("t3") # get hoppings
+  if t2!=0.0 or t3!=0.0:
+      ts = [1.,t2,t3]
+      fm = specialhopping.neighbor_hopping_matrix(g,ts)
+      h = g.get_hamiltonian(mgenerator=fm,has_spin=True)
+  else:
+      h = g.get_hamiltonian(has_spin=True)
   h.add_zeeman([get("Bx"),get("By"),get("Bz")]) # Zeeman fields
   h.add_sublattice_imbalance(get("mAB"))  # sublattice imbalance
   h.add_rashba(get("rashba"))  # Rashba field
