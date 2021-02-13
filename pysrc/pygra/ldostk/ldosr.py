@@ -6,7 +6,7 @@ from ..dos import calculate_dos
 # specialized routines to compute the LDOS in continuum space
 
 def ldosr_generator(h,rs=0.2,es=np.linspace(-1.,1.,100),
-        delta=3e-2,nn=20,**kwargs):
+        delta=3e-2,nn=20,sector="electron",**kwargs):
     """Return a function that computes the LDOS as a function of the
     position"""
     (evals,vs) = h.get_eigenvectors(**kwargs,kpoints=False)
@@ -33,6 +33,9 @@ def ldosr_generator(h,rs=0.2,es=np.linspace(-1.,1.,100),
             elif h.check_mode("spinful_nambu"):
               yout = yout + calculate_dos(evals,es,delta,w=ds[:,4*ii])*ws[i]
               yout = yout+ calculate_dos(evals,es,delta,w=ds[:,4*ii+1])*ws[i]
+              if sector=="all":
+                yout = yout + calculate_dos(evals,es,delta,w=ds[:,4*ii+2])*ws[i]
+                yout = yout+ calculate_dos(evals,es,delta,w=ds[:,4*ii+3])*ws[i]
             else: raise
         return (es,yout)
     return fun

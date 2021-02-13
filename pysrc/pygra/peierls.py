@@ -136,13 +136,13 @@ def add_inplane_bfield(h,**kwargs):   add_bfield(h,mode="inplane",**kwargs)
 def add_offplane_bfield(h,**kwargs):   add_bfield(h,mode="offplane",**kwargs)
 
 def add_peierls(h,mag_field,**kwargs):
-    add_offplane_bfield(h,b=mag_field*2)
+    add_offplane_bfield(h,b=mag_field*2,**kwargs)
 
 
 
 
 
-def add_bfield(h,b=0.0,phi=0.0,mode="inplane"):
+def add_bfield(h,b=0.0,phi=0.0,mode="inplane",gauge="Landau"):
     """Add an in-plane magnetic field"""
     if h.dimensionality>2: raise # not implemented
     if h.has_spin: gi = lambda i: i//2
@@ -155,7 +155,11 @@ def add_bfield(h,b=0.0,phi=0.0,mode="inplane"):
     r = g.r # get positions
     def get_phase(r,dr):
         if mode=="inplane": return 2*r[2]*(dr[0]*sphi - dr[1]*cphi)
-        elif mode=="offplane": return r[1]*dr[0]/2.
+        elif mode=="offplane": 
+            if gauge=="Landau": return r[1]*dr[0]/2.
+            elif gauge=="symmetric": return r[1]*dr[0]/4.- r[0]*dr[1]/4.
+            else: raise
+        else: raise
     def add_phase(m,r1,r2): # add the phase
         mo = coo_matrix(m) # convert to coo matrix
         data = mo.data +0.0j

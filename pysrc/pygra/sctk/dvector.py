@@ -34,6 +34,6 @@ def average_hamiltonian_dvector(h,nk=10,spatial_sum=True):
     out = np.abs(out)**2 # square each term
     out = np.mean(out,axis=0) # average over k-points
     out = np.sum(out,axis=1) # sum over rows
-    if spatial_sum: out = np.sum(out,axis=1) # sum over columns
+    if spatial_sum: out = np.mean(out,axis=1) # sum over columns
     return out # return a vector
 

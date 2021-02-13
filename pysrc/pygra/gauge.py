@@ -28,3 +28,17 @@ def Operator2canonical_gauge(h,op):
     U = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k)@v)
     Ud = operators.Operator(lambda v,k=None: canonical_gauge_transformation(h,k).T.conjugate()@v)
     return Ud*op*U
+
+
+def hamiltonian_gauge_transformation(h,phis):
+    ho = h.copy()
+    phis = np.array(phis)
+    if len(phis)!=len(h.geometry.r): raise
+    U = np.diag(np.exp(1j*np.pi*2*phis)) # create the 
+    U = ho.spinless2full(U) # increase the space if necessary
+    Uh = np.conjugate(U.T) # transpose
+    ho.modify_hamiltonian_matrices(lambda m: U@m@Uh)
+    return ho
+
+
+

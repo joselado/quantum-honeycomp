@@ -57,12 +57,14 @@ def valence_TMDC(g=None,soc=0.0,**kwargs):
 
 
 
-def NbSe2(soc=0.0,cdw=0.0):
+def NbSe2(soc=0.0,cdw=0.0,g=None):
     """Return the Hamiltonian of NbSe2"""
-    g = geometry.triangular_lattice()  # triangular lattice
+    if g is None: 
+        g = geometry.triangular_lattice()  # triangular lattice
+        if cdw!=0.0: g = g.supercell(3)
 #    ts = np.array([86.8,139.9,29.6,3.5,3.3])
 #    ts = np.array([46.,257.5,4.4,-15,6])
-    ts = np.array([0.3,1.,0.,0.,0.])
+    ts = np.array([0.3,2.,0.6,0.2,0.])
     t = ts[0]/np.max(ts) # 1NN 
 #    ts[0] = 0.0 # set to zero
     ts = ts/np.max(ts) # normalize
@@ -77,9 +79,15 @@ def NbSe2(soc=0.0,cdw=0.0):
         hsoc = valence_TMDC(g=h.geometry,soc=soc,d=d) # hamiltonian with SOC
         h = h + t*hsoc # add the two Hamiltonians
     if cdw!=0.0: # add the CDW
-        h = h.supercell(3) # create a supercell
+        g0 = geometry.triangular_lattice()  # triangular lattice
+        g0 = g0.supercell(3) # create a supercell
         from . import potentials
-        f = potentials.commensurate_potential(h.geometry,amplitude=cdw,k=3.5)
+        f0 = potentials.commensurate_potential(g0,n=6,angle=np.pi/6.,
+                k=1./np.sqrt(3)*2.)
+        f0 = f0.normalize()*cdw
+        f0 = f0.set_average(0.)
+        rc = np.mean(h.geometry.get_closest_position([.1,.1,0.],n=3),axis=0)
+        f = lambda r: f0(r-rc)
         h.geometry.write_profile(f)
         h.add_onsite(f)
     h.set_filling(.5)
@@ -89,6 +97,27 @@ def NbSe2(soc=0.0,cdw=0.0):
     
 
 
+
+def triangular_pi_flux(g=None,**kwargs):
+    """Return a pi-flux Hamiltonian"""
+    if g is None: # no geometry given
+        g = geometry.triangular_lattice() # geometry of a traingular lattice
+    g = g.supercell((2,1)) # create a supercell with 2 atoms
+    ft = specialhopping.phase_C3_matrix(g,phi=.5)
+    h = g.get_hamiltonian(mgenerator=ft,is_multicell=True,**kwargs) # return the Hamiltonian
+    h.add_peierls(2*np.pi*1./np.sqrt(3.),gauge="Landau") # field
+    from . import gauge
+#    h = gauge.hamiltonian_gauge_transformation(h,[0.,0.25])
+#    return h
+    if h.has_time_reversal_symmetry(): pass
+    else: 
+        print(np.round(h.intra,2))
+        for t in h.hopping:
+          print(np.round(t.m,2))
+        print("Something wrong happened in pi-flux")
+        raise
+    exit()
+    return h
 
 
 

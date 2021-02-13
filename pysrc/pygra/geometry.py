@@ -70,9 +70,13 @@ class Geometry:
       return supercelltk.target_angle_volume(self,angle=0.5)
   def closest_index(self,r):
       return sculpt.get_closest(self,n=1,r0=r)[0]
-  def get_closest_position(self,r):
-      ii = self.closest_index(r)
-      return self.r[ii] # return this position
+  def get_closest_position(self,r,n=1):
+      if n==0:
+        ii = self.closest_index(r)
+        return self.r[ii] # return this position
+      else:
+        iis = sculpt.get_closest(self,n=n,r0=r)
+        return [self.r[ii] for ii in iis] # return positions
   def supercell(self,nsuper):
     """Creates a supercell"""
     if self.dimensionality==0: return self # zero dimensional
@@ -626,7 +630,7 @@ def supercell1d(g,nsuper):
   celldis = g.a1[0]
   if np.abs(g.a1.dot(g.a1) - g.a1[0]**2)>0.001:
     print("Something weird in supercell 1d")
-    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.sqrt([1.,0.,0.])),nsuper) 
+    return supercell1d(sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.])),nsuper) 
   # position of the supercell
   yout = []
   xout = []
@@ -708,6 +712,7 @@ def triangular_lattice(n=1):
   g.update_reciprocal() # update reciprocal lattice vectors
   if n>1: return supercelltk.target_angle_volume(g,angle=1./3.,volume=int(n),
           same_length=True) 
+  g = sculpt.rotate_a2b(g,g.a1,np.array([1.,0.,0.]))
   return g
 
 

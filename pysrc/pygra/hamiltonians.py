@@ -67,15 +67,28 @@ class Hamiltonian():
   def modify_hamiltonian_matrices(self,f):
       """Modify all the matrices of a Hamiltonian"""
       modify_hamiltonian_matrices(self,f)
+  def remove_sites(self,store):
+      from . import sculpt
+      self.geometry = sculpt.remove_sites(self.geometry,store)
+      from .algebratk.matrixcrop import crop_matrix
+      if self.has_spin: raise
+      f = lambda m: crop_matrix(m,store)
+      self.modify_hamiltonian_matrices(f) # modify all the matrices
   def get_filling(self,**kwargs):
       """Get the filling of a Hamiltonian at this energy"""
       return spectrum.get_filling(self,**kwargs) # eigenvalues
+  def project_interactions(self,**kwargs):
+      """Project interactions"""
+      from .interactions.vijkl import Vijkl
+      return Vijkl(self,**kwargs)
   def reduce(self):
       return hamiltonianmode.reduce_hamiltonian(self)
   def full2profile(self,x,**kwargs):
       """Transform a 1D array in the full space to the spatial basis"""
       from .htk.matrixcomponent import full2profile
       return full2profile(self,x,**kwargs)
+  def get_chern(h,**kwargs):
+      return topology.chern(h,**kwargs)
   def get_hopping_dict(self):
       """Return the dictionary with the hoppings"""
       return multicell.get_hopping_dict(self)
@@ -97,6 +110,7 @@ class Hamiltonian():
     self.get_eh_sector = None # no function for getting electrons
     self.fermi_energy = 0.0 # fermi energy at zero
     self.dimensionality = 0 # dimensionality of the Hamiltonian
+    self.temperature = 0.0 # temperature of the Hamiltonian
     self.is_sparse = False
     self.is_multicell = False # for hamiltonians with hoppings to several neighbors
     self.hopping_dict = {} # hopping dictonary
@@ -113,6 +127,7 @@ class Hamiltonian():
       else: return hk_gen(self) # for normal cells
   def has_time_reversal_symmetry(self):
       """Check if a Hamiltonian has time reversal symmetry"""
+      from .htk import symmetry
       return symmetry.has_time_reversal_symmetry(self)
   def get_qpi(self,**kwargs):
       from .chitk import qpi
@@ -145,8 +160,8 @@ class Hamiltonian():
       from . import gauge
       return gauge.to_canonical_gauge(self,m,k) # return the matrix
   def print_hamiltonian(self):
-    """Print hamiltonian on screen"""
-    print_hamiltonian(self)
+      """Print hamiltonian on screen"""
+      print_hamiltonian(self)
   def check_mode(self,n):
       """Verify the type of Hamiltonian"""
       return hamiltonianmode.check_mode(self,n)
@@ -196,10 +211,14 @@ class Hamiltonian():
     """ Creates a supercell of a one dimensional system"""
     if nsuper==1: return self
     if self.dimensionality==0: return self
-    elif self.dimensionality==1: ns = [nsuper,1,1]
-    elif self.dimensionality==2: ns = [nsuper,nsuper,1]
-    elif self.dimensionality==3: ns = [nsuper,nsuper,nsuper]
-    else: raise
+    try: 
+        nsuper[2] 
+        ns = nsuper # array as input
+    except:
+        if self.dimensionality==1: ns = [nsuper,1,1]
+        elif self.dimensionality==2: ns = [nsuper,nsuper,1]
+        elif self.dimensionality==3: ns = [nsuper,nsuper,nsuper]
+        else: raise
     return multicell.supercell_hamiltonian(self,nsuper=ns)
   def set_finite_system(self,periodic=True):
     """ Transforms the system into a finite system"""
@@ -400,12 +419,12 @@ class Hamiltonian():
       """Add a crystal field term to the Hamiltonian"""
       from . import crystalfield
       crystalfield.hartree(self,v=v) 
-  def add_peierls(self,mag_field,new=False):
+  def add_peierls(self,mag_field,**kwargs):
       """
       Add magnetic field
       """
       from .peierls import add_peierls
-      add_peierls(self,mag_field=mag_field,new=new)
+      add_peierls(self,mag_field=mag_field,**kwargs)
   def add_inplane_bfield(self,**kwargs):
       """Add in-plane magnetic field"""
       from .peierls import add_inplane_bfield

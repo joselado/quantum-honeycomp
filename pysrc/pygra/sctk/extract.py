@@ -15,6 +15,17 @@ def extract_anomalous_dict(dd):
     return out # return dictionary
 
 
+def extract_normal_dict(dd):
+    """Given a dictionary, extract the anomalous part"""
+    out = dict()
+    for key in dd:
+        d = dd[key] # get this patrix
+        m00 = get_eh_sector(d,i=0,j=0)
+        m = build_nambu_matrix(m00) # build matrix
+        out[key] = m
+    return out # return dictionary
+
+
 
 
 def get_anomalous_hamiltonian(self):

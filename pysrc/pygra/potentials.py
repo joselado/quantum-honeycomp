@@ -3,21 +3,25 @@ import numpy as np
 from .algebra import isnumber
 
 class Potential():
-    def __init__(self,f):
+    def __init__(self,f,g=None):
         if type(f)==Potential: self.f = f.f # store function
         elif callable(f): self.f = f # store function
         elif isnumber(f): self.f = lambda r: f # store function
         else: 
             print("Unrecognized potential",f)
             raise
+        self.g = g # geometry
     def __add__(self,a):
         a = Potential(a)
         g = lambda r: self.f(r) + a.f(r)
-        return Potential(g)
+        return Potential(g,g=self.g)
+    def redefine(self,f):
+        g = lambda r: f(self.f(r))
+        return Potential(g,g=self.g)
     def __mul__(self,a):
         a = Potential(a)
         g = lambda r: self.f(r)*a.f(r)
-        return Potential(g)
+        return Potential(g,g=self.g)
     def __rmul__(self,a): return self*a
     def __neg__(self): return (-1)*self
     def __sub__(self,a): return self + (-1)*a
@@ -25,6 +29,11 @@ class Potential():
     def __radd__(self,a): return self + a
     def __call__(self,r):
         return self.f(r)
+    def normalize(self):
+        return Potential(enforce_minmax(self,[0.,1.],g=self.g),g=self.g)
+    def set_average(self,average):
+        out = enforce_average(self,average,g=self.g)
+        return Potential(out,g=self.g)
 
 
 
@@ -83,6 +92,7 @@ def commensurate_potential(g,k=1,amplitude=1.0,n=None,
     f = enforce_average(f,average,g=g) # enforce average
     if minmax is not None: f = enforce_minmax(f,minmax,g=g) # enforce minmax
     f = Potential(f)
+    f.g = g
     return f
 
 
@@ -187,7 +197,17 @@ def enforce_minmax(f,a,g=None):
 
 
 
+def array2potential(x,y,v):
+    """Given an initial xyz array, return a function
+    that interpolates over them"""
+    from .interpolation import interpolator2d
+    if len(v)!=len(x): raise
+    return Potential(interpolator2d(x,y,v))
 
+
+def object2potential(V,r=None):
+    """Transform a generic object into a callable potential"""
+    return V
 
 
 

@@ -590,9 +590,8 @@ def identify_superconductivity(h,tol=1e-5):
     # now check if it has some symmetry
     singletp = np.sum(np.abs(extract_singlet_pairing(m1))) # singlet
     tripletp = np.sum(np.abs(extract_triplet_pairing(m1))) # triplet
-    print(singletp,tripletp)
-    if singletp<tol: out.append("Odd superconductivity")
-    if tripletp<tol: out.append("Even superconductivity")
+    if singletp>tol: out.append("Even superconductivity")
+    if tripletp>tol: out.append("Odd superconductivity")
 #    print(np.round(d1-d2,2),tol)
     return out
 

@@ -10,7 +10,7 @@ class Testimator:
     self.maxite = maxite
     self.silent = silent
     self.i = 0
-    if len(title)>0: print(title)
+    if len(title)>0 and not silent: print(title)
   def remaining(self,i,tot):
     """Print the ramining time in this task"""
     t = time.perf_counter() # current time

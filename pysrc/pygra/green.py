@@ -584,9 +584,14 @@ def surface_multienergy(h1,k=[0.0,0.,0.],energies=[0.0],reverse=True,**kwargs):
                    only_bulk=False,reverse=reverse,
                    **kwargs) # surface green function 
   out = [] # output
-  for energy in energies: # loop
-    gs1,sf1 = fun1(energy)
-    out.append([sf1,gs1])
+  from . import parallel
+  def fp(x):
+      gs1,sf1 = fun1(x)
+      return [sf1,gs1]
+  out = parallel.pcall(fp,energies)
+#  for energy in energies: # loop
+#    gs1,sf1 = fun1(energy)
+#    out.append([sf1,gs1])
   return out # return output
 
 

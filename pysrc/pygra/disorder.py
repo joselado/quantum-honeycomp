@@ -4,21 +4,12 @@ import numpy as np
 
 def anderson(h,w=0.0,p=1.0):
   """Return a Hamiltonian with Anderson disorder"""
-  if h.has_eh: raise # not yet
-  if h.has_spin: raise # not yet
-  ho = h.copy() # copy the Hamiltonian
-  n = h.intra.shape[0] # dimension
-  cs = (np.random.random(n) - .5)*2*w # disorder
-  # decide if an impurity should be added
-  ps = []
-  for ip in np.random.random(n): # loop over random numbers
-    if p<ip: ps.append(0.)
-    else: ps.append(1.)
-  ps = np.array(ps)
-  ho.intra = ho.intra + np.diag(cs*ps)
-  return ho # return Hamiltonian
-
-
+  def fdis(r):
+      if np.random.random()<p: # probability of an impurity
+        return (np.random.random() - .5)*2*w # disorder
+      return 0.0
+  h.add_onsite(fdis)
+  return h
 
 
 def phase(h,w=0.0):

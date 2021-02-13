@@ -194,22 +194,32 @@ def rotate_layer(g,theta,dr=[0.,0.,0.]):
     g1.xyz2r() # update
     return g1 # return the geometry
 
-
-def multilayer_graphene(l=[0]):
-    """Return a multilayer graphene system"""
+def multilayer_graphene(**kwargs):
+    """Return a multilayer graphene geometry"""
     g = geometry.honeycomb_lattice() # get a honeycomb lattice
-    dr = g.r[0] - g.r[1] # shift between two sites
+    dr = g.r[0] - g.r[1] # distance
+    return multilayer(g,dr=dr,dz=[0.,0.,3.],**kwargs)
+
+
+def multilayer(g,l=[0],dr=[1.,0.,0.],dz=[0.,0.,1.]):
+    """Return a multilayer geometry"""
+    dr = np.array(dr) # to array
+    dz = np.array(dz) # to array
     ss = [] # list for the sublattice
     rs = [] # list for the positions
     ii = 0 # start
     for il in l: # loop over layers
-        for (ri,si) in zip(g.r,g.sublattice): # loop over positions
-            rs.append(ri + dr*il + ii*np.array([0.,0.,3.])) # add position
-            ss.append(si*(-1)**(il+ii)) # add sublattice
+        if g.has_sublattice:
+            for (ri,si) in zip(g.r,g.sublattice): # loop over positions
+                rs.append(ri + dr*il + ii*dz) # add position
+                ss.append(si*(-1)**(il+ii)) # add sublattice
+        else:
+            for ri in g.r: # loop over positions
+                rs.append(ri + dr*il + ii*dz) # add position
         ii += 1
     go = g.copy()
     go.r = np.array(rs)
-    go.sublattice = np.array(ss)
+    if g.has_sublattice: go.sublattice = np.array(ss)
     go.r2xyz()
     go.center()
     go = sculpt.rotate_a2b(go,go.a1,np.array([1.,0.,0.]))
@@ -292,7 +302,7 @@ def parse_twisted_multimultilayer(name,n=3):
     # thirs element determines whether if they are rotated
     gs = [] # empty list
     for ni in name[0]: # loop over names of the layers
-            if ni=="": gi = multilayer_graphene([0]) # normal honeycomb
+            if ni in ["","A"]: gi = multilayer_graphene([0]) # normal honeycomb
             elif ni=="AA": gi = multilayer_graphene([0,0]) 
             elif ni=="AB": gi = multilayer_graphene([0,1]) 
             elif ni=="BA": gi = multilayer_graphene([1,0]) 

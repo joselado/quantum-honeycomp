@@ -129,30 +129,19 @@ def optimize_gap(h,direct=True,ntries=10):
   for r in rs: # loop over gaps
     if r[0]==mg: return r # return minimum
 
-#
-#def closest_to_zero(h):
-#  """Returns the eigenvalue closest to zero energy,
-#     This is a simple way to calculate the gap for
-#     superconductors"""
-#  h = h.copy()
-#  h.turn_sparse() # sparse Hamiltonian
-#  hkgen = h.get_hk_gen() # get generator
-#
-
-  
-#  else: # indirect gap
 
 
-
-
-def indirect_gap(h,robust=True):
+def indirect_gap(h,robust=True,**kwargs):
   """Calculates the gap for a 2d Hamiltonian by doing
   a kmesh sampling. It will return the positive energy with smallest value"""
+  if h.intra.shape[0]>30:
+      h = h.copy()
+      h.turn_sparse() # sparse Hamiltonian
   from scipy.optimize import minimize
   hk_gen = h.get_hk_gen() # generator
   def gete(k): # return the energies
     hk = hk_gen(k) # Hamiltonian 
-    if h.is_sparse: es = algebra.smalleig(hk,numw=10) # sparse
+    if h.is_sparse: es = algebra.smalleig(hk,numw=3) # sparse
     else: es = algebra.eigvalsh(hk) # get eigenvalues
     return es # get the energies
   # We will assume that the chemical potential is at zero
@@ -178,13 +167,15 @@ def indirect_gap(h,robust=True):
     from scipy.optimize import differential_evolution
     from scipy.optimize import minimize
     bounds = [(0.,1.) for i in range(h.dimensionality)]
-    x0 = np.random.random(h.dimensionality) # inital vector
-    if robust: res = differential_evolution(f,bounds=bounds)
-    else: res = minimize(f,x0,method="Powell")
+    if robust: res = differential_evolution(f,bounds=bounds,**kwargs)
+    else: 
+        x0 = np.random.random(h.dimensionality) # inital vector
+        res = minimize(f,x0,method="Powell",bounds=bounds,**kwargs)
     return f(res.x)
   ev = opte(funv) # optimize valence band
 #  return ev
-  ec = opte(func) # optimize conduction band
+  if h.has_eh: ec = ev # workaround for SC
+  else: ec = opte(func) # optimize conduction band
   return ec+ev # return result
 #  return np.min(gaps)
 

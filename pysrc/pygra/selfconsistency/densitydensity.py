@@ -342,6 +342,8 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
         t0 = time.perf_counter() # time
         diff = diff_mf(mfnew,mf) # mix mean field
         mf = mix_mf(mfnew,mf,mix=mix) # mix mean field
+        if callback_mf is not None: # redefine mean-field if necessary
+            mf = callback_mf(mf) # callback for the mean field
         t1 = time.perf_counter() # time
         if verbose>1: print("Time in mixing",t1-t0)
         if verbose>0: print("ERROR in the SCF cycle",diff)
@@ -456,25 +458,30 @@ def hubbard(h,U=1.0,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.copy() # copy Hamiltonian
     h.turn_multicell() # multicell Hamiltonian
-    U = utilities.obj2fun(U) # redefine as a function
+    U = obj2geometryarray(U,h.geometry) # redefine as array 
+    n = len(h.geometry.r) # number of spinless sites
     if h.has_spin:
-      n = len(h.geometry.r) # number of spinless sites
       zero = np.zeros((2*n,2*n),dtype=np.complex)
-      for i in range(n): zero[2*i,2*i+1] = U(i) # Hubbard interaction
+      for i in range(n): zero[2*i,2*i+1] = U[i] # Hubbard interaction
     else: 
       zero = np.zeros((n,n),dtype=np.complex)
       n = len(h.geometry.r) # number of spinless sites
-      for i in range(n): zero[i,i] = U(i) # Hubbard interaction
+      for i in range(n): zero[i,i] = U[i] # Hubbard interaction
     v = dict() # dictionary
     v[(0,0,0)] = zero 
+    def callback_mf(mf):
+        """Put the constrains in the mean field if necessary"""
+        mf = mfconstrains.enforce_constrains(mf,h,constrains)
+        return mf
     if h.has_spin:
-      return densitydensity(h,v=v,**kwargs)
+      return densitydensity(h,v=v,callback_mf=callback_mf,**kwargs)
     else:
-      return densitydensity(h,v=v,compute_cross=False,**kwargs)
+      return densitydensity(h,v=v,compute_cross=False,
+              callback_mf=callback_mf,**kwargs)
 
 
 def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
-        constrains=[],**kwargs):
+        constrains=[],Vr=None,**kwargs):
     """Wrapper to perform a Hubbard model calculation"""
     h = h.get_multicell() # multicell Hamiltonian
     h.turn_dense()
@@ -484,6 +491,10 @@ def Vinteraction(h,V1=0.0,V2=0.0,V3=0.0,U=0.0,
     mgenerator = specialhopping.distance_hopping_matrix([V1/2.,V2/2.,V3/2.],nd[0:3])
     hv = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
             mgenerator=mgenerator) 
+    if Vr is not None:
+      hv1 = h.geometry.get_hamiltonian(has_spin=False,is_multicell=True,
+              fun=Vr)
+      hv = hv + hv1 # add the two Hamiltonians
     v = hv.get_hopping_dict() # hopping dictionary
     U = obj2geometryarray(U,h.geometry) # convert to array
     if h.has_spin: #raise # not implemented

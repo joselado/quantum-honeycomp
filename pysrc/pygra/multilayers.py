@@ -82,35 +82,8 @@ def bilayer_aa(h,t = 0.1):
 
 def add_electric_field(h,e = 0.0):
   """Adds electric field to the system"""
-  z = h.geometry.z # z coordinates
-  g = h.geometry
-  if h.is_sparse: # for psrase hamiltonians
-    rows = []
-    cols = []
-    data = []
-    if h.has_spin: raise # for spinful hamiltonians
-    else: # for spinless hamiltonians
-      for i in range(len(z)):
-        if callable(e): efield = e(g.x[i],g.y[i],g.z[i])  # if it is function
-        else: efield = e  # if it is number
-        data.append(z[i]*efield)
-        rows.append(i)
-        cols.append(i)
-    n = len(z)
-    m = csc_matrix((data,(rows,cols)),shape=(n,n)) # create fermi shift
-    h.intra = h.intra + m  # add potential shift
-  else:
-    if h.has_spin: # if has spin
-      for i in range(len(z)):
-        if callable(e): efield = e(g.x[i],g.y[i],g.z[i])  # if it is function
-        else: efield = e  # if it is number
-        h.intra[2*i,2*i] += z[i]*efield
-        h.intra[2*i+1,2*i+1] += z[i]*efield
-    else: 
-      for i in range(len(z)):
-        if callable(e): efield = e(g.x[i],g.y[i],g.z[i])  # if it is function
-        else: efield = e  # if it is number
-        h.intra[i,i] += z[i]*efield
+  h.add_onsite(lambda r: e*r[2])
+  return h
 
 def multilayered_hamiltonian(h,dr=np.array([0.,0.,0.])):
   """ Creates a multilayered hamiltonian by adding several layers """

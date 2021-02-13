@@ -82,7 +82,10 @@ def getplot(obj):
     cb.set_label(args.cblabel) # set the label
   plt.xlim([min(k),max(k)])   # x axis range
   ewin = 1.01 - obj.get_slider("ewin") # energy window
-  plt.ylim([ewin*min(e),ewin*max(e)])   # y axis range
+  e0 = obj.get_slider("e0")
+  de = np.max(np.abs(e)) # maximum value
+  eshift = de*(e0-.5)*2
+  plt.ylim([ewin*min(e)+eshift,ewin*max(e)+eshift])   # y axis range
   
   # axis
   xlab = plt.xlabel("")
@@ -122,6 +125,8 @@ if len(m)>2: # has color
         label="Colormap",key="cmap")
 main.add_slider(label="Energy window",key="ewin",
         vs=np.linspace(0.,1.,100)) # Energy window
+main.add_slider(label="Offset",key="e0",
+        vs=np.linspace(0.,1.,100),v0=0.5) # Energy window
 main.add_slider(label="Size",key="size",
         vs=range(1,100),v0=40) # Energy window
 main.plot()

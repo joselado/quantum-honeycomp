@@ -11,7 +11,7 @@ def get_mf_anomalous(v,dm):
     for d in v: mf[d] = zero.copy()  # initialize
     for d in v: # loop over directions
         d2 = tuple(-np.array(d))
-        m = anomalous_term_ij(v[d],dm[d2]) # get matrix
+        m = anomalous_term_ij(2*v[d],dm[d2]) # get matrix
         mf[d] = mf[d] + m # add normal term
     return mf
 

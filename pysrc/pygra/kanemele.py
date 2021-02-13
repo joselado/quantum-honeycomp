@@ -61,10 +61,13 @@ def km_vector(ri,rj,rm,use_fortran=use_fortran):
 def haldane(r1,r2,rm,fun=0.0,sublattice=None):
   """Return the Haldane coupling"""
   if sublattice is None: sublattice = np.zeros(len(r1)) + 1.0
-  if fun==0.0: return 0
-  if is_number(fun): kmfun = lambda r: fun # function that always returns fun
+  if is_number(fun): 
+      if fun==0.0: return 0 # skip
+      kmfun = lambda r: fun # function that always returns fun
   elif callable(fun): kmfun = fun # callable function
-  else: raise # no idea
+  else: # anything else
+      from .potentials import array2potential
+      kmfun = array2potential(r1[:,0],r1[:,1],fun)
   nsites = len(r1) # number of sites
   mout = np.zeros((nsites,nsites),dtype=np.complex) # initialize
   from . import neighbor

@@ -92,17 +92,23 @@ def enforce_constrains(mf,h,constrains=[]):
     for c in constrains:
         if c=="no_charge":
             mf = remove_charge(h)(mf) # remove charge renormalization
-        if c=="no_magnetism":
+        elif c=="no_magnetism":
             mf = remove_magnetism(h)(mf) # remove magnetism
-        if c=="no_inplane_magnetism":
+        elif c=="no_inplane_magnetism":
             mf = remove_inplane_magnetism(h)(mf) # remove inplane magnetism
-        if c=="no_offplane_magnetism":
+        elif c=="no_offplane_magnetism":
             mf = remove_offplane_magnetism(h)(mf) # remove inplane magnetism
-        if c=="no_normal_term":
+        elif c=="no_normal_term":
             if h.has_eh:
                 from ..sctk.extract import extract_anomalous_dict
                 mf = extract_anomalous_dict(mf)
             else: raise
+        elif c in ["no_anomalous_term","no_SC","no_superconductivity"]:
+            if h.has_eh:
+                from ..sctk.extract import extract_normal_dict
+                mf = extract_normal_dict(mf)
+            else: pass
+#        print(np.round(mf[(0,0,0)],1))
     return mf
 
 

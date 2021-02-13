@@ -38,17 +38,20 @@ def remove(g,l):
 def intersec(g,f):
   """ Intersec coordinates with a certain function which yields True or False,
   output is resultant geometry """
-  gout = g.copy() # copy the geometry
   store = np.array([f(ir) for ir in g.r],dtype=int) # store
+  return remove_sites(g,store) # remove those sites
+
+
+def remove_sites(g,store):
+  """ Intersec coordinates with a certain function which yields True or False,
+  output is resultant geometry """
+  gout = g.copy() # copy the geometry
+  store = np.array(store,dtype=int) # store
   gout.r = g.r[store==1]
   gout.r2xyz() # update r
   if gout.has_sublattice: # if has sublattice, keep the indexes
     gout.sublattice = g.sublattice[store==1]
   return gout
-
-
-
-
 
 
 def intersected_indexes(g,f):

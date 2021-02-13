@@ -146,13 +146,18 @@ def extract_from_hamiltonian(self,name):
     elif name=="mx" and self.has_spin:
       if self.has_eh: h0.remove_nambu() # not implemented
       return mx(h0.intra)
-    elif name=="swave":
+    elif name in ["swave","SC"]:
         if self.check_mode("spinful_nambu"): 
             return swave(self.intra)
         elif self.check_mode("spinless_nambu"): 
             from .sctk import spinless
             return spinless.extract_swave(self.intra)
         else: raise
+    elif name=="CDW":
+        if self.geometry.has_sublattice: # if it has sublattice
+            v = self.extract("density")
+            v = v - np.mean(v) # remove average
+            return v*np.array(self.geometry.sublattice)
     elif name=="my" and self.has_spin:
       if self.has_eh: h0.remove_nambu() # not implemented
       return my(h0.intra)

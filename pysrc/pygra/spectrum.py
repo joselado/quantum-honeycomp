@@ -292,10 +292,11 @@ def real_space_vev(h,operator=None,nk=1,nrep=3,name="REAL_SPACE_VEV.OUT",
 def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
         kp=None,mode="mesh",tol=1e-1):
   """Return the total energy"""
-  h.turn_dense()
+  if nbands is None: h.turn_dense()
   if h.is_sparse and not use_kpm: 
-    print("Sparse Hamiltonian but no bands given, taking 20")
-    nbands=20
+      if nbands is None:
+        print("Sparse Hamiltonian but no bands given, taking 20")
+        nbands=20
   f = h.get_hk_gen() # get generator
   etot = 0.0 # initialize
   iv = 0
@@ -305,7 +306,7 @@ def total_energy(h,nk=10,nbands=None,use_kpm=False,random=False,
     if use_kpm: # Kernel polynomial method
       return kpm.total_energy(hk,scale=10.,ntries=20,npol=100) # using KPM
     else: # conventional diagonalization
-      if nbands is None: vv = lg.eigvalsh(hk) # diagonalize k hamiltonian
+      if nbands is None: vv = algebra.eigvalsh(hk) # diagonalize k hamiltonian
       else: 
           vv,aa = slg.eigsh(hk,k=4*nbands,which="LM",sigma=0.0) 
           vv = -np.sort(-(vv[vv<0.0])) # negative eigenvalues
@@ -430,7 +431,7 @@ def set_filling(h,filling=0.5,nk=10,extrae=0.,delta=1e-1):
         f = interp1d(di,ei) # interpolating function
         efermi = f(fill) # get the fermi energy
     else: # dense Hamiltonian, use ED
-        es = eigenvalues(h,nk=nk)
+        es = eigenvalues(h,nk=nk,notime=True)
         efermi = get_fermi_energy(es,fill)
     h.shift_fermi(-efermi) # shift the fermi energy
 
@@ -439,6 +440,7 @@ def get_fermi_energy(es,filling,fermi_shift=0.0):
   """Return the Fermi energy"""
   ne = len(es) ; ifermi = int(round(ne*filling)) # index for fermi
   sorte = np.sort(es) # sorted eigenvalues
+  if ifermi==0: return sorte[0] + fermi_shift
   fermi = (sorte[ifermi-1] + sorte[ifermi])/2.+fermi_shift # fermi energy
   return fermi
 
@@ -460,7 +462,7 @@ def get_filling(h,**kwargs):
         return spinless.get_filling(h,**kwargs)
     elif h.check_mode("spinful_nambu"): raise # spinful Nambu
     else:
-        es = spectrum.eigenvalues(self,**kwargs) # eigenvalues
+        es = eigenvalues(h,**kwargs) # eigenvalues
         es = np.array(es)
         esf = es[es<0.0]
         return len(esf)/len(es) # return filling
@@ -485,4 +487,20 @@ def eigenvalues_kmesh(h,nk=20):
         ei = algebra.eigvalsh(hk) # get the energies
         es[i,j,:] = ei # store energies
     return es # return all the energies
+
+
+
+
+def lowest_energies(h,n=4,k=None,**kwargs):
+    """Return the lowest energy states in a k-point"""
+    if k is None: raise
+    es,ws = h.get_eigenvectors(kpoints=False,k=k,numw=2*n,**kwargs)
+    es = [y for (x,y) in sorted(zip(np.abs(es),es))][0:n]
+    es = np.sort(es)
+    return es
+
+
+
+
+
 
