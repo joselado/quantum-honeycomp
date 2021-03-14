@@ -44,6 +44,12 @@ class Geometry:
     self.ncells = 2 # number of neighboring cells returned
   def neighbor_distances(self,**kwargs):
       return neighbor_distances(self,**kwargs)
+  def normalize_nn_distance(self):
+      """Set the NN istance equal to 1"""
+      if self.dimensionality>0: raise
+      d = self.neighbor_distances(n=1)[0]
+      self.r = self.r/d
+      self.r2xyz()
   def get_index(self,r,**kwargs):
     return get_index(self,r,**kwargs)
   def __add__(self,g1):
@@ -1665,3 +1671,7 @@ def array2function_jit(r,v,ir):
 
 
 from .sculpt import image2island
+
+
+from .geometrytk.readgeometry import read_xyz
+

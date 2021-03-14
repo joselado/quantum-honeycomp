@@ -176,3 +176,22 @@ def strained_hopping_matrix(*args,**kwargs):
     return entry2matrix(f) # return the matrix
 
 
+
+class HoppingGenerator():
+    """Class for a Hopping generator"""
+    def __init__(self,m):
+        if type(m)==HoppingGenerator: self.f = m.f # redefine
+        elif callable(m): self.f = m # define callable function
+    def __call__(self,rs1,rs2):
+        """Call method"""
+        return self.f(rs1,rs2)
+    def __mul__(self,m):
+        m2 = HoppingGenerator(m) # transform to HoppingGenerator
+        fout = lambda rs1,rs2: np.array(self(rs1,rs2))*np.array(m2(rs1,rs2))
+        return HoppingGenerator(fout) # return new object
+    def __rmul__(self,m): return self*m # commutative 
+
+
+
+
+

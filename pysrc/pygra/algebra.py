@@ -39,10 +39,15 @@ def trace(m):
     return np.trace(m)
 
 
-def densebmat(ms):
+def densebmat(m):
     """Turn a block matrix dense"""
     ms = [[todense(mi) for mi in mij] for mij in m]
     return todense(bmat(ms)) # return block matrix
+
+def direct_sum(ms):
+    mout = [[None for i in range(len(ms))] for j in range(len(ms))]
+    for i in range(len(ms)): mout[i][i] = ms[i]
+    return densebmat(mout)
 
 
 def dot(a,b):

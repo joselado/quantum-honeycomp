@@ -75,7 +75,7 @@ def get_bonds(rs1,rs2):
       ri = rs1[i]
       rj = rs2[j]
       dr = ri  - rj
-      if 0.1<dr.dot(dr)<1.1: # result
+      if 0.8<dr.dot(dr)<1.2: # result
         bonds += [(i,j)] 
   bonds = np.array(bonds) # transform to int array
   return bonds
@@ -96,7 +96,7 @@ xyz = read_positions().transpose()
 create_atoms(xyz)    # plot the atoms
 rs = xyz.transpose() 
 
-if len(rs)<60:
+if len(rs)<200:
   create_bonds(rs,rs)
 
 

@@ -684,7 +684,8 @@ def getgreen_jit(wfs,es,energy,delta,zero):
 
 
 
-def green_operator(h0,operator,e=0.0,delta=1e-3,nk=10):
+def green_operator(h0,operator=None,e=0.0,delta=1e-3,nk=10,
+        gmode="adaptive"):
     """Return the integration of an operator times the Green function"""
     h = h0.copy()
     h.turn_dense()
@@ -702,8 +703,9 @@ def green_operator(h0,operator,e=0.0,delta=1e-3,nk=10):
         out += -(o0@o1).trace().imag # Add contribution
       out /= len(ks) # normalize
     else:
-      g = bloch_selfenergy(h,energy=e,delta=delta,mode="adaptive")[0] 
-      out = -(np.array(g)@operator).trace().imag
+      g = bloch_selfenergy(h,energy=e,delta=delta,mode=gmode)[0] 
+      if operator is None: out = -(np.array(g)).trace().imag
+      else: out = -(np.array(g)@operator).trace().imag
     return out
 
 

@@ -110,3 +110,23 @@ def multiply_hopping_dict(hop1,hop2):
                 else: out[key] = m # store
     return out # return output
 
+
+
+
+def direct_sum_hopping_dict(hop1,hop2):
+    """Perform the direct sum of two hopping dictionaries"""
+    from .algebra import direct_sum
+    out = dict() # create dictionary
+    keys = [key1 for key1 in hop1]
+    keys2 = [key1 for key1 in hop2]
+    zero1 = 0.*hop1[keys[0]] # initialize as zero
+    zero2 = 0.*hop2[keys2[0]] # initialize as zero
+    for key2 in hop2:
+        if key2 not in keys: keys.append(key2) # store
+    for key in keys:
+        if key in hop1: m1 = hop1[key]
+        else: m1 = zero1
+        if key in hop2: m2 = hop2[key]
+        else: m2 = zero2
+        out[key] = direct_sum([m1,m2]) # store
+    return out

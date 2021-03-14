@@ -2,6 +2,7 @@ from __future__ import print_function
 from scipy.sparse import csc_matrix,bmat
 from .rotate_spin import sx,sy,sz
 import numpy as np
+from numba import jit
 from . import parallel
 
 try:
@@ -17,7 +18,7 @@ def is_number(s):
 
 isnumber = is_number
 
-def generalized_kane_mele(r1,r2,rm,fun=0.0):
+def generalized_kane_mele(r1,r2,rm,fun=0.0,tol=1e-5):
   """Return the Kane-Mele generalized Hamiltonian"""
   if fun==0.0: return 0
   if is_number(fun): kmfun = lambda r: fun # function that always returns fun
@@ -32,7 +33,7 @@ def generalized_kane_mele(r1,r2,rm,fun=0.0):
       dr = r1[i]-r2[j] # difference
       if dr.dot(dr)>4.1:
         continue # if too far away, next iteration
-      ur = km_vector(r1[i],r2[j],rm) # kane mele vector
+      ur = km_vector(r1[i],r2[j],rm,tol=tol) # kane mele vector
       r3 = (r1[i] + r2[j])/2.0
       sm = (sx*ur[0] + sy*ur[1] + sz*ur[2])*kmfun(r3) # contribution
       if mout[i][j] is None: mout[i][j] = csc_matrix(1j*sm) # add contribution
@@ -40,19 +41,38 @@ def generalized_kane_mele(r1,r2,rm,fun=0.0):
   return bmat(mout) # return matrix
 
 
-def km_vector(ri,rj,rm,use_fortran=use_fortran):
+def km_vector(ri,rj,rm,use_fortran=use_fortran,
+        tol=1e-5):
   """Return the Kane Mele vector"""
-  if use_fortran:
-    return kanemelef90.kmvector(ri,rj,rm)
-  else:
+  if tol>1e-5: 
+      use_fortran = False
+  if use_fortran: return kanemelef90.kmvector(ri,rj,rm)
+  else:  
+      v = np.array([0.,0.,0.])
+      return km_vector_jit(ri,rj,v,np.array(rm),tol=tol)
+#      rmin = 1. -tol
+#      rmax = 1. +tol
+#      for k in range(len(rm)): # look for an intermediate site
+#        dr1 = rm[k]-ri # difference
+#        dr2 = rj-rm[k] # difference
+#        if rmin<dr1.dot(dr1)<rmax and rmin<dr2.dot(dr2)<rmax: # if connected
+#           ur = np.cross(dr1,dr2) # Kane Mele vector
+#           return ur
+#      return np.array([0.,0.,0.])
+
+
+@jit(nopython=True)
+def km_vector_jit(ri,rj,v,rm,tol=1e-5):
+    rmin = 1. -tol
+    rmax = 1. +tol
     for k in range(len(rm)): # look for an intermediate site
       dr1 = rm[k]-ri # difference
       dr2 = rj-rm[k] # difference
-      if 0.01<dr1.dot(dr1)<1.01 and 0.01<dr2.dot(dr2)<1.01: # if connected
-         ur = np.cross(dr1,dr2) # Kane Mele vector
-         return ur
-    return np.array([0.,0.,0.])
-
+      if rmin<dr1.dot(dr1)<rmax and rmin<dr2.dot(dr2)<rmax: # if connected
+         v = np.cross(dr1,dr2) # Kane Mele vector
+         return v
+    v = np.array([0.,0.,0.])
+    return v
 
 
 
@@ -135,7 +155,7 @@ def add_anti_kane_mele(h,t):
           time_reversal = True) 
 
 
-def add_kane_mele(self,t):
+def add_kane_mele(self,t,**kwargs):
   """Add to a Hamiltonian a Haldane-like hopping"""
   if not self.has_spin: self.turn_spinful() # spilful Hamiltonian
   from .multicell import close_enough # check if two rs are close
@@ -167,7 +187,7 @@ def add_kane_mele(self,t):
               rs += rtmp
     else: raise
 
-    m = generalized_kane_mele(g.r,g.r,rs,fun=t) # kane mele coupling
+    m = generalized_kane_mele(g.r,g.r,rs,fun=t,**kwargs) # kane mele coupling
     m = self.spinful2full(m) # convert the matrix
     self.intra = self.intra + m # add matrix
     for i in range(len(self.hopping)): # loop over hoppings
@@ -195,23 +215,23 @@ def add_kane_mele(self,t):
             rs.append(ri + i*g.a1 + j*g.a2)
     else: raise
     # now create the hamiltonian
-    m = generalized_kane_mele(g.r,g.r,rs,fun=t) # kane mele coupling
+    m = generalized_kane_mele(g.r,g.r,rs,fun=t,**kwargs) # kane mele coupling
     m = self.spinful2full(m) # convert the matrix
     self.intra = self.intra + m
     if self.dimensionality==0: pass  # zero dimensional
     elif self.dimensionality==1:  # zero dimensional
       r2 = [ri + g.a1 for ri in g.r] # new positions
-      m = generalized_kane_mele(g.r,r2,rs,fun=t)
+      m = generalized_kane_mele(g.r,r2,rs,fun=t,**kwargs)
       m = self.spinful2full(m) # convert the matrix
       self.inter = self.inter + m 
     elif self.dimensionality==2:  # two dimensional
       r2 = [ri + 1*g.a1 + 0*g.a2 for ri in g.r] # second vectors
-      m = generalized_kane_mele(g.r,r2,rs,fun=t)
+      m = generalized_kane_mele(g.r,r2,rs,fun=t,**kwargs)
       m = self.spinful2full(m) # convert the matrix
       self.tx = self.tx + m 
       ###############
       r2 = [ri + 0*g.a1 + 1*g.a2 for ri in g.r] # second vectors
-      m = generalized_kane_mele(g.r,r2,rs,fun=t)
+      m = generalized_kane_mele(g.r,r2,rs,fun=t,**kwargs)
       m = self.spinful2full(m) # convert the matrix
       self.ty = self.ty + m 
       #################

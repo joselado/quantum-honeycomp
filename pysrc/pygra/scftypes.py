@@ -481,88 +481,88 @@ def write_magnetization(mag):
 
 
 
-
-def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
-                  maxerror=1e-05,silent=False,mf=None,nk=None,
-                  smearing=None,fermi_shift=0.0,save=True,
-                  mode="Hubbard",energy_cutoff=None,maxite=1000,
-                  broyden=False,callback=None,**kwargs):
-  """ Solve a generalized selfcnsistent problem"""
-  if nk is not None: nkp = nk # redefine
-  mf_file = "MF.pkl"
-  os.system("rm -f STOP") # remove stop file
-  nat = h.intra.shape[0]//2 # number of atoms
-  htmp = h.copy()  # copy hamiltonian
-  htmp.turn_dense() # turn to dense Hamiltonian
-  # generalate the necessary list of correlators
-  if mf is None: # generate initial mean field
-    try:  old_mf = inout.load(mf_file) # load the file
-    except: old_mf = meanfield.guess(h,"random") # random guess
-  else: old_mf = mf # use guess
-  # get the pairs for the correlators
-  ndim = h.intra.shape[0] # dimension
-  totkp = nkp**(h.dimensionality) # total number of kpoints
-  file_etot = open("SCF_ENERGY.OUT","w")
-  file_gap = open("SCF_GAP.OUT","w")
-  file_error = open("SCF_ERROR.OUT","w")
-  ite = 0 # iteration counter
-  scf = scfclass(htmp) # create scf class
-  scf.nkgrid = nkp
-  scf.silent = silent
-  scf.mixing = mix
-  scf.mode = mode # store the mode
-  scf.g = g # coupling
-  scf.smearing = smearing
-  scf.energy_cutoff = energy_cutoff # energy_cutoff
-  scf.filling = filling # filling of the system
-#  scf.mf0 = old_mf # initial mean field
-  if type(mode) is type(dict()): # of mode is a dictionary add several interactions
-    print("Adding multiple interactions")
-    for key in mode:
-      scf.setup_interaction(g=mode[key],mode=key,**kwargs) # create the interaction matrices
-  else: # conventional way
-    scf.setup_interaction(g=g,mode=mode,**kwargs) # create the interaction matrices
-  if type(old_mf) is type(dict()): # of mode is a dictionary add several interactions
-    scf.mf = old_mf # initial mean field
-  else:
-    scf.mf[(0,0,0)] = old_mf # initial mean field
-#  scf.solve()
-  stop_scf = False # do not stop
-  scf.maxerror = maxerror
-#  print("BEGINNING OF BROYDEN")
-#  print("END OF BROYDEN")
-  while True: # infinite loop
-    scf.iterate() # do an iteration
-    if scf.hamiltonian.has_spin: 
-        scf.hamiltonian.write_magnetization() # write the magnetization
-    eout = scf.get_total_energy() # total energy
-    if not silent: print("Total energy",eout)
-#    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
-    ite = scf.iteration
-    file_etot.write(str(ite)+"    "+str(scf.get_total_energy())+"\n") 
-    file_error.write(str(ite)+"    "+str(scf.error)+"\n") # write energy in file
-    file_gap.write(str(ite)+"    "+str(scf.gap)+"\n") # write energy in file
-#    totcharge = np.sum(charge).real # total charge
-#    avcharge = totcharge/nat # average charge
-#    ######
-    if callback is not None: callback(scf.hamiltonian) # callback
-    if not silent:
-      print("\n")
-      print("Error in SCF =",scf.error)
-      print("Fermi energy =",scf.fermi)
-      print("Gap =",scf.gap)
-    if scf.error<maxerror or os.path.exists("STOP") or scf.iteration==maxite: 
-      stop_scf = True # stop the calculation after the next iteration
-      scf.mixing = 1.0 # last iteration with mixing one
-      scf.smearing = None # last iteration without smearing
-    if stop_scf: break # stop the calculation
-  if broyden: scf = meanfield.broyden_solver(scf)
-  if save: inout.save(scf.mf,mf_file) # save mean field
-  file_etot.close() # close file
-  file_error.close() # close file
-  file_gap.close() # close file
-  if scf.scfmode=="filling":  scf.hamiltonian.shift_fermi(-scf.fermi)
-  return scf # return mean field
+#
+#def selfconsistency(h,g=1.0,nkp = 100,filling=0.5,mix=0.2,
+#                  maxerror=1e-05,silent=False,mf=None,nk=None,
+#                  smearing=None,fermi_shift=0.0,save=True,
+#                  mode="Hubbard",energy_cutoff=None,maxite=1000,
+#                  broyden=False,callback=None,**kwargs):
+#  """ Solve a generalized selfcnsistent problem"""
+#  if nk is not None: nkp = nk # redefine
+#  mf_file = "MF.pkl"
+#  os.system("rm -f STOP") # remove stop file
+#  nat = h.intra.shape[0]//2 # number of atoms
+#  htmp = h.copy()  # copy hamiltonian
+#  htmp.turn_dense() # turn to dense Hamiltonian
+#  # generalate the necessary list of correlators
+#  if mf is None: # generate initial mean field
+#    try:  old_mf = inout.load(mf_file) # load the file
+#    except: old_mf = meanfield.guess(h,"random") # random guess
+#  else: old_mf = mf # use guess
+#  # get the pairs for the correlators
+#  ndim = h.intra.shape[0] # dimension
+#  totkp = nkp**(h.dimensionality) # total number of kpoints
+#  file_etot = open("SCF_ENERGY.OUT","w")
+#  file_gap = open("SCF_GAP.OUT","w")
+#  file_error = open("SCF_ERROR.OUT","w")
+#  ite = 0 # iteration counter
+#  scf = scfclass(htmp) # create scf class
+#  scf.nkgrid = nkp
+#  scf.silent = silent
+#  scf.mixing = mix
+#  scf.mode = mode # store the mode
+#  scf.g = g # coupling
+#  scf.smearing = smearing
+#  scf.energy_cutoff = energy_cutoff # energy_cutoff
+#  scf.filling = filling # filling of the system
+##  scf.mf0 = old_mf # initial mean field
+#  if type(mode) is type(dict()): # of mode is a dictionary add several interactions
+#    print("Adding multiple interactions")
+#    for key in mode:
+#      scf.setup_interaction(g=mode[key],mode=key,**kwargs) # create the interaction matrices
+#  else: # conventional way
+#    scf.setup_interaction(g=g,mode=mode,**kwargs) # create the interaction matrices
+#  if type(old_mf) is type(dict()): # of mode is a dictionary add several interactions
+#    scf.mf = old_mf # initial mean field
+#  else:
+#    scf.mf[(0,0,0)] = old_mf # initial mean field
+##  scf.solve()
+#  stop_scf = False # do not stop
+#  scf.maxerror = maxerror
+##  print("BEGINNING OF BROYDEN")
+##  print("END OF BROYDEN")
+#  while True: # infinite loop
+#    scf.iterate() # do an iteration
+#    if scf.hamiltonian.has_spin: 
+#        scf.hamiltonian.write_magnetization() # write the magnetization
+#    eout = scf.get_total_energy() # total energy
+#    if not silent: print("Total energy",eout)
+##    etot = np.sum(eoccs)/totkp + edc  # eigenvalues and double counting
+#    ite = scf.iteration
+#    file_etot.write(str(ite)+"    "+str(scf.get_total_energy())+"\n") 
+#    file_error.write(str(ite)+"    "+str(scf.error)+"\n") # write energy in file
+#    file_gap.write(str(ite)+"    "+str(scf.gap)+"\n") # write energy in file
+##    totcharge = np.sum(charge).real # total charge
+##    avcharge = totcharge/nat # average charge
+##    ######
+#    if callback is not None: callback(scf.hamiltonian) # callback
+#    if not silent:
+#      print("\n")
+#      print("Error in SCF =",scf.error)
+#      print("Fermi energy =",scf.fermi)
+#      print("Gap =",scf.gap)
+#    if scf.error<maxerror or os.path.exists("STOP") or scf.iteration==maxite: 
+#      stop_scf = True # stop the calculation after the next iteration
+#      scf.mixing = 1.0 # last iteration with mixing one
+#      scf.smearing = None # last iteration without smearing
+#    if stop_scf: break # stop the calculation
+#  if broyden: scf = meanfield.broyden_solver(scf)
+#  if save: inout.save(scf.mf,mf_file) # save mean field
+#  file_etot.close() # close file
+#  file_error.close() # close file
+#  file_gap.close() # close file
+#  if scf.scfmode=="filling":  scf.hamiltonian.shift_fermi(-scf.fermi)
+#  return scf # return mean field
 
 
 
@@ -589,6 +589,6 @@ def plain_expectation_value(self):
             self.interactions[i].vbv = vv[i][1]
 
 
-
-
+# workaround
+from .meanfield import Vinteraction as selfconsistency
 
