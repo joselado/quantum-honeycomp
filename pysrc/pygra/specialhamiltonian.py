@@ -56,15 +56,23 @@ def valence_TMDC(g=None,soc=0.0,**kwargs):
     return h # return the Hamiltonian
 
 
+def NbSe2(**kwargs):
+#    return TMDC_MX2(**kwargs,ts=[0.0263,0.099,-0.0014,-0.0112,-0.0146,0.0025])
+    return TMDC_MX2(**kwargs,ts=[0.026,0.1,-0.0014,-0.011,-0.015,0.003])
+#    return TMDC_MX2(**kwargs,ts=[0.3,2.,0.6,0.2,0.])
 
-def NbSe2(soc=0.0,cdw=0.0,g=None):
+def TaS2(**kwargs):
+    return TMDC_MX2(**kwargs,ts=[0.0263,0.099,-0.0014,-0.0112,-0.0146,0.0025])
+    #return TMDC_MX2(**kwargs,ts=[0.2,2.,0.6,0.2,0.])
+
+def TMDC_MX2(soc=0.0,cdw=0.0,g=None,ts=[1.0]):
     """Return the Hamiltonian of NbSe2"""
     if g is None: 
         g = geometry.triangular_lattice()  # triangular lattice
         if cdw!=0.0: g = g.supercell(3)
 #    ts = np.array([86.8,139.9,29.6,3.5,3.3])
 #    ts = np.array([46.,257.5,4.4,-15,6])
-    ts = np.array([0.3,2.,0.6,0.2,0.])
+    ts = np.array(ts)
     t = ts[0]/np.max(ts) # 1NN 
 #    ts[0] = 0.0 # set to zero
     ts = ts/np.max(ts) # normalize
