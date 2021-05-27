@@ -194,7 +194,7 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
         if i>0: # positive
           fo[j].write(str(epos[i-1])+"  ")
           for op in operator: # loop over operators
-            c = braket_wAw(wfpos[i-1],op).real # expectation value
+            c = op.braket(wfpos[i-1]).real # expectation value
             fo[j].write(str(c)+"  ") # write in file
           fo[j].write("\n") # write in file
           

@@ -234,7 +234,7 @@ class Hamiltonian():
   def read(self,output_file="hamiltonian.pkl"):
     """ Read the Hamiltonian"""
     return load(output_file) # read Hamiltonian
-  def load(self,**kwargs): self.read(**kwargs)
+  def load(self,**kwargs): return self.read(**kwargs)
   def get_total_energy(self,**kwargs):
     """ Get total energy of the system"""
     from .spectrum import total_energy

@@ -25,7 +25,7 @@ class Potential():
     def __rmul__(self,a): return self*a
     def __neg__(self): return (-1)*self
     def __sub__(self,a): return self + (-1)*a
-    def __rsub__(self,a): return self + (-1)*a
+    def __rsub__(self,a): return -self + a
     def __radd__(self,a): return self + a
     def __call__(self,r):
         return self.f(r)
