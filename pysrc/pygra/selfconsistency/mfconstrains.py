@@ -116,6 +116,6 @@ def enforce_constrains(mf,h,constrains=[]):
 
 def obj2mf(mf):
     from ..algebra import ismatrix
-    if ismatrix: return {(0,0,0):mf}
+    if ismatrix(mf): return {(0,0,0):mf}
     else: return mf
 

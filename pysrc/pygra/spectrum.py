@@ -157,7 +157,7 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
   kxout = []
   kyout = []
   if reciprocal: R = h.geometry.get_k2K() # get matrix
-  else:  R = np.matrix(np.identity(3)) # get identity
+  else:  R = np.array(np.identity(3)) # get identity
   # setup a reasonable value for delta
   # setup the operator
   operator = operator2list(operator) # convert into a list
@@ -166,11 +166,12 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
   for x in kxs:
     for y in kxs:
       print("Doing",x,y)
-      r = np.matrix([x,y,0.]).T # real space vectors
-      k = np.array((R*r).T)[0] # change of basis
+      r = np.array([x,y,0.]) # real space vectors
+      k = np.array(R)@r # change of basis
+      print(k)
       hk = hk_gen(k) # get hamiltonian
       if not h.is_sparse: evals,waves = lg.eigh(hk) # eigenvalues
-      else: evals,waves = slg.eigsh(hk,k=max(nindex)*2,sigma=0.0,
+      else: evals,waves = slg.eigsh(hk,k=max(np.abs(nindex))*2,sigma=0.0,
              tol=arpack_tol,which="LM") # eigenvalues
       waves = waves.transpose() # transpose
       epos,wfpos = [],[] # positive
@@ -187,8 +188,6 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
       wfneg = [yy for (xx,yy) in sorted(zip(-np.array(eneg),wfneg))] 
       epos = sorted(epos)
       eneg = -np.array(sorted(-np.array(eneg)))
-#      epos = sorted(evals[evals>0]) # positive energies
-#      eneg = -np.array(sorted(np.abs(evals[evals<0]))) # negative energies
       for (i,j) in zip(nindex,range(len(nindex))): # loop over desired bands
         fo[j].write(str(x)+"     "+str(y)+"   ")
         if i>0: # positive
@@ -201,7 +200,7 @@ def selected_bands2d(h,output_file="BANDS2D_",nindex=[-1,1],
         if i<0: # negative
           fo[j].write(str(eneg[abs(i)-1])+"\n")
           for op in operator: # loop over operators
-            c = braket_wAw(wfneg[abs(i)-1],op).real # expectation value
+            c = op.braket(wfpos[abs(i)-1]).real # expectation value
             fo[j].write(str(c)+"  ") # write in file
           fo[j].write("\n") # write in file
   [f.close() for f in fo] # close file
@@ -498,9 +497,5 @@ def lowest_energies(h,n=4,k=None,**kwargs):
     es = [y for (x,y) in sorted(zip(np.abs(es),es))][0:n]
     es = np.sort(es)
     return es
-
-
-
-
 
 
