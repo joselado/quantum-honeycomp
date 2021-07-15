@@ -15,7 +15,7 @@ class MultiHopping():
         elif type(a)==np.ndarray or issparse(a) or type(a)==np.matrix:
             dd = dict() ; dd[(0,0,0)] = a
             self.dict = dd
-        else: return NotImplemented
+        else: raise
     def __add__(self,a):
         if type(a)!=MultiHopping: return NotImplemented
         out = add_hopping_dict(self.dict,a.dict)

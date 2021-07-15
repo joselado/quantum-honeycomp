@@ -476,6 +476,12 @@ def bichain(n=1):
   return g
 
 
+def dimer():
+    """Geomtry of a dimer"""
+    g = bichain()
+    g.dimensionality = 0
+    return g
+
 
 
 

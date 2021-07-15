@@ -458,9 +458,11 @@ def identify_symmetry_breaking(h0,h,as_string=False,tol=1e-3):
     out = [] # empty list
     if dd.norm()>tol: # non-zero
         for s in symmetry_breaking: # loop over contributions
-            d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
-            proj = dd.dot(d0) # compute the projection
-            if np.abs(proj)>tol: out.append(s)
+            try:
+                d0 = MultiHopping(guess(h,s,fun=1.0)) # get this type
+                proj = dd.dot(d0) # compute the projection
+                if np.abs(proj)>tol: out.append(s)
+            except: pass
         h1 = h0.copy() # copy
         h1.set_multihopping(dd) # set the difference
         out += superconductivity.identify_superconductivity(h1,tol=tol) # check SC

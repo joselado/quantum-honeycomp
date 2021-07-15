@@ -136,7 +136,7 @@ def hamiltonian_spin_rotation(self,vector=np.array([0.,0.,1.]),angle=0.):
 
 
 def generate_spin_spiral(self,vector=np.array([0.,0.,1.]),
-                            qspiral=[1.,0.,0.],fractional=False):
+                            qspiral=[1.,0.,0.],fractional=True):
     """
     Generate a spin spiral antsaz in the Hamiltonian
     """

@@ -288,7 +288,9 @@ def generic_densitydensity(h0,mf=None,mix=0.1,v=None,nk=8,solver="plain",
     h1.nk = nk # store the number of kpoints
     if mf is None: # no mean field given
       try: 
-          if load_mf: mf = inout.load(mf_file) # load the file
+          if load_mf: 
+              mf = inout.load(mf_file) # load the file
+              MultiHopping(h0.get_dict()) + MultiHopping(mf) # see if compatible
           else: raise
       except: 
           mf = dict()
