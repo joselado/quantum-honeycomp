@@ -51,6 +51,7 @@ signals["crystal3d_pyqt"] = call_mode("3d",pyqt=True)
 signals["huge0d_pyqt"] = call_mode("huge_0d",pyqt=True)  
 signals["multilayergraphene"] = call_mode("multilayergraphene",pyqt=True)  
 signals["impurity_embedding"] = call_mode("impurity_embedding")  
+signals["tmdc"] = call_mode("tmdc")  
 
 
 
