@@ -5,6 +5,9 @@
 This program allows to perform tight binding calculations with a user friendly interface
 ![Alt text](screenshots/quantum_honeycomp.png?raw=true "Quantum Honeycomp System selection")
 
+A generic version of this program is called quantum-lattice, and can be downlaoded from
+[https://github.com/joselado/quantum-lattice](https://github.com/joselado/quantum-lattice)
+
 
 # How to install #
 

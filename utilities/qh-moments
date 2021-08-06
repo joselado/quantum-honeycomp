@@ -6,7 +6,7 @@
 
 
 
-lattice_color = (0,1,1) # color of the lattice
+lattice_color = (0.8,.8,0.6) # color of the lattice
 
 import os
 import sys
@@ -60,7 +60,7 @@ figure.scene.disable_render = True
 
 
 
-mag_factor = 2.0
+mag_factor = 1.5
 
 import numpy as np
 import sys
@@ -103,15 +103,19 @@ xyz = get_positions().transpose()
 
 
 
-def scale_mag(mag,threshold=0.001):
+def scale_mag(mag,threshold=1e-9):
   """ Scales the magnetism if bigger than a certain threhold"""
   mmag = mag.transpose()
   mm = np.array([im.dot(im) for im in mmag]) # norms square
   mm = np.sqrt(mm) # vector with norms
-  if max(mm)<threshold:  # if small do nothing
+  if np.max(mm)<threshold:  # if small do nothing
     return mag
   else:
-    return mag/max(mm)
+    mag = mag/np.max(mm) # set maaximum norm to 1
+    m2 = np.power(mm,3./4.)
+    m2 /= np.max(m2) # list of norms renormalized
+    mag = mag/m2 # renormalized length (for visualization purposes)
+    return mag
 
 
 
@@ -147,18 +151,14 @@ def create_lattice(xyz,dr=[0.,0.,0.],bold=False):
 
 
 def create_arrow(r,v,fac=2,res=20,op=1,col=(1,0,0)):
-   """
-     Draws an arrow starting at point r and with direction v
-     The size is tricky, and is controlled by the parameter fac...
-     ...good luck!
-     r & v: arra-like objects
-   """
+   """Create an arrow"""
    X = r[0]
    Y = r[1]
    Z = r[2]
    Vx = v[0]
    Vy = v[1]
    Vz = v[2]
+   vv = np.sqrt(Vx**2 + Vy**2 + Vz**2) # norm
    mlab.quiver3d(X,Y,Z,Vx,Vy,Vz,scale_factor=fac,
                  mode='arrow',
                  resolution=res,
